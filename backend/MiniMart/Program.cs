@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
 using MiniMart.Models;
+using MiniMart.Repositories.RepoInterface;
+using MiniMart.Repositories.RepoImplement;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +30,10 @@ builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
 builder.Services.AddControllers()
+
     .AddOData(options => options
         .Select()
         .Filter()
