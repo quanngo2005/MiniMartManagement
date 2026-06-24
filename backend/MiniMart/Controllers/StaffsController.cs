@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
@@ -10,7 +11,8 @@ namespace MiniMart.Controllers
 {
     [ApiController]
     [Route("api/staffs")]
-    public class StaffsController : ControllerBase
+    [Route("odata/staffs")]
+    public class StaffsController : ODataController
     {
         private readonly IEmployeeRepository _employeeRepository;
 

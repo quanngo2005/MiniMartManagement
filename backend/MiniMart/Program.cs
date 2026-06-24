@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // ── OData EDM Model ──────────────────────────────────────────────
 var odataBuilder = new ODataConventionModelBuilder();
 odataBuilder.EntitySet<Role>("Roles");
-odataBuilder.EntitySet<Employee>("Employees");
+odataBuilder.EntitySet<Employee>("staffs");
 odataBuilder.EntitySet<Customer>("Customers");
 odataBuilder.EntitySet<Supplier>("Suppliers");
 odataBuilder.EntitySet<Category>("Categories");
