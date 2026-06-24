@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MiniMart.Models;
 
@@ -42,6 +42,9 @@ namespace MiniMart.Data
         public DbSet<Receipt> Receipts { get; set; }
         public DbSet<ReceiptDetail> ReceiptDetails { get; set; }
         public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
+        public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<PromotionProduct> PromotionProducts { get; set; }
+        public DbSet<OrderPromotion> OrderPromotions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -144,6 +147,24 @@ namespace MiniMart.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =========================
+            // PROMOTION PRODUCT
+            // =========================
+            modelBuilder.Entity<PromotionProduct>()
+                .HasKey(pp => new { pp.PromotionId, pp.ProductId });
+
+            modelBuilder.Entity<PromotionProduct>()
+                .HasOne(pp => pp.Promotion)
+                .WithMany(p => p.PromotionProducts)
+                .HasForeignKey(pp => pp.PromotionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PromotionProduct>()
+                .HasOne(pp => pp.Product)
+                .WithMany(p => p.PromotionProducts)
+                .HasForeignKey(pp => pp.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // =========================
             // UNIQUE INDEX
             // =========================
             modelBuilder.Entity<Employee>().HasIndex(e => e.Username).IsUnique();
@@ -153,6 +174,23 @@ namespace MiniMart.Data
             modelBuilder.Entity<Customer>().HasIndex(c => c.PhoneNumber).IsUnique();
             modelBuilder.Entity<Supplier>().HasIndex(s => s.SupplierCode).IsUnique();
             modelBuilder.Entity<Category>().HasIndex(c => c.CategoryCode).IsUnique();
+
+            // =========================
+            // SEED DATA
+            // =========================
+            modelBuilder.Entity<Role>().HasData(DataSource.GetRoles());
+            modelBuilder.Entity<Employee>().HasData(DataSource.GetEmployees());
+            modelBuilder.Entity<Customer>().HasData(DataSource.GetCustomers());
+            modelBuilder.Entity<Supplier>().HasData(DataSource.GetSuppliers());
+            modelBuilder.Entity<Category>().HasData(DataSource.GetCategories());
+            modelBuilder.Entity<Product>().HasData(DataSource.GetProducts());
+            modelBuilder.Entity<Receipt>().HasData(DataSource.GetReceipts());
+            modelBuilder.Entity<Batch>().HasData(DataSource.GetBatches());
+            modelBuilder.Entity<ReceiptDetail>().HasData(DataSource.GetReceiptDetails());
+            modelBuilder.Entity<Shift>().HasData(DataSource.GetShifts());
+            modelBuilder.Entity<Order>().HasData(DataSource.GetOrders());
+            modelBuilder.Entity<OrderDetail>().HasData(DataSource.GetOrderDetails());
+            modelBuilder.Entity<InventoryTransaction>().HasData(DataSource.GetInventoryTransactions());
         }
     }
 }
