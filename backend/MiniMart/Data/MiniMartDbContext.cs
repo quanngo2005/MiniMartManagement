@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using MiniMart.Exceptions;
 using MiniMart.Models;
+using MiniMart.Models.Enums;
 
 namespace MiniMart.Data
 {
@@ -34,11 +36,16 @@ namespace MiniMart.Data
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Store> Stores { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Batch> Batches { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<PointTransaction> PointTransactions { get; set; }
+        public DbSet<OrderReturn> OrderReturns { get; set; }
+        public DbSet<OrderReturnDetail> OrderReturnDetails { get; set; }
         public DbSet<Receipt> Receipts { get; set; }
         public DbSet<ReceiptDetail> ReceiptDetails { get; set; }
         public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
@@ -46,6 +53,33 @@ namespace MiniMart.Data
         public DbSet<PromotionProduct> PromotionProducts { get; set; }
         public DbSet<OrderPromotion> OrderPromotions { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<TaxRate> TaxRates { get; set; }
+        public DbSet<EInvoice> EInvoices { get; set; }
+        public DbSet<EInvoiceDetail> EInvoiceDetails { get; set; }
+
+        public override int SaveChanges()
+        {
+            ValidatePromotionOverlaps();
+            return base.SaveChanges();
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            ValidatePromotionOverlaps();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            await ValidatePromotionOverlapsAsync(cancellationToken);
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            await ValidatePromotionOverlapsAsync(cancellationToken);
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -81,6 +115,19 @@ namespace MiniMart.Data
                 .HasForeignKey(s => s.CashierId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Shift>()
+                .HasOne(s => s.Store)
+                .WithMany(s => s.Shifts)
+                .HasForeignKey(s => s.StoreId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================
+            // STORE
+            // =========================
+            modelBuilder.Entity<Store>()
+                .Property(s => s.StoreName)
+                .HasMaxLength(255);
+
             // =========================
             // CATEGORY
             // =========================
@@ -89,6 +136,51 @@ namespace MiniMart.Data
                 .WithMany(c => c.ChildCategories)
                 .HasForeignKey(c => c.ParentCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.TaxRate)
+                .WithMany(t => t.Categories)
+                .HasForeignKey(c => c.TaxRateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Category>()
+                .Property(c => c.CategoryName)
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<TaxRate>()
+                .Property(t => t.Rate)
+                .HasColumnType("decimal(5,2)");
+
+            modelBuilder.Entity<TaxRate>()
+                .Property(t => t.Description)
+                .HasMaxLength(100);
+
+            // =========================
+            // SEARCHABLE LABEL BOUNDS
+            // =========================
+            modelBuilder.Entity<Role>()
+                .Property(r => r.RoleName)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Employee>()
+                .Property(e => e.FullName)
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.ProductName)
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<Supplier>()
+                .Property(s => s.SupplierName)
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<Supplier>()
+                .Property(s => s.ContactPerson)
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<Promotion>()
+                .Property(p => p.Name)
+                .HasMaxLength(255);
 
             // =========================
             // INVENTORY TRANSACTION
@@ -112,6 +204,24 @@ namespace MiniMart.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =========================
+            // POINT TRANSACTION
+            // =========================
+            modelBuilder.Entity<PointTransaction>()
+                .HasOne(pt => pt.Customer)
+                .WithMany(c => c.PointTransactions)
+                .HasForeignKey(pt => pt.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PointTransaction>()
+                .HasOne(pt => pt.Order)
+                .WithMany(o => o.PointTransactions)
+                .HasForeignKey(pt => pt.OrderId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<PointTransaction>()
+                .ToTable(t => t.HasCheckConstraint("CK_PointTransactions_TransactionType", "[TransactionType] IN (1,2,3,4)"));
+
+            // =========================
             // ORDER DETAIL
             // =========================
             modelBuilder.Entity<OrderDetail>()
@@ -125,6 +235,159 @@ namespace MiniMart.Data
                 .WithMany(p => p.OrderDetails)
                 .HasForeignKey(od => od.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderDetail>()
+                .Property(od => od.VatRate)
+                .HasColumnType("decimal(5,2)");
+
+            modelBuilder.Entity<OrderDetail>()
+                .Property(od => od.UnitPriceAfterDiscount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<OrderDetail>()
+                .Property(od => od.VatAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<OrderDetail>()
+                .Property(od => od.TotalWithVat)
+                .HasColumnType("decimal(18,2)");
+
+            // =========================
+            // ORDER
+            // =========================
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Store)
+                .WithMany(s => s.Orders)
+                .HasForeignKey(o => o.StoreId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Order>()
+                .ToTable(t => t.HasCheckConstraint("CK_Orders_PaymentMethod", "[PaymentMethod] IN (1,2,3,4,5,6)"));
+
+            // =========================
+            // PAYMENT
+            // =========================
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Order)
+                .WithMany(o => o.Payments)
+                .HasForeignKey(p => p.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Payment>()
+                .ToTable(t => t.HasCheckConstraint("CK_Payments_PaymentMethod", "[PaymentMethod] IN (1,2,3,4,5,6)"));
+
+            // =========================
+            // ORDER RETURN
+            // =========================
+            modelBuilder.Entity<OrderReturn>()
+                .HasOne(or => or.OriginalOrder)
+                .WithMany(o => o.OrderReturns)
+                .HasForeignKey(or => or.OriginalOrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderReturn>()
+                .HasOne(or => or.Employee)
+                .WithMany(e => e.OrderReturns)
+                .HasForeignKey(or => or.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderReturn>()
+                .HasOne(or => or.EInvoice)
+                .WithMany(ei => ei.OrderReturns)
+                .HasForeignKey(or => or.EInvoiceId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<OrderReturn>()
+                .Property(or => or.RefundAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<OrderReturn>()
+                .ToTable(t =>
+                {
+                    t.HasCheckConstraint("CK_OrderReturns_Status", "[Status] IN (1,2,3)");
+                    t.HasCheckConstraint("CK_OrderReturns_RefundMethod", "[RefundMethod] IN (1,2,3,4,5,6)");
+                });
+
+            modelBuilder.Entity<OrderReturnDetail>()
+                .HasOne(ord => ord.OrderReturn)
+                .WithMany(or => or.OrderReturnDetails)
+                .HasForeignKey(ord => ord.OrderReturnId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OrderReturnDetail>()
+                .HasOne(ord => ord.Product)
+                .WithMany(p => p.OrderReturnDetails)
+                .HasForeignKey(ord => ord.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderReturnDetail>()
+                .Property(ord => ord.UnitPrice)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<OrderReturnDetail>()
+                .Property(ord => ord.TotalPrice)
+                .HasColumnType("decimal(18,2)");
+
+            // =========================
+            // E-INVOICE
+            // =========================
+            modelBuilder.Entity<EInvoice>()
+                .HasOne(ei => ei.Order)
+                .WithMany(o => o.EInvoices)
+                .HasForeignKey(ei => ei.OrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<EInvoiceDetail>()
+                .HasOne(eid => eid.EInvoice)
+                .WithMany(ei => ei.EInvoiceDetails)
+                .HasForeignKey(eid => eid.EInvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<EInvoiceDetail>()
+                .HasOne(eid => eid.OrderDetail)
+                .WithMany(od => od.EInvoiceDetails)
+                .HasForeignKey(eid => eid.OrderDetailId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EInvoice>()
+                .Property(ei => ei.TotalBeforeVAT)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<EInvoice>()
+                .Property(ei => ei.VATAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<EInvoice>()
+                .Property(ei => ei.TotalAfterVAT)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<EInvoiceDetail>()
+                .Property(eid => eid.UnitPrice)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<EInvoiceDetail>()
+                .Property(eid => eid.DiscountAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<EInvoiceDetail>()
+                .Property(eid => eid.AmountBeforeVAT)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<EInvoiceDetail>()
+                .Property(eid => eid.VatRate)
+                .HasColumnType("decimal(5,2)");
+
+            modelBuilder.Entity<EInvoiceDetail>()
+                .Property(eid => eid.VatAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<EInvoiceDetail>()
+                .Property(eid => eid.AmountAfterVAT)
+                .HasColumnType("decimal(18,2)");
 
             // =========================
             // RECEIPT DETAIL
@@ -145,6 +408,12 @@ namespace MiniMart.Data
                 .HasOne(rd => rd.Batch)
                 .WithMany(b => b.ReceiptDetails)
                 .HasForeignKey(rd => rd.BatchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Receipt>()
+                .HasOne(r => r.Store)
+                .WithMany(s => s.Receipts)
+                .HasForeignKey(r => r.StoreId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =========================
@@ -202,10 +471,12 @@ namespace MiniMart.Data
             // =========================
             // SEED DATA
             // =========================
+            modelBuilder.Entity<TaxRate>().HasData(DataSource.GetTaxRates());
             modelBuilder.Entity<Role>().HasData(DataSource.GetRoles());
             modelBuilder.Entity<Employee>().HasData(DataSource.GetEmployees());
             modelBuilder.Entity<Customer>().HasData(DataSource.GetCustomers());
             modelBuilder.Entity<Supplier>().HasData(DataSource.GetSuppliers());
+            modelBuilder.Entity<Store>().HasData(DataSource.GetStores());
             modelBuilder.Entity<Category>().HasData(DataSource.GetCategories());
             modelBuilder.Entity<Product>().HasData(DataSource.GetProducts());
             modelBuilder.Entity<Receipt>().HasData(DataSource.GetReceipts());
@@ -216,5 +487,204 @@ namespace MiniMart.Data
             modelBuilder.Entity<OrderDetail>().HasData(DataSource.GetOrderDetails());
             modelBuilder.Entity<InventoryTransaction>().HasData(DataSource.GetInventoryTransactions());
         }
+
+        private void ValidatePromotionOverlaps()
+        {
+            var candidates = BuildPromotionGuardCandidates();
+            ValidatePendingPromotionOverlaps(candidates);
+
+            foreach (var candidate in candidates)
+            {
+                var conflictingPromotionName = Promotions
+                    .AsNoTracking()
+                    .Where(p => p.PromotionId != candidate.PromotionId
+                        && p.IsActive
+                        && p.Type == candidate.Type
+                        && p.StartDate < candidate.EndDate
+                        && p.EndDate > candidate.StartDate
+                        && p.PromotionProducts.Any(pp => candidate.ProductIds.Contains(pp.ProductId)))
+                    .Select(p => p.Name)
+                    .FirstOrDefault();
+
+                if (conflictingPromotionName is not null)
+                {
+                    ThrowPromotionOverlapException(candidate, conflictingPromotionName);
+                }
+            }
+        }
+
+        private async Task ValidatePromotionOverlapsAsync(CancellationToken cancellationToken)
+        {
+            var candidates = BuildPromotionGuardCandidates();
+            ValidatePendingPromotionOverlaps(candidates);
+
+            foreach (var candidate in candidates)
+            {
+                var conflictingPromotionName = await Promotions
+                    .AsNoTracking()
+                    .Where(p => p.PromotionId != candidate.PromotionId
+                        && p.IsActive
+                        && p.Type == candidate.Type
+                        && p.StartDate < candidate.EndDate
+                        && p.EndDate > candidate.StartDate
+                        && p.PromotionProducts.Any(pp => candidate.ProductIds.Contains(pp.ProductId)))
+                    .Select(p => p.Name)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (conflictingPromotionName is not null)
+                {
+                    ThrowPromotionOverlapException(candidate, conflictingPromotionName);
+                }
+            }
+        }
+
+        private List<PromotionGuardCandidate> BuildPromotionGuardCandidates()
+        {
+            var changedPromotionEntries = ChangeTracker.Entries<Promotion>()
+                .Where(e => e.State is EntityState.Added or EntityState.Modified)
+                .ToList();
+
+            var changedPromotionProductEntries = ChangeTracker.Entries<PromotionProduct>()
+                .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
+                .ToList();
+
+            var promotionsByKey = changedPromotionEntries
+                .Select(e => e.Entity)
+                .Where(p => p.PromotionId != 0)
+                .ToDictionary(p => p.PromotionId);
+
+            foreach (var entry in changedPromotionProductEntries)
+            {
+                var promotion = entry.Entity.Promotion;
+                if (promotion is not null && promotion.PromotionId != 0)
+                {
+                    promotionsByKey[promotion.PromotionId] = promotion;
+                }
+            }
+
+            var missingPromotionIds = changedPromotionProductEntries
+                .Select(e => e.Entity.PromotionId)
+                .Where(promotionId => promotionId != 0 && !promotionsByKey.ContainsKey(promotionId))
+                .Distinct()
+                .ToList();
+
+            foreach (var promotion in Promotions
+                .AsNoTracking()
+                .Where(p => missingPromotionIds.Contains(p.PromotionId)))
+            {
+                promotionsByKey[promotion.PromotionId] = promotion;
+            }
+
+            var candidates = changedPromotionEntries
+                .Select(e => e.Entity)
+                .Concat(promotionsByKey.Values.Where(p => changedPromotionEntries.All(e => e.Entity != p)))
+                .Distinct()
+                .Select(promotion =>
+                {
+                    var productIds = GetPromotionProductIds(promotion);
+                    ApplyPendingPromotionProductChanges(promotion, productIds, changedPromotionProductEntries);
+
+                    return new PromotionGuardCandidate(
+                        promotion.PromotionId,
+                        string.IsNullOrWhiteSpace(promotion.Name) ? "Promotion" : promotion.Name,
+                        promotion.Type,
+                        promotion.StartDate,
+                        promotion.EndDate,
+                        promotion.IsActive,
+                        productIds);
+                })
+                .Where(c => c.IsActive && c.ProductIds.Count > 0)
+                .ToList();
+
+            return candidates;
+        }
+
+        private HashSet<int> GetPromotionProductIds(Promotion promotion)
+        {
+            var productIds = promotion.PromotionProducts?
+                .Select(pp => pp.ProductId)
+                .Where(productId => productId != 0)
+                .ToHashSet() ?? new HashSet<int>();
+
+            if (promotion.PromotionId != 0)
+            {
+                foreach (var productId in PromotionProducts
+                    .AsNoTracking()
+                    .Where(pp => pp.PromotionId == promotion.PromotionId)
+                    .Select(pp => pp.ProductId))
+                {
+                    productIds.Add(productId);
+                }
+            }
+
+            return productIds;
+        }
+
+        private static void ApplyPendingPromotionProductChanges(
+            Promotion promotion,
+            HashSet<int> productIds,
+            IReadOnlyCollection<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<PromotionProduct>> changedEntries)
+        {
+            foreach (var entry in changedEntries)
+            {
+                var promotionProduct = entry.Entity;
+                var belongsToPromotion = promotionProduct.Promotion == promotion
+                    || promotionProduct.PromotionId == promotion.PromotionId
+                    || (promotion.PromotionId == 0 && promotionProduct.Promotion == promotion);
+
+                if (!belongsToPromotion || promotionProduct.ProductId == 0)
+                {
+                    continue;
+                }
+
+                if (entry.State == EntityState.Deleted)
+                {
+                    productIds.Remove(promotionProduct.ProductId);
+                }
+                else
+                {
+                    productIds.Add(promotionProduct.ProductId);
+                }
+            }
+        }
+
+        private static void ValidatePendingPromotionOverlaps(IReadOnlyList<PromotionGuardCandidate> candidates)
+        {
+            for (var i = 0; i < candidates.Count; i++)
+            {
+                for (var j = i + 1; j < candidates.Count; j++)
+                {
+                    var current = candidates[i];
+                    var other = candidates[j];
+                    var sameExistingPromotion = current.PromotionId != 0 && current.PromotionId == other.PromotionId;
+
+                    if (sameExistingPromotion
+                        || current.Type != other.Type
+                        || current.StartDate >= other.EndDate
+                        || current.EndDate <= other.StartDate
+                        || !current.ProductIds.Overlaps(other.ProductIds))
+                    {
+                        continue;
+                    }
+
+                    ThrowPromotionOverlapException(current, other.Name);
+                }
+            }
+        }
+
+        private static void ThrowPromotionOverlapException(PromotionGuardCandidate candidate, string conflictingPromotionName)
+        {
+            throw new DomainException(
+                $"Promotion '{candidate.Name}' overlaps with active promotion '{conflictingPromotionName}' for the same product and promotion type.");
+        }
+
+        private sealed record PromotionGuardCandidate(
+            int PromotionId,
+            string Name,
+            PromotionType Type,
+            DateTime StartDate,
+            DateTime EndDate,
+            bool IsActive,
+            HashSet<int> ProductIds);
     }
 }

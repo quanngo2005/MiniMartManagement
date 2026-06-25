@@ -57,6 +57,9 @@ namespace MiniMart.Models
         public ICollection<InventoryTransaction> InventoryTransactions { get; set; }
     = new List<InventoryTransaction>();
 
+        public ICollection<OrderReturn> OrderReturns { get; set; }
+            = new List<OrderReturn>();
+
         public ICollection<RefreshToken> RefreshTokens { get; set; }
             = new List<RefreshToken>();
     }

@@ -11,7 +11,7 @@ namespace MiniMart.Models
 
         public decimal SubTotal { get; set; }
 
-        public decimal Promotion { get; set; }
+        public decimal PromotionDiscount { get; set; }
 
         public decimal TaxAmount { get; set; }
 
@@ -33,6 +33,10 @@ namespace MiniMart.Models
 
         public Employee Employee { get; set; }
 
+        public int StoreId { get; set; }
+
+        public Store Store { get; set; }
+
         public int? CustomerId { get; set; }
 
         public Customer? Customer { get; set; }
@@ -41,5 +45,17 @@ namespace MiniMart.Models
 
         public ICollection<OrderDetail> OrderDetails { get; set; }
             = new List<OrderDetail>();
+
+        public ICollection<EInvoice> EInvoices { get; set; }
+            = new List<EInvoice>();
+
+        public ICollection<Payment> Payments { get; set; }
+            = new List<Payment>();
+
+        public ICollection<PointTransaction> PointTransactions { get; set; }
+            = new List<PointTransaction>();
+
+        public ICollection<OrderReturn> OrderReturns { get; set; }
+            = new List<OrderReturn>();
     }
 } 
