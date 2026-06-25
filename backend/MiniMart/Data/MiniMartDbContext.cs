@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MiniMart.Models;
 
@@ -198,6 +198,23 @@ namespace MiniMart.Data
             modelBuilder.Entity<Customer>().HasIndex(c => c.PhoneNumber).IsUnique();
             modelBuilder.Entity<Supplier>().HasIndex(s => s.SupplierCode).IsUnique();
             modelBuilder.Entity<Category>().HasIndex(c => c.CategoryCode).IsUnique();
+
+            // =========================
+            // SEED DATA
+            // =========================
+            modelBuilder.Entity<Role>().HasData(DataSource.GetRoles());
+            modelBuilder.Entity<Employee>().HasData(DataSource.GetEmployees());
+            modelBuilder.Entity<Customer>().HasData(DataSource.GetCustomers());
+            modelBuilder.Entity<Supplier>().HasData(DataSource.GetSuppliers());
+            modelBuilder.Entity<Category>().HasData(DataSource.GetCategories());
+            modelBuilder.Entity<Product>().HasData(DataSource.GetProducts());
+            modelBuilder.Entity<Receipt>().HasData(DataSource.GetReceipts());
+            modelBuilder.Entity<Batch>().HasData(DataSource.GetBatches());
+            modelBuilder.Entity<ReceiptDetail>().HasData(DataSource.GetReceiptDetails());
+            modelBuilder.Entity<Shift>().HasData(DataSource.GetShifts());
+            modelBuilder.Entity<Order>().HasData(DataSource.GetOrders());
+            modelBuilder.Entity<OrderDetail>().HasData(DataSource.GetOrderDetails());
+            modelBuilder.Entity<InventoryTransaction>().HasData(DataSource.GetInventoryTransactions());
         }
     }
 }

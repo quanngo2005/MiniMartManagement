@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniMart.Data;
 
@@ -11,9 +12,11 @@ using MiniMart.Data;
 namespace MiniMart.Migrations
 {
     [DbContext(typeof(MiniMartDbContext))]
-    partial class MiniMartDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260624085204_SeedInitialData")]
+    partial class SeedInitialData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -798,9 +801,6 @@ namespace MiniMart.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FailedLoginAttempts")
-                        .HasColumnType("int");
-
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -809,15 +809,6 @@ namespace MiniMart.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("HireDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastFailedLoginAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LockoutEnd")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("PasswordChangedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PasswordHash")
@@ -1876,32 +1867,6 @@ namespace MiniMart.Migrations
                     b.ToTable("OrderPromotions");
                 });
 
-            modelBuilder.Entity("MiniMart.Models.OrderPromotion", b =>
-                {
-                    b.Property<int>("OrderPromotionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderPromotionId"));
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PromotionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderPromotionId");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("PromotionId");
-
-                    b.ToTable("OrderPromotions");
-                });
-
             modelBuilder.Entity("MiniMart.Models.Product", b =>
                 {
                     b.Property<int>("ProductId")
@@ -2746,71 +2711,6 @@ namespace MiniMart.Migrations
                     b.ToTable("PromotionProducts");
                 });
 
-            modelBuilder.Entity("MiniMart.Models.Promotion", b =>
-                {
-                    b.Property<int>("PromotionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PromotionId"));
-
-                    b.Property<int?>("BuyQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("DiscountPercent")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("GiftProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("GiftQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("MinOrderValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("PromotionId");
-
-                    b.HasIndex("GiftProductId");
-
-                    b.ToTable("Promotions");
-                });
-
-            modelBuilder.Entity("MiniMart.Models.PromotionProduct", b =>
-                {
-                    b.Property<int>("PromotionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PromotionId", "ProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("PromotionProducts");
-                });
-
             modelBuilder.Entity("MiniMart.Models.Receipt", b =>
                 {
                     b.Property<int>("ReceiptId")
@@ -3116,59 +3016,6 @@ namespace MiniMart.Migrations
                             ReceiptId = 5,
                             TotalPrice = 6050000m
                         });
-                });
-
-            modelBuilder.Entity("MiniMart.Models.RefreshToken", b =>
-                {
-                    b.Property<int>("RefreshTokenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RefreshTokenId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeviceName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReplacedByTokenHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TokenFamilyId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserAgent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("RefreshTokenId");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
-
-                    b.HasIndex("EmployeeId", "TokenFamilyId");
-
-                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Role", b =>
@@ -3660,7 +3507,7 @@ namespace MiniMart.Migrations
                     b.HasOne("MiniMart.Models.Product", "Product")
                         .WithMany("PromotionProducts")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MiniMart.Models.Promotion", "Promotion")
@@ -3719,17 +3566,6 @@ namespace MiniMart.Migrations
                     b.Navigation("Receipt");
                 });
 
-            modelBuilder.Entity("MiniMart.Models.RefreshToken", b =>
-                {
-                    b.HasOne("MiniMart.Models.Employee", "Employee")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
             modelBuilder.Entity("MiniMart.Models.Shift", b =>
                 {
                     b.HasOne("MiniMart.Models.Employee", "Cashier")
@@ -3778,8 +3614,6 @@ namespace MiniMart.Migrations
                     b.Navigation("Orders");
 
                     b.Navigation("Receipts");
-
-                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Order", b =>
