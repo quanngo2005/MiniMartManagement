@@ -111,6 +111,15 @@ namespace MiniMart.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =========================
+            // ORDER - SHIFT
+            // =========================
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Shift)
+                .WithMany(s => s.Orders)
+                .HasForeignKey(o => o.ShiftId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================
             // ORDER DETAIL
             // =========================
             modelBuilder.Entity<OrderDetail>()
