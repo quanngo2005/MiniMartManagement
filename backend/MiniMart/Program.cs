@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
+using MiniMart.Extensions;
+using MiniMart.Middleware;
 using MiniMart.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,10 +43,13 @@ builder.Services.AddControllers()
 // ── Swagger ───────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMiniMartAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
 // ── Pipeline ──────────────────────────────────────────────────────
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -59,6 +64,8 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseMiddleware<CsrfMiddleware>();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

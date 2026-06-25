@@ -1,0 +1,9 @@
+[mcp_servers.code-review-graph]
+command = "uvx"
+args = [
+    "code-review-graph",
+    "serve",
+]
+
+[mcp_servers.code-review-graph.tools.build_or_update_graph_tool]
+approval_mode = "approve"

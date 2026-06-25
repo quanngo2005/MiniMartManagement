@@ -42,6 +42,10 @@ namespace MiniMart.Data
         public DbSet<Receipt> Receipts { get; set; }
         public DbSet<ReceiptDetail> ReceiptDetails { get; set; }
         public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
+        public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<PromotionProduct> PromotionProducts { get; set; }
+        public DbSet<OrderPromotion> OrderPromotions { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -144,10 +148,51 @@ namespace MiniMart.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =========================
+            // PROMOTION PRODUCT
+            // =========================
+            modelBuilder.Entity<PromotionProduct>()
+                .HasKey(pp => new { pp.PromotionId, pp.ProductId });
+
+            modelBuilder.Entity<PromotionProduct>()
+                .HasOne(pp => pp.Promotion)
+                .WithMany(p => p.PromotionProducts)
+                .HasForeignKey(pp => pp.PromotionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PromotionProduct>()
+                .HasOne(pp => pp.Product)
+                .WithMany(p => p.PromotionProducts)
+                .HasForeignKey(pp => pp.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderPromotion>()
+                .HasOne(op => op.Order)
+                .WithMany(o => o.OrderPromotions)
+                .HasForeignKey(op => op.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OrderPromotion>()
+                .HasOne(op => op.Promotion)
+                .WithMany(p => p.OrderPromotions)
+                .HasForeignKey(op => op.PromotionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // =========================
+            // REFRESH TOKEN
+            // =========================
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.Employee)
+                .WithMany(e => e.RefreshTokens)
+                .HasForeignKey(rt => rt.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // =========================
             // UNIQUE INDEX
             // =========================
             modelBuilder.Entity<Employee>().HasIndex(e => e.Username).IsUnique();
             modelBuilder.Entity<Employee>().HasIndex(e => e.PhoneNumber).IsUnique();
+            modelBuilder.Entity<RefreshToken>().HasIndex(rt => rt.TokenHash).IsUnique();
+            modelBuilder.Entity<RefreshToken>().HasIndex(rt => new { rt.EmployeeId, rt.TokenFamilyId });
             modelBuilder.Entity<Product>().HasIndex(p => p.ProductCode).IsUnique();
             modelBuilder.Entity<Product>().HasIndex(p => p.Barcode).IsUnique();
             modelBuilder.Entity<Customer>().HasIndex(c => c.PhoneNumber).IsUnique();

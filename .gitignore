@@ -54,3 +54,5 @@ TestResult.xml
 nunit-*.xml
 /.gemini
 /.vs
+*.db-shm
+/backend/.vs
