@@ -30,6 +30,10 @@ namespace MiniMart.Models
 
         public Employee Employee { get; set; }
 
+        public int StoreId { get; set; }
+
+        public Store Store { get; set; }
+
         public ICollection<ReceiptDetail> ReceiptDetails { get; set; }
             = new List<ReceiptDetail>();
 

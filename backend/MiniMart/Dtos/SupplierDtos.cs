@@ -14,8 +14,6 @@ namespace MiniMart.DTOs
         public string? BankName { get; set; }
         public string? Description { get; set; }
         public bool Status { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
     public class CreateSupplierDto

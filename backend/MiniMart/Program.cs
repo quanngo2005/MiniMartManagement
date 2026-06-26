@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
+using MiniMart.Extensions;
+using MiniMart.Middleware;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Repositories.RepoImplement;
@@ -14,11 +16,19 @@ odataBuilder.EntitySet<Role>("Roles");
 odataBuilder.EntitySet<Employee>("staffs");
 odataBuilder.EntitySet<Customer>("Customers");
 odataBuilder.EntitySet<Supplier>("Suppliers");
+odataBuilder.EntitySet<Store>("Stores");
 odataBuilder.EntitySet<Category>("Categories");
 odataBuilder.EntitySet<Product>("Products");
 odataBuilder.EntitySet<Batch>("Batches");
 odataBuilder.EntitySet<Order>("Orders");
 odataBuilder.EntitySet<OrderDetail>("OrderDetails");
+odataBuilder.EntitySet<Payment>("Payments");
+odataBuilder.EntitySet<PointTransaction>("PointTransactions");
+odataBuilder.EntitySet<OrderReturn>("OrderReturns");
+odataBuilder.EntitySet<OrderReturnDetail>("OrderReturnDetails");
+odataBuilder.EntitySet<TaxRate>("TaxRates");
+odataBuilder.EntitySet<EInvoice>("EInvoices");
+odataBuilder.EntitySet<EInvoiceDetail>("EInvoiceDetails");
 odataBuilder.EntitySet<Receipt>("Receipts");
 odataBuilder.EntitySet<ReceiptDetail>("ReceiptDetails");
 odataBuilder.EntitySet<Shift>("Shifts");
@@ -46,10 +56,13 @@ builder.Services.AddControllers()
 // ── Swagger ───────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMiniMartAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
 // ── Pipeline ──────────────────────────────────────────────────────
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -64,6 +77,8 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseMiddleware<CsrfMiddleware>();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

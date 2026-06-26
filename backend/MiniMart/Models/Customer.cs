@@ -24,5 +24,8 @@ namespace MiniMart.Models
 
         public ICollection<Order> Orders { get; set; }
             = new List<Order>();
+
+        public ICollection<PointTransaction> PointTransactions { get; set; }
+            = new List<PointTransaction>();
     }
 }

@@ -12,8 +12,6 @@ namespace MiniMart.DTOs
         public bool Status { get; set; }
         public int ProductId { get; set; }
         public int ReceiptId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
     public class CreateBatchDto

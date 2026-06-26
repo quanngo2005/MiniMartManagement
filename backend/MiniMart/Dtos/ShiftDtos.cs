@@ -16,9 +16,8 @@ namespace MiniMart.DTOs
         public string? Note { get; set; }
         public DateTime? ClosedAt { get; set; }
         public int EmployeeId { get; set; }
+        public int StoreId { get; set; }
         public int? CashierId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
     public class CreateShiftDto
@@ -34,6 +33,7 @@ namespace MiniMart.DTOs
         public string? Note { get; set; }
         public DateTime? ClosedAt { get; set; }
         public int EmployeeId { get; set; }
+        public int StoreId { get; set; }
         public int? CashierId { get; set; }
     }
 
@@ -50,6 +50,7 @@ namespace MiniMart.DTOs
         public string? Note { get; set; }
         public DateTime? ClosedAt { get; set; }
         public int EmployeeId { get; set; }
+        public int StoreId { get; set; }
         public int? CashierId { get; set; }
     }
 }

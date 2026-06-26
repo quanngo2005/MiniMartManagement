@@ -31,6 +31,10 @@ namespace MiniMart.Models
 
         public Employee Employee { get; set; }
 
+        public int StoreId { get; set; }
+
+        public Store Store { get; set; }
+
         public int? CashierId { get; set; }
 
         public Employee? Cashier { get; set; }

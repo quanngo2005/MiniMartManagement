@@ -23,6 +23,14 @@ namespace MiniMart.Models
 
         public string PasswordHash { get; set; }
 
+        public int FailedLoginAttempts { get; set; }
+
+        public DateTime? LockoutEnd { get; set; }
+
+        public DateTime? LastFailedLoginAt { get; set; }
+
+        public DateTime? PasswordChangedAt { get; set; }
+
         public decimal Salary { get; set; }
 
         public DateTime HireDate { get; set; }
@@ -48,5 +56,11 @@ namespace MiniMart.Models
             = new List<Shift>();
         public ICollection<InventoryTransaction> InventoryTransactions { get; set; }
     = new List<InventoryTransaction>();
+
+        public ICollection<OrderReturn> OrderReturns { get; set; }
+            = new List<OrderReturn>();
+
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
+            = new List<RefreshToken>();
     }
 }
