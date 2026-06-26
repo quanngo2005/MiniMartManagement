@@ -13,8 +13,6 @@ namespace MiniMart.DTOs
         public PaymentMethod RefundMethod { get; set; }
         public int? EInvoiceId { get; set; }
         public OrderReturnStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
     public class OrderReturnDetailDto

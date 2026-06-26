@@ -17,8 +17,6 @@ namespace MiniMart.DTOs
         public string? Avatar { get; set; }
         public EmployeeStatus Status { get; set; }
         public int RoleId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
     public class CreateEmployeeDto

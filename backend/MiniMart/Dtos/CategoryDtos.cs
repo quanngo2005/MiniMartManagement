@@ -11,8 +11,6 @@ namespace MiniMart.DTOs
         public int DisplayOrder { get; set; }
         public int? ParentCategoryId { get; set; }
         public int TaxRateId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
     public class CreateCategoryDto

@@ -7,3 +7,4 @@
 - [Phase 2 core architecture cleanup](phase2-core-cleanup.md) - store ownership, promotion discount rename, stock trigger, payment constraint, and searchable label bounds.
 - [Phase 3 operational tables](phase3-operational-tables.md) - payments, point transactions, order returns, return inventory references, and minimum stock thresholds.
 - [Phase 4 promotion overlap guard](phase4-promotion-overlap-guard.md) - SaveChanges validation that rejects overlapping active promotions for the same product and promotion type.
+- [Package architecture](package-architecture.md) - package-level structure and current runtime dependency direction.

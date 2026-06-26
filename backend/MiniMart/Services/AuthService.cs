@@ -274,7 +274,7 @@ namespace MiniMart.Services
         {
             var tokensToRevoke = await _dbContext.RefreshTokens
                 .Where(rt => rt.EmployeeId == employeeId && rt.RevokedAt == null && rt.ExpiresAt > DateTime.UtcNow)
-                .OrderByDescending(rt => rt.CreatedAt)
+                .OrderByDescending(rt => rt.RefreshTokenId)
                 .Skip(MaxActiveDevices)
                 .ToListAsync();
 

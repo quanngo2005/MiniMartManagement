@@ -11,7 +11,5 @@ namespace MiniMart.DTOs
         public int Delta { get; set; }
         public int BalanceAfter { get; set; }
         public string? Note { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 }

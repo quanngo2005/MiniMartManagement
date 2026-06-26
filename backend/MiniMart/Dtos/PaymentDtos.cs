@@ -10,7 +10,5 @@ namespace MiniMart.DTOs
         public decimal Amount { get; set; }
         public string? TransactionRef { get; set; }
         public DateTime PaidAt { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 }
