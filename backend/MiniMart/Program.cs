@@ -5,13 +5,15 @@ using MiniMart.Data;
 using MiniMart.Extensions;
 using MiniMart.Middleware;
 using MiniMart.Models;
+using MiniMart.Repositories.RepoInterface;
+using MiniMart.Repositories.RepoImplement;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ── OData EDM Model ──────────────────────────────────────────────
 var odataBuilder = new ODataConventionModelBuilder();
 odataBuilder.EntitySet<Role>("Roles");
-odataBuilder.EntitySet<Employee>("Employees");
+odataBuilder.EntitySet<Employee>("staffs");
 odataBuilder.EntitySet<Customer>("Customers");
 odataBuilder.EntitySet<Supplier>("Suppliers");
 odataBuilder.EntitySet<Store>("Stores");
@@ -38,7 +40,10 @@ builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
 builder.Services.AddControllers()
+
     .AddOData(options => options
         .Select()
         .Filter()
