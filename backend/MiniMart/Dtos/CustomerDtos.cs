@@ -9,7 +9,6 @@ namespace MiniMart.DTOs
         public string? Email { get; set; }
         public string? Address { get; set; }
         public int Point { get; set; }
-        public decimal TotalSpent { get; set; }
         public bool CustomerStatus { get; set; }
     }
 
@@ -21,7 +20,6 @@ namespace MiniMart.DTOs
         public string? Email { get; set; }
         public string? Address { get; set; }
         public int Point { get; set; }
-        public decimal TotalSpent { get; set; }
         public bool CustomerStatus { get; set; }
     }
 
@@ -33,7 +31,6 @@ namespace MiniMart.DTOs
         public string? Email { get; set; }
         public string? Address { get; set; }
         public int Point { get; set; }
-        public decimal TotalSpent { get; set; }
         public bool CustomerStatus { get; set; }
     }
 }

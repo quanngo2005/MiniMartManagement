@@ -4,9 +4,9 @@ namespace MiniMart.Services
 {
     public interface IAuthService
     {
-        Task<(AuthResponse Response, TokenPair Tokens)> LoginAsync(LoginRequest request, string? ipAddress, string? userAgent);
+        Task<(AuthResponse Response, TokenPair Tokens)> LoginAsync(LoginRequest request);
 
-        Task<(AuthResponse Response, TokenPair Tokens)> RefreshTokenAsync(string refreshToken, string? ipAddress, string? userAgent);
+        Task<(AuthResponse Response, TokenPair Tokens)> RefreshTokenAsync(string refreshToken);
 
         Task LogoutAsync(string refreshToken);
 

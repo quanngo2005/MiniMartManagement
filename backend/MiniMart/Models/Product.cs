@@ -39,8 +39,6 @@ namespace MiniMart.Models
 
         public ICollection<OrderDetail> OrderDetails { get; set; }
             = new List<OrderDetail>();
-        public ICollection<ReceiptDetail> ReceiptDetails { get; set; }
-    = new List<ReceiptDetail>();
 
         public ICollection<InventoryTransaction> InventoryTransactions { get; set; }
             = new List<InventoryTransaction>();

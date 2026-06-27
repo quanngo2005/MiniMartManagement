@@ -36,8 +36,6 @@ namespace MiniMart.Repositories.RepoImplement
 
         public async Task<Employee> CreateEmployeeAsync(Employee employee)
         {
-            employee.CreatedAt = DateTime.Now;
-            employee.UpdatedAt = null;
             await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
             return employee;
@@ -66,7 +64,6 @@ namespace MiniMart.Repositories.RepoImplement
             existing.Avatar = employee.Avatar;
             existing.Status = employee.Status;
             existing.RoleId = employee.RoleId;
-            existing.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             return existing;
@@ -78,7 +75,6 @@ namespace MiniMart.Repositories.RepoImplement
             if (employee == null) return false;
 
             employee.Status = EmployeeStatus.Inactive;
-            employee.UpdatedAt = DateTime.Now;
             await _context.SaveChangesAsync();
             return true;
         }

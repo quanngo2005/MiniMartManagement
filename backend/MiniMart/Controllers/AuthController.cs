@@ -39,7 +39,7 @@ namespace MiniMart.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<ApiResponse<AuthResponse>>> Login(LoginRequest request)
         {
-            var (response, tokens) = await _authService.LoginAsync(request, GetIpAddress(), Request.Headers.UserAgent.FirstOrDefault());
+            var (response, tokens) = await _authService.LoginAsync(request);
             SetTokenCookies(tokens);
             return Ok(ApiResponse<AuthResponse>.Ok(response, "Login successful."));
         }
@@ -53,7 +53,7 @@ namespace MiniMart.Controllers
                 return Unauthorized(ApiResponse<object>.Fail("Refresh token is missing."));
             }
 
-            var (response, tokens) = await _authService.RefreshTokenAsync(refreshToken, GetIpAddress(), Request.Headers.UserAgent.FirstOrDefault());
+            var (response, tokens) = await _authService.RefreshTokenAsync(refreshToken);
             SetTokenCookies(tokens);
             return Ok(ApiResponse<AuthResponse>.Ok(response, "Token refreshed."));
         }
@@ -147,9 +147,5 @@ namespace MiniMart.Controllers
             return int.TryParse(employeeId, out var id) ? id : 0;
         }
 
-        private string? GetIpAddress()
-        {
-            return HttpContext.Connection.RemoteIpAddress?.ToString();
-        }
     }
 }

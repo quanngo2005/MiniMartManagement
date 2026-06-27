@@ -24,11 +24,7 @@
 
         public decimal VatRate { get; set; }
 
-        public decimal UnitPriceAfterDiscount { get; set; }
-
         public decimal VatAmount { get; set; }
-
-        public decimal TotalWithVat { get; set; }
 
         public ICollection<EInvoiceDetail> EInvoiceDetails { get; set; }
             = new List<EInvoiceDetail>();

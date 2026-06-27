@@ -36,7 +36,7 @@ namespace MiniMart.Data
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
-        public DbSet<Store> Stores { get; set; }
+
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Batch> Batches { get; set; }
@@ -47,11 +47,9 @@ namespace MiniMart.Data
         public DbSet<OrderReturn> OrderReturns { get; set; }
         public DbSet<OrderReturnDetail> OrderReturnDetails { get; set; }
         public DbSet<Receipt> Receipts { get; set; }
-        public DbSet<ReceiptDetail> ReceiptDetails { get; set; }
         public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<PromotionProduct> PromotionProducts { get; set; }
-        public DbSet<OrderPromotion> OrderPromotions { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<TaxRate> TaxRates { get; set; }
         public DbSet<EInvoice> EInvoices { get; set; }
@@ -114,19 +112,6 @@ namespace MiniMart.Data
                 .WithMany(e => e.CashierShifts)
                 .HasForeignKey(s => s.CashierId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Shift>()
-                .HasOne(s => s.Store)
-                .WithMany(s => s.Shifts)
-                .HasForeignKey(s => s.StoreId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // =========================
-            // STORE
-            // =========================
-            modelBuilder.Entity<Store>()
-                .Property(s => s.StoreName)
-                .HasMaxLength(255);
 
             // =========================
             // CATEGORY
@@ -241,28 +226,13 @@ namespace MiniMart.Data
                 .HasColumnType("decimal(5,2)");
 
             modelBuilder.Entity<OrderDetail>()
-                .Property(od => od.UnitPriceAfterDiscount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<OrderDetail>()
                 .Property(od => od.VatAmount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<OrderDetail>()
-                .Property(od => od.TotalWithVat)
                 .HasColumnType("decimal(18,2)");
 
             // =========================
             // ORDER
             // =========================
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Store)
-                .WithMany(s => s.Orders)
-                .HasForeignKey(o => o.StoreId)
-                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Order>()
-                .ToTable(t => t.HasCheckConstraint("CK_Orders_PaymentMethod", "[PaymentMethod] IN (1,2,3,4,5,6)"));
 
             // =========================
             // PAYMENT
@@ -390,33 +360,6 @@ namespace MiniMart.Data
                 .HasColumnType("decimal(18,2)");
 
             // =========================
-            // RECEIPT DETAIL
-            // =========================
-            modelBuilder.Entity<ReceiptDetail>()
-                .HasOne(rd => rd.Receipt)
-                .WithMany(r => r.ReceiptDetails)
-                .HasForeignKey(rd => rd.ReceiptId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<ReceiptDetail>()
-                .HasOne(rd => rd.Product)
-                .WithMany(p => p.ReceiptDetails)
-                .HasForeignKey(rd => rd.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ReceiptDetail>()
-                .HasOne(rd => rd.Batch)
-                .WithMany(b => b.ReceiptDetails)
-                .HasForeignKey(rd => rd.BatchId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Receipt>()
-                .HasOne(r => r.Store)
-                .WithMany(s => s.Receipts)
-                .HasForeignKey(r => r.StoreId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // =========================
             // PROMOTION PRODUCT
             // =========================
             modelBuilder.Entity<PromotionProduct>()
@@ -434,18 +377,6 @@ namespace MiniMart.Data
                 .HasForeignKey(pp => pp.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<OrderPromotion>()
-                .HasOne(op => op.Order)
-                .WithMany(o => o.OrderPromotions)
-                .HasForeignKey(op => op.OrderId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<OrderPromotion>()
-                .HasOne(op => op.Promotion)
-                .WithMany(p => p.OrderPromotions)
-                .HasForeignKey(op => op.PromotionId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             // =========================
             // REFRESH TOKEN
             // =========================
@@ -461,7 +392,6 @@ namespace MiniMart.Data
             modelBuilder.Entity<Employee>().HasIndex(e => e.Username).IsUnique();
             modelBuilder.Entity<Employee>().HasIndex(e => e.PhoneNumber).IsUnique();
             modelBuilder.Entity<RefreshToken>().HasIndex(rt => rt.TokenHash).IsUnique();
-            modelBuilder.Entity<RefreshToken>().HasIndex(rt => new { rt.EmployeeId, rt.TokenFamilyId });
             modelBuilder.Entity<Product>().HasIndex(p => p.ProductCode).IsUnique();
             modelBuilder.Entity<Product>().HasIndex(p => p.Barcode).IsUnique();
             modelBuilder.Entity<Customer>().HasIndex(c => c.PhoneNumber).IsUnique();
@@ -476,12 +406,10 @@ namespace MiniMart.Data
             modelBuilder.Entity<Employee>().HasData(DataSource.GetEmployees());
             modelBuilder.Entity<Customer>().HasData(DataSource.GetCustomers());
             modelBuilder.Entity<Supplier>().HasData(DataSource.GetSuppliers());
-            modelBuilder.Entity<Store>().HasData(DataSource.GetStores());
             modelBuilder.Entity<Category>().HasData(DataSource.GetCategories());
             modelBuilder.Entity<Product>().HasData(DataSource.GetProducts());
             modelBuilder.Entity<Receipt>().HasData(DataSource.GetReceipts());
             modelBuilder.Entity<Batch>().HasData(DataSource.GetBatches());
-            modelBuilder.Entity<ReceiptDetail>().HasData(DataSource.GetReceiptDetails());
             modelBuilder.Entity<Shift>().HasData(DataSource.GetShifts());
             modelBuilder.Entity<Order>().HasData(DataSource.GetOrders());
             modelBuilder.Entity<OrderDetail>().HasData(DataSource.GetOrderDetails());

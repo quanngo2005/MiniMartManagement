@@ -9,6 +9,8 @@ namespace MiniMart.DTOs
         public decimal ImportPrice { get; set; }
         public int QuantityImported { get; set; }
         public int QuantityRemaining { get; set; }
+        public int Quantity { get; set; }
+        public decimal TotalPrice { get; set; }
         public bool Status { get; set; }
         public int ProductId { get; set; }
         public int ReceiptId { get; set; }
@@ -22,6 +24,8 @@ namespace MiniMart.DTOs
         public decimal ImportPrice { get; set; }
         public int QuantityImported { get; set; }
         public int QuantityRemaining { get; set; }
+        public int Quantity { get; set; }
+        public decimal TotalPrice { get; set; }
         public bool Status { get; set; }
         public int ProductId { get; set; }
         public int ReceiptId { get; set; }
@@ -35,6 +39,8 @@ namespace MiniMart.DTOs
         public decimal ImportPrice { get; set; }
         public int QuantityImported { get; set; }
         public int QuantityRemaining { get; set; }
+        public int Quantity { get; set; }
+        public decimal TotalPrice { get; set; }
         public bool Status { get; set; }
         public int ProductId { get; set; }
         public int ReceiptId { get; set; }
