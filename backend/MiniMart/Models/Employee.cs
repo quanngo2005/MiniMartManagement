@@ -27,10 +27,6 @@ namespace MiniMart.Models
 
         public DateTime? LockoutEnd { get; set; }
 
-        public DateTime? LastFailedLoginAt { get; set; }
-
-        public DateTime? PasswordChangedAt { get; set; }
-
         public decimal Salary { get; set; }
 
         public DateTime HireDate { get; set; }

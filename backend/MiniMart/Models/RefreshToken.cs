@@ -12,16 +12,6 @@ namespace MiniMart.Models
 
         public DateTime? RevokedAt { get; set; }
 
-        public string? ReplacedByTokenHash { get; set; }
-
-        public string TokenFamilyId { get; set; } = string.Empty;
-
-        public string? DeviceName { get; set; }
-
-        public string? IpAddress { get; set; }
-
-        public string? UserAgent { get; set; }
-
         public int EmployeeId { get; set; }
 
         public Employee Employee { get; set; } = null!;

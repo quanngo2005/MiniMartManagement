@@ -30,7 +30,7 @@ namespace MiniMart.Services
             _jwtSettings = jwtSettings.Value;
         }
 
-        public async Task<(AuthResponse Response, TokenPair Tokens)> LoginAsync(LoginRequest request, string? ipAddress, string? userAgent)
+        public async Task<(AuthResponse Response, TokenPair Tokens)> LoginAsync(LoginRequest request)
         {
             var employee = await _dbContext.Employees
                 .Include(e => e.Role)
@@ -46,7 +46,6 @@ namespace MiniMart.Services
             if (!VerifyPassword(request.Password, employee.PasswordHash))
             {
                 employee.FailedLoginAttempts += 1;
-                employee.LastFailedLoginAt = DateTime.UtcNow;
 
                 if (employee.FailedLoginAttempts >= MaxFailedLoginAttempts)
                 {
@@ -60,14 +59,14 @@ namespace MiniMart.Services
             employee.FailedLoginAttempts = 0;
             employee.LockoutEnd = null;
 
-            var tokens = CreateTokenPair(employee, request.RememberMe, request.DeviceName, ipAddress, userAgent, null);
+            var tokens = CreateTokenPair(employee, request.RememberMe);
             await EnforceDeviceLimitAsync(employee.EmployeeId);
             await _dbContext.SaveChangesAsync();
 
             return (CreateAuthResponse(employee, tokens.AccessTokenExpiresAt), tokens);
         }
 
-        public async Task<(AuthResponse Response, TokenPair Tokens)> RefreshTokenAsync(string refreshToken, string? ipAddress, string? userAgent)
+        public async Task<(AuthResponse Response, TokenPair Tokens)> RefreshTokenAsync(string refreshToken)
         {
             var tokenHash = _jwtService.HashToken(refreshToken);
             var storedToken = await _dbContext.RefreshTokens
@@ -82,8 +81,7 @@ namespace MiniMart.Services
 
             if (storedToken.RevokedAt != null)
             {
-                await RevokeTokenFamilyAsync(storedToken.EmployeeId, storedToken.TokenFamilyId);
-                await _dbContext.SaveChangesAsync();
+                await LogoutAllAsync(storedToken.EmployeeId);
                 throw new UnauthorizedDomainException("Refresh token reuse detected.");
             }
 
@@ -96,14 +94,9 @@ namespace MiniMart.Services
 
             var tokens = CreateTokenPair(
                 storedToken.Employee,
-                storedToken.ExpiresAt > DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays),
-                storedToken.DeviceName,
-                ipAddress,
-                userAgent,
-                storedToken.TokenFamilyId);
+                storedToken.ExpiresAt > DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays));
 
             storedToken.RevokedAt = DateTime.UtcNow;
-            storedToken.ReplacedByTokenHash = _jwtService.HashToken(tokens.RefreshToken);
 
             await _dbContext.SaveChangesAsync();
 
@@ -171,8 +164,7 @@ namespace MiniMart.Services
                 Avatar = request.Avatar,
                 Status = EmployeeStatus.Active,
                 RoleId = request.RoleId,
-                Role = role,
-                PasswordChangedAt = DateTime.UtcNow
+                Role = role
             };
 
             _dbContext.Employees.Add(employee);
@@ -195,7 +187,6 @@ namespace MiniMart.Services
             }
 
             employee.PasswordHash = HashPassword(request.NewPassword);
-            employee.PasswordChangedAt = DateTime.UtcNow;
             await LogoutAllAsync(employeeId);
         }
 
@@ -239,11 +230,7 @@ namespace MiniMart.Services
 
         private TokenPair CreateTokenPair(
             Employee employee,
-            bool rememberMe,
-            string? deviceName,
-            string? ipAddress,
-            string? userAgent,
-            string? existingFamilyId)
+            bool rememberMe)
         {
             var accessToken = _jwtService.GenerateAccessToken(employee);
             var refreshToken = _jwtService.GenerateRefreshToken();
@@ -254,10 +241,6 @@ namespace MiniMart.Services
             {
                 TokenHash = _jwtService.HashToken(refreshToken),
                 ExpiresAt = refreshExpiresAt,
-                TokenFamilyId = existingFamilyId ?? Guid.NewGuid().ToString("N"),
-                DeviceName = deviceName,
-                IpAddress = ipAddress,
-                UserAgent = userAgent,
                 EmployeeId = employee.EmployeeId
             });
 
@@ -279,18 +262,6 @@ namespace MiniMart.Services
                 .ToListAsync();
 
             foreach (var token in tokensToRevoke)
-            {
-                token.RevokedAt = DateTime.UtcNow;
-            }
-        }
-
-        private async Task RevokeTokenFamilyAsync(int employeeId, string tokenFamilyId)
-        {
-            var familyTokens = await _dbContext.RefreshTokens
-                .Where(rt => rt.EmployeeId == employeeId && rt.TokenFamilyId == tokenFamilyId && rt.RevokedAt == null)
-                .ToListAsync();
-
-            foreach (var token in familyTokens)
             {
                 token.RevokedAt = DateTime.UtcNow;
             }

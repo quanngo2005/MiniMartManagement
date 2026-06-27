@@ -2,6 +2,7 @@
 
 ## Entries
 
+- [Staff employee contract](staff-employee-contract.md) - staff DTO password mapping and removed audit columns.
 - [Cookie authentication flow](auth-cookie-flow.md) - how employee-based auth, cookies, CSRF, and refresh-token storage are wired.
 - [Invoice and VAT foundation](invoice-vat-foundation.md) - TaxRates, category VAT assignments, order-detail VAT snapshots, and e-invoice relationships.
 - [Phase 2 core architecture cleanup](phase2-core-cleanup.md) - store ownership, promotion discount rename, stock trigger, payment constraint, and searchable label bounds.
