@@ -12,8 +12,6 @@ namespace MiniMart.DTOs
         public string? Note { get; set; }
         public int SupplierId { get; set; }
         public int EmployeeId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
     public class CreateReceiptDto

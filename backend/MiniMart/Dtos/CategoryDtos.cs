@@ -10,8 +10,7 @@ namespace MiniMart.DTOs
         public bool Status { get; set; }
         public int DisplayOrder { get; set; }
         public int? ParentCategoryId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public int TaxRateId { get; set; }
     }
 
     public class CreateCategoryDto
@@ -23,6 +22,7 @@ namespace MiniMart.DTOs
         public bool Status { get; set; }
         public int DisplayOrder { get; set; }
         public int? ParentCategoryId { get; set; }
+        public int TaxRateId { get; set; }
     }
 
     public class UpdateCategoryDto
@@ -34,5 +34,6 @@ namespace MiniMart.DTOs
         public bool Status { get; set; }
         public int DisplayOrder { get; set; }
         public int? ParentCategoryId { get; set; }
+        public int TaxRateId { get; set; }
     }
 }

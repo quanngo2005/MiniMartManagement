@@ -18,6 +18,10 @@ namespace MiniMart.Models
 
         public int QuantityRemaining { get; set; }
 
+        public int Quantity { get; set; }
+
+        public decimal TotalPrice { get; set; }
+
         public bool Status { get; set; } // true: còn, false: hết
 
         public int ProductId { get; set; }
@@ -27,9 +31,6 @@ namespace MiniMart.Models
         public int ReceiptId { get; set; }
 
         public Receipt Receipt { get; set; }
-        public ICollection<ReceiptDetail> ReceiptDetails { get; set; }
-    = new List<ReceiptDetail>();
-
         public ICollection<InventoryTransaction> InventoryTransactions { get; set; }
             = new List<InventoryTransaction>();
 

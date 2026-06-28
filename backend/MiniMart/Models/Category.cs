@@ -21,6 +21,10 @@ namespace MiniMart.Models
 
         public Category? ParentCategory { get; set; }
 
+        public int TaxRateId { get; set; }
+
+        public TaxRate TaxRate { get; set; }
+
         public ICollection<Category> ChildCategories { get; set; }
             = new List<Category>();
 

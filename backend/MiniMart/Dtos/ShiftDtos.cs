@@ -17,8 +17,6 @@ namespace MiniMart.DTOs
         public DateTime? ClosedAt { get; set; }
         public int EmployeeId { get; set; }
         public int? CashierId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
     public class CreateShiftDto

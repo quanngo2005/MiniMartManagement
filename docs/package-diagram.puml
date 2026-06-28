@@ -1,0 +1,147 @@
+@startuml MiniMart_Package_Diagram
+title MiniMartManagement - Project Package Diagram
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam componentStyle rectangle
+
+package "MiniMartManagement" {
+  package "frontend\nMock Flutter App" as Frontend <<mock>> {
+    package "screens" as FlutterScreens
+    package "providers" as FlutterProviders
+    package "repositories" as FlutterRepositories
+    package "services" as FlutterServices
+    package "dtos" as FlutterDtos
+  }
+
+  package "backend/MiniMart" as Backend {
+    package "ASP.NET Core Host" as Host {
+      class Program
+    }
+
+    package "Controllers\nMiniMart.Controllers" as Controllers {
+      class AuthController
+    }
+
+    package "Middleware\nMiniMart.Middleware" as Middleware {
+      class ExceptionMiddleware
+      class CsrfMiddleware
+    }
+
+    package "Services\nMiniMart.Services" as Services {
+      interface IAuthService
+      class AuthService
+      interface IJwtService
+      class JwtService
+    }
+
+    package "DTOs\nMiniMart.DTOs" as DTOs {
+      class ApiResponse
+      class AuthDtos
+      class EntityDtos
+    }
+
+    package "Data\nMiniMart.Data" as Data {
+      class MiniMartDbContext
+    }
+
+    package "Models\nMiniMart.Models" as Models {
+      class DomainEntities
+      package "Base\nMiniMart.Models.Base" as ModelBase {
+        class BaseEntity
+      }
+      package "Enums\nMiniMart.Models.Enums" as Enums {
+        enum OrderStatus
+        enum PaymentMethod
+        enum PromotionType
+      }
+    }
+
+    package "Repositories\nMiniMart.Repositories.RepoInterface" as Repositories <<interfaces_only>> {
+      interface IProductRepository
+      interface IOrderRepository
+      interface ICustomerRepository
+    }
+
+    package "Settings\nMiniMart.Settings" as Settings {
+      class JwtSettings
+    }
+
+    package "Extensions\nMiniMart.Extensions" as Extensions {
+      class ServiceExtensions
+    }
+
+    package "Exceptions\nMiniMart.Exceptions" as Exceptions {
+      class DomainException
+    }
+
+    package "Migrations\nMiniMart.Migrations" as Migrations {
+      class EFCoreMigrations
+    }
+
+    package "Views + wwwroot" as ViewsStatic {
+      artifact "Razor Views"
+      artifact "Static Assets"
+    }
+  }
+
+  package "docs" as Docs {
+    artifact "architecture/auth notes"
+    artifact "implementation phases"
+  }
+}
+
+FlutterScreens --> FlutterProviders : reads state / dispatches actions
+FlutterProviders --> FlutterRepositories : coordinates use cases
+FlutterRepositories --> FlutterServices : calls API services
+FlutterRepositories --> FlutterDtos : maps data
+FlutterServices --> FlutterDtos : serializes JSON
+FlutterServices --> Controllers : HTTP/JSON
+
+Program --> Extensions : registers auth
+Program --> Data : AddDbContext
+Program --> Models : builds OData EDM
+Program --> Middleware : configures pipeline
+Program --> Controllers : maps API controllers
+
+Extensions --> Services : registers
+Extensions --> Settings : binds Jwt settings
+
+Controllers --> Services : calls
+Controllers --> DTOs : request/response contracts
+Controllers --> Middleware : CSRF token constants
+
+Middleware --> DTOs : error envelopes
+Middleware --> Exceptions : maps domain errors
+
+Services --> Data : queries/saves
+Services --> DTOs : maps responses
+Services --> Models : domain/auth entities
+Services --> Enums : status checks
+Services --> Settings : token configuration
+Services --> Exceptions : domain failures
+
+Data --> Models : DbSet + relationships
+Data --> Enums : constraints/guards
+Data --> Exceptions : promotion overlap guard
+
+Models --> ModelBase : inherits
+Models --> Enums : typed statuses/methods
+
+Migrations --> Data : generated from DbContext
+Repositories ..> Models : repository contracts
+ViewsStatic ..> Host : MVC/static hosting
+
+note right of Repositories
+  Current repository interfaces are empty
+  and not registered in Program/ServiceExtensions.
+  Runtime data access is through MiniMartDbContext.
+end note
+
+note bottom of Frontend
+  Mocked as a Flutter app package for the diagram.
+  The project currently only has frontend/feHolder.txt.
+end note
+
+@enduml
