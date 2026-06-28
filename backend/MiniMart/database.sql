@@ -39,12 +39,10 @@ BEGIN
         [PasswordHash]        NVARCHAR(MAX)  NOT NULL,
         [FailedLoginAttempts] INT            NOT NULL DEFAULT 0,
         [LockoutEnd]          DATETIME2      NULL,
-        [LastFailedLoginAt]   DATETIME2      NULL,
-        [PasswordChangedAt]   DATETIME2      NULL,
         [Salary]              DECIMAL(18,2)  NOT NULL,
         [HireDate]            DATETIME2      NOT NULL,
         [Avatar]              NVARCHAR(MAX)  NULL,
-        [Status]              INT            NOT NULL,  -- EmployeeStatus: 1=Active, 2=Inactive, 3=Resigned
+        [Status]              INT            NOT NULL,
         [RoleId]              INT            NOT NULL,
         CONSTRAINT [PK_Employees] PRIMARY KEY ([EmployeeId]),
         CONSTRAINT [FK_Employees_Roles_RoleId]
@@ -54,24 +52,7 @@ END
 GO
 
 -- ============================================
--- 3. STORES
--- ============================================
-IF OBJECT_ID(N'[dbo].[Stores]', N'U') IS NULL
-BEGIN
-    CREATE TABLE [dbo].[Stores] (
-        [StoreId]     INT            IDENTITY(1,1) NOT NULL,
-        [StoreCode]   NVARCHAR(MAX)  NOT NULL,
-        [StoreName]   NVARCHAR(255)  NOT NULL,
-        [Address]     NVARCHAR(MAX)  NULL,
-        [PhoneNumber] NVARCHAR(MAX)  NULL,
-        [Status]      BIT            NOT NULL,
-        CONSTRAINT [PK_Stores] PRIMARY KEY ([StoreId])
-    );
-END
-GO
-
--- ============================================
--- 4. TAX RATES
+-- 3. TAX RATES
 -- ============================================
 IF OBJECT_ID(N'[dbo].[TaxRates]', N'U') IS NULL
 BEGIN
@@ -88,7 +69,7 @@ END
 GO
 
 -- ============================================
--- 5. CATEGORIES (self-referencing + TaxRate FK)
+-- 4. CATEGORIES (self-referencing + TaxRate FK)
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Categories]', N'U') IS NULL
 BEGIN
@@ -111,19 +92,18 @@ END
 GO
 
 -- ============================================
--- 6. CUSTOMERS
+-- 5. CUSTOMERS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Customers]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[Customers] (
         [CustomerId]     INT            IDENTITY(1,1) NOT NULL,
-        [CustomerCode]   NVARCHAR(MAX)  NOT NULL,
-        [FullName]       NVARCHAR(MAX)  NOT NULL,
+        [CustomerCode]   NVARCHAR(50)   NOT NULL,
+        [FullName]       NVARCHAR(255)  NOT NULL,
         [PhoneNumber]    NVARCHAR(450)  NOT NULL,
         [Email]          NVARCHAR(MAX)  NULL,
         [Address]        NVARCHAR(MAX)  NULL,
         [Point]          INT            NOT NULL,
-        [TotalSpent]     DECIMAL(18,2)  NOT NULL,
         [CustomerStatus] BIT            NOT NULL,
         CONSTRAINT [PK_Customers] PRIMARY KEY ([CustomerId])
     );
@@ -131,13 +111,13 @@ END
 GO
 
 -- ============================================
--- 7. SUPPLIERS
+-- 6. SUPPLIERS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Suppliers]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[Suppliers] (
         [SupplierId]   INT            IDENTITY(1,1) NOT NULL,
-        [SupplierCode] NVARCHAR(450)  NOT NULL,
+        [SupplierCode] NVARCHAR(50)   NOT NULL,
         [SupplierName] NVARCHAR(255)  NOT NULL,
         [ContactPerson] NVARCHAR(255) NULL,
         [PhoneNumber]  NVARCHAR(MAX)  NOT NULL,
@@ -154,13 +134,13 @@ END
 GO
 
 -- ============================================
--- 8. PRODUCTS
+-- 7. PRODUCTS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Products]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[Products] (
         [ProductId]    INT            IDENTITY(1,1) NOT NULL,
-        [ProductCode]  NVARCHAR(450)  NOT NULL,
+        [ProductCode]  NVARCHAR(50)   NOT NULL,
         [Barcode]      NVARCHAR(450)  NOT NULL,
         [ProductName]  NVARCHAR(255)  NOT NULL,
         [SellingPrice] DECIMAL(18,2)  NOT NULL,
@@ -181,13 +161,13 @@ END
 GO
 
 -- ============================================
--- 9. RECEIPTS (Purchase Orders from Suppliers)
+-- 8. RECEIPTS (Purchase Orders from Suppliers)
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Receipts]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[Receipts] (
         [ReceiptId]    INT            IDENTITY(1,1) NOT NULL,
-        [ReceiptCode]  NVARCHAR(MAX)  NOT NULL,
+        [ReceiptCode]  NVARCHAR(50)   NOT NULL,
         [ImportDate]   DATETIME2      NOT NULL,
         [TotalAmount]  DECIMAL(18,2)  NOT NULL,
         [PaidAmount]   DECIMAL(18,2)  NOT NULL,
@@ -196,31 +176,30 @@ BEGIN
         [Note]         NVARCHAR(MAX)  NULL,
         [SupplierId]   INT            NOT NULL,
         [EmployeeId]   INT            NOT NULL,
-        [StoreId]      INT            NOT NULL,
         CONSTRAINT [PK_Receipts] PRIMARY KEY ([ReceiptId]),
         CONSTRAINT [FK_Receipts_Suppliers_SupplierId]
             FOREIGN KEY ([SupplierId]) REFERENCES [dbo].[Suppliers] ([SupplierId]) ON DELETE NO ACTION,
         CONSTRAINT [FK_Receipts_Employees_EmployeeId]
-            FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[Employees] ([EmployeeId]) ON DELETE NO ACTION,
-        CONSTRAINT [FK_Receipts_Stores_StoreId]
-            FOREIGN KEY ([StoreId]) REFERENCES [dbo].[Stores] ([StoreId]) ON DELETE NO ACTION
+            FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[Employees] ([EmployeeId]) ON DELETE NO ACTION
     );
 END
 GO
 
 -- ============================================
--- 10. BATCHES (Lot tracking)
+-- 9. BATCHES (Lot tracking, merged from ReceiptDetails)
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Batches]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[Batches] (
         [BatchId]          INT            IDENTITY(1,1) NOT NULL,
-        [BatchCode]        NVARCHAR(MAX)  NOT NULL,
+        [BatchCode]        NVARCHAR(50)   NOT NULL,
         [ManufactureDate]  DATETIME2      NOT NULL,
         [ExpiryDate]       DATETIME2      NOT NULL,
         [ImportPrice]      DECIMAL(18,2)  NOT NULL,
         [QuantityImported] INT            NOT NULL,
         [QuantityRemaining] INT           NOT NULL,
+        [Quantity]         INT            NOT NULL,
+        [TotalPrice]       DECIMAL(18,2)  NOT NULL,
         [Status]           BIT            NOT NULL,
         [ProductId]        INT            NOT NULL,
         [ReceiptId]        INT            NOT NULL,
@@ -234,31 +213,7 @@ END
 GO
 
 -- ============================================
--- 11. RECEIPT DETAILS
--- ============================================
-IF OBJECT_ID(N'[dbo].[ReceiptDetails]', N'U') IS NULL
-BEGIN
-    CREATE TABLE [dbo].[ReceiptDetails] (
-        [ReceiptDetailId] INT            IDENTITY(1,1) NOT NULL,
-        [ReceiptId]       INT            NOT NULL,
-        [ProductId]       INT            NOT NULL,
-        [BatchId]         INT            NULL,
-        [Quantity]        INT            NOT NULL,
-        [ImportPrice]     DECIMAL(18,2)  NOT NULL,
-        [TotalPrice]      DECIMAL(18,2)  NOT NULL,
-        CONSTRAINT [PK_ReceiptDetails] PRIMARY KEY ([ReceiptDetailId]),
-        CONSTRAINT [FK_ReceiptDetails_Receipts_ReceiptId]
-            FOREIGN KEY ([ReceiptId]) REFERENCES [dbo].[Receipts] ([ReceiptId]) ON DELETE CASCADE,
-        CONSTRAINT [FK_ReceiptDetails_Products_ProductId]
-            FOREIGN KEY ([ProductId]) REFERENCES [dbo].[Products] ([ProductId]) ON DELETE NO ACTION,
-        CONSTRAINT [FK_ReceiptDetails_Batches_BatchId]
-            FOREIGN KEY ([BatchId]) REFERENCES [dbo].[Batches] ([BatchId]) ON DELETE NO ACTION
-    );
-END
-GO
-
--- ============================================
--- 12. SHIFTS
+-- 10. SHIFTS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Shifts]', N'U') IS NULL
 BEGIN
@@ -271,77 +226,64 @@ BEGIN
         [StartCash]  DECIMAL(18,2)  NOT NULL,
         [EndCash]    DECIMAL(18,2)  NOT NULL,
         [Revenue]    DECIMAL(18,2)  NOT NULL,
-        [Status]     INT            NOT NULL,  -- ShiftStatus: 1=Pending, 2=Working, 3=Closed
+        [Status]     INT            NOT NULL,
         [Note]       NVARCHAR(MAX)  NULL,
         [ClosedAt]   DATETIME2      NULL,
         [EmployeeId] INT            NOT NULL,
         [CashierId]  INT            NULL,
-        [StoreId]    INT            NOT NULL,
         CONSTRAINT [PK_Shifts] PRIMARY KEY ([ShiftId]),
         CONSTRAINT [FK_Shifts_Employees_EmployeeId]
             FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[Employees] ([EmployeeId]) ON DELETE NO ACTION,
         CONSTRAINT [FK_Shifts_Employees_CashierId]
-            FOREIGN KEY ([CashierId]) REFERENCES [dbo].[Employees] ([EmployeeId]) ON DELETE NO ACTION,
-        CONSTRAINT [FK_Shifts_Stores_StoreId]
-            FOREIGN KEY ([StoreId]) REFERENCES [dbo].[Stores] ([StoreId]) ON DELETE NO ACTION
+            FOREIGN KEY ([CashierId]) REFERENCES [dbo].[Employees] ([EmployeeId]) ON DELETE NO ACTION
     );
 END
 GO
 
 -- ============================================
--- 13. ORDERS
+-- 11. ORDERS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Orders]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[Orders] (
-        [OrderId]          INT            IDENTITY(1,1) NOT NULL,
-        [OrderCode]        NVARCHAR(MAX)  NOT NULL,
-        [SubTotal]         DECIMAL(18,2)  NOT NULL,
-        [PromotionDiscount] DECIMAL(18,2) NOT NULL DEFAULT 0,
-        [TaxAmount]        DECIMAL(18,2)  NOT NULL,
-        [TotalAmount]      DECIMAL(18,2)  NOT NULL,
-        [DiscountAmount]   DECIMAL(18,2)  NOT NULL,
-        [FinalAmount]      DECIMAL(18,2)  NOT NULL,
-        [PaidAmount]       DECIMAL(18,2)  NOT NULL,
-        [ChangeAmount]     DECIMAL(18,2)  NOT NULL,
-        [PaymentMethod]    INT            NOT NULL,
-        [Status]           INT            NOT NULL,  -- OrderStatus: 1=Pending, 2=Completed, 3=Cancelled
-        [Note]             NVARCHAR(MAX)  NULL,
-        [EmployeeId]       INT            NOT NULL,
-        [StoreId]          INT            NOT NULL,
-        [CustomerId]       INT            NULL,
+        [OrderId]      INT            IDENTITY(1,1) NOT NULL,
+        [OrderCode]    NVARCHAR(50)   NOT NULL,
+        [SubTotal]     DECIMAL(18,2)  NOT NULL,
+        [TaxAmount]    DECIMAL(18,2)  NOT NULL,
+        [DiscountAmount] DECIMAL(18,2) NOT NULL,
+        [FinalAmount]  DECIMAL(18,2)  NOT NULL,
+        [PaidAmount]   DECIMAL(18,2)  NOT NULL,
+        [ChangeAmount] DECIMAL(18,2)  NOT NULL,
+        [Status]       INT            NOT NULL,
+        [Note]         NVARCHAR(MAX)  NULL,
+        [EmployeeId]   INT            NOT NULL,
+        [CustomerId]   INT            NULL,
         CONSTRAINT [PK_Orders] PRIMARY KEY ([OrderId]),
         CONSTRAINT [FK_Orders_Employees_EmployeeId]
             FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[Employees] ([EmployeeId]) ON DELETE NO ACTION,
-        CONSTRAINT [FK_Orders_Stores_StoreId]
-            FOREIGN KEY ([StoreId]) REFERENCES [dbo].[Stores] ([StoreId]) ON DELETE NO ACTION,
         CONSTRAINT [FK_Orders_Customers_CustomerId]
-            FOREIGN KEY ([CustomerId]) REFERENCES [dbo].[Customers] ([CustomerId]) ON DELETE NO ACTION,
-        CONSTRAINT [CK_Orders_PaymentMethod]
-            CHECK ([PaymentMethod] IN (1,2,3,4,5,6))
+            FOREIGN KEY ([CustomerId]) REFERENCES [dbo].[Customers] ([CustomerId]) ON DELETE NO ACTION
     );
 END
 GO
 
 -- ============================================
--- 14. ORDER DETAILS
+-- 12. ORDER DETAILS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[OrderDetails]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[OrderDetails] (
-        [OrderDetailId]         INT            IDENTITY(1,1) NOT NULL,
-        [OrderId]               INT            NOT NULL,
-        [ProductId]             INT            NOT NULL,
-        [Quantity]              INT            NOT NULL,
-        [IsGift]                BIT            NOT NULL DEFAULT 0,
-        [AppliedPromotionId]    INT            NULL,
-        [UnitPrice]             DECIMAL(18,2)  NOT NULL,
-        [DiscountAmount]        DECIMAL(18,2)  NOT NULL,
-        [TotalPrice]            DECIMAL(18,2)  NOT NULL,
-        [VatRate]               DECIMAL(5,2)   NOT NULL DEFAULT 0,
-        [UnitPriceAfterDiscount] DECIMAL(18,2) NOT NULL DEFAULT 0,
-        [VatAmount]             DECIMAL(18,2)  NOT NULL DEFAULT 0,
-        [TotalWithVat]          DECIMAL(18,2)  NOT NULL DEFAULT 0,
+        [OrderDetailId]      INT            IDENTITY(1,1) NOT NULL,
+        [OrderId]            INT            NOT NULL,
+        [ProductId]          INT            NOT NULL,
+        [Quantity]           INT            NOT NULL,
+        [IsGift]             BIT            NOT NULL DEFAULT 0,
+        [AppliedPromotionId] INT            NULL,
+        [UnitPrice]          DECIMAL(18,2)  NOT NULL,
+        [DiscountAmount]     DECIMAL(18,2)  NOT NULL,
+        [TotalPrice]         DECIMAL(18,2)  NOT NULL,
+        [VatRate]            DECIMAL(5,2)   NOT NULL DEFAULT 0,
+        [VatAmount]          DECIMAL(18,2)  NOT NULL DEFAULT 0,
         CONSTRAINT [PK_OrderDetails] PRIMARY KEY ([OrderDetailId]),
         CONSTRAINT [FK_OrderDetails_Orders_OrderId]
             FOREIGN KEY ([OrderId]) REFERENCES [dbo].[Orders] ([OrderId]) ON DELETE CASCADE,
@@ -354,7 +296,7 @@ END
 GO
 
 -- ============================================
--- 15. PAYMENTS
+-- 13. PAYMENTS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Payments]', N'U') IS NULL
 BEGIN
@@ -375,7 +317,7 @@ END
 GO
 
 -- ============================================
--- 16. POINT TRANSACTIONS (Loyalty)
+-- 14. POINT TRANSACTIONS (Loyalty)
 -- ============================================
 IF OBJECT_ID(N'[dbo].[PointTransactions]', N'U') IS NULL
 BEGIN
@@ -383,7 +325,7 @@ BEGIN
         [PointTransactionId] INT            IDENTITY(1,1) NOT NULL,
         [CustomerId]         INT            NOT NULL,
         [OrderId]            INT            NULL,
-        [TransactionType]    INT            NOT NULL,  -- 1=Earn, 2=Redeem, 3=Adjust, 4=Expire
+        [TransactionType]    INT            NOT NULL,
         [Delta]              INT            NOT NULL,
         [BalanceAfter]       INT            NOT NULL,
         [Note]               NVARCHAR(MAX)  NULL,
@@ -399,7 +341,7 @@ END
 GO
 
 -- ============================================
--- 17. PROMOTIONS
+-- 15. PROMOTIONS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[Promotions]', N'U') IS NULL
 BEGIN
@@ -407,12 +349,12 @@ BEGIN
         [PromotionId]     INT            IDENTITY(1,1) NOT NULL,
         [Name]            NVARCHAR(255)  NOT NULL,
         [Description]     NVARCHAR(MAX)  NOT NULL,
-        [Type]            INT            NOT NULL,  -- 0=PercentDiscount, 1=BuyXGetYFree
+        [Type]            INT            NOT NULL,
         [DiscountPercent] DECIMAL(18,2)  NULL,
+        [DiscountAmount]  DECIMAL(18,2)  NULL,
         [BuyQuantity]     INT            NULL,
         [GiftQuantity]    INT            NULL,
         [GiftProductId]   INT            NULL,
-        [MinOrderValue]   DECIMAL(18,2)  NULL,
         [StartDate]       DATETIME2      NOT NULL,
         [EndDate]         DATETIME2      NOT NULL,
         [IsActive]        BIT            NOT NULL,
@@ -424,7 +366,7 @@ END
 GO
 
 -- ============================================
--- 18. PROMOTION PRODUCTS (many-to-many)
+-- 16. PROMOTION PRODUCTS (many-to-many)
 -- ============================================
 IF OBJECT_ID(N'[dbo].[PromotionProducts]', N'U') IS NULL
 BEGIN
@@ -441,34 +383,15 @@ END
 GO
 
 -- ============================================
--- 19. ORDER PROMOTIONS (applied to an order)
--- ============================================
-IF OBJECT_ID(N'[dbo].[OrderPromotions]', N'U') IS NULL
-BEGIN
-    CREATE TABLE [dbo].[OrderPromotions] (
-        [OrderPromotionId] INT            IDENTITY(1,1) NOT NULL,
-        [OrderId]          INT            NOT NULL,
-        [PromotionId]      INT            NOT NULL,
-        [DiscountAmount]   DECIMAL(18,2)  NOT NULL,
-        CONSTRAINT [PK_OrderPromotions] PRIMARY KEY ([OrderPromotionId]),
-        CONSTRAINT [FK_OrderPromotions_Orders_OrderId]
-            FOREIGN KEY ([OrderId]) REFERENCES [dbo].[Orders] ([OrderId]) ON DELETE CASCADE,
-        CONSTRAINT [FK_OrderPromotions_Promotions_PromotionId]
-            FOREIGN KEY ([PromotionId]) REFERENCES [dbo].[Promotions] ([PromotionId]) ON DELETE CASCADE
-    );
-END
-GO
-
--- ============================================
--- 20. E-INVOICES
+-- 17. E-INVOICES
 -- ============================================
 IF OBJECT_ID(N'[dbo].[EInvoices]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[EInvoices] (
         [EInvoiceId]     INT            IDENTITY(1,1) NOT NULL,
         [OrderId]        INT            NOT NULL,
-        [InvoiceSerial]  NVARCHAR(MAX)  NOT NULL,
-        [InvoiceNumber]  NVARCHAR(MAX)  NOT NULL,
+        [InvoiceSerial]  NVARCHAR(50)   NOT NULL,
+        [InvoiceNumber]  NVARCHAR(50)   NOT NULL,
         [BuyerTaxCode]   NVARCHAR(MAX)  NULL,
         [BuyerName]      NVARCHAR(MAX)  NULL,
         [BuyerAddress]   NVARCHAR(MAX)  NULL,
@@ -487,7 +410,7 @@ END
 GO
 
 -- ============================================
--- 21. E-INVOICE DETAILS
+-- 18. E-INVOICE DETAILS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[EInvoiceDetails]', N'U') IS NULL
 BEGIN
@@ -514,20 +437,20 @@ END
 GO
 
 -- ============================================
--- 22. ORDER RETURNS
+-- 19. ORDER RETURNS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[OrderReturns]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[OrderReturns] (
         [OrderReturnId]   INT            IDENTITY(1,1) NOT NULL,
-        [ReturnCode]      NVARCHAR(MAX)  NOT NULL,
+        [ReturnCode]      NVARCHAR(50)   NOT NULL,
         [OriginalOrderId] INT            NOT NULL,
         [EmployeeId]      INT            NOT NULL,
         [Reason]          NVARCHAR(MAX)  NOT NULL,
         [RefundAmount]    DECIMAL(18,2)  NOT NULL,
         [RefundMethod]    INT            NOT NULL,
         [EInvoiceId]      INT            NULL,
-        [Status]          INT            NOT NULL,  -- 1=Pending, 2=Approved, 3=Rejected
+        [Status]          INT            NOT NULL,
         CONSTRAINT [PK_OrderReturns] PRIMARY KEY ([OrderReturnId]),
         CONSTRAINT [FK_OrderReturns_Orders_OriginalOrderId]
             FOREIGN KEY ([OriginalOrderId]) REFERENCES [dbo].[Orders] ([OrderId]) ON DELETE NO ACTION,
@@ -544,7 +467,7 @@ END
 GO
 
 -- ============================================
--- 23. ORDER RETURN DETAILS
+-- 20. ORDER RETURN DETAILS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[OrderReturnDetails]', N'U') IS NULL
 BEGIN
@@ -565,17 +488,17 @@ END
 GO
 
 -- ============================================
--- 24. INVENTORY TRANSACTIONS
+-- 21. INVENTORY TRANSACTIONS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[InventoryTransactions]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[InventoryTransactions] (
         [InventoryTransactionId] INT            IDENTITY(1,1) NOT NULL,
-        [TransactionType]        INT            NOT NULL,  -- 1=Import, 2=Sale, 3=ReturnToSupplier, 4=Damage, 5=Adjustment, 6=OrderReturn
+        [TransactionType]        INT            NOT NULL,
         [Quantity]               INT            NOT NULL,
         [PreviousStock]          INT            NOT NULL,
         [CurrentStock]           INT            NOT NULL,
-        [ReferenceType]          INT            NULL,      -- 1=Order, 2=Receipt, 3=ReturnToSupplier, 4=Adjustment, 5=OrderReturn
+        [ReferenceType]          INT            NULL,
         [ReferenceId]            INT            NULL,
         [Note]                   NVARCHAR(MAX)  NULL,
         [ProductId]              INT            NOT NULL,
@@ -593,21 +516,16 @@ END
 GO
 
 -- ============================================
--- 25. REFRESH TOKENS
+-- 22. REFRESH TOKENS
 -- ============================================
 IF OBJECT_ID(N'[dbo].[RefreshTokens]', N'U') IS NULL
 BEGIN
     CREATE TABLE [dbo].[RefreshTokens] (
-        [RefreshTokenId]      INT            IDENTITY(1,1) NOT NULL,
-        [TokenHash]           NVARCHAR(450)  NOT NULL,
-        [ExpiresAt]           DATETIME2      NOT NULL,
-        [RevokedAt]           DATETIME2      NULL,
-        [ReplacedByTokenHash] NVARCHAR(MAX)  NULL,
-        [TokenFamilyId]       NVARCHAR(MAX)  NOT NULL,
-        [DeviceName]          NVARCHAR(MAX)  NULL,
-        [IpAddress]           NVARCHAR(MAX)  NULL,
-        [UserAgent]           NVARCHAR(MAX)  NULL,
-        [EmployeeId]          INT            NOT NULL,
+        [RefreshTokenId] INT            IDENTITY(1,1) NOT NULL,
+        [TokenHash]      NVARCHAR(450)  NOT NULL,
+        [ExpiresAt]      DATETIME2      NOT NULL,
+        [RevokedAt]      DATETIME2      NULL,
+        [EmployeeId]     INT            NOT NULL,
         CONSTRAINT [PK_RefreshTokens] PRIMARY KEY ([RefreshTokenId]),
         CONSTRAINT [FK_RefreshTokens_Employees_EmployeeId]
             FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[Employees] ([EmployeeId]) ON DELETE CASCADE
@@ -658,10 +576,6 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_RefreshTokens_Token
     WHERE [TokenHash] IS NOT NULL;
 GO
 
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_RefreshTokens_EmployeeId_TokenFamilyId')
-    CREATE INDEX [IX_RefreshTokens_EmployeeId_TokenFamilyId] ON [dbo].[RefreshTokens] ([EmployeeId], [TokenFamilyId]);
-GO
-
 -- ============================================
 -- FK PERFORMANCE INDEXES
 -- ============================================
@@ -701,22 +615,6 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_Receipts_EmployeeId
     CREATE INDEX [IX_Receipts_EmployeeId] ON [dbo].[Receipts] ([EmployeeId]);
 GO
 
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_Receipts_StoreId')
-    CREATE INDEX [IX_Receipts_StoreId] ON [dbo].[Receipts] ([StoreId]);
-GO
-
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_ReceiptDetails_ReceiptId')
-    CREATE INDEX [IX_ReceiptDetails_ReceiptId] ON [dbo].[ReceiptDetails] ([ReceiptId]);
-GO
-
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_ReceiptDetails_ProductId')
-    CREATE INDEX [IX_ReceiptDetails_ProductId] ON [dbo].[ReceiptDetails] ([ProductId]);
-GO
-
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_ReceiptDetails_BatchId')
-    CREATE INDEX [IX_ReceiptDetails_BatchId] ON [dbo].[ReceiptDetails] ([BatchId]);
-GO
-
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_Shifts_EmployeeId')
     CREATE INDEX [IX_Shifts_EmployeeId] ON [dbo].[Shifts] ([EmployeeId]);
 GO
@@ -725,16 +623,8 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_Shifts_CashierId')
     CREATE INDEX [IX_Shifts_CashierId] ON [dbo].[Shifts] ([CashierId]);
 GO
 
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_Shifts_StoreId')
-    CREATE INDEX [IX_Shifts_StoreId] ON [dbo].[Shifts] ([StoreId]);
-GO
-
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_Orders_EmployeeId')
     CREATE INDEX [IX_Orders_EmployeeId] ON [dbo].[Orders] ([EmployeeId]);
-GO
-
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_Orders_StoreId')
-    CREATE INDEX [IX_Orders_StoreId] ON [dbo].[Orders] ([StoreId]);
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_Orders_CustomerId')
@@ -771,14 +661,6 @@ GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_PromotionProducts_ProductId')
     CREATE INDEX [IX_PromotionProducts_ProductId] ON [dbo].[PromotionProducts] ([ProductId]);
-GO
-
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_OrderPromotions_OrderId')
-    CREATE INDEX [IX_OrderPromotions_OrderId] ON [dbo].[OrderPromotions] ([OrderId]);
-GO
-
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_OrderPromotions_PromotionId')
-    CREATE INDEX [IX_OrderPromotions_PromotionId] ON [dbo].[OrderPromotions] ([PromotionId]);
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_EInvoices_OrderId')

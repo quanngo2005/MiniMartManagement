@@ -1,4 +1,4 @@
-namespace MiniMart.Exceptions
+namespace MiniMart.Shared.Exceptions
 {
     public class DomainException : Exception
     {

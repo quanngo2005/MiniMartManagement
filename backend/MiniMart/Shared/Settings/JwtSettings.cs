@@ -1,4 +1,4 @@
-namespace MiniMart.Settings
+namespace MiniMart.Shared.Settings
 {
     public class JwtSettings
     {

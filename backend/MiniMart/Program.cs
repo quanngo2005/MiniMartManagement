@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
-using MiniMart.Extensions;
-using MiniMart.Middleware;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Repositories.RepoImplement;
+using MiniMart.Shared.Extensions;
+using MiniMart.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
