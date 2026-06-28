@@ -32,8 +32,6 @@ namespace MiniMart.Repositories.RepoImplement
 
         public async Task<Shift> CreateShiftAsync(Shift shift)
         {
-            shift.CreatedAt = DateTime.Now;
-            shift.UpdatedAt = null;
             await _context.Shifts.AddAsync(shift);
             await _context.SaveChangesAsync();
             return shift;
@@ -56,7 +54,6 @@ namespace MiniMart.Repositories.RepoImplement
             existing.ClosedAt = shift.ClosedAt;
             existing.EmployeeId = shift.EmployeeId;
             existing.CashierId = shift.CashierId;
-            existing.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             return existing;

@@ -32,8 +32,6 @@ namespace MiniMart.Controllers
             ClosedAt = s.ClosedAt,
             EmployeeId = s.EmployeeId,
             CashierId = s.CashierId,
-            CreatedAt = s.CreatedAt,
-            UpdatedAt = s.UpdatedAt
         };
 
         // Compiled delegate for single item mapping
