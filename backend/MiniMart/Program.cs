@@ -28,6 +28,14 @@ builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+<<<<<<< Updated upstream
+=======
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+
+>>>>>>> Stashed changes
 builder.Services.AddControllers()
     .AddOData(options => options
         .Select()

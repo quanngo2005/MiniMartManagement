@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+<<<<<<< Updated upstream
+=======
+using MiniMart.Shared.Exceptions;
+>>>>>>> Stashed changes
 using MiniMart.Models;
 
 namespace MiniMart.Data
