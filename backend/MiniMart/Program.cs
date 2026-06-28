@@ -31,6 +31,7 @@ builder.Services.AddDbContext<MiniMartDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
 
 builder.Services.AddControllers()
 
