@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MiniMart.Exceptions;
+using MiniMart.Shared.Exceptions;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 

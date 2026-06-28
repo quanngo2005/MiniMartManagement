@@ -31,9 +31,7 @@ namespace MiniMart.Controllers
             Note = s.Note,
             ClosedAt = s.ClosedAt,
             EmployeeId = s.EmployeeId,
-            CashierId = s.CashierId,
-            CreatedAt = s.CreatedAt,
-            UpdatedAt = s.UpdatedAt
+            CashierId = s.CashierId
         };
 
         // Compiled delegate for single item mapping
