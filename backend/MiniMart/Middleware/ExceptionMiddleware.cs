@@ -1,6 +1,6 @@
 using System.Text.Json;
 using MiniMart.DTOs;
-using MiniMart.Exceptions;
+using MiniMart.Shared.Exceptions;
 
 namespace MiniMart.Middleware
 {

@@ -6,7 +6,7 @@ using MiniMart.DTOs;
 using MiniMart.Exceptions;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
-using MiniMart.Settings;
+using MiniMart.Shared.Settings;
 
 namespace MiniMart.Services
 {

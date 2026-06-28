@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MiniMart.Models;
-using MiniMart.Settings;
+using MiniMart.Shared.Settings;
 
 namespace MiniMart.Services
 {
