@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MiniMart.Data;
 using MiniMart.DTOs;
-using MiniMart.Exceptions;
+using MiniMart.Shared.Exceptions;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Shared.Settings;

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MiniMart.Exceptions;
+using MiniMart.Shared.Exceptions;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 
@@ -77,6 +77,12 @@ namespace MiniMart.Data
         {
             await ValidatePromotionOverlapsAsync(cancellationToken);
             return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder.Properties<decimal>()
+                .HavePrecision(18, 2);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
