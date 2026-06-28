@@ -33,4 +33,10 @@ namespace MiniMart.DTOs
         public int Point { get; set; }
         public bool CustomerStatus { get; set; }
     }
+
+    public class UpdatePointsDto
+    {
+        /// <summary>Số điểm cần cộng (dương) hoặc trừ (âm)</summary>
+        public int Delta { get; set; }
+    }
 }
