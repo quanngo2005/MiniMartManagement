@@ -80,7 +80,7 @@ namespace MiniMart.Repositories.RepoImplement
             var promotion = await _context.Promotions.FindAsync(id);
             if (promotion == null) return false;
 
-            _context.Promotions.Remove(promotion);
+            promotion.IsActive = false;
             await _context.SaveChangesAsync();
             return true;
         }

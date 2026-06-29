@@ -53,7 +53,7 @@ namespace MiniMart.Repositories.RepoImplement
             var customer = await _context.Customers.FindAsync(id);
             if (customer == null) return false;
 
-            _context.Customers.Remove(customer);
+            customer.CustomerStatus = false;
             await _context.SaveChangesAsync();
             return true;
         }
