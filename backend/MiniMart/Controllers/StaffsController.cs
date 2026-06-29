@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -31,9 +32,7 @@ namespace MiniMart.Controllers
             HireDate = e.HireDate,
             Avatar = e.Avatar,
             Status = e.Status,
-            RoleId = e.RoleId,
-            CreatedAt = e.CreatedAt,
-            UpdatedAt = e.UpdatedAt
+            RoleId = e.RoleId
         };
 
         // Compiled delegate for single item mappings
@@ -93,7 +92,7 @@ namespace MiniMart.Controllers
                 Email = createDto.Email,
                 Address = createDto.Address,
                 Username = createDto.Username,
-                PasswordHash = createDto.PasswordHash,
+                PasswordHash = HashPassword(createDto.Password),
                 Salary = createDto.Salary,
                 HireDate = createDto.HireDate,
                 Avatar = createDto.Avatar,
@@ -137,7 +136,7 @@ namespace MiniMart.Controllers
                 Email = updateDto.Email,
                 Address = updateDto.Address,
                 Username = updateDto.Username,
-                PasswordHash = string.IsNullOrEmpty(updateDto.PasswordHash) ? existing.PasswordHash : updateDto.PasswordHash,
+                PasswordHash = string.IsNullOrEmpty(updateDto.Password) ? existing.PasswordHash : HashPassword(updateDto.Password),
                 Salary = updateDto.Salary,
                 HireDate = updateDto.HireDate,
                 Avatar = updateDto.Avatar,
@@ -161,6 +160,13 @@ namespace MiniMart.Controllers
             if (!success) return NotFound(new { message = $"Employee with ID {id} not found." });
 
             return NoContent();
+        }
+
+        private static string HashPassword(string password)
+        {
+            var salt = RandomNumberGenerator.GetBytes(16);
+            var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100_000, HashAlgorithmName.SHA256, 32);
+            return $"PBKDF2-SHA256:100000:{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
         }
     }
 }

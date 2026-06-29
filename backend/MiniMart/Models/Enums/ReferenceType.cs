@@ -5,6 +5,7 @@
         Order = 1, 
         Receipt = 2,
         ReturnToSupplier = 3,
-        Adjustment =4,
+        Adjustment = 4,
+        OrderReturn = 5,
     }
 }

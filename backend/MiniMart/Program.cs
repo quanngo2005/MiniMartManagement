@@ -5,6 +5,8 @@ using MiniMart.Data;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Repositories.RepoImplement;
+using MiniMart.Shared.Extensions;
+using MiniMart.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +21,14 @@ odataBuilder.EntitySet<Product>("Products");
 odataBuilder.EntitySet<Batch>("Batches");
 odataBuilder.EntitySet<Order>("Orders");
 odataBuilder.EntitySet<OrderDetail>("OrderDetails");
+odataBuilder.EntitySet<Payment>("Payments");
+odataBuilder.EntitySet<PointTransaction>("PointTransactions");
+odataBuilder.EntitySet<OrderReturn>("OrderReturns");
+odataBuilder.EntitySet<OrderReturnDetail>("OrderReturnDetails");
+odataBuilder.EntitySet<TaxRate>("TaxRates");
+odataBuilder.EntitySet<EInvoice>("EInvoices");
+odataBuilder.EntitySet<EInvoiceDetail>("EInvoiceDetails");
 odataBuilder.EntitySet<Receipt>("Receipts");
-odataBuilder.EntitySet<ReceiptDetail>("ReceiptDetails");
 odataBuilder.EntitySet<Shift>("Shifts");
 odataBuilder.EntitySet<InventoryTransaction>("InventoryTransactions");
 odataBuilder.EntitySet<Promotion>("Promotions");
@@ -32,7 +40,8 @@ builder.Services.AddDbContext<MiniMartDbContext>(options =>
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
-
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddControllers()
 
     .AddOData(options => options
@@ -47,10 +56,13 @@ builder.Services.AddControllers()
 // ── Swagger ───────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMiniMartAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
 // ── Pipeline ──────────────────────────────────────────────────────
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -65,6 +77,8 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseMiddleware<CsrfMiddleware>();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

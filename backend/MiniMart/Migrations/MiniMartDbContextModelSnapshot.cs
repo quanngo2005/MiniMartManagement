@@ -34,19 +34,20 @@ namespace MiniMart.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("ImportPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("ManufactureDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<int>("QuantityImported")
@@ -61,8 +62,9 @@ namespace MiniMart.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("BatchId");
 
@@ -77,211 +79,226 @@ namespace MiniMart.Migrations
                         {
                             BatchId = 1,
                             BatchCode = "BATCH001",
-                            CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2025, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 23000m,
                             ManufactureDate = new DateTime(2023, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 18,
+                            Quantity = 200,
                             QuantityImported = 200,
                             QuantityRemaining = 150,
                             ReceiptId = 1,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 4600000m
                         },
                         new
                         {
                             BatchId = 2,
                             BatchCode = "BATCH002",
-                            CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 23000m,
                             ManufactureDate = new DateTime(2023, 12, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 19,
+                            Quantity = 160,
                             QuantityImported = 160,
                             QuantityRemaining = 120,
                             ReceiptId = 1,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 3680000m
                         },
                         new
                         {
                             BatchId = 3,
                             BatchCode = "BATCH003",
-                            CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2025, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 20000m,
                             ManufactureDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 20,
+                            Quantity = 200,
                             QuantityImported = 200,
                             QuantityRemaining = 160,
                             ReceiptId = 1,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 4000000m
                         },
                         new
                         {
                             BatchId = 4,
                             BatchCode = "BATCH004",
-                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 4000m,
                             ManufactureDate = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 24,
+                            Quantity = 500,
                             QuantityImported = 500,
                             QuantityRemaining = 400,
                             ReceiptId = 2,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 2000000m
                         },
                         new
                         {
                             BatchId = 5,
                             BatchCode = "BATCH005",
-                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 3000m,
                             ManufactureDate = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 25,
+                            Quantity = 400,
                             QuantityImported = 400,
                             QuantityRemaining = 350,
                             ReceiptId = 2,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 1200000m
                         },
                         new
                         {
                             BatchId = 6,
                             BatchCode = "BATCH006",
-                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2025, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 5000m,
                             ManufactureDate = new DateTime(2023, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 1,
+                            Quantity = 300,
                             QuantityImported = 300,
                             QuantityRemaining = 250,
                             ReceiptId = 2,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 1500000m
                         },
                         new
                         {
                             BatchId = 7,
                             BatchCode = "BATCH007",
-                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2025, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 8000m,
                             ManufactureDate = new DateTime(2023, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 3,
+                            Quantity = 300,
                             QuantityImported = 300,
                             QuantityRemaining = 280,
                             ReceiptId = 2,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 2400000m
                         },
                         new
                         {
                             BatchId = 8,
                             BatchCode = "BATCH008",
-                            CreatedAt = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2025, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 18000m,
                             ManufactureDate = new DateTime(2023, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 11,
+                            Quantity = 150,
                             QuantityImported = 150,
                             QuantityRemaining = 100,
                             ReceiptId = 3,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 2700000m
                         },
                         new
                         {
                             BatchId = 9,
                             BatchCode = "BATCH009",
-                            CreatedAt = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2025, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 35000m,
                             ManufactureDate = new DateTime(2023, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 12,
+                            Quantity = 100,
                             QuantityImported = 100,
                             QuantityRemaining = 80,
                             ReceiptId = 3,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 3500000m
                         },
                         new
                         {
                             BatchId = 10,
                             BatchCode = "BATCH010",
-                            CreatedAt = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 42000m,
                             ManufactureDate = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 36,
+                            Quantity = 100,
                             QuantityImported = 100,
                             QuantityRemaining = 90,
                             ReceiptId = 4,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 4200000m
                         },
                         new
                         {
                             BatchId = 11,
                             BatchCode = "BATCH011",
-                            CreatedAt = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 58000m,
                             ManufactureDate = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 37,
+                            Quantity = 80,
                             QuantityImported = 80,
                             QuantityRemaining = 70,
                             ReceiptId = 4,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 4640000m
                         },
                         new
                         {
                             BatchId = 12,
                             BatchCode = "BATCH012",
-                            CreatedAt = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 40000m,
                             ManufactureDate = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 38,
+                            Quantity = 90,
                             QuantityImported = 90,
                             QuantityRemaining = 80,
                             ReceiptId = 4,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 3600000m
                         },
                         new
                         {
                             BatchId = 13,
                             BatchCode = "BATCH013",
-                            CreatedAt = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 42000m,
                             ManufactureDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 41,
+                            Quantity = 100,
                             QuantityImported = 100,
                             QuantityRemaining = 90,
                             ReceiptId = 5,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 4200000m
                         },
                         new
                         {
                             BatchId = 14,
                             BatchCode = "BATCH014",
-                            CreatedAt = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 58000m,
                             ManufactureDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 42,
+                            Quantity = 90,
                             QuantityImported = 90,
                             QuantityRemaining = 80,
                             ReceiptId = 5,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 5220000m
                         },
                         new
                         {
                             BatchId = 15,
                             BatchCode = "BATCH015",
-                            CreatedAt = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ExpiryDate = new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImportPrice = 55000m,
                             ManufactureDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 43,
+                            Quantity = 110,
                             QuantityImported = 110,
                             QuantityRemaining = 100,
                             ReceiptId = 5,
-                            Status = true
+                            Status = true,
+                            TotalPrice = 6050000m
                         });
                 });
 
@@ -299,10 +316,8 @@ namespace MiniMart.Migrations
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -316,8 +331,8 @@ namespace MiniMart.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("TaxRateId")
+                        .HasColumnType("int");
 
                     b.HasKey("CategoryId");
 
@@ -325,6 +340,8 @@ namespace MiniMart.Migrations
                         .IsUnique();
 
                     b.HasIndex("ParentCategoryId");
+
+                    b.HasIndex("TaxRateId");
 
                     b.ToTable("Categories");
 
@@ -334,107 +351,107 @@ namespace MiniMart.Migrations
                             CategoryId = 1,
                             CategoryCode = "TPHUC",
                             CategoryName = "Thực phẩm & Đồ uống",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Thực phẩm và đồ uống các loại",
                             DisplayOrder = 1,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         },
                         new
                         {
                             CategoryId = 2,
                             CategoryCode = "VSCS",
                             CategoryName = "Vệ sinh & Chăm sóc",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Sản phẩm vệ sinh và chăm sóc cá nhân",
                             DisplayOrder = 2,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         },
                         new
                         {
                             CategoryId = 3,
                             CategoryCode = "GIADUNG",
                             CategoryName = "Gia dụng",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Đồ dùng gia đình",
                             DisplayOrder = 3,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         },
                         new
                         {
                             CategoryId = 4,
                             CategoryCode = "NUOCUONG",
                             CategoryName = "Nước uống & Đồ uống",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Nước uống, nước ngọt, nước tăng lực",
                             DisplayOrder = 1,
                             ParentCategoryId = 1,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         },
                         new
                         {
                             CategoryId = 5,
                             CategoryCode = "SNACK",
                             CategoryName = "Bánh kẹo & Snack",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Bánh kẹo, snack các loại",
                             DisplayOrder = 2,
                             ParentCategoryId = 1,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         },
                         new
                         {
                             CategoryId = 6,
                             CategoryCode = "SUADANH",
                             CategoryName = "Sữa & Sản phẩm từ sữa",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Sữa tươi, sữa hộp, sữa chua",
                             DisplayOrder = 3,
                             ParentCategoryId = 1,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         },
                         new
                         {
                             CategoryId = 7,
                             CategoryCode = "MITOMIM",
                             CategoryName = "Mì & Thực phẩm khô",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Mì gói, bún khô, phở khô",
                             DisplayOrder = 4,
                             ParentCategoryId = 1,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         },
                         new
                         {
                             CategoryId = 8,
                             CategoryCode = "GIACVI",
                             CategoryName = "Gia vị & Dầu ăn",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Gia vị, dầu ăn, nước mắm, tương",
                             DisplayOrder = 5,
                             ParentCategoryId = 1,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         },
                         new
                         {
                             CategoryId = 9,
                             CategoryCode = "GIATRANG",
                             CategoryName = "Giặt tẩy",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Bột giặt, nước giặt, nước xả",
                             DisplayOrder = 1,
                             ParentCategoryId = 2,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         },
                         new
                         {
                             CategoryId = 10,
                             CategoryCode = "VSCT",
                             CategoryName = "Vệ sinh cá nhân",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Dầu gội, sữa tắm, kem đánh răng",
                             DisplayOrder = 2,
                             ParentCategoryId = 2,
-                            Status = true
+                            Status = true,
+                            TaxRateId = 4
                         });
                 });
 
@@ -448,9 +465,6 @@ namespace MiniMart.Migrations
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("CustomerCode")
                         .IsRequired()
@@ -473,12 +487,6 @@ namespace MiniMart.Migrations
                     b.Property<int>("Point")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalSpent")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("CustomerId");
 
                     b.HasIndex("PhoneNumber")
@@ -491,288 +499,361 @@ namespace MiniMart.Migrations
                         {
                             CustomerId = 1,
                             Address = "12 Lê Lợi, Q.1, TP.HCM",
-                            CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH001",
                             CustomerStatus = true,
                             Email = "hoa.nguyen@gmail.com",
                             FullName = "Nguyễn Thị Hoa",
                             PhoneNumber = "0911000001",
-                            Point = 150,
-                            TotalSpent = 1500000m
+                            Point = 150
                         },
                         new
                         {
                             CustomerId = 2,
                             Address = "45 Nguyễn Huệ, Q.1, TP.HCM",
-                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH002",
                             CustomerStatus = true,
                             Email = "binh.tran@gmail.com",
                             FullName = "Trần Văn Bình",
                             PhoneNumber = "0911000002",
-                            Point = 300,
-                            TotalSpent = 3000000m
+                            Point = 300
                         },
                         new
                         {
                             CustomerId = 3,
                             Address = "78 Trần Hưng Đạo, Q.5, TP.HCM",
-                            CreatedAt = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH003",
                             CustomerStatus = true,
                             Email = "cam.le@gmail.com",
                             FullName = "Lê Thị Cẩm",
                             PhoneNumber = "0911000003",
-                            Point = 80,
-                            TotalSpent = 800000m
+                            Point = 80
                         },
                         new
                         {
                             CustomerId = 4,
                             Address = "23 Võ Thị Sáu, Q.3, TP.HCM",
-                            CreatedAt = new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH004",
                             CustomerStatus = true,
                             Email = "duc.pham@gmail.com",
                             FullName = "Phạm Minh Đức",
                             PhoneNumber = "0911000004",
-                            Point = 500,
-                            TotalSpent = 5000000m
+                            Point = 500
                         },
                         new
                         {
                             CustomerId = 5,
                             Address = "56 Đinh Tiên Hoàng, Q.Bình Thạnh",
-                            CreatedAt = new DateTime(2024, 2, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH005",
                             CustomerStatus = true,
                             Email = "e.hoang@gmail.com",
                             FullName = "Hoàng Thị Ế",
                             PhoneNumber = "0911000005",
-                            Point = 200,
-                            TotalSpent = 2000000m
+                            Point = 200
                         },
                         new
                         {
                             CustomerId = 6,
                             Address = "34 CMT8, Q.10, TP.HCM",
-                            CreatedAt = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH006",
                             CustomerStatus = true,
                             Email = "phong.vu@gmail.com",
                             FullName = "Vũ Quốc Phong",
                             PhoneNumber = "0911000006",
-                            Point = 420,
-                            TotalSpent = 4200000m
+                            Point = 420
                         },
                         new
                         {
                             CustomerId = 7,
                             Address = "90 Lý Thường Kiệt, Q.10, TP.HCM",
-                            CreatedAt = new DateTime(2024, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH007",
                             CustomerStatus = true,
                             Email = "giau.dang@gmail.com",
                             FullName = "Đặng Thị Giàu",
                             PhoneNumber = "0911000007",
-                            Point = 60,
-                            TotalSpent = 600000m
+                            Point = 60
                         },
                         new
                         {
                             CustomerId = 8,
                             Address = "11 Phan Đăng Lưu, Q.Bình Thạnh",
-                            CreatedAt = new DateTime(2024, 3, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH008",
                             CustomerStatus = true,
                             Email = "hai.bui@gmail.com",
                             FullName = "Bùi Văn Hải",
                             PhoneNumber = "0911000008",
-                            Point = 750,
-                            TotalSpent = 7500000m
+                            Point = 750
                         },
                         new
                         {
                             CustomerId = 9,
                             Address = "67 Xô Viết Nghệ Tĩnh, Q.Bình Thạnh",
-                            CreatedAt = new DateTime(2024, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH009",
                             CustomerStatus = true,
                             Email = "iris.ngo@gmail.com",
                             FullName = "Ngô Thị Iris",
                             PhoneNumber = "0911000009",
-                            Point = 110,
-                            TotalSpent = 1100000m
+                            Point = 110
                         },
                         new
                         {
                             CustomerId = 10,
                             Address = "28 Điện Biên Phủ, Q.Bình Thạnh",
-                            CreatedAt = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH010",
                             CustomerStatus = true,
                             Email = "khoa.trinh@gmail.com",
                             FullName = "Trịnh Minh Khoa",
                             PhoneNumber = "0911000010",
-                            Point = 330,
-                            TotalSpent = 3300000m
+                            Point = 330
                         },
                         new
                         {
                             CustomerId = 11,
                             Address = "5 Nơ Trang Long, Q.Bình Thạnh",
-                            CreatedAt = new DateTime(2024, 4, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH011",
                             CustomerStatus = true,
                             Email = "lan.ly@gmail.com",
                             FullName = "Lý Thị Lan",
                             PhoneNumber = "0911000011",
-                            Point = 90,
-                            TotalSpent = 900000m
+                            Point = 90
                         },
                         new
                         {
                             CustomerId = 12,
                             Address = "42 Hai Bà Trưng, Q.1, TP.HCM",
-                            CreatedAt = new DateTime(2024, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH012",
                             CustomerStatus = true,
                             Email = "manh.phan@gmail.com",
                             FullName = "Phan Văn Mạnh",
                             PhoneNumber = "0911000012",
-                            Point = 650,
-                            TotalSpent = 6500000m
+                            Point = 650
                         },
                         new
                         {
                             CustomerId = 13,
                             Address = "17 Trường Chinh, Q.Tân Bình",
-                            CreatedAt = new DateTime(2024, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH013",
                             CustomerStatus = true,
                             Email = "nga.dinh@gmail.com",
                             FullName = "Đinh Thị Nga",
                             PhoneNumber = "0911000013",
-                            Point = 40,
-                            TotalSpent = 400000m
+                            Point = 40
                         },
                         new
                         {
                             CustomerId = 14,
                             Address = "88 Hoàng Văn Thụ, Q.Tân Bình",
-                            CreatedAt = new DateTime(2024, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH014",
                             CustomerStatus = true,
                             Email = "oanh.cao@gmail.com",
                             FullName = "Cao Thanh Oanh",
                             PhoneNumber = "0911000014",
-                            Point = 270,
-                            TotalSpent = 2700000m
+                            Point = 270
                         },
                         new
                         {
                             CustomerId = 15,
                             Address = "3 Bạch Đằng, Q.Tân Bình",
-                            CreatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH015",
                             CustomerStatus = true,
                             Email = "phat.mai@gmail.com",
                             FullName = "Mai Văn Phát",
                             PhoneNumber = "0911000015",
-                            Point = 180,
-                            TotalSpent = 1800000m
+                            Point = 180
                         },
                         new
                         {
                             CustomerId = 16,
                             Address = "54 Nguyễn Thái Sơn, Q.Gò Vấp",
-                            CreatedAt = new DateTime(2024, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH016",
                             CustomerStatus = true,
                             Email = "quynh.truong@gmail.com",
                             FullName = "Trương Thị Quỳnh",
                             PhoneNumber = "0911000016",
-                            Point = 520,
-                            TotalSpent = 5200000m
+                            Point = 520
                         },
                         new
                         {
                             CustomerId = 17,
                             Address = "29 Quang Trung, Q.Gò Vấp",
-                            CreatedAt = new DateTime(2024, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH017",
                             CustomerStatus = true,
                             Email = "quan.do@gmail.com",
                             FullName = "Đỗ Minh Quân",
                             PhoneNumber = "0911000017",
-                            Point = 95,
-                            TotalSpent = 950000m
+                            Point = 95
                         },
                         new
                         {
                             CustomerId = 18,
                             Address = "71 Lê Đức Thọ, Q.Gò Vấp",
-                            CreatedAt = new DateTime(2024, 7, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH018",
                             CustomerStatus = false,
                             Email = "suong.ho@gmail.com",
                             FullName = "Hồ Thị Sương",
                             PhoneNumber = "0911000018",
-                            Point = 380,
-                            TotalSpent = 3800000m
+                            Point = 380
                         },
                         new
                         {
                             CustomerId = 19,
                             Address = "6 Nguyễn Oanh, Q.Gò Vấp",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH019",
                             CustomerStatus = true,
                             Email = "tai.luong@gmail.com",
                             FullName = "Lương Văn Tài",
                             PhoneNumber = "0911000019",
-                            Point = 210,
-                            TotalSpent = 2100000m
+                            Point = 210
                         },
                         new
                         {
                             CustomerId = 20,
                             Address = "38 Phan Văn Trị, Q.Gò Vấp",
-                            CreatedAt = new DateTime(2024, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH020",
                             CustomerStatus = true,
                             Email = "uyen.duong@gmail.com",
                             FullName = "Dương Thị Uyên",
                             PhoneNumber = "0911000020",
-                            Point = 460,
-                            TotalSpent = 4600000m
+                            Point = 460
                         },
                         new
                         {
                             CustomerId = 21,
                             Address = "13 Phạm Văn Đồng, Q.Bình Thạnh",
-                            CreatedAt = new DateTime(2024, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH021",
                             CustomerStatus = true,
                             Email = "van.kieu@gmail.com",
                             FullName = "Kiều Thanh Vân",
                             PhoneNumber = "0911000021",
-                            Point = 130,
-                            TotalSpent = 1300000m
+                            Point = 130
                         },
                         new
                         {
                             CustomerId = 22,
                             Address = "49 Nơ Trang Long, Q.Bình Thạnh",
-                            CreatedAt = new DateTime(2024, 9, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerCode = "KH022",
                             CustomerStatus = true,
                             Email = "xuan.to@gmail.com",
                             FullName = "Tô Văn Xuân",
                             PhoneNumber = "0911000022",
-                            Point = 700,
-                            TotalSpent = 7000000m
+                            Point = 700
                         });
+                });
+
+            modelBuilder.Entity("MiniMart.Models.EInvoice", b =>
+                {
+                    b.Property<int>("EInvoiceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EInvoiceId"));
+
+                    b.Property<string>("BuyerAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BuyerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BuyerTaxCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GDTAuthCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceSerial")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("IssuedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("TotalAfterVAT")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalBeforeVAT")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("VATAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("XMLContent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EInvoiceId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("EInvoices");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.EInvoiceDetail", b =>
+                {
+                    b.Property<int>("EInvoiceDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EInvoiceDetailId"));
+
+                    b.Property<decimal>("AmountAfterVAT")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("AmountBeforeVAT")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("EInvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderDetailId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("VatAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("VatRate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.HasKey("EInvoiceDetailId");
+
+                    b.HasIndex("EInvoiceId");
+
+                    b.HasIndex("OrderDetailId");
+
+                    b.ToTable("EInvoiceDetails");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Employee", b =>
@@ -789,23 +870,27 @@ namespace MiniMart.Migrations
                     b.Property<string>("Avatar")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("FailedLoginAttempts")
+                        .HasColumnType("int");
+
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("HireDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LockoutEnd")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PasswordHash")
@@ -820,13 +905,11 @@ namespace MiniMart.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Salary")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -848,9 +931,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 1,
-                            CreatedAt = new DateTime(2020, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1985, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "an.nguyen@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Nguyễn Văn An",
                             Gender = true,
                             HireDate = new DateTime(2020, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -864,9 +947,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 2,
-                            CreatedAt = new DateTime(2020, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1992, 7, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "bich.tran@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Trần Thị Bích",
                             Gender = false,
                             HireDate = new DateTime(2020, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -880,9 +963,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 3,
-                            CreatedAt = new DateTime(2020, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "chau.le@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Lê Minh Châu",
                             Gender = true,
                             HireDate = new DateTime(2020, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -896,9 +979,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 4,
-                            CreatedAt = new DateTime(2021, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1993, 9, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "dung.pham@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Phạm Thị Dung",
                             Gender = false,
                             HireDate = new DateTime(2021, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -912,9 +995,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 5,
-                            CreatedAt = new DateTime(2021, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1988, 12, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "em.hoang@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Hoàng Văn Em",
                             Gender = true,
                             HireDate = new DateTime(2021, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -928,9 +1011,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 6,
-                            CreatedAt = new DateTime(2021, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1995, 2, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "phuong.vu@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Vũ Thị Phương",
                             Gender = false,
                             HireDate = new DateTime(2021, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -944,9 +1027,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 7,
-                            CreatedAt = new DateTime(2021, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1987, 8, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "hung.dang@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Đặng Quốc Hùng",
                             Gender = true,
                             HireDate = new DateTime(2021, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -960,9 +1043,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 8,
-                            CreatedAt = new DateTime(2022, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1994, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "lan.bui@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Bùi Thị Lan",
                             Gender = false,
                             HireDate = new DateTime(2022, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -976,9 +1059,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 9,
-                            CreatedAt = new DateTime(2022, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1991, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "minh.ngo@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Ngô Thanh Minh",
                             Gender = true,
                             HireDate = new DateTime(2022, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -992,9 +1075,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 10,
-                            CreatedAt = new DateTime(2022, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1996, 10, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "nga.trinh@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Trịnh Thị Nga",
                             Gender = false,
                             HireDate = new DateTime(2022, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1008,9 +1091,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 11,
-                            CreatedAt = new DateTime(2023, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1989, 1, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "phuc.ly@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Lý Văn Phúc",
                             Gender = true,
                             HireDate = new DateTime(2023, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1024,9 +1107,9 @@ namespace MiniMart.Migrations
                         new
                         {
                             EmployeeId = 12,
-                            CreatedAt = new DateTime(2023, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1997, 5, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "quynh.phan@minimart.vn",
+                            FailedLoginAttempts = 0,
                             FullName = "Phan Thị Quỳnh",
                             Gender = false,
                             HireDate = new DateTime(2023, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1049,9 +1132,6 @@ namespace MiniMart.Migrations
 
                     b.Property<int?>("BatchId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("CurrentStock")
                         .HasColumnType("int");
@@ -1080,9 +1160,6 @@ namespace MiniMart.Migrations
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("InventoryTransactionId");
 
                     b.HasIndex("BatchId");
@@ -1098,7 +1175,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 1,
                             BatchId = 1,
-                            CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 200,
                             EmployeeId = 4,
                             Note = "Nhập hàng từ phiếu PN001",
@@ -1113,7 +1189,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 2,
                             BatchId = 2,
-                            CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 160,
                             EmployeeId = 4,
                             Note = "Nhập hàng từ phiếu PN001",
@@ -1128,7 +1203,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 3,
                             BatchId = 3,
-                            CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 200,
                             EmployeeId = 4,
                             Note = "Nhập hàng từ phiếu PN001",
@@ -1143,7 +1217,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 4,
                             BatchId = 4,
-                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 500,
                             EmployeeId = 4,
                             Note = "Nhập hàng từ phiếu PN002",
@@ -1158,7 +1231,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 5,
                             BatchId = 6,
-                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 300,
                             EmployeeId = 4,
                             Note = "Nhập hàng từ phiếu PN002",
@@ -1173,7 +1245,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 6,
                             BatchId = 1,
-                            CreatedAt = new DateTime(2024, 6, 1, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 198,
                             EmployeeId = 2,
                             Note = "Bán hàng đơn HD001",
@@ -1188,7 +1259,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 7,
                             BatchId = 6,
-                            CreatedAt = new DateTime(2024, 6, 1, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 298,
                             EmployeeId = 2,
                             Note = "Bán hàng đơn HD001",
@@ -1203,7 +1273,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 8,
                             BatchId = 4,
-                            CreatedAt = new DateTime(2024, 6, 1, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 498,
                             EmployeeId = 2,
                             Note = "Bán hàng đơn HD001",
@@ -1218,7 +1287,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 9,
                             BatchId = 10,
-                            CreatedAt = new DateTime(2024, 6, 1, 17, 20, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 98,
                             EmployeeId = 3,
                             Note = "Bán hàng đơn HD004",
@@ -1233,7 +1301,6 @@ namespace MiniMart.Migrations
                         {
                             InventoryTransactionId = 10,
                             BatchId = 12,
-                            CreatedAt = new DateTime(2024, 6, 1, 17, 20, 0, 0, DateTimeKind.Unspecified),
                             CurrentStock = 88,
                             EmployeeId = 3,
                             Note = "Bán hàng đơn HD004",
@@ -1255,21 +1322,21 @@ namespace MiniMart.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
 
                     b.Property<decimal>("ChangeAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("FinalAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Note")
@@ -1280,12 +1347,7 @@ namespace MiniMart.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PaidAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Promotion")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ShiftId")
@@ -1295,16 +1357,12 @@ namespace MiniMart.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("SubTotal")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("OrderId");
 
@@ -1321,180 +1379,140 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 1,
                             ChangeAmount = 4000m,
-                            CreatedAt = new DateTime(2024, 6, 1, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 1,
                             DiscountAmount = 0m,
                             EmployeeId = 2,
                             FinalAmount = 66000m,
                             OrderCode = "HD001",
                             PaidAmount = 70000m,
-                            PaymentMethod = 1,
-                            Promotion = 0m,
                             Status = 2,
                             SubTotal = 66000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 66000m
+                            TaxAmount = 0m
                         },
                         new
                         {
                             OrderId = 2,
                             ChangeAmount = 0m,
-                            CreatedAt = new DateTime(2024, 6, 1, 9, 15, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 4,
                             DiscountAmount = 0m,
                             EmployeeId = 2,
                             FinalAmount = 110000m,
                             OrderCode = "HD002",
                             PaidAmount = 110000m,
-                            PaymentMethod = 2,
-                            Promotion = 0m,
                             Status = 2,
                             SubTotal = 110000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 110000m
+                            TaxAmount = 0m
                         },
                         new
                         {
                             OrderId = 3,
                             ChangeAmount = 0m,
-                            CreatedAt = new DateTime(2024, 6, 1, 15, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 2,
                             DiscountAmount = 5000m,
                             EmployeeId = 3,
                             FinalAmount = 50000m,
                             OrderCode = "HD003",
                             PaidAmount = 50000m,
-                            PaymentMethod = 1,
-                            Promotion = 5000m,
                             Status = 2,
                             SubTotal = 55000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 55000m
+                            TaxAmount = 0m
                         },
                         new
                         {
                             OrderId = 4,
                             ChangeAmount = 20000m,
-                            CreatedAt = new DateTime(2024, 6, 1, 17, 20, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 8,
                             DiscountAmount = 0m,
                             EmployeeId = 3,
                             FinalAmount = 180000m,
                             OrderCode = "HD004",
                             PaidAmount = 200000m,
-                            PaymentMethod = 1,
-                            Promotion = 0m,
                             Status = 2,
                             SubTotal = 180000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 180000m
+                            TaxAmount = 0m
                         },
                         new
                         {
                             OrderId = 5,
                             ChangeAmount = 8000m,
-                            CreatedAt = new DateTime(2024, 6, 2, 7, 45, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 3,
                             DiscountAmount = 0m,
                             EmployeeId = 5,
                             FinalAmount = 92000m,
                             OrderCode = "HD005",
                             PaidAmount = 100000m,
-                            PaymentMethod = 1,
-                            Promotion = 0m,
                             Status = 2,
                             SubTotal = 92000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 92000m
+                            TaxAmount = 0m
                         },
                         new
                         {
                             OrderId = 6,
                             ChangeAmount = 0m,
-                            CreatedAt = new DateTime(2024, 6, 2, 16, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 12,
                             DiscountAmount = 10000m,
                             EmployeeId = 6,
                             FinalAmount = 235000m,
                             OrderCode = "HD006",
                             PaidAmount = 235000m,
-                            PaymentMethod = 2,
-                            Promotion = 10000m,
                             Status = 2,
                             SubTotal = 245000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 245000m
+                            TaxAmount = 0m
                         },
                         new
                         {
                             OrderId = 7,
                             ChangeAmount = 2000m,
-                            CreatedAt = new DateTime(2024, 6, 2, 10, 10, 0, 0, DateTimeKind.Unspecified),
                             DiscountAmount = 0m,
                             EmployeeId = 5,
                             FinalAmount = 38000m,
                             OrderCode = "HD007",
                             PaidAmount = 40000m,
-                            PaymentMethod = 1,
-                            Promotion = 0m,
                             Status = 2,
                             SubTotal = 38000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 38000m
+                            TaxAmount = 0m
                         },
                         new
                         {
                             OrderId = 8,
                             ChangeAmount = 0m,
-                            CreatedAt = new DateTime(2024, 6, 2, 19, 30, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 6,
                             DiscountAmount = 0m,
                             EmployeeId = 10,
                             FinalAmount = 130000m,
                             OrderCode = "HD008",
                             PaidAmount = 130000m,
-                            PaymentMethod = 3,
-                            Promotion = 0m,
                             Status = 2,
                             SubTotal = 130000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 130000m
+                            TaxAmount = 0m
                         },
                         new
                         {
                             OrderId = 9,
                             ChangeAmount = 5000m,
-                            CreatedAt = new DateTime(2024, 6, 3, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 10,
                             DiscountAmount = 0m,
                             EmployeeId = 2,
                             FinalAmount = 75000m,
                             OrderCode = "HD009",
                             PaidAmount = 80000m,
-                            PaymentMethod = 1,
-                            Promotion = 0m,
                             Status = 2,
                             SubTotal = 75000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 75000m
+                            TaxAmount = 0m
                         },
                         new
                         {
                             OrderId = 10,
                             ChangeAmount = 0m,
-                            CreatedAt = new DateTime(2024, 6, 3, 11, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 22,
                             DiscountAmount = 20000m,
                             EmployeeId = 12,
                             FinalAmount = 300000m,
                             OrderCode = "HD010",
                             PaidAmount = 300000m,
-                            PaymentMethod = 2,
-                            Promotion = 20000m,
                             Status = 2,
                             SubTotal = 320000m,
-                            TaxAmount = 0m,
-                            TotalAmount = 320000m
+                            TaxAmount = 0m
                         });
                 });
 
@@ -1510,6 +1528,7 @@ namespace MiniMart.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsGift")
@@ -1525,10 +1544,20 @@ namespace MiniMart.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("VatAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("VatRate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.HasKey("OrderDetailId");
 
@@ -1548,7 +1577,9 @@ namespace MiniMart.Migrations
                             ProductId = 18,
                             Quantity = 2,
                             TotalPrice = 64000m,
-                            UnitPrice = 32000m
+                            UnitPrice = 32000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1559,7 +1590,9 @@ namespace MiniMart.Migrations
                             ProductId = 1,
                             Quantity = 2,
                             TotalPrice = 14000m,
-                            UnitPrice = 7000m
+                            UnitPrice = 7000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1570,7 +1603,9 @@ namespace MiniMart.Migrations
                             ProductId = 24,
                             Quantity = 2,
                             TotalPrice = 10000m,
-                            UnitPrice = 5000m
+                            UnitPrice = 5000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1581,7 +1616,9 @@ namespace MiniMart.Migrations
                             ProductId = 9,
                             Quantity = 2,
                             TotalPrice = 44000m,
-                            UnitPrice = 22000m
+                            UnitPrice = 22000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1592,7 +1629,9 @@ namespace MiniMart.Migrations
                             ProductId = 12,
                             Quantity = 1,
                             TotalPrice = 45000m,
-                            UnitPrice = 45000m
+                            UnitPrice = 45000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1603,7 +1642,9 @@ namespace MiniMart.Migrations
                             ProductId = 11,
                             Quantity = 1,
                             TotalPrice = 25000m,
-                            UnitPrice = 25000m
+                            UnitPrice = 25000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1614,7 +1655,9 @@ namespace MiniMart.Migrations
                             ProductId = 41,
                             Quantity = 1,
                             TotalPrice = 50000m,
-                            UnitPrice = 55000m
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1625,7 +1668,9 @@ namespace MiniMart.Migrations
                             ProductId = 36,
                             Quantity = 2,
                             TotalPrice = 110000m,
-                            UnitPrice = 55000m
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1636,7 +1681,9 @@ namespace MiniMart.Migrations
                             ProductId = 38,
                             Quantity = 2,
                             TotalPrice = 104000m,
-                            UnitPrice = 52000m
+                            UnitPrice = 52000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1647,7 +1694,9 @@ namespace MiniMart.Migrations
                             ProductId = 39,
                             Quantity = 1,
                             TotalPrice = 25000m,
-                            UnitPrice = 25000m
+                            UnitPrice = 25000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1658,7 +1707,9 @@ namespace MiniMart.Migrations
                             ProductId = 20,
                             Quantity = 2,
                             TotalPrice = 56000m,
-                            UnitPrice = 28000m
+                            UnitPrice = 28000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1669,7 +1720,9 @@ namespace MiniMart.Migrations
                             ProductId = 24,
                             Quantity = 3,
                             TotalPrice = 15000m,
-                            UnitPrice = 5000m
+                            UnitPrice = 5000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1680,7 +1733,9 @@ namespace MiniMart.Migrations
                             ProductId = 3,
                             Quantity = 3,
                             TotalPrice = 33000m,
-                            UnitPrice = 11000m
+                            UnitPrice = 11000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1691,7 +1746,9 @@ namespace MiniMart.Migrations
                             ProductId = 31,
                             Quantity = 2,
                             TotalPrice = 110000m,
-                            UnitPrice = 55000m
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1702,7 +1759,9 @@ namespace MiniMart.Migrations
                             ProductId = 29,
                             Quantity = 2,
                             TotalPrice = 56000m,
-                            UnitPrice = 28000m
+                            UnitPrice = 28000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1713,7 +1772,9 @@ namespace MiniMart.Migrations
                             ProductId = 34,
                             Quantity = 2,
                             TotalPrice = 65000m,
-                            UnitPrice = 35000m
+                            UnitPrice = 35000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1724,7 +1785,9 @@ namespace MiniMart.Migrations
                             ProductId = 33,
                             Quantity = 2,
                             TotalPrice = 51000m,
-                            UnitPrice = 28000m
+                            UnitPrice = 28000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1735,7 +1798,9 @@ namespace MiniMart.Migrations
                             ProductId = 24,
                             Quantity = 5,
                             TotalPrice = 25000m,
-                            UnitPrice = 5000m
+                            UnitPrice = 5000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1746,7 +1811,9 @@ namespace MiniMart.Migrations
                             ProductId = 26,
                             Quantity = 2,
                             TotalPrice = 12000m,
-                            UnitPrice = 6000m
+                            UnitPrice = 6000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1757,7 +1824,9 @@ namespace MiniMart.Migrations
                             ProductId = 43,
                             Quantity = 1,
                             TotalPrice = 72000m,
-                            UnitPrice = 72000m
+                            UnitPrice = 72000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1768,7 +1837,9 @@ namespace MiniMart.Migrations
                             ProductId = 42,
                             Quantity = 1,
                             TotalPrice = 75000m,
-                            UnitPrice = 75000m
+                            UnitPrice = 75000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1779,7 +1850,9 @@ namespace MiniMart.Migrations
                             ProductId = 44,
                             Quantity = 2,
                             TotalPrice = 76000m,
-                            UnitPrice = 38000m
+                            UnitPrice = 38000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1790,7 +1863,9 @@ namespace MiniMart.Migrations
                             ProductId = 8,
                             Quantity = 2,
                             TotalPrice = 36000m,
-                            UnitPrice = 18000m
+                            UnitPrice = 18000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1801,7 +1876,9 @@ namespace MiniMart.Migrations
                             ProductId = 15,
                             Quantity = 3,
                             TotalPrice = 45000m,
-                            UnitPrice = 15000m
+                            UnitPrice = 15000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1812,7 +1889,9 @@ namespace MiniMart.Migrations
                             ProductId = 36,
                             Quantity = 2,
                             TotalPrice = 105000m,
-                            UnitPrice = 55000m
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1823,7 +1902,9 @@ namespace MiniMart.Migrations
                             ProductId = 37,
                             Quantity = 2,
                             TotalPrice = 140000m,
-                            UnitPrice = 75000m
+                            UnitPrice = 75000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         },
                         new
                         {
@@ -1834,34 +1915,167 @@ namespace MiniMart.Migrations
                             ProductId = 41,
                             Quantity = 2,
                             TotalPrice = 105000m,
-                            UnitPrice = 55000m
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
                         });
                 });
 
-            modelBuilder.Entity("MiniMart.Models.OrderPromotion", b =>
+            modelBuilder.Entity("MiniMart.Models.OrderReturn", b =>
                 {
-                    b.Property<int>("OrderPromotionId")
+                    b.Property<int>("OrderReturnId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderPromotionId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderReturnId"));
 
-                    b.Property<decimal>("DiscountAmount")
+                    b.Property<int?>("EInvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OriginalOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("RefundAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RefundMethod")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReturnCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderReturnId");
+
+                    b.HasIndex("EInvoiceId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("OriginalOrderId");
+
+                    b.ToTable("OrderReturns", t =>
+                        {
+                            t.HasCheckConstraint("CK_OrderReturns_RefundMethod", "[RefundMethod] IN (1,2,3,4,5,6)");
+
+                            t.HasCheckConstraint("CK_OrderReturns_Status", "[Status] IN (1,2,3)");
+                        });
+                });
+
+            modelBuilder.Entity("MiniMart.Models.OrderReturnDetail", b =>
+                {
+                    b.Property<int>("OrderReturnDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderReturnDetailId"));
+
+                    b.Property<int>("OrderReturnId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("OrderReturnDetailId");
+
+                    b.HasIndex("OrderReturnId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderReturnDetails");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.Payment", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PromotionId")
+                    b.Property<DateTime>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
 
-                    b.HasKey("OrderPromotionId");
+                    b.Property<string>("TransactionRef")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PaymentId");
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("PromotionId");
+                    b.ToTable("Payments", t =>
+                        {
+                            t.HasCheckConstraint("CK_Payments_PaymentMethod", "[PaymentMethod] IN (1,2,3,4,5,6)");
+                        });
+                });
 
-                    b.ToTable("OrderPromotions");
+            modelBuilder.Entity("MiniMart.Models.PointTransaction", b =>
+                {
+                    b.Property<int>("PointTransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PointTransactionId"));
+
+                    b.Property<int>("BalanceAfter")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Delta")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
+
+                    b.HasKey("PointTransactionId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("PointTransactions", t =>
+                        {
+                            t.HasCheckConstraint("CK_PointTransactions_TransactionType", "[TransactionType] IN (1,2,3,4)");
+                        });
                 });
 
             modelBuilder.Entity("MiniMart.Models.Product", b =>
@@ -1879,14 +2093,14 @@ namespace MiniMart.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MinimumStock")
+                        .HasColumnType("int");
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
@@ -1894,9 +2108,11 @@ namespace MiniMart.Migrations
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<decimal>("SellingPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("Status")
@@ -1907,9 +2123,6 @@ namespace MiniMart.Migrations
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("ProductId");
 
@@ -1931,7 +2144,7 @@ namespace MiniMart.Migrations
                             ProductId = 1,
                             Barcode = "8934588011001",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP001",
                             ProductName = "Nước suối Aquafina 500ml",
                             SellingPrice = 7000m,
@@ -1944,7 +2157,7 @@ namespace MiniMart.Migrations
                             ProductId = 2,
                             Barcode = "8934588011002",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP002",
                             ProductName = "Nước suối Lavie 500ml",
                             SellingPrice = 6000m,
@@ -1957,7 +2170,7 @@ namespace MiniMart.Migrations
                             ProductId = 3,
                             Barcode = "8934588011003",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP003",
                             ProductName = "Nước ngọt Pepsi lon 330ml",
                             SellingPrice = 11000m,
@@ -1970,7 +2183,7 @@ namespace MiniMart.Migrations
                             ProductId = 4,
                             Barcode = "8934588011004",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP004",
                             ProductName = "Nước ngọt Coca-Cola lon 330ml",
                             SellingPrice = 11000m,
@@ -1983,7 +2196,7 @@ namespace MiniMart.Migrations
                             ProductId = 5,
                             Barcode = "8934588011005",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP005",
                             ProductName = "Nước tăng lực Sting đỏ 330ml",
                             SellingPrice = 10000m,
@@ -1996,7 +2209,7 @@ namespace MiniMart.Migrations
                             ProductId = 6,
                             Barcode = "8934588011006",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP006",
                             ProductName = "Trà xanh 0 độ chai 350ml",
                             SellingPrice = 9000m,
@@ -2009,7 +2222,7 @@ namespace MiniMart.Migrations
                             ProductId = 7,
                             Barcode = "8934588011007",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP007",
                             ProductName = "Nước cam ép Teppy 250ml",
                             SellingPrice = 8000m,
@@ -2022,7 +2235,7 @@ namespace MiniMart.Migrations
                             ProductId = 8,
                             Barcode = "8934588011008",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP008",
                             ProductName = "Bia Tiger lon 330ml",
                             SellingPrice = 18000m,
@@ -2035,7 +2248,7 @@ namespace MiniMart.Migrations
                             ProductId = 9,
                             Barcode = "8934588011009",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP009",
                             ProductName = "Bia Heineken lon 330ml",
                             SellingPrice = 22000m,
@@ -2048,7 +2261,7 @@ namespace MiniMart.Migrations
                             ProductId = 10,
                             Barcode = "8934588011010",
                             CategoryId = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP010",
                             ProductName = "Nước suối Aquafina 1.5L",
                             SellingPrice = 12000m,
@@ -2061,7 +2274,7 @@ namespace MiniMart.Migrations
                             ProductId = 11,
                             Barcode = "8934588011011",
                             CategoryId = 5,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP011",
                             ProductName = "Bánh quy Oreo socola gói 119g",
                             SellingPrice = 25000m,
@@ -2074,7 +2287,7 @@ namespace MiniMart.Migrations
                             ProductId = 12,
                             Barcode = "8934588011012",
                             CategoryId = 5,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP012",
                             ProductName = "Snack Pringles Original 110g",
                             SellingPrice = 45000m,
@@ -2087,7 +2300,7 @@ namespace MiniMart.Migrations
                             ProductId = 13,
                             Barcode = "8934588011013",
                             CategoryId = 5,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP013",
                             ProductName = "Bánh mì tươi Kinh Đô 300g",
                             SellingPrice = 22000m,
@@ -2100,7 +2313,7 @@ namespace MiniMart.Migrations
                             ProductId = 14,
                             Barcode = "8934588011014",
                             CategoryId = 5,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP014",
                             ProductName = "Kẹo dẻo Haribo 250g",
                             SellingPrice = 35000m,
@@ -2113,7 +2326,7 @@ namespace MiniMart.Migrations
                             ProductId = 15,
                             Barcode = "8934588011015",
                             CategoryId = 5,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP015",
                             ProductName = "Snack Lay's vị tự nhiên 52g",
                             SellingPrice = 15000m,
@@ -2126,7 +2339,7 @@ namespace MiniMart.Migrations
                             ProductId = 16,
                             Barcode = "8934588011016",
                             CategoryId = 5,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP016",
                             ProductName = "Bánh Cosy sữa 135g",
                             SellingPrice = 18000m,
@@ -2139,7 +2352,7 @@ namespace MiniMart.Migrations
                             ProductId = 17,
                             Barcode = "8934588011017",
                             CategoryId = 5,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP017",
                             ProductName = "Kẹo Chupa Chups hộp 60 cái",
                             SellingPrice = 55000m,
@@ -2152,7 +2365,7 @@ namespace MiniMart.Migrations
                             ProductId = 18,
                             Barcode = "8934588011018",
                             CategoryId = 6,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP018",
                             ProductName = "Sữa tươi Vinamilk có đường 1L",
                             SellingPrice = 32000m,
@@ -2165,7 +2378,7 @@ namespace MiniMart.Migrations
                             ProductId = 19,
                             Barcode = "8934588011019",
                             CategoryId = 6,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP019",
                             ProductName = "Sữa tươi Vinamilk không đường 1L",
                             SellingPrice = 32000m,
@@ -2178,7 +2391,7 @@ namespace MiniMart.Migrations
                             ProductId = 20,
                             Barcode = "8934588011020",
                             CategoryId = 6,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP020",
                             ProductName = "Sữa chua Vinamilk lốc 4 hũ",
                             SellingPrice = 28000m,
@@ -2191,7 +2404,7 @@ namespace MiniMart.Migrations
                             ProductId = 21,
                             Barcode = "8934588011021",
                             CategoryId = 6,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP021",
                             ProductName = "Sữa đặc Ông Thọ 380g",
                             SellingPrice = 24000m,
@@ -2204,7 +2417,7 @@ namespace MiniMart.Migrations
                             ProductId = 22,
                             Barcode = "8934588011022",
                             CategoryId = 6,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP022",
                             ProductName = "Sữa hạt Milo hộp 180ml",
                             SellingPrice = 12000m,
@@ -2217,7 +2430,7 @@ namespace MiniMart.Migrations
                             ProductId = 23,
                             Barcode = "8934588011023",
                             CategoryId = 6,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP023",
                             ProductName = "Sữa chua uống Vinamilk 130ml",
                             SellingPrice = 9000m,
@@ -2230,7 +2443,7 @@ namespace MiniMart.Migrations
                             ProductId = 24,
                             Barcode = "8934588011024",
                             CategoryId = 7,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP024",
                             ProductName = "Mì Hảo Hảo tôm chua cay 75g",
                             SellingPrice = 5000m,
@@ -2243,7 +2456,7 @@ namespace MiniMart.Migrations
                             ProductId = 25,
                             Barcode = "8934588011025",
                             CategoryId = 7,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP025",
                             ProductName = "Mì 3 Miền sa tế hành 65g",
                             SellingPrice = 4000m,
@@ -2256,7 +2469,7 @@ namespace MiniMart.Migrations
                             ProductId = 26,
                             Barcode = "8934588011026",
                             CategoryId = 7,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP026",
                             ProductName = "Phở Bắc Sông Hương gói 65g",
                             SellingPrice = 6000m,
@@ -2269,7 +2482,7 @@ namespace MiniMart.Migrations
                             ProductId = 27,
                             Barcode = "8934588011027",
                             CategoryId = 7,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP027",
                             ProductName = "Cháo Cung Đình ăn liền 60g",
                             SellingPrice = 7000m,
@@ -2282,7 +2495,7 @@ namespace MiniMart.Migrations
                             ProductId = 28,
                             Barcode = "8934588011028",
                             CategoryId = 7,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP028",
                             ProductName = "Bún gạo lứt Bích Chi 400g",
                             SellingPrice = 22000m,
@@ -2295,7 +2508,7 @@ namespace MiniMart.Migrations
                             ProductId = 29,
                             Barcode = "8934588011029",
                             CategoryId = 8,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP029",
                             ProductName = "Nước mắm Chin-su 500ml",
                             SellingPrice = 28000m,
@@ -2308,7 +2521,7 @@ namespace MiniMart.Migrations
                             ProductId = 30,
                             Barcode = "8934588011030",
                             CategoryId = 8,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP030",
                             ProductName = "Tương ớt Chin-su 250g",
                             SellingPrice = 18000m,
@@ -2321,7 +2534,7 @@ namespace MiniMart.Migrations
                             ProductId = 31,
                             Barcode = "8934588011031",
                             CategoryId = 8,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP031",
                             ProductName = "Dầu ăn Tường An 1L",
                             SellingPrice = 55000m,
@@ -2334,7 +2547,7 @@ namespace MiniMart.Migrations
                             ProductId = 32,
                             Barcode = "8934588011032",
                             CategoryId = 8,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP032",
                             ProductName = "Muối iod Cà Mau 500g",
                             SellingPrice = 8000m,
@@ -2347,7 +2560,7 @@ namespace MiniMart.Migrations
                             ProductId = 33,
                             Barcode = "8934588011033",
                             CategoryId = 8,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP033",
                             ProductName = "Đường Biên Hòa 1kg",
                             SellingPrice = 28000m,
@@ -2360,7 +2573,7 @@ namespace MiniMart.Migrations
                             ProductId = 34,
                             Barcode = "8934588011034",
                             CategoryId = 8,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP034",
                             ProductName = "Hạt nêm Knorr 400g",
                             SellingPrice = 35000m,
@@ -2373,7 +2586,7 @@ namespace MiniMart.Migrations
                             ProductId = 35,
                             Barcode = "8934588011035",
                             CategoryId = 8,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP035",
                             ProductName = "Xì dầu Maggi 700ml",
                             SellingPrice = 32000m,
@@ -2386,7 +2599,7 @@ namespace MiniMart.Migrations
                             ProductId = 36,
                             Barcode = "8934588011036",
                             CategoryId = 9,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP036",
                             ProductName = "Bột giặt OMO đỏ 800g",
                             SellingPrice = 55000m,
@@ -2399,7 +2612,7 @@ namespace MiniMart.Migrations
                             ProductId = 37,
                             Barcode = "8934588011037",
                             CategoryId = 9,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP037",
                             ProductName = "Nước giặt Comfort 1.6L",
                             SellingPrice = 75000m,
@@ -2412,7 +2625,7 @@ namespace MiniMart.Migrations
                             ProductId = 38,
                             Barcode = "8934588011038",
                             CategoryId = 9,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP038",
                             ProductName = "Nước xả vải Downy 1L",
                             SellingPrice = 52000m,
@@ -2425,7 +2638,7 @@ namespace MiniMart.Migrations
                             ProductId = 39,
                             Barcode = "8934588011039",
                             CategoryId = 9,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP039",
                             ProductName = "Nước rửa bát Sunlight 750ml",
                             SellingPrice = 25000m,
@@ -2438,7 +2651,7 @@ namespace MiniMart.Migrations
                             ProductId = 40,
                             Barcode = "8934588011040",
                             CategoryId = 9,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP040",
                             ProductName = "Nước lau sàn Vim chanh 1L",
                             SellingPrice = 38000m,
@@ -2451,7 +2664,7 @@ namespace MiniMart.Migrations
                             ProductId = 41,
                             Barcode = "8934588011041",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP041",
                             ProductName = "Dầu gội Clear men 370ml",
                             SellingPrice = 55000m,
@@ -2464,7 +2677,7 @@ namespace MiniMart.Migrations
                             ProductId = 42,
                             Barcode = "8934588011042",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP042",
                             ProductName = "Dầu gội Sunsilk đen óng 650ml",
                             SellingPrice = 75000m,
@@ -2477,7 +2690,7 @@ namespace MiniMart.Migrations
                             ProductId = 43,
                             Barcode = "8934588011043",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP043",
                             ProductName = "Sữa tắm Lifebuoy kháng khuẩn 800g",
                             SellingPrice = 72000m,
@@ -2490,7 +2703,7 @@ namespace MiniMart.Migrations
                             ProductId = 44,
                             Barcode = "8934588011044",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP044",
                             ProductName = "Kem đánh răng P/S 230g",
                             SellingPrice = 38000m,
@@ -2503,7 +2716,7 @@ namespace MiniMart.Migrations
                             ProductId = 45,
                             Barcode = "8934588011045",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP045",
                             ProductName = "Bàn chải đánh răng Oral-B soft",
                             SellingPrice = 25000m,
@@ -2516,7 +2729,7 @@ namespace MiniMart.Migrations
                             ProductId = 46,
                             Barcode = "8934588011046",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP046",
                             ProductName = "Lăn khử mùi Rexona men 40ml",
                             SellingPrice = 42000m,
@@ -2529,7 +2742,7 @@ namespace MiniMart.Migrations
                             ProductId = 47,
                             Barcode = "8934588011047",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP047",
                             ProductName = "Dầu xả Dove dưỡng ẩm 320ml",
                             SellingPrice = 65000m,
@@ -2542,7 +2755,7 @@ namespace MiniMart.Migrations
                             ProductId = 48,
                             Barcode = "8934588011048",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP048",
                             ProductName = "Giấy vệ sinh Pulppy 10 cuộn",
                             SellingPrice = 48000m,
@@ -2555,7 +2768,7 @@ namespace MiniMart.Migrations
                             ProductId = 49,
                             Barcode = "8934588011049",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP049",
                             ProductName = "Nước súc miệng Listerine 250ml",
                             SellingPrice = 42000m,
@@ -2568,7 +2781,7 @@ namespace MiniMart.Migrations
                             ProductId = 50,
                             Barcode = "8934588011050",
                             CategoryId = 10,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP050",
                             ProductName = "Sữa rửa mặt Pond's trắng da 100g",
                             SellingPrice = 55000m,
@@ -2581,7 +2794,7 @@ namespace MiniMart.Migrations
                             ProductId = 51,
                             Barcode = "8934588011051",
                             CategoryId = 3,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP051",
                             ProductName = "Túi nylon đựng rác 60x80cm gói",
                             SellingPrice = 15000m,
@@ -2594,7 +2807,7 @@ namespace MiniMart.Migrations
                             ProductId = 52,
                             Barcode = "8934588011052",
                             CategoryId = 3,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP052",
                             ProductName = "Hộp đựng thực phẩm nhựa 1L",
                             SellingPrice = 35000m,
@@ -2607,7 +2820,7 @@ namespace MiniMart.Migrations
                             ProductId = 53,
                             Barcode = "8934588011053",
                             CategoryId = 3,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP053",
                             ProductName = "Khăn giấy lau bếp 2 cuộn",
                             SellingPrice = 22000m,
@@ -2620,7 +2833,7 @@ namespace MiniMart.Migrations
                             ProductId = 54,
                             Barcode = "8934588011054",
                             CategoryId = 3,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP054",
                             ProductName = "Bọc thực phẩm màng bọc 30m",
                             SellingPrice = 28000m,
@@ -2633,7 +2846,7 @@ namespace MiniMart.Migrations
                             ProductId = 55,
                             Barcode = "8934588011055",
                             CategoryId = 3,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MinimumStock = 0,
                             ProductCode = "SP055",
                             ProductName = "Nến thơm cốc nhỏ 100g",
                             SellingPrice = 45000m,
@@ -2658,7 +2871,12 @@ namespace MiniMart.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("DiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal?>("DiscountPercent")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("EndDate")
@@ -2673,12 +2891,10 @@ namespace MiniMart.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<decimal?>("MinOrderValue")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -2716,10 +2932,8 @@ namespace MiniMart.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptId"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal>("DebtAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("EmployeeId")
@@ -2732,6 +2946,7 @@ namespace MiniMart.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PaidAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ReceiptCode")
@@ -2745,10 +2960,8 @@ namespace MiniMart.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("ReceiptId");
 
@@ -2762,7 +2975,6 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 1,
-                            CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 0m,
                             EmployeeId = 4,
                             ImportDate = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -2775,7 +2987,6 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 2,
-                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 0m,
                             EmployeeId = 4,
                             ImportDate = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -2788,7 +2999,6 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 3,
-                            CreatedAt = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 2200000m,
                             EmployeeId = 7,
                             ImportDate = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -2801,7 +3011,6 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 4,
-                            CreatedAt = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 0m,
                             EmployeeId = 9,
                             ImportDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -2814,7 +3023,6 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 5,
-                            CreatedAt = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 0m,
                             EmployeeId = 4,
                             ImportDate = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -2826,193 +3034,35 @@ namespace MiniMart.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MiniMart.Models.ReceiptDetail", b =>
+            modelBuilder.Entity("MiniMart.Models.RefreshToken", b =>
                 {
-                    b.Property<int>("ReceiptDetailId")
+                    b.Property<int>("RefreshTokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptDetailId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RefreshTokenId"));
 
-                    b.Property<int?>("BatchId")
+                    b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("ImportPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ReceiptId")
-                        .HasColumnType("int");
+                    b.HasKey("RefreshTokenId");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.HasIndex("EmployeeId");
 
-                    b.HasKey("ReceiptDetailId");
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
 
-                    b.HasIndex("BatchId");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("ReceiptId");
-
-                    b.ToTable("ReceiptDetails");
-
-                    b.HasData(
-                        new
-                        {
-                            ReceiptDetailId = 1,
-                            BatchId = 1,
-                            ImportPrice = 23000m,
-                            ProductId = 18,
-                            Quantity = 200,
-                            ReceiptId = 1,
-                            TotalPrice = 4600000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 2,
-                            BatchId = 2,
-                            ImportPrice = 23000m,
-                            ProductId = 19,
-                            Quantity = 160,
-                            ReceiptId = 1,
-                            TotalPrice = 3680000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 3,
-                            BatchId = 3,
-                            ImportPrice = 20000m,
-                            ProductId = 20,
-                            Quantity = 200,
-                            ReceiptId = 1,
-                            TotalPrice = 4000000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 4,
-                            BatchId = 4,
-                            ImportPrice = 4000m,
-                            ProductId = 24,
-                            Quantity = 500,
-                            ReceiptId = 2,
-                            TotalPrice = 2000000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 5,
-                            BatchId = 5,
-                            ImportPrice = 3000m,
-                            ProductId = 25,
-                            Quantity = 400,
-                            ReceiptId = 2,
-                            TotalPrice = 1200000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 6,
-                            BatchId = 6,
-                            ImportPrice = 5000m,
-                            ProductId = 1,
-                            Quantity = 300,
-                            ReceiptId = 2,
-                            TotalPrice = 1500000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 7,
-                            BatchId = 7,
-                            ImportPrice = 8000m,
-                            ProductId = 3,
-                            Quantity = 300,
-                            ReceiptId = 2,
-                            TotalPrice = 2400000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 8,
-                            BatchId = 8,
-                            ImportPrice = 18000m,
-                            ProductId = 11,
-                            Quantity = 150,
-                            ReceiptId = 3,
-                            TotalPrice = 2700000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 9,
-                            BatchId = 9,
-                            ImportPrice = 35000m,
-                            ProductId = 12,
-                            Quantity = 100,
-                            ReceiptId = 3,
-                            TotalPrice = 3500000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 10,
-                            BatchId = 10,
-                            ImportPrice = 42000m,
-                            ProductId = 36,
-                            Quantity = 100,
-                            ReceiptId = 4,
-                            TotalPrice = 4200000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 11,
-                            BatchId = 11,
-                            ImportPrice = 58000m,
-                            ProductId = 37,
-                            Quantity = 80,
-                            ReceiptId = 4,
-                            TotalPrice = 4640000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 12,
-                            BatchId = 12,
-                            ImportPrice = 40000m,
-                            ProductId = 38,
-                            Quantity = 90,
-                            ReceiptId = 4,
-                            TotalPrice = 3600000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 13,
-                            BatchId = 13,
-                            ImportPrice = 42000m,
-                            ProductId = 41,
-                            Quantity = 100,
-                            ReceiptId = 5,
-                            TotalPrice = 4200000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 14,
-                            BatchId = 14,
-                            ImportPrice = 58000m,
-                            ProductId = 42,
-                            Quantity = 90,
-                            ReceiptId = 5,
-                            TotalPrice = 5220000m
-                        },
-                        new
-                        {
-                            ReceiptDetailId = 15,
-                            BatchId = 15,
-                            ImportPrice = 55000m,
-                            ProductId = 43,
-                            Quantity = 110,
-                            ReceiptId = 5,
-                            TotalPrice = 6050000m
-                        });
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Role", b =>
@@ -3023,21 +3073,16 @@ namespace MiniMart.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoleName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("RoleId");
 
@@ -3047,7 +3092,6 @@ namespace MiniMart.Migrations
                         new
                         {
                             RoleId = 1,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Quản lý cửa hàng",
                             RoleName = "Quản lý",
                             Status = true
@@ -3055,7 +3099,6 @@ namespace MiniMart.Migrations
                         new
                         {
                             RoleId = 2,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Nhân viên thu ngân",
                             RoleName = "Thu ngân",
                             Status = true
@@ -3063,7 +3106,6 @@ namespace MiniMart.Migrations
                         new
                         {
                             RoleId = 3,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Nhân viên quản lý kho",
                             RoleName = "Kho",
                             Status = true
@@ -3084,13 +3126,11 @@ namespace MiniMart.Migrations
                     b.Property<DateTime?>("ClosedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("EndCash")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("EndTime")
@@ -3100,6 +3140,7 @@ namespace MiniMart.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Revenue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ShiftName")
@@ -3107,6 +3148,7 @@ namespace MiniMart.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("StartCash")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("StartTime")
@@ -3114,9 +3156,6 @@ namespace MiniMart.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("WorkDate")
                         .HasColumnType("datetime2");
@@ -3135,7 +3174,6 @@ namespace MiniMart.Migrations
                             ShiftId = 1,
                             CashierId = 2,
                             ClosedAt = new DateTime(2024, 6, 1, 14, 5, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EmployeeId = 1,
                             EndCash = 3200000m,
                             EndTime = new DateTime(2024, 6, 1, 14, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3151,7 +3189,6 @@ namespace MiniMart.Migrations
                             ShiftId = 2,
                             CashierId = 3,
                             ClosedAt = new DateTime(2024, 6, 1, 22, 10, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EmployeeId = 1,
                             EndCash = 4100000m,
                             EndTime = new DateTime(2024, 6, 1, 22, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3167,7 +3204,6 @@ namespace MiniMart.Migrations
                             ShiftId = 3,
                             CashierId = 5,
                             ClosedAt = new DateTime(2024, 6, 2, 14, 2, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2024, 6, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EmployeeId = 1,
                             EndCash = 2800000m,
                             EndTime = new DateTime(2024, 6, 2, 14, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3183,7 +3219,6 @@ namespace MiniMart.Migrations
                             ShiftId = 4,
                             CashierId = 6,
                             ClosedAt = new DateTime(2024, 6, 2, 22, 8, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2024, 6, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EmployeeId = 1,
                             EndCash = 5200000m,
                             EndTime = new DateTime(2024, 6, 2, 22, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3198,7 +3233,6 @@ namespace MiniMart.Migrations
                         {
                             ShiftId = 5,
                             CashierId = 10,
-                            CreatedAt = new DateTime(2024, 6, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EmployeeId = 1,
                             EndCash = 0m,
                             EndTime = new DateTime(2024, 6, 3, 14, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3229,10 +3263,8 @@ namespace MiniMart.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactPerson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -3253,13 +3285,11 @@ namespace MiniMart.Migrations
 
                     b.Property<string>("SupplierName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("TaxCode")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("SupplierId");
 
@@ -3276,7 +3306,6 @@ namespace MiniMart.Migrations
                             BankAccount = "0011004123456",
                             BankName = "Vietcombank",
                             ContactPerson = "Nguyễn Hữu Thắng",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "contact@vinamilk.com.vn",
                             PhoneNumber = "0281000001",
                             Status = true,
@@ -3291,7 +3320,6 @@ namespace MiniMart.Migrations
                             BankAccount = "0031004234567",
                             BankName = "Vietinbank",
                             ContactPerson = "Trần Thị Mai",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "contact@masan.com.vn",
                             PhoneNumber = "0281000002",
                             Status = true,
@@ -3306,7 +3334,6 @@ namespace MiniMart.Migrations
                             BankAccount = "0041004345678",
                             BankName = "BIDV",
                             ContactPerson = "Lê Văn Hùng",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "contact@kinhdo.vn",
                             PhoneNumber = "0281000003",
                             Status = true,
@@ -3321,7 +3348,6 @@ namespace MiniMart.Migrations
                             BankAccount = "0051004456789",
                             BankName = "ACB",
                             ContactPerson = "Phạm Anh Tuấn",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "contact@unilever.com.vn",
                             PhoneNumber = "0281000004",
                             Status = true,
@@ -3336,13 +3362,78 @@ namespace MiniMart.Migrations
                             BankAccount = "0061004567890",
                             BankName = "Techcombank",
                             ContactPerson = "Hoàng Thị Lan",
-                            CreatedAt = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "contact@pg.com.vn",
                             PhoneNumber = "0281000005",
                             Status = true,
                             SupplierCode = "NCC005",
                             SupplierName = "Công ty CP P&G Việt Nam",
                             TaxCode = "0301777666"
+                        });
+                });
+
+            modelBuilder.Entity("MiniMart.Models.TaxRate", b =>
+                {
+                    b.Property<int>("TaxRateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaxRateId"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateOnly>("EffectiveFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("EffectiveTo")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("Rate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("TaxRateId");
+
+                    b.ToTable("TaxRates");
+
+                    b.HasData(
+                        new
+                        {
+                            TaxRateId = 1,
+                            Description = "Mien thue GTGT",
+                            EffectiveFrom = new DateOnly(2025, 7, 1),
+                            Rate = 0.00m,
+                            Status = true
+                        },
+                        new
+                        {
+                            TaxRateId = 2,
+                            Description = "Thue suat 5% - hang thiet yeu",
+                            EffectiveFrom = new DateOnly(2025, 7, 1),
+                            Rate = 5.00m,
+                            Status = true
+                        },
+                        new
+                        {
+                            TaxRateId = 3,
+                            Description = "Thue suat giam theo chinh sach",
+                            EffectiveFrom = new DateOnly(2022, 2, 1),
+                            EffectiveTo = new DateOnly(2024, 6, 30),
+                            Rate = 8.00m,
+                            Status = false
+                        },
+                        new
+                        {
+                            TaxRateId = 4,
+                            Description = "Thue suat 10% - hang hoa thong thuong",
+                            EffectiveFrom = new DateOnly(2025, 7, 1),
+                            Rate = 10.00m,
+                            Status = true
                         });
                 });
 
@@ -3372,7 +3463,45 @@ namespace MiniMart.Migrations
                         .HasForeignKey("ParentCategoryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("MiniMart.Models.TaxRate", "TaxRate")
+                        .WithMany("Categories")
+                        .HasForeignKey("TaxRateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("ParentCategory");
+
+                    b.Navigation("TaxRate");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.EInvoice", b =>
+                {
+                    b.HasOne("MiniMart.Models.Order", "Order")
+                        .WithMany("EInvoices")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.EInvoiceDetail", b =>
+                {
+                    b.HasOne("MiniMart.Models.EInvoice", "EInvoice")
+                        .WithMany("EInvoiceDetails")
+                        .HasForeignKey("EInvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MiniMart.Models.OrderDetail", "OrderDetail")
+                        .WithMany("EInvoiceDetails")
+                        .HasForeignKey("OrderDetailId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("EInvoice");
+
+                    b.Navigation("OrderDetail");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Employee", b =>
@@ -3452,23 +3581,78 @@ namespace MiniMart.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("MiniMart.Models.OrderPromotion", b =>
+            modelBuilder.Entity("MiniMart.Models.OrderReturn", b =>
+                {
+                    b.HasOne("MiniMart.Models.EInvoice", "EInvoice")
+                        .WithMany("OrderReturns")
+                        .HasForeignKey("EInvoiceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("MiniMart.Models.Employee", "Employee")
+                        .WithMany("OrderReturns")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniMart.Models.Order", "OriginalOrder")
+                        .WithMany("OrderReturns")
+                        .HasForeignKey("OriginalOrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("EInvoice");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("OriginalOrder");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.OrderReturnDetail", b =>
+                {
+                    b.HasOne("MiniMart.Models.OrderReturn", "OrderReturn")
+                        .WithMany("OrderReturnDetails")
+                        .HasForeignKey("OrderReturnId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MiniMart.Models.Product", "Product")
+                        .WithMany("OrderReturnDetails")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("OrderReturn");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.Payment", b =>
                 {
                     b.HasOne("MiniMart.Models.Order", "Order")
-                        .WithMany("OrderPromotions")
+                        .WithMany("Payments")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MiniMart.Models.Promotion", "Promotion")
-                        .WithMany("OrderPromotions")
-                        .HasForeignKey("PromotionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.PointTransaction", b =>
+                {
+                    b.HasOne("MiniMart.Models.Customer", "Customer")
+                        .WithMany("PointTransactions")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Order");
+                    b.HasOne("MiniMart.Models.Order", "Order")
+                        .WithMany("PointTransactions")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Promotion");
+                    b.Navigation("Customer");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Product", b =>
@@ -3504,7 +3688,7 @@ namespace MiniMart.Migrations
                     b.HasOne("MiniMart.Models.Product", "Product")
                         .WithMany("PromotionProducts")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MiniMart.Models.Promotion", "Promotion")
@@ -3537,30 +3721,15 @@ namespace MiniMart.Migrations
                     b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("MiniMart.Models.ReceiptDetail", b =>
+            modelBuilder.Entity("MiniMart.Models.RefreshToken", b =>
                 {
-                    b.HasOne("MiniMart.Models.Batch", "Batch")
-                        .WithMany("ReceiptDetails")
-                        .HasForeignKey("BatchId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("MiniMart.Models.Product", "Product")
-                        .WithMany("ReceiptDetails")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MiniMart.Models.Receipt", "Receipt")
-                        .WithMany("ReceiptDetails")
-                        .HasForeignKey("ReceiptId")
+                    b.HasOne("MiniMart.Models.Employee", "Employee")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Batch");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Receipt");
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Shift", b =>
@@ -3584,8 +3753,6 @@ namespace MiniMart.Migrations
             modelBuilder.Entity("MiniMart.Models.Batch", b =>
                 {
                     b.Navigation("InventoryTransactions");
-
-                    b.Navigation("ReceiptDetails");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Category", b =>
@@ -3598,6 +3765,15 @@ namespace MiniMart.Migrations
             modelBuilder.Entity("MiniMart.Models.Customer", b =>
                 {
                     b.Navigation("Orders");
+
+                    b.Navigation("PointTransactions");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.EInvoice", b =>
+                {
+                    b.Navigation("EInvoiceDetails");
+
+                    b.Navigation("OrderReturns");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Employee", b =>
@@ -3608,16 +3784,36 @@ namespace MiniMart.Migrations
 
                     b.Navigation("ManagedShifts");
 
+                    b.Navigation("OrderReturns");
+
                     b.Navigation("Orders");
 
                     b.Navigation("Receipts");
+
+                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Order", b =>
                 {
+                    b.Navigation("EInvoices");
+
                     b.Navigation("OrderDetails");
 
-                    b.Navigation("OrderPromotions");
+                    b.Navigation("OrderReturns");
+
+                    b.Navigation("Payments");
+
+                    b.Navigation("PointTransactions");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.OrderDetail", b =>
+                {
+                    b.Navigation("EInvoiceDetails");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.OrderReturn", b =>
+                {
+                    b.Navigation("OrderReturnDetails");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Product", b =>
@@ -3628,23 +3824,19 @@ namespace MiniMart.Migrations
 
                     b.Navigation("OrderDetails");
 
-                    b.Navigation("PromotionProducts");
+                    b.Navigation("OrderReturnDetails");
 
-                    b.Navigation("ReceiptDetails");
+                    b.Navigation("PromotionProducts");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Promotion", b =>
                 {
-                    b.Navigation("OrderPromotions");
-
                     b.Navigation("PromotionProducts");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Receipt", b =>
                 {
                     b.Navigation("Batches");
-
-                    b.Navigation("ReceiptDetails");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Role", b =>
@@ -3660,6 +3852,11 @@ namespace MiniMart.Migrations
             modelBuilder.Entity("MiniMart.Models.Supplier", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.TaxRate", b =>
+                {
+                    b.Navigation("Categories");
                 });
 #pragma warning restore 612, 618
         }

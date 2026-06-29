@@ -18,11 +18,12 @@ namespace MiniMart.Models
 
         public int Point { get; set; }
 
-        public decimal TotalSpent { get; set; }
-
         public bool CustomerStatus { get; set; }
 
         public ICollection<Order> Orders { get; set; }
             = new List<Order>();
+
+        public ICollection<PointTransaction> PointTransactions { get; set; }
+            = new List<PointTransaction>();
     }
 }
