@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MiniMart.Data;
 using MiniMart.DTOs;
 using MiniMart.Models;
@@ -55,7 +55,7 @@ namespace MiniMart.Repositories.RepoImplement
             {
                 OrderId = order.OrderId,
                 OrderCode = order.OrderCode,
-                CreatedAt = order.CreatedAt,
+                CreatedAt = DateTime.Now,
                 CashierName = order.Employee?.FullName ?? "",
                 CustomerName = order.Customer?.FullName,
                 CustomerPhone = order.Customer?.PhoneNumber,
@@ -64,7 +64,7 @@ namespace MiniMart.Repositories.RepoImplement
                 FinalAmount = order.FinalAmount,
                 PaidAmount = order.PaidAmount,
                 ChangeAmount = order.ChangeAmount,
-                PaymentMethod = order.PaymentMethod,
+                PaymentMethod = PaymentMethod.Cash,
                 Items = order.OrderDetails.Select(od => new OrderReceiptItemDto
                 {
                     ProductName = od.Product?.ProductName ?? "",
@@ -80,9 +80,9 @@ namespace MiniMart.Repositories.RepoImplement
         // CREATE ORDER (Pending) 
         public async Task<Order> CreateOrderAsync(Order order)
         {
-            order.CreatedAt = DateTime.Now;
             order.Status = OrderStatus.Pending;
             order.OrderCode = $"ORD-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
+            order.OrderDate = DateTime.Now;
 
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
@@ -163,16 +163,14 @@ namespace MiniMart.Repositories.RepoImplement
                     SubTotal = subTotal,
                     DiscountAmount = discountAmount,
                     FinalAmount = finalAmount,
-                    TotalAmount = subTotal,
                     PaidAmount = request.PaidAmount,
                     ChangeAmount = changeAmount,
-                    PaymentMethod = request.PaymentMethod,
                     Status = OrderStatus.Completed,
+                    OrderDate = DateTime.Now,
                     Note = request.Note,
                     EmployeeId = request.EmployeeId,
                     CustomerId = request.CustomerId,
-                    ShiftId = request.ShiftId,
-                    CreatedAt = DateTime.Now
+                    ShiftId = request.ShiftId
                 };
 
                 await _context.Orders.AddAsync(order);
@@ -199,8 +197,7 @@ namespace MiniMart.Repositories.RepoImplement
                         ReferenceId = order.OrderId,
                         ProductId = item.ProductId,
                         EmployeeId = request.EmployeeId,
-                        Note = $"Bán hàng - Đơn {order.OrderCode}",
-                        CreatedAt = DateTime.Now
+                        Note = $"Bán hàng - Đơn {order.OrderCode}"
                     });
                 }
 
@@ -209,7 +206,6 @@ namespace MiniMart.Repositories.RepoImplement
                 {
                     customer.Point -= loyaltyPointsUsed;   
                     customer.Point += pointsEarned;        
-                    customer.TotalSpent += finalAmount;
                 }
 
                 shift.Revenue += finalAmount;
@@ -231,7 +227,7 @@ namespace MiniMart.Repositories.RepoImplement
                     CustomerPointBalance = customer?.Point,
                     PaymentMethod = request.PaymentMethod,
                     Status = OrderStatus.Completed,
-                    CreatedAt = order.CreatedAt,
+                    CreatedAt = DateTime.Now,
                     Items = orderDetails.Select(od => new OrderDetailDto
                     {
                         ProductId = od.ProductId,

@@ -17,6 +17,8 @@ namespace MiniMart.Models
 
         public string? TransactionRef { get; set; }
 
+        public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+
         public DateTime PaidAt { get; set; }
     }
 }

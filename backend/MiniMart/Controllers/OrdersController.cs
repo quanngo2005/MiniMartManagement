@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -21,18 +21,15 @@ namespace MiniMart.Controllers
             OrderId = o.OrderId,
             OrderCode = o.OrderCode,
             SubTotal = o.SubTotal,
-            TotalAmount = o.TotalAmount,
             DiscountAmount = o.DiscountAmount,
             FinalAmount = o.FinalAmount,
             PaidAmount = o.PaidAmount,
             ChangeAmount = o.ChangeAmount,
-            PaymentMethod = o.PaymentMethod,
             Status = o.Status,
             Note = o.Note,
+            OrderDate = o.OrderDate,
             EmployeeId = o.EmployeeId,
-            CustomerId = o.CustomerId,
-            CreatedAt = o.CreatedAt,
-            UpdatedAt = o.UpdatedAt
+            CustomerId = o.CustomerId
         };
 
         private static readonly Func<Order, OrderDto> MapToDto = AsDto.Compile();
@@ -83,10 +80,8 @@ namespace MiniMart.Controllers
             var order = new Order
             {
                 SubTotal = createDto.SubTotal,
-                TotalAmount = createDto.TotalAmount,
                 PaidAmount = createDto.PaidAmount,
                 ChangeAmount = createDto.ChangeAmount,
-                PaymentMethod = createDto.PaymentMethod,
                 Status = OrderStatus.Pending,
                 Note = createDto.Note,
                 EmployeeId = createDto.EmployeeId,

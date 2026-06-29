@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
-using MiniMart.Models;
-using MiniMart.Repositories.RepoInterface;
-using MiniMart.Repositories.RepoImplement;
-using MiniMart.Shared.Extensions;
 using MiniMart.Middleware;
+using MiniMart.Models;
+using MiniMart.Repositories.Implementations;
+using MiniMart.Repositories.Interfaces;
+using MiniMart.Repositories.RepoImplement;
+using MiniMart.Repositories.RepoInterface;
+using MiniMart.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,7 @@ builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 builder.Services.AddControllers()
 

@@ -1,4 +1,4 @@
-﻿using MiniMart.Models.Base;
+using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
@@ -8,6 +8,8 @@ namespace MiniMart.Models
         public int OrderId { get; set; }
 
         public string OrderCode { get; set; }
+
+        public DateTime OrderDate { get; set; }
 
         public decimal SubTotal { get; set; }
 
