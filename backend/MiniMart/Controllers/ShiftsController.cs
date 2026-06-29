@@ -48,7 +48,9 @@ namespace MiniMart.Controllers
         [EnableQuery]
         public ActionResult<IQueryable<ShiftDto>> GetAllShifts()
         {
-            var query = _shiftRepository.GetAllShiftsQueryable().Select(AsDto);
+            var query = _shiftRepository.GetAllShiftsQueryable()
+                .Where(s => s.Status != ShiftStatus.Cancelled)
+                .Select(AsDto);
             return Ok(query);
         }
 
@@ -58,7 +60,7 @@ namespace MiniMart.Controllers
         public async Task<ActionResult<ShiftDto>> GetShiftById(int id)
         {
             var shift = await _shiftRepository.GetShiftByIdAsync(id);
-            if (shift == null)
+            if (shift == null || shift.Status == ShiftStatus.Cancelled)
             {
                 return NotFound(new { message = $"Shift with ID {id} not found." });
             }
@@ -114,7 +116,7 @@ namespace MiniMart.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var existing = await _shiftRepository.GetShiftByIdAsync(id);
-            if (existing == null)
+            if (existing == null || existing.Status == ShiftStatus.Cancelled)
             {
                 return NotFound(new { message = $"Shift with ID {id} not found." });
             }
@@ -162,7 +164,7 @@ namespace MiniMart.Controllers
         public async Task<IActionResult> DeleteShift(int id)
         {
             var existing = await _shiftRepository.GetShiftByIdAsync(id);
-            if (existing == null)
+            if (existing == null || existing.Status == ShiftStatus.Cancelled)
             {
                 return NotFound(new { message = $"Shift with ID {id} not found." });
             }
@@ -192,7 +194,7 @@ namespace MiniMart.Controllers
             }
 
             var shift = await _shiftRepository.GetShiftByIdAsync(openRequest.ShiftId);
-            if (shift == null)
+            if (shift == null || shift.Status == ShiftStatus.Cancelled)
             {
                 return NotFound(new { message = $"Shift with ID {openRequest.ShiftId} not found." });
             }
@@ -230,7 +232,7 @@ namespace MiniMart.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var shift = await _shiftRepository.GetShiftByIdAsync(id);
-            if (shift == null)
+            if (shift == null || shift.Status == ShiftStatus.Cancelled)
             {
                 return NotFound(new { message = $"Shift with ID {id} not found." });
             }

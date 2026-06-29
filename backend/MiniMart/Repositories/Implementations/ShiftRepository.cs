@@ -64,7 +64,7 @@ namespace MiniMart.Repositories.RepoImplement
             var shift = await _context.Shifts.FindAsync(id);
             if (shift == null) return false;
 
-            _context.Shifts.Remove(shift);
+            shift.Status = ShiftStatus.Cancelled;
             await _context.SaveChangesAsync();
             return true;
         }
