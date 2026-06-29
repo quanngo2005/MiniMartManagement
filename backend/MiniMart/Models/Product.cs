@@ -16,6 +16,8 @@ namespace MiniMart.Models
 
         public int StockQuantity { get; set; }
 
+        public int MinimumStock { get; set; }
+
         public string? Description { get; set; }
 
         public string? ImageUrl { get; set; }
@@ -37,10 +39,11 @@ namespace MiniMart.Models
 
         public ICollection<OrderDetail> OrderDetails { get; set; }
             = new List<OrderDetail>();
-        public ICollection<ReceiptDetail> ReceiptDetails { get; set; }
-    = new List<ReceiptDetail>();
 
         public ICollection<InventoryTransaction> InventoryTransactions { get; set; }
             = new List<InventoryTransaction>();
+
+        public ICollection<OrderReturnDetail> OrderReturnDetails { get; set; }
+            = new List<OrderReturnDetail>();
     }
 }

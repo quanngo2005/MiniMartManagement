@@ -9,10 +9,7 @@ namespace MiniMart.DTOs
         public string? Email { get; set; }
         public string? Address { get; set; }
         public int Point { get; set; }
-        public decimal TotalSpent { get; set; }
         public bool CustomerStatus { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
     public class CreateCustomerDto
@@ -23,7 +20,6 @@ namespace MiniMart.DTOs
         public string? Email { get; set; }
         public string? Address { get; set; }
         public int Point { get; set; }
-        public decimal TotalSpent { get; set; }
         public bool CustomerStatus { get; set; }
     }
 
@@ -35,7 +31,12 @@ namespace MiniMart.DTOs
         public string? Email { get; set; }
         public string? Address { get; set; }
         public int Point { get; set; }
-        public decimal TotalSpent { get; set; }
         public bool CustomerStatus { get; set; }
+    }
+
+    public class UpdatePointsDto
+    {
+        /// <summary>Số điểm cần cộng (dương) hoặc trừ (âm)</summary>
+        public int Delta { get; set; }
     }
 }

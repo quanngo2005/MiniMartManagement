@@ -15,14 +15,21 @@ jobs:
         working-directory: backend/MiniMart
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
 
       - name: Restore
         run: dotnet restore
+
+      - name: Verify audit fields are not used
+        run: |
+          if grep -RInE '\b(CreatedAt|UpdatedAt)\b' --include='*.cs' --exclude-dir=Migrations .; then
+            echo "CreatedAt/UpdatedAt are no longer part of the active model. Remove these references."
+            exit 1
+          fi
 
       - name: Build
         run: dotnet build --configuration Release --no-restore

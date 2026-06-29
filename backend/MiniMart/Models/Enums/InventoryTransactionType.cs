@@ -6,6 +6,7 @@
         Sale = 2, // bán hàng
         ReturnToSupplier = 3, //trả lại nhà cung cấp
         Damage = 4, // hư hỏng
-        Adjustment = 5 // chỉnh sửa tồn kho (có thể là tăng hoặc giảm)
+        Adjustment = 5, // chỉnh sửa tồn kho (có thể là tăng hoặc giảm)
+        OrderReturn = 6 // hàng khách trả được nhập lại kho
     }
 }
