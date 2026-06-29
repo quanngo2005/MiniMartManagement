@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
+using MiniMart.Mapping;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Repositories.RepoImplement;
+using MiniMart.Services;
 using MiniMart.Shared.Extensions;
 using MiniMart.Middleware;
 
@@ -40,6 +42,10 @@ builder.Services.AddDbContext<MiniMartDbContext>(options =>
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
+builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
+builder.Services.AddScoped<IBatchRepository, BatchRepository>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
 
 builder.Services.AddControllers()
 

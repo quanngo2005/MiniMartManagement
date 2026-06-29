@@ -16,3 +16,4 @@ Operational notes:
 - Frontend must call `GET /api/auth/csrf-token` first, then send `X-XSRF-TOKEN` on `POST`, `PUT`, `PATCH`, and `DELETE`.
 - Replace `Jwt:SecretKey` in appsettings before production.
 - Existing employees must have PBKDF2-formatted `PasswordHash` values before they can log in with this service.
+- `docs/MiniMart_RBAC_Tests.postman_collection.json` stores access tokens from login `Set-Cookie` headers as collection variables for role-switching tests, while its collection pre-request script still sends the CSRF header from `csrf_token`/`XSRF-TOKEN` for unsafe methods.

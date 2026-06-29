@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MiniMart.Exceptions;
+using MiniMart.Shared.Exceptions;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 
@@ -476,6 +476,11 @@ namespace MiniMart.Data
                 .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
                 .ToList();
 
+            if (changedPromotionEntries.Count == 0 && changedPromotionProductEntries.Count == 0)
+            {
+                return new List<PromotionGuardCandidate>();
+            }
+
             var promotionsByKey = changedPromotionEntries
                 .Select(e => e.Entity)
                 .Where(p => p.PromotionId != 0)
@@ -495,13 +500,6 @@ namespace MiniMart.Data
                 .Where(promotionId => promotionId != 0 && !promotionsByKey.ContainsKey(promotionId))
                 .Distinct()
                 .ToList();
-
-            foreach (var promotion in Promotions
-                .AsNoTracking()
-                .Where(p => missingPromotionIds.Contains(p.PromotionId)))
-            {
-                promotionsByKey[promotion.PromotionId] = promotion;
-            }
 
             var candidates = changedPromotionEntries
                 .Select(e => e.Entity)
@@ -523,6 +521,40 @@ namespace MiniMart.Data
                 })
                 .Where(c => c.IsActive && c.ProductIds.Count > 0)
                 .ToList();
+
+            if (missingPromotionIds.Count > 0)
+            {
+                var existingPromotionCandidates = Promotions
+                    .AsNoTracking()
+                    .Where(p => missingPromotionIds.Contains(p.PromotionId))
+                    .Select(p => new
+                    {
+                        p.PromotionId,
+                        p.Name,
+                        p.Type,
+                        p.StartDate,
+                        p.EndDate,
+                        p.IsActive
+                    })
+                    .AsEnumerable()
+                    .Select(p =>
+                    {
+                        var productIds = GetPromotionProductIds(p.PromotionId);
+                        ApplyPendingPromotionProductChanges(p.PromotionId, productIds, changedPromotionProductEntries);
+
+                        return new PromotionGuardCandidate(
+                            p.PromotionId,
+                            string.IsNullOrWhiteSpace(p.Name) ? "Promotion" : p.Name,
+                            p.Type,
+                            p.StartDate,
+                            p.EndDate,
+                            p.IsActive,
+                            productIds);
+                    })
+                    .Where(c => c.IsActive && c.ProductIds.Count > 0);
+
+                candidates.AddRange(existingPromotionCandidates);
+            }
 
             return candidates;
         }
@@ -548,6 +580,15 @@ namespace MiniMart.Data
             return productIds;
         }
 
+        private HashSet<int> GetPromotionProductIds(int promotionId)
+        {
+            return PromotionProducts
+                .AsNoTracking()
+                .Where(pp => pp.PromotionId == promotionId)
+                .Select(pp => pp.ProductId)
+                .ToHashSet();
+        }
+
         private static void ApplyPendingPromotionProductChanges(
             Promotion promotion,
             HashSet<int> productIds,
@@ -561,6 +602,30 @@ namespace MiniMart.Data
                     || (promotion.PromotionId == 0 && promotionProduct.Promotion == promotion);
 
                 if (!belongsToPromotion || promotionProduct.ProductId == 0)
+                {
+                    continue;
+                }
+
+                if (entry.State == EntityState.Deleted)
+                {
+                    productIds.Remove(promotionProduct.ProductId);
+                }
+                else
+                {
+                    productIds.Add(promotionProduct.ProductId);
+                }
+            }
+        }
+
+        private static void ApplyPendingPromotionProductChanges(
+            int promotionId,
+            HashSet<int> productIds,
+            IReadOnlyCollection<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<PromotionProduct>> changedEntries)
+        {
+            foreach (var entry in changedEntries)
+            {
+                var promotionProduct = entry.Entity;
+                if (promotionProduct.PromotionId != promotionId || promotionProduct.ProductId == 0)
                 {
                     continue;
                 }

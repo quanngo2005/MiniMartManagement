@@ -3,9 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MiniMart.Data;
 using MiniMart.DTOs;
-using MiniMart.Exceptions;
+using MiniMart.Shared.Exceptions;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
+using MiniMart.Shared.Authorization;
 using MiniMart.Shared.Settings;
 
 namespace MiniMart.Services
@@ -291,6 +292,10 @@ namespace MiniMart.Services
 
         private static EmployeeUserDto MapUser(Employee employee)
         {
+            var permissions = AppPermissions.ByRole.TryGetValue(employee.RoleId, out var perms)
+                ? perms.ToList()
+                : new List<string>();
+
             return new EmployeeUserDto
             {
                 EmployeeId = employee.EmployeeId,
@@ -299,7 +304,8 @@ namespace MiniMart.Services
                 Email = employee.Email,
                 Status = employee.Status,
                 RoleId = employee.RoleId,
-                RoleName = employee.Role?.RoleName ?? string.Empty
+                RoleName = employee.Role?.RoleName ?? string.Empty,
+                Permissions = permissions
             };
         }
 

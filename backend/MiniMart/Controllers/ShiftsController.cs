@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -44,6 +46,7 @@ namespace MiniMart.Controllers
 
         // GET: /api/shifts OR /odata/Shifts
         // Lấy danh sách tất cả ca làm việc (Manager)
+        [Authorize(Policy = "ManagerUp")]
         [HttpGet]
         [EnableQuery]
         public ActionResult<IQueryable<ShiftDto>> GetAllShifts()
@@ -54,6 +57,7 @@ namespace MiniMart.Controllers
 
         // GET: /api/shifts/{id}
         // Xem chi tiết ca làm việc theo ID (Manager, Cashier)
+        [Authorize(Policy = "AnyEmployee")]
         [HttpGet("{id}")]
         public async Task<ActionResult<ShiftDto>> GetShiftById(int id)
         {
@@ -67,6 +71,7 @@ namespace MiniMart.Controllers
 
         // POST: /api/shifts
         // Tạo mới ca làm việc (Manager)
+        [Authorize(Policy = "ManagerUp")]
         [HttpPost]
         public async Task<ActionResult<ShiftDto>> CreateShift([FromBody] CreateShiftDto createDto)
         {
@@ -107,6 +112,7 @@ namespace MiniMart.Controllers
 
         // PUT: /api/shifts/{id}
         // Cập nhật thông tin ca làm việc (Manager)
+        [Authorize(Policy = "ManagerUp")]
         [HttpPut("{id}")]
         public async Task<ActionResult<ShiftDto>> UpdateShift(int id, [FromBody] UpdateShiftDto updateDto)
         {
@@ -158,6 +164,7 @@ namespace MiniMart.Controllers
 
         // DELETE: /api/shifts/{id}
         // Xóa ca làm việc chưa hoạt động (Manager)
+        [Authorize(Policy = "ManagerUp")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteShift(int id)
         {
@@ -179,6 +186,7 @@ namespace MiniMart.Controllers
 
         // POST: /api/shifts/open
         // Thu ngân mở ca, nhập tiền mặt đầu ca (Cashier)
+        [Authorize(Policy = "AnyEmployee")]
         [HttpPost("open")]
         public async Task<ActionResult<ShiftDto>> OpenShift([FromBody] OpenShiftRequest openRequest)
         {
@@ -207,6 +215,12 @@ namespace MiniMart.Controllers
                 return UnprocessableEntity(new { message = "Cashier ID does not exist." });
             }
 
+            var currentUserId = GetCurrentEmployeeId();
+            if (!User.IsInRole("Manager") && !User.IsInRole("Admin") && openRequest.CashierId != currentUserId)
+            {
+                return Forbid();
+            }
+
             shift.CashierId = openRequest.CashierId;
             shift.StartCash = openRequest.StartCash;
             shift.Status = ShiftStatus.Working;
@@ -223,6 +237,7 @@ namespace MiniMart.Controllers
 
         // POST: /api/shifts/{id}/close
         // Thu ngân đóng ca, chốt doanh thu cuối ca (Cashier)
+        [Authorize(Policy = "AnyEmployee")]
         [HttpPost("{id}/close")]
         public async Task<ActionResult<ShiftDto>> CloseShift(int id, [FromBody] CloseShiftRequest closeRequest)
         {
@@ -238,6 +253,12 @@ namespace MiniMart.Controllers
             if (shift.Status != ShiftStatus.Working)
             {
                 return UnprocessableEntity(new { message = "Only working shifts can be closed." });
+            }
+
+            var currentUserId = GetCurrentEmployeeId();
+            if (!User.IsInRole("Manager") && !User.IsInRole("Admin") && shift.CashierId != currentUserId)
+            {
+                return Forbid();
             }
 
             shift.EndCash = closeRequest.EndCash;
@@ -256,6 +277,7 @@ namespace MiniMart.Controllers
 
         // GET: /api/shifts/current
         // Lấy thông tin ca làm đang hoạt động hiện tại (Cashier, Manager)
+        [Authorize(Policy = "AnyEmployee")]
         [HttpGet("current")]
         public async Task<ActionResult<ShiftDto>> GetCurrentShift()
         {
@@ -265,6 +287,11 @@ namespace MiniMart.Controllers
                 return NotFound(new { message = "No active working shift found." });
             }
             return Ok(MapToDto(activeShift));
+        }
+        private int GetCurrentEmployeeId()
+        {
+            var employeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(employeeId, out var id) ? id : 0;
         }
     }
 }

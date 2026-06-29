@@ -119,14 +119,20 @@ Content-Type: application/json
 X-XSRF-TOKEN: <csrf-token>
 
 {
-  "username": "admin",
-  "password": "Password123!",
-  "rememberMe": true,
-  "deviceName": "Chrome on Windows"
+  "username": "admin.test",
+  "password": "Admin@123",
+  "rememberMe": true
 }
 ```
 
 The response body contains user data and access expiry. It does not return the raw tokens.
+
+Development/test login accounts:
+
+| Role | Username | Password |
+| --- | --- | --- |
+| Admin | `admin.test` | `Admin@123` |
+| Manager | `manager.test` | `Manager@123` |
 
 ## Authenticated Requests
 
@@ -301,4 +307,3 @@ Why this order matters:
 | Login returns account inactive | `Employee.Status` is not `Active` or `Role.Status` is false |
 | Login keeps failing for old employees | Stored `PasswordHash` is not in the PBKDF2 format expected by `AuthService` |
 | Cookies not saved in browser | HTTPS missing, cross-site cookie settings mismatch, or credentials not included |
-
