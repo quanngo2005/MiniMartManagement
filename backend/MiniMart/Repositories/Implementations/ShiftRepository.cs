@@ -77,6 +77,14 @@ namespace MiniMart.Repositories.RepoImplement
                 .FirstOrDefaultAsync(s => s.Status == ShiftStatus.Working);
         }
 
+        public async Task<Shift?> GetActiveShiftByCashierIdAsync(int cashierId)
+        {
+            return await _context.Shifts
+                .Include(s => s.Employee)
+                .Include(s => s.Cashier)
+                .FirstOrDefaultAsync(s => s.Status == ShiftStatus.Working && s.CashierId == cashierId);
+        }
+
         public async Task<bool> EmployeeExistsAsync(int employeeId)
         {
             return await _context.Employees.AnyAsync(e => e.EmployeeId == employeeId);
