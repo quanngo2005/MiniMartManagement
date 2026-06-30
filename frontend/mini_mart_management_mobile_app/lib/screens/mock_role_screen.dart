@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
 class MockRoleScreen extends StatelessWidget {
@@ -68,6 +69,25 @@ class MockRoleScreen extends StatelessWidget {
                             color: AppColors.primary,
                             fontWeight: FontWeight.w800,
                           ),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const CategoryManagementScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Tiếp tục đến Trang quản lý'),
                     ),
                   ],
                 ),

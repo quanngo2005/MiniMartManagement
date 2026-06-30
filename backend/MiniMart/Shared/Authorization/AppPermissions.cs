@@ -2,10 +2,10 @@ namespace MiniMart.Shared.Authorization
 {
     public static class AppPermissions
     {
-        public const string StaffView   = "staffs.view";
-        public const string StaffCreate = "staffs.create";
-        public const string StaffEdit   = "staffs.edit";
-        public const string StaffDelete = "staffs.delete";
+        public const string EmployeeView   = "employees.view";
+        public const string EmployeeCreate = "employees.create";
+        public const string EmployeeEdit   = "employees.edit";
+        public const string EmployeeDelete = "employees.delete";
 
         public const string ShiftView   = "shifts.view";
         public const string ShiftCreate = "shifts.create";
@@ -55,7 +55,7 @@ namespace MiniMart.Shared.Authorization
 
         public static readonly IReadOnlyDictionary<int, string[]> ByRole = new Dictionary<int, string[]>
         {
-            [1] = new[] { StaffView, StaffCreate, StaffEdit, StaffDelete,
+            [1] = new[] { EmployeeView, EmployeeCreate, EmployeeEdit, EmployeeDelete,
                            ShiftView, ShiftCreate, ShiftEdit, ShiftDelete, ShiftOpen, ShiftClose,
                            ProductView, ProductCreate, ProductEdit, ProductDelete,
                            CategoryView, CategoryCreate, CategoryEdit, CategoryDelete,
@@ -80,7 +80,7 @@ namespace MiniMart.Shared.Authorization
                            InventoryView, InventoryCreate, InventoryEdit,
                            DashboardView },
 
-            [4] = new[] { StaffView, StaffCreate, StaffEdit, StaffDelete,
+            [4] = new[] { EmployeeView, EmployeeCreate, EmployeeEdit, EmployeeDelete,
                            ShiftView, ShiftCreate, ShiftEdit, ShiftDelete, ShiftOpen, ShiftClose,
                            ProductView, ProductCreate, ProductEdit, ProductDelete,
                            CategoryView, CategoryCreate, CategoryEdit, CategoryDelete,
