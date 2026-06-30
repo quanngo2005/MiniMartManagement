@@ -213,6 +213,15 @@ namespace MiniMart.Data
                 .ToTable(t => t.HasCheckConstraint("CK_PointTransactions_TransactionType", "[TransactionType] IN (1,2,3,4)"));
 
             // =========================
+            // ORDER - SHIFT
+            // =========================
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Shift)
+                .WithMany(s => s.Orders)
+                .HasForeignKey(o => o.ShiftId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================
             // ORDER DETAIL
             // =========================
             modelBuilder.Entity<OrderDetail>()

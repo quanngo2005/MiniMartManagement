@@ -2,13 +2,15 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
+using MiniMart.Middleware;
 using MiniMart.Mapping;
 using MiniMart.Models;
-using MiniMart.Repositories.RepoInterface;
+using MiniMart.Repositories.Implementations;
+using MiniMart.Repositories.Interfaces;
 using MiniMart.Repositories.RepoImplement;
+using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services;
 using MiniMart.Shared.Extensions;
-using MiniMart.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
@@ -54,6 +56,10 @@ builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<MiniMart.Services.Interfaces.IPaymentGatewayService, MiniMart.Services.VnPayService>();
+
 builder.Services.AddControllers()
 
     .AddOData(options => options
