@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -11,9 +12,10 @@ using MiniMart.Repositories.RepoInterface;
 namespace MiniMart.Controllers
 {
     [ApiController]
+    [Authorize(Policy = "ManagerUp")]
     [Route("api/staffs")]
     [Route("odata/staffs")]
-    public class StaffsController : ODataController
+    public class StaffsController : ControllerBase
     {
         private readonly IEmployeeRepository _employeeRepository;
 
@@ -32,7 +34,8 @@ namespace MiniMart.Controllers
             HireDate = e.HireDate,
             Avatar = e.Avatar,
             Status = e.Status,
-            RoleId = e.RoleId
+            RoleId = e.RoleId,
+            RoleName = e.Role.RoleName
         };
 
         // Compiled delegate for single item mappings

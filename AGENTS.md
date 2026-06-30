@@ -1,38 +1,474 @@
-<!-- code-review-graph MCP tools -->
-## MCP Tools: code-review-graph
+````markdown
+# MiniMart — AGENT.md
 
-**IMPORTANT: This project has a knowledge graph. ALWAYS use the
-code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
-the codebase.** The graph is faster, cheaper (fewer tokens), and gives
-you structural context (callers, dependents, test coverage) that file
-scanning cannot.
+> **Ponytail principle**: Think like the laziest senior dev in the room.
+> The best code is the code you never wrote.
+> Before adding anything — check if it already exists. Before inventing a pattern — find the existing one and clone it.
 
-### When to use graph tools FIRST
+---
 
-- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
-- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
-- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
-- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview` + `list_communities`
+## Project Overview
 
-Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
+Two separate repositories communicating via REST API with JWT authentication:
 
-### Key Tools
+| Repo | Stack | Role |
+|------|-------|------|
+| `MiniMart` | ASP.NET 8 Web API | Backend — business logic, data, auth |
+| `mini_mart_management_mobile_app` | Flutter | Frontend — mobile management app |
+
+**Auth**: JWT issued by backend, stored and sent by Flutter on every authenticated request.
+
+---
+
+## 🦴 Ponytail Rules (Read This First)
+
+1. **Search before creating** — use graph tools or grep before writing any new class, service, or widget
+2. **Clone the existing pattern** — every layer has conventions; find one and follow it exactly
+3. **No gold-plating** — implement what was asked, nothing more
+4. **DTOs already exist** — check `Dtos/` before defining any new response shape
+5. **One change at a time** — don't refactor while fixing a bug; don't rename while adding a feature
+6. **If you're unsure about project structure, ask** — don't guess and scaffold
+
+---
+
+## 🗺️ Code Review Graph (MCP Tools)
+
+**ALWAYS use graph tools before Grep/Glob/Read — faster, cheaper (fewer tokens), and gives structural context file scanning cannot.**
 
 | Tool | Use when |
-| ------ | ---------- |
+|------|----------|
+| `semantic_search_nodes` | Finding functions/classes by name or keyword |
+| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
 | `detect_changes` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context` | Need source snippets for review — token-efficient |
+| `get_review_context` | Need source snippets — token-efficient |
 | `get_impact_radius` | Understanding blast radius of a change |
 | `get_affected_flows` | Finding which execution paths are impacted |
-| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Finding functions/classes by name or keyword |
-| `get_architecture_overview` | Understanding high-level codebase structure |
+| `get_architecture_overview` | High-level codebase structure |
 | `refactor_tool` | Planning renames, finding dead code |
 
-### Workflow
+**Workflow for every code review:**
+1. `detect_changes` → risk-scored diff overview
+2. `get_affected_flows` → understand execution path impact
+3. `query_graph` pattern=`tests_for` → check coverage
+4. Fall back to Grep/Glob/Read **only** if graph doesn't cover what you need
 
-1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern="tests_for" to check coverage.
+---
+
+## 🖥️ Backend — MiniMart (ASP.NET 8)
+
+### Architecture: N-Layer + Repository Pattern
+
+```
+Controllers/         → thin HTTP layer only — no business logic
+Services/            → business logic; depends on IRepository, never on DbContext directly
+Repositories/
+  Interfaces/        → IRepository<T> contracts
+  Implementations/   → EF Core queries only — no raw SQL unless unavoidable
+Data/                → DbContext, seed data, entity configurations
+Models/
+  Base/              → base entity (Id, timestamps, soft-delete if used)
+  Enums/             → shared enums — add here, not inline
+Dtos/                → request/response shapes — NEVER return raw Model entities
+Mapping/             → AutoMapper profiles — never map manually if AutoMapper covers it
+Middleware/          → global error handling, logging, request pipeline
+Shared/
+  Authorization/     → JWT policies, role requirements — add policies here only
+  Exceptions/        → custom exception types — throw here, caught by Middleware
+  Extensions/        → IServiceCollection / IApplicationBuilder extension methods
+  Settings/          → strongly-typed config (IOptions<T>) — no IConfiguration["key"] inline
+```
+
+### Conventions
+
+- **Controllers**: `[Authorize]` by default unless explicitly public. Route: `api/[controller]`. Return `ActionResult<ResponseDto>`.
+- **Services**: depend only on `IRepository<T>` interfaces, never `DbContext`.
+- **Repositories**: EF Core queries only. No business logic, no HTTP concerns.
+- **Exceptions**: defined in `Shared/Exceptions/`, thrown from Services, caught globally by Middleware. No `try/catch` in Controllers.
+- **DTOs**: `CreateDto`, `UpdateDto`, `ResponseDto` per entity. Check `Dtos/` before adding a new one.
+- **Mapping**: add profiles to `Mapping/`. Never `new ResponseDto { Prop = entity.Prop }` by hand.
+- **Auth**: roles/policies defined in `Shared/Authorization/`. Don't define new policies inline in Controllers.
+- **Config**: new settings → `Shared/Settings/` as `IOptions<T>`, registered in an extension in `Shared/Extensions/`.
+
+### Adding a feature — Backend checklist
+
+- [ ] Model in `Models/` (inherit base entity if it has Id/timestamps)
+- [ ] Migration: `dotnet ef migrations add <DescriptiveName>`
+- [ ] Interface in `Repositories/Interfaces/`
+- [ ] Implementation in `Repositories/Implementations/`
+- [ ] Service in `Services/`
+- [ ] DTOs in `Dtos/` (Create, Update, Response as needed)
+- [ ] Mapping profile in `Mapping/`
+- [ ] Controller in `Controllers/`
+- [ ] Register via extension in `Shared/Extensions/` — not scattered in `Program.cs`
+
+### Mandatory Rules: Repository Pattern & Dependency Injection (DI)
+
+**Repository Pattern**:
+- **Strict adherence**: All data access **MUST** go through `IRepository<T>` interfaces and their implementations. 
+- No direct `DbContext` usage outside `Repositories/Implementations/`.
+- Services **never** query the database directly — they only call repository methods.
+- Every entity must have its corresponding `IRepository<T>` if it needs persistence.
+- Use generic `IRepository<T>` where possible; create specific methods in interfaces only when needed (e.g., `IProductRepository : IRepository<Product>`).
+- Query logic stays in repositories — no business rules or complex joins in Services that should be repository methods.
+
+**Dependency Injection (DI)**:
+- **Always use constructor injection** for all dependencies (Repositories into Services, Services into Controllers).
+- Register all services, repositories, and other components using extensions in `Shared/Extensions/` (e.g., `AddRepositories()`, `AddServices()`).
+- Never use `new` keyword for instantiating services/repositories in production code (except for DTOs or simple value objects).
+- Use `IServiceCollection` extensions for proper lifetime management (Scoped for Repositories/Services, Singleton for caches/config, Transient where appropriate).
+- Controllers should only depend on Services via DI — no manual instantiation.
+- Follow ASP.NET Core built-in DI container best practices. Avoid third-party containers unless already in the project.
+
+**Violation Consequences**:
+- Direct DbContext access or manual `new` = immediate refactor required.
+- Always verify with `query_graph` that dependencies flow correctly through DI.
+
+---
+
+## 📱 Flutter App — mini_mart_management_mobile_app
+
+### Architecture: Provider + Repository Pattern
+
+```
+lib/
+  config/       → base URL, environment constants, router/routes — no hardcoded URLs elsewhere
+  core/         → base classes, utilities, shared logic, error handling
+  models/       → Dart model classes that mirror backend DTOs exactly
+  services/     → HTTP layer (Dio/http) — sends requests, attaches JWT, returns raw data
+  repositories/ → calls services, parses responses, throws typed exceptions — no HTTP code
+  providers/    → state management (ChangeNotifier/Provider) — calls repositories, holds UI state
+  screens/      → full pages/routes — consume providers only, no direct service calls
+  widgets/      → reusable UI components — stateless where possible
+  assets/       → images, fonts, icons
+```
+
+### Conventions
+
+- **Models**: mirror backend DTOs exactly. If a backend DTO changes, update the Flutter model in the same change.
+- **Services**: only HTTP calls + JWT header attachment. No business logic, no state.
+- **Repositories**: call services, parse/validate responses, throw typed exceptions from `core/`. No HTTP code.
+- **Providers**: call repositories, expose state + loading/error flags. No HTTP calls.
+- **Screens**: `context.watch` / `Consumer` only. No business logic, no service calls, no raw HTTP.
+- **Widgets**: accept typed parameters — never raw `Map<String, dynamic>`.
+
+### JWT Flow
+
+1. Login → `services/` POSTs credentials → backend returns token
+2. Token persisted securely (FlutterSecureStorage preferred over plain SharedPreferences)
+3. Every authenticated request: service layer reads token, adds `Authorization: Bearer <token>` header
+4. On 401 response → clear stored token, redirect to login screen
+
+### Adding a feature — Flutter checklist
+
+- [ ] Model in `models/` matching backend DTO
+- [ ] Method in `services/` for the HTTP call
+- [ ] Method in `repositories/` calling the service
+- [ ] Provider in `providers/` exposing state + loading/error
+- [ ] Screen in `screens/` consuming the provider
+- [ ] Reusable UI pieces extracted to `widgets/`
+- [ ] Route registered in `config/`
+
+---
+
+## 🎨 Flutter — Coding Rules & Component Reuse
+
+> **Ponytail**: Before writing a widget, open `widgets/` and look for 30 seconds. Most of the time, it already exists.
+
+### 1. When to Extract a Widget
+
+Extract immediately when **any** of these are true:
+
+| Condition | Action |
+|-----------|--------|
+| A UI block appears more than once | Extract to `widgets/` |
+| A widget subtree exceeds ~40–50 lines | Extract to a private method or new file |
+| A subtree has its own independent state | Extract to its own `StatefulWidget` |
+| A widget is used across more than one screen | Move to `widgets/` (not inline in a screen file) |
+| A `Column`/`Row` child is getting deeply nested | Extract the child |
+
+**The smell test**: if you're scrolling to find where a widget ends, it needs to be extracted.
+
+---
+
+### 2. Widget File & Naming Conventions
+
+```
+widgets/
+  buttons/
+    primary_button.dart        → PrimaryButton
+    secondary_button.dart      → SecondaryButton
+    icon_action_button.dart    → IconActionButton
+  cards/
+    product_card.dart          → ProductCard
+    order_summary_card.dart    → OrderSummaryCard
+  inputs/
+    labeled_text_field.dart    → LabeledTextField
+    search_bar.dart            → AppSearchBar
+  feedback/
+    loading_overlay.dart       → LoadingOverlay
+    error_banner.dart          → ErrorBanner
+    empty_state.dart           → EmptyState
+  layout/
+    section_header.dart        → SectionHeader
+    divider_with_label.dart    → DividerWithLabel
+```
+
+**Naming rules:**
+- Widget class: `PascalCase` + descriptive suffix (`Card`, `Button`, `Sheet`, `Dialog`, `List`, `Tile`, `Banner`)
+- File: `snake_case` matching the class name exactly
+- Private helpers inside a screen: prefix with `_` (`_buildHeaderSection`)
+
+---
+
+### 3. Widget Design — Typed, Explicit, Composable
+
+**✅ Do — typed required parameters:**
+```dart
+class ProductCard extends StatelessWidget {
+  const ProductCard({
+    super.key,
+    required this.product,
+    required this.onTap,
+    this.showStock = true,
+  });
+
+  final Product product;
+  final VoidCallback onTap;
+  final bool showStock;
+
+  @override
+  Widget build(BuildContext context) { ... }
+}
+```
+
+**❌ Don't — raw Map, dynamic, or too many primitives:**
+```dart
+// Bad: caller has no idea what keys are valid
+ProductCard(data: {'name': ..., 'price': ...})
+
+// Bad: 6 loose primitives instead of a model
+ProductCard(name: n, price: p, stock: s, image: img, id: id, category: c)
+```
+
+**Rules:**
+- Always pass a typed model instead of multiple primitive fields
+- `required` for data the widget cannot function without
+- `this.x = defaultValue` for optional presentation toggles
+- Every widget with a `const`-capable constructor **must** have `const ProductCard({super.key, ...})`
+- Never accept `Map<String, dynamic>` as a parameter
+
+---
+
+### 4. Stateless vs Stateful — Default to Stateless
+
+```dart
+// ✅ Stateless: no internal mutable state
+class OrderStatusBadge extends StatelessWidget { ... }
+
+// ✅ Stateful only when the widget owns its own ephemeral UI state
+// (e.g. text field focus, local toggle, animation controller)
+class QuantitySelector extends StatefulWidget { ... }
+```
+
+**Never make a widget Stateful just to call a Provider** — use `context.watch` or `Consumer` inside a `StatelessWidget`.
+
+---
+
+### 5. Provider Consumption — Use the Right Method
+
+```dart
+// context.watch — rebuild on every change (use inside build())
+final products = context.watch<ProductProvider>().products;
+
+// context.read — one-time read, no rebuild (use in callbacks/handlers)
+onPressed: () => context.read<CartProvider>().add(product),
+
+// context.select — rebuild only when the selected value changes (prefer for performance)
+final isLoading = context.select<ProductProvider, bool>((p) => p.isLoading);
+
+// Consumer — when only part of the tree should rebuild
+Consumer<ProductProvider>(
+  builder: (context, provider, child) => Text(provider.count.toString()),
+  child: ExpensiveStaticWidget(), // not rebuilt
+)
+```
+
+**Rule**: always prefer `context.select` over `context.watch` when you only need one field from a large provider.
+
+---
+
+### 6. Styling — Never Hardcode, Always Use Theme
+
+```dart
+// ✅ Theme-aware
+Text(
+  'Total',
+  style: Theme.of(context).textTheme.titleMedium,
+)
+Container(
+  color: Theme.of(context).colorScheme.primary,
+)
+
+// ✅ Named style from theme extension or constants in core/
+Text('Label', style: AppTextStyles.label)
+
+// ❌ Never hardcode colors or text styles inline
+Text('Total', style: TextStyle(fontSize: 16, color: Color(0xFF333333)))
+Container(color: Colors.blue)
+```
+
+**Where styles live:**
+- Color palette → `core/` or theme definition in `config/`
+- Text styles → `ThemeData.textTheme` or a `AppTextStyles` constants class in `core/`
+- Spacing → constants in `core/` (e.g. `AppSpacing.md = 16.0`) — no magic numbers
+
+---
+
+### 7. Layout — Prefer Specific over Generic
+
+```dart
+// ✅ SizedBox for spacing — clear intent
+const SizedBox(height: 16)
+const SizedBox(width: 8)
+
+// ✅ Padding widget for padding
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16),
+  child: content,
+)
+
+// ❌ Container for spacing or padding only — too heavy
+Container(height: 16)
+Container(padding: EdgeInsets.all(8), child: ...)
+
+// ✅ const wherever the subtree is static
+const Icon(Icons.check, color: Colors.green)
+const SizedBox(height: 24)
+```
+
+**Layout rules:**
+- `SizedBox` for gaps and fixed sizes, `Padding` for padding — not `Container`
+- `Expanded` and `Flexible` inside `Row`/`Column`, never fixed widths for fluid layouts
+- `ListView.builder` for any list — never `Column` with `.map()` for scrollable content
+- `const` on every widget and constructor where possible — the analyzer will warn you
+
+---
+
+### 8. Loading / Error / Empty — Reuse the Standard Widgets
+
+Every async list or data screen follows this exact pattern:
+
+```dart
+@override
+Widget build(BuildContext context) {
+  final provider = context.watch<ProductProvider>();
+
+  if (provider.isLoading) return const LoadingOverlay();
+  if (provider.error != null) return ErrorBanner(message: provider.error!);
+  if (provider.items.isEmpty) return const EmptyState(message: 'No products found');
+
+  return ListView.builder(
+    itemCount: provider.items.length,
+    itemBuilder: (_, i) => ProductCard(product: provider.items[i]),
+  );
+}
+```
+
+- `LoadingOverlay`, `ErrorBanner`, `EmptyState` live in `widgets/feedback/`
+- Never inline a `CircularProgressIndicator` or error `Text` in a screen — use these widgets
+- If a feedback widget doesn't exist yet, create it in `widgets/feedback/` before using it
+
+---
+
+### 9. Screen Structure — Consistent Skeleton
+
+Every screen file follows this order:
+
+```dart
+class ProductListScreen extends StatelessWidget {
+  const ProductListScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: _buildAppBar(context),     // 1. AppBar
+      body: _buildBody(context),         // 2. Body (main content)
+      floatingActionButton: _buildFab(), // 3. FAB if needed
+    );
+  }
+
+  // Private builder methods — each returns a Widget
+  PreferredSizeWidget _buildAppBar(BuildContext context) { ... }
+
+  Widget _buildBody(BuildContext context) {
+    final provider = context.watch<ProductProvider>();
+    if (provider.isLoading) return const LoadingOverlay();
+    if (provider.error != null) return ErrorBanner(message: provider.error!);
+    return _buildList(provider.products);
+  }
+
+  Widget _buildList(List<Product> products) {
+    return ListView.builder(
+      itemCount: products.length,
+      itemBuilder: (_, i) => ProductCard(product: products[i]),
+    );
+  }
+
+  Widget _buildFab() { ... }
+}
+```
+
+**Rules:**
+- Each screen has **one** `build()` method — complexity goes into private `_build*` methods or extracted widgets
+- Private builder methods are acceptable for screen-specific UI that won't be reused
+- If a `_build*` method would be useful in another screen → promote it to `widgets/`
+- Screens do not have `Column` with 200 lines of children — break it up
+
+---
+
+### 10. Reuse Checklist — Before Writing Any Widget
+
+- [ ] Check `widgets/` — does something similar already exist?
+- [ ] Check the screen files — is it already extracted somewhere nearby?
+- [ ] Run `semantic_search_nodes` with the widget concept (e.g. "card", "button", "badge")
+- [ ] If reusing: pass it typed params, don't copy-paste and modify
+- [ ] If creating new: put it in the right `widgets/` subfolder, make the constructor `const`, accept a typed model
+
+---
+
+## 🔌 API Contract
+
+- Backend base URL lives in `lib/config/` — **never hardcoded** in any screen or service
+- All endpoints follow `/api/[controller]` prefix
+- Auth header: `Authorization: Bearer <jwt_token>`
+- Standard response shape: check existing service methods before assuming envelope format
+- If backend changes an endpoint or DTO → Flutter model + service must be updated in the same branch
+
+---
+
+## ❌ Never Do These
+
+**Backend**
+- Call `DbContext` directly from a Controller or Service
+- Return raw `Model` entities from Controllers — always use DTOs
+- Define policies or roles inline in `[Authorize]` attributes — use `Shared/Authorization/`
+- Add new config keys as `IConfiguration["raw.key"]` inline — use `IOptions<T>`
+- Create a new exception type if a fitting one exists in `Shared/Exceptions/`
+- Map DTOs by hand if AutoMapper covers it
+- Instantiate services/repositories with `new` keyword
+
+**Flutter**
+- Hardcode the API URL anywhere outside `lib/config/`
+- Call HTTP services from Screens or Widgets
+- Put business logic inside Providers — it belongs in Repositories or Services
+- Store sensitive tokens in plain SharedPreferences without encryption
+- Duplicate a model instead of referencing the existing one
+
+---
+
+## When in Doubt
+
+- **Unsure about existing patterns?** → run `semantic_search_nodes` or `query_graph` first
+- **Unsure about project structure?** → ask before scaffolding anything
+- **Something already exists that almost fits?** → adapt it, don't duplicate it
+````

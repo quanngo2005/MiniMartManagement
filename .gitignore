@@ -56,3 +56,4 @@ nunit-*.xml
 /.vs
 *.db-shm
 /backend/.vs
+/frontend/stitch_assets

@@ -1,0 +1,1623 @@
+{
+  "info": {
+    "name": "MiniMart RBAC Tests",
+    "description": "Test collection for MiniMart role-based authorization. Uses XSRF-TOKEN/X-XSRF-TOKEN for unsafe requests and stores JWT access_token values from Set-Cookie for role-switching tests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cashier_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "warehouse_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cashier_employee_id",
+      "value": "2",
+      "type": "string"
+    },
+    {
+      "key": "test_shift_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "csrf_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "current_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "test_employee_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "test_role_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "noauth"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Add CSRF header for unsafe methods. Run GET /api/auth/csrf-token first.",
+          "const unsafeMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];",
+          "if (unsafeMethods.includes(pm.request.method)) {",
+          "    const csrfToken = pm.collectionVariables.get('csrf_token') || pm.cookies.get('XSRF-TOKEN');",
+          "    pm.request.headers.remove('X-XSRF-TOKEN');",
+          "    if (csrfToken) {",
+          "        pm.request.headers.add({ key: 'X-XSRF-TOKEN', value: csrfToken });",
+          "    }",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "GET CSRF Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 + has csrfToken', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eq(true);",
+                  "    pm.expect(body.data.csrfToken).to.be.a('string');",
+                  "    pm.collectionVariables.set('csrf_token', body.data.csrfToken);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/csrf-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "csrf-token"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login as Admin (admin.test)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset('admin_token');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login Admin success + has permissions', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eq(true);",
+                  "    pm.expect(body.data.user.roleId).to.eq(4);",
+                  "    pm.expect(body.data.user.roleName).to.eq('Admin');",
+                  "    pm.expect(body.data.user.permissions).to.be.an('array');",
+                  "    pm.expect(body.data.user.permissions.length).to.be.greaterThan(0);",
+                  "    pm.expect(body.data.user.permissions).to.include('staffs.view');",
+                  "});",
+                  "",
+                  "const setCookies = pm.response.headers.all()",
+                  "    .filter(header => header.key.toLowerCase() === 'set-cookie')",
+                  "    .map(header => header.value)",
+                  "    .join('; ');",
+                  "const match = setCookies.match(/(?:^|;\\\\s*)access_token=([^;]+)/);",
+                  "pm.test('Admin access_token cookie returned', () => {",
+                  "    pm.expect(match).to.not.be.null;",
+                  "});",
+                  "if (match) {",
+                  "    pm.collectionVariables.set('admin_token', decodeURIComponent(match[1]));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin.test\",\n  \"password\": \"Admin@123\",\n  \"rememberMe\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login as Cashier (bich.tran)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset('cashier_token');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login Cashier success - roleId=2', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eq(true);",
+                  "    pm.expect(body.data.user.roleId).to.eq(2);",
+                  "    pm.expect(body.data.user.roleName).to.eq('Cashier');",
+                  "    pm.expect(body.data.user.permissions).to.include('shifts.open');",
+                  "    pm.expect(body.data.user.permissions).to.not.include('staffs.view');",
+                  "});",
+                  "",
+                  "const setCookies = pm.response.headers.all()",
+                  "    .filter(header => header.key.toLowerCase() === 'set-cookie')",
+                  "    .map(header => header.value)",
+                  "    .join('; ');",
+                  "const match = setCookies.match(/(?:^|;\\\\s*)access_token=([^;]+)/);",
+                  "pm.test('Cashier access_token cookie returned', () => {",
+                  "    pm.expect(match).to.not.be.null;",
+                  "});",
+                  "if (match) {",
+                  "    pm.collectionVariables.set('cashier_token', decodeURIComponent(match[1]));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"bich.tran\",\n  \"password\": \"cashier123\",\n  \"rememberMe\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login as Warehouse (dung.pham)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset('warehouse_token');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login Warehouse success - roleId=3', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eq(true);",
+                  "    pm.expect(body.data.user.roleId).to.eq(3);",
+                  "    pm.expect(body.data.user.roleName).to.eq('Warehouse');",
+                  "    pm.expect(body.data.user.permissions).to.include('products.view');",
+                  "    pm.expect(body.data.user.permissions).to.not.include('staffs.view');",
+                  "});",
+                  "",
+                  "const setCookies = pm.response.headers.all()",
+                  "    .filter(header => header.key.toLowerCase() === 'set-cookie')",
+                  "    .map(header => header.value)",
+                  "    .join('; ');",
+                  "const match = setCookies.match(/(?:^|;\\\\s*)access_token=([^;]+)/);",
+                  "pm.test('Warehouse access_token cookie returned', () => {",
+                  "    pm.expect(match).to.not.be.null;",
+                  "});",
+                  "if (match) {",
+                  "    pm.collectionVariables.set('warehouse_token', decodeURIComponent(match[1]));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"dung.pham\",\n  \"password\": \"warehouse123\",\n  \"rememberMe\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET My Profile (verify permissions)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.variables.set('current_token', pm.collectionVariables.get('admin_token'));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GET /auth/me returns user + permissions', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.data.employeeId).to.be.a('number');",
+                  "    pm.expect(body.data.roleName).to.be.a('string');",
+                  "    pm.expect(body.data.permissions).to.be.an('array');",
+                  "    pm.expect(body.data.permissions.length).to.be.greaterThan(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staffs",
+      "item": [
+        {
+          "name": "GetAll - Admin (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: GET /staffs returns list with roleName', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.value).to.be.an('array');",
+                  "    if (body.value.length > 0) {",
+                  "        pm.expect(body.value[0]).to.have.property('roleName');",
+                  "        pm.expect(body.value[0].roleName).to.be.a('string');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/staffs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "staffs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GetAll - Cashier (expect 403)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: GET /staffs returns 403 Forbidden', () => {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/staffs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "staffs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GetAll - No Auth (expect 401)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset('current_token');",
+                  "pm.request.headers.remove('Authorization');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('No auth: GET /staffs returns 401 Unauthorized', () => {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/staffs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "staffs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GetById - Admin (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: GET /staffs/1 returns employee with roleName', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.employeeId).to.eq(1);",
+                  "    pm.expect(body.roleName).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/staffs/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "staffs",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GetById - Cashier (expect 403)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: GET /staffs/1 returns 403', () => {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/staffs/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "staffs",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create - Admin (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: POST /staffs creates employee', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.employeeId).to.be.a('number');",
+                  "    pm.expect(body.roleName).to.eq('Cashier');",
+                  "});",
+                  "",
+                  "// Lưu ID để dùng cho test update/delete",
+                  "const employeeId = pm.response.json().employeeId;",
+                  "if (employeeId) pm.collectionVariables.set('test_employee_id', employeeId.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Test Nhân Viên\",\n  \"gender\": true,\n  \"dateOfBirth\": \"2000-01-01T00:00:00\",\n  \"phoneNumber\": \"0999999999\",\n  \"username\": \"test.staff\",\n  \"password\": \"test123\",\n  \"salary\": 5000000,\n  \"hireDate\": \"2025-01-01T00:00:00\",\n  \"status\": 1,\n  \"roleId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/staffs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "staffs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create - Cashier (expect 403)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: POST /staffs returns 403', () => {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Should Fail\",\n  \"gender\": true,\n  \"dateOfBirth\": \"2000-01-01T00:00:00\",\n  \"phoneNumber\": \"0999999998\",\n  \"username\": \"should.fail\",\n  \"password\": \"test123\",\n  \"salary\": 5000000,\n  \"hireDate\": \"2025-01-01T00:00:00\",\n  \"status\": 1,\n  \"roleId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/staffs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "staffs"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shifts",
+      "item": [
+        {
+          "name": "GetAll - Admin (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: GET /shifts returns list', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.value).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/shifts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GetAll - Cashier (expect 403)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: GET /shifts returns 403', () => {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/shifts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GetById - Cashier (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: GET /shifts/1 returns shift detail', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().shiftId).to.eq(1);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/shifts/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GetCurrent - Cashier (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: GET /shifts/current returns current shift or 404', () => {",
+                  "    const status = pm.response.code;",
+                  "    pm.expect(status).to.be.oneOf([200, 404]);",
+                  "    if (status === 200) {",
+                  "        pm.expect(pm.response.json().status).to.eq(1);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/shifts/current",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts",
+                "current"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create - Admin (201) + lưu shiftId",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: POST /shifts creates shift', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "    pm.expect(pm.response.json().shiftId).to.be.a('number');",
+                  "});",
+                  "",
+                  "const shiftId = pm.response.json().shiftId;",
+                  "if (shiftId) pm.collectionVariables.set('test_shift_id', shiftId.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shiftName\": \"Ca test\",\n  \"startTime\": \"2025-01-01T06:00:00\",\n  \"endTime\": \"2025-01-01T14:00:00\",\n  \"workDate\": \"2025-01-01\",\n  \"startCash\": 500000,\n  \"endCash\": 0,\n  \"revenue\": 0,\n  \"status\": 0,\n  \"employeeId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/shifts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create - Cashier (expect 403)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: POST /shifts returns 403', () => {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shiftName\": \"Ca fail\",\n  \"startTime\": \"2025-01-01T06:00:00\",\n  \"endTime\": \"2025-01-01T14:00:00\",\n  \"workDate\": \"2025-01-01\",\n  \"startCash\": 500000,\n  \"endCash\": 0,\n  \"revenue\": 0,\n  \"status\": 0,\n  \"employeeId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/shifts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Open - Cashier đúng shift (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: open đúng shift của mình', () => {",
+                  "    const status = pm.response.code;",
+                  "    // Có thể 200 (thành công) hoặc 409 (đã có ca active)",
+                  "    pm.expect(status).to.be.oneOf([200, 409]);",
+                  "    if (status === 200) {",
+                  "        pm.expect(pm.response.json().status).to.eq(1);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shiftId\": {{test_shift_id}},\n  \"cashierId\": {{cashier_employee_id}},\n  \"startCash\": 500000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/shifts/open",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts",
+                "open"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Open - Cashier sai shift (expect 403)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: open shift với cashierId khác -> 403', () => {",
+                  "    // Nếu shift còn Pending, sẽ bị 403 - Forbid",
+                  "    // Nếu shift không còn Pending, sẽ bị 422",
+                  "    const status = pm.response.code;",
+                  "    pm.expect(status).to.be.oneOf([403, 422, 409]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shiftId\": {{test_shift_id}},\n  \"cashierId\": 999,\n  \"startCash\": 500000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/shifts/open",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts",
+                "open"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Close - Cashier đúng shift (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: close shift của mình', () => {",
+                  "    const status = pm.response.code;",
+                  "    // 200 nếu shift đang Working + đúng cashier",
+                  "    // 422 nếu shift không phải Working",
+                  "    pm.expect(status).to.be.oneOf([200, 422, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endCash\": 1500000,\n  \"note\": \"Đóng ca test\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/shifts/{{test_shift_id}}/close",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts",
+                "{{test_shift_id}}",
+                "close"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Close - Cashier sai shift (expect 403)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: close shift không phải của mình -> 403', () => {",
+                  "    const status = pm.response.code;",
+                  "    pm.expect(status).to.be.oneOf([403, 422, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endCash\": 1500000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/shifts/1/close",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts",
+                "1",
+                "close"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete - Admin (của shift test)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: DELETE shift', () => {",
+                  "    const status = pm.response.code;",
+                  "    // 204 nếu shift Pending, 422 nếu đã Working/Closed",
+                  "    pm.expect(status).to.be.oneOf([204, 422, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/shifts/{{test_shift_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "shifts",
+                "{{test_shift_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "GetAll - Admin (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: GET /roles returns seeded roles', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.be.an('array');",
+                  "    pm.expect(body.length).to.be.at.least(5);",
+                  "    const names = body.map(r => r.roleName);",
+                  "    pm.expect(names).to.include.members(['Admin', 'Manager', 'Cashier', 'Warehouse', 'Staff']);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/roles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "roles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GetAll - Cashier (expect 403)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('cashier_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cashier: GET /roles returns 403', () => {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/roles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "roles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create - Admin (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: POST /roles creates role', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.roleName).to.eq('TestRole');",
+                  "    pm.expect(body.roleId).to.be.a('number');",
+                  "});",
+                  "",
+                  "const roleId = pm.response.json().roleId;",
+                  "if (roleId) pm.collectionVariables.set('test_role_id', roleId.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"TestRole\",\n  \"description\": \"Role test\",\n  \"status\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/roles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "roles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create - trùng tên (expect 409)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.variables.set('current_token', pm.collectionVariables.get('admin_token'));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: POST /roles duplicate name -> 409', () => {",
+                  "    pm.expect(pm.response.code).to.eq(409);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"TestRole\",\n  \"description\": \"Duplicate\",\n  \"status\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/roles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "roles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete - Admin (role test không có employee)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin: DELETE role không có employee -> 204', () => {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/roles/{{test_role_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "roles",
+                "{{test_role_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Edge Cases",
+      "item": [
+        {
+          "name": "Expired Token (expect 401)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.request.headers.remove('Authorization');",
+                  "pm.request.headers.add({ key: 'Authorization', value: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.expired.xxx' });"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Expired token -> 401 Unauthorized', () => {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/staffs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "staffs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sai CSRF Token (expect 400)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('admin_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}",
+                  "pm.request.headers.remove('X-XSRF-TOKEN');",
+                  "pm.request.headers.add({ key: 'X-XSRF-TOKEN', value: 'FAKE_CSRF_TOKEN_12345' });"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Sai CSRF token -> 400', () => {",
+                  "    pm.response.to.have.status(400);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eq(false);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"CSRF Test\",\n  \"gender\": true,\n  \"dateOfBirth\": \"2000-01-01T00:00:00\",\n  \"phoneNumber\": \"0999999997\",\n  \"username\": \"csrf.test\",\n  \"password\": \"test123\",\n  \"salary\": 5000000,\n  \"hireDate\": \"2025-01-01T00:00:00\",\n  \"status\": 1,\n  \"roleId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/staffs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "staffs"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+
