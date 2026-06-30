@@ -17,6 +17,7 @@ namespace MiniMart.DTOs
         public string? Avatar { get; set; }
         public EmployeeStatus Status { get; set; }
         public int RoleId { get; set; }
+        public string RoleName { get; set; } = string.Empty;
     }
 
     public class CreateEmployeeDto

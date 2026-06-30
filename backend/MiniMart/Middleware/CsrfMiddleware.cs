@@ -27,6 +27,14 @@ namespace MiniMart.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // ---  VNPAY --------------------------------
+            if (context.Request.Path.StartsWithSegments("/api/Payments"))
+            {
+                await _next(context);
+                return;
+            }
+            // -------------------------------------------
+
             if (!SafeMethods.Contains(context.Request.Method))
             {
                 var cookieToken = context.Request.Cookies[CookieName];

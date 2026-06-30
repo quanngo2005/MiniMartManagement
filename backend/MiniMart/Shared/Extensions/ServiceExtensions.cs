@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MiniMart.Services;
+using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Settings;
 
 namespace MiniMart.Shared.Extensions
