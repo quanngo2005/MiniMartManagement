@@ -1,3 +1,4 @@
+````markdown
 # MiniMart — AGENT.md
 
 > **Ponytail principle**: Think like the laziest senior dev in the room.
@@ -100,6 +101,28 @@ Shared/
 - [ ] Controller in `Controllers/`
 - [ ] Register via extension in `Shared/Extensions/` — not scattered in `Program.cs`
 
+### Mandatory Rules: Repository Pattern & Dependency Injection (DI)
+
+**Repository Pattern**:
+- **Strict adherence**: All data access **MUST** go through `IRepository<T>` interfaces and their implementations. 
+- No direct `DbContext` usage outside `Repositories/Implementations/`.
+- Services **never** query the database directly — they only call repository methods.
+- Every entity must have its corresponding `IRepository<T>` if it needs persistence.
+- Use generic `IRepository<T>` where possible; create specific methods in interfaces only when needed (e.g., `IProductRepository : IRepository<Product>`).
+- Query logic stays in repositories — no business rules or complex joins in Services that should be repository methods.
+
+**Dependency Injection (DI)**:
+- **Always use constructor injection** for all dependencies (Repositories into Services, Services into Controllers).
+- Register all services, repositories, and other components using extensions in `Shared/Extensions/` (e.g., `AddRepositories()`, `AddServices()`).
+- Never use `new` keyword for instantiating services/repositories in production code (except for DTOs or simple value objects).
+- Use `IServiceCollection` extensions for proper lifetime management (Scoped for Repositories/Services, Singleton for caches/config, Transient where appropriate).
+- Controllers should only depend on Services via DI — no manual instantiation.
+- Follow ASP.NET Core built-in DI container best practices. Avoid third-party containers unless already in the project.
+
+**Violation Consequences**:
+- Direct DbContext access or manual `new` = immediate refactor required.
+- Always verify with `query_graph` that dependencies flow correctly through DI.
+
 ---
 
 ## 📱 Flutter App — mini_mart_management_mobile_app
@@ -126,7 +149,6 @@ lib/
 - **Repositories**: call services, parse/validate responses, throw typed exceptions from `core/`. No HTTP code.
 - **Providers**: call repositories, expose state + loading/error flags. No HTTP calls.
 - **Screens**: `context.watch` / `Consumer` only. No business logic, no service calls, no raw HTTP.
-- **Widgets**: accept typed parameters — never raw `Map<String, dynamic>`. Extract reusable pieces here.
 
 ### JWT Flow
 
@@ -432,6 +454,7 @@ class ProductListScreen extends StatelessWidget {
 - Add new config keys as `IConfiguration["raw.key"]` inline — use `IOptions<T>`
 - Create a new exception type if a fitting one exists in `Shared/Exceptions/`
 - Map DTOs by hand if AutoMapper covers it
+- Instantiate services/repositories with `new` keyword
 
 **Flutter**
 - Hardcode the API URL anywhere outside `lib/config/`
@@ -447,3 +470,4 @@ class ProductListScreen extends StatelessWidget {
 - **Unsure about existing patterns?** → run `semantic_search_nodes` or `query_graph` first
 - **Unsure about project structure?** → ask before scaffolding anything
 - **Something already exists that almost fits?** → adapt it, don't duplicate it
+````

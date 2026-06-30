@@ -82,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         passwordFocus: _passwordFocus,
                         obscurePassword: _obscurePassword,
                         showError: _showError,
+                        errorMessage: null,
                         isLoading: _isLoading,
                         onTogglePassword: _togglePasswordVisibility,
                         onSubmit: _handleLogin,

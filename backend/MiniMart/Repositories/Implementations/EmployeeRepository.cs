@@ -34,6 +34,13 @@ namespace MiniMart.Repositories.RepoImplement
                 .FirstOrDefaultAsync(e => e.EmployeeId == id);
         }
 
+        public async Task<Employee?> GetByUsernameAsync(string username)
+        {
+            return await _context.Employees
+                .Include(e => e.Role)
+                .FirstOrDefaultAsync(e => e.Username == username);
+        }
+
         public async Task<Employee> CreateEmployeeAsync(Employee employee)
         {
             await _context.Employees.AddAsync(employee);
@@ -100,6 +107,16 @@ namespace MiniMart.Repositories.RepoImplement
         public async Task<bool> RoleExistsAsync(int roleId)
         {
             return await _context.Roles.AnyAsync(r => r.RoleId == roleId);
+        }
+
+        public async Task<bool> ActiveRoleExistsAsync(int roleId)
+        {
+            return await _context.Roles.AnyAsync(r => r.RoleId == roleId && r.Status);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

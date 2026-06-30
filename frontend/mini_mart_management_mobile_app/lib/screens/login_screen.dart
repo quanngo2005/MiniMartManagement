@@ -1,11 +1,12 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
+import 'package:mini_mart_management_mobile_app/screens/mock_role_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/dotted_background.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/login_card.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/login_footer.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/login_header.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,8 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordFocus = FocusNode();
 
   bool _obscurePassword = true;
-  bool _isLoading = false;
-  bool _showError = false;
 
   @override
   void dispose() {
@@ -35,18 +34,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     FocusScope.of(context).unfocus();
-    setState(() {
-      _isLoading = true;
-      _showError = false;
-    });
 
-    await Future<void>.delayed(const Duration(milliseconds: 900));
+    final authProvider = context.read<AuthProvider>();
+    final user = await authProvider.login(
+      username: _usernameController.text.trim(),
+      password: _passwordController.text,
+    );
+
     if (!mounted) return;
 
-    setState(() {
-      _isLoading = false;
-      _showError = true;
-    });
+    if (user != null) {
+      await Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => MockRoleScreen(user: user),
+        ),
+      );
+    }
   }
 
   void _togglePasswordVisibility() {
@@ -57,6 +60,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.select<AuthProvider, bool>(
+      (provider) => provider.isLoading,
+    );
+    final errorMessage = context.select<AuthProvider, String?>(
+      (provider) => provider.errorMessage,
+    );
+
     return Scaffold(
       body: Stack(
         children: [
@@ -81,8 +91,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         usernameFocus: _usernameFocus,
                         passwordFocus: _passwordFocus,
                         obscurePassword: _obscurePassword,
-                        showError: _showError,
-                        isLoading: _isLoading,
+                        showError: errorMessage != null,
+                        errorMessage: errorMessage,
+                        isLoading: isLoading,
                         onTogglePassword: _togglePasswordVisibility,
                         onSubmit: _handleLogin,
                       ),
@@ -94,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          if (_isLoading) const LoadingOverlay(),
+          if (isLoading) const LoadingOverlay(),
         ],
       ),
     );

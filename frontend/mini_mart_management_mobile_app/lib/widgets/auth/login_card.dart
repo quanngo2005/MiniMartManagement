@@ -11,6 +11,7 @@ class LoginCard extends StatelessWidget {
     required this.passwordFocus,
     required this.obscurePassword,
     required this.showError,
+    required this.errorMessage,
     required this.isLoading,
     required this.onTogglePassword,
     required this.onSubmit,
@@ -23,6 +24,7 @@ class LoginCard extends StatelessWidget {
   final FocusNode passwordFocus;
   final bool obscurePassword;
   final bool showError;
+  final String? errorMessage;
   final bool isLoading;
   final VoidCallback onTogglePassword;
   final VoidCallback onSubmit;
@@ -110,7 +112,7 @@ class LoginCard extends StatelessWidget {
                 ),
               ),
             ),
-            LoginErrorMessage(visible: showError),
+            LoginErrorMessage(visible: showError, message: errorMessage),
             const SizedBox(height: 26),
             SizedBox(
               height: 48,
