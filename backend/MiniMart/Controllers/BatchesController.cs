@@ -10,7 +10,7 @@ namespace MiniMart.Controllers
     [ApiController]
     [Route("api/batches")]
     [Route("odata/Batches")]
-    public class BatchesController : ODataController
+    public class BatchesController : ControllerBase
     {
         private readonly IBatchService _batchService;
 

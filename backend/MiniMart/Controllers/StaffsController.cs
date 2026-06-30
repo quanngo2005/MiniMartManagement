@@ -15,7 +15,7 @@ namespace MiniMart.Controllers
     [Authorize(Policy = "ManagerUp")]
     [Route("api/staffs")]
     [Route("odata/staffs")]
-    public class StaffsController : ODataController
+    public class StaffsController : ControllerBase
     {
         private readonly IEmployeeRepository _employeeRepository;
 

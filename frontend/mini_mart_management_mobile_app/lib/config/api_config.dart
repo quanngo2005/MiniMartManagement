@@ -1,7 +1,7 @@
 abstract final class ApiConfig {
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://localhost:5005',
+    defaultValue: 'http://localhost:5005',
   );
 
   static Uri uri(String path) {

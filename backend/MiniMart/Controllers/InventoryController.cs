@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
 using MiniMart.DTOs;
 using MiniMart.Services;
 
@@ -11,7 +10,7 @@ namespace MiniMart.Controllers
     [Authorize(Policy = "WarehouseUp")]
     [Route("api/inventory")]
     [Route("odata/InventoryTransactions")]
-    public class InventoryController : ODataController
+    public class InventoryController : ControllerBase
     {
         private readonly IInventoryService _inventoryService;
 

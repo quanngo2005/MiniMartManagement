@@ -3,7 +3,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
@@ -14,7 +13,7 @@ namespace MiniMart.Controllers
     [ApiController]
     [Route("api/shifts")]
     [Route("odata/Shifts")]
-    public class ShiftsController : ODataController
+    public class ShiftsController : ControllerBase
     {
         private readonly IShiftRepository _shiftRepository;
 
