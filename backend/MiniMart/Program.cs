@@ -51,6 +51,8 @@ builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IBatchService, BatchService>();
 builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
 
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddControllers()
 
     .AddOData(options => options
