@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniMart.DTOs;
 using MiniMart.Middleware;
-using MiniMart.Services;
+using MiniMart.Services.Interfaces;
 
 namespace MiniMart.Controllers
 {
