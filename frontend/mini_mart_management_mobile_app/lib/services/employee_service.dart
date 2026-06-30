@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/employee.dart';
+import 'package:mini_mart_management_mobile_app/models/role.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
 class EmployeeService {
@@ -163,6 +164,32 @@ class EmployeeService {
     if (setCookieHeader == null || setCookieHeader.isEmpty) return null;
     final match = RegExp(r'XSRF-TOKEN=([^;,\s]+)').firstMatch(setCookieHeader);
     return match?.group(1);
+  }
+
+  Future<List<Role>> getRoles() async {
+    final response = await _client.get(
+      ApiConfig.uri('/api/roles'),
+      headers: const {'Accept': 'application/json'},
+    );
+
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(_readMessage(responseJson));
+    }
+
+    final data = responseJson['data'] ?? responseJson['Data'] ?? responseJson;
+    if (data is List) {
+      return data.map((json) => Role.fromJson(json)).toList();
+    }
+
+    if (data is Map<String, dynamic>) {
+      final value = data['value'] ?? data['Value'];
+      if (value is List) {
+        return value.map((json) => Role.fromJson(json)).toList();
+      }
+    }
+
+    throw const ApiException('Không thể đọc danh sách vai trò.');
   }
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee.dart';
+import 'package:mini_mart_management_mobile_app/models/role.dart';
 import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
@@ -22,6 +23,7 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<EmployeeProvider>().fetchEmployees();
+      context.read<EmployeeProvider>().fetchRoles();
     });
     _searchController.addListener(() {
       setState(() {
@@ -267,34 +269,44 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
     Color badgeText;
     switch (emp.roleId) {
       case 4: // Admin
-        badgeBg = AppColors.primaryContainer;
-        badgeText = AppColors.primary;
+        badgeBg = const Color(0xFFE0F2FE); // light blue
+        badgeText = const Color(0xFF0369A1); // dark blue
         break;
       case 1: // Manager
-        badgeBg = const Color(0xFF6CF8BB).withValues(alpha: 0.2);
-        badgeText = const Color(0xFF00714D);
+        badgeBg = const Color(0xFFDCFCE7); // light green
+        badgeText = const Color(0xFF15803D); // dark green
         break;
-      default: // Cashier, Warehouse
+      case 2: // Cashier
+        badgeBg = const Color(0xFFFEF9C3); // light yellow
+        badgeText = const Color(0xFFA16207); // dark yellow/gold
+        break;
+      case 3: // Warehouse
+        badgeBg = const Color(0xFFF3E8FF); // light purple
+        badgeText = const Color(0xFF7E22CE); // dark purple
+        break;
+      default:
         badgeBg = AppColors.borderGray;
         badgeText = AppColors.textDark;
     }
 
     return Opacity(
       opacity: isActive ? 1.0 : 0.6,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.borderGray),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x05000000),
-              offset: Offset(0, 2),
-              blurRadius: 4,
-            ),
-          ],
-        ),
+      child: GestureDetector(
+        onTap: () => _showEmployeeDetailsSheet(context, emp),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.borderGray),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x05000000),
+                offset: Offset(0, 2),
+                blurRadius: 4,
+              ),
+            ],
+          ),
         child: Column(
           children: [
             Row(
@@ -420,6 +432,7 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
           ],
         ),
       ),
+      ),
     );
   }
 
@@ -495,6 +508,24 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
       ),
     );
   }
+
+  void _showEmployeeDetailsSheet(BuildContext context, Employee emp) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => _EmployeeDetailsSheet(
+        employee: emp,
+        onEdit: () {
+          Navigator.pop(ctx);
+          _showEditEmployeeDialog(context, emp);
+        },
+      ),
+    );
+  }
 }
 
 class _EmployeeFormSheet extends StatefulWidget {
@@ -545,6 +576,26 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.employee != null;
+    final roles = context.read<EmployeeProvider>().roles;
+    final seen = <String>{};
+    final uniqueRoles = <Role>[];
+    for (final r in roles) {
+      if (seen.add(r.roleName.trim().toLowerCase())) {
+        uniqueRoles.add(r);
+      }
+    }
+    var roleItems = uniqueRoles.map((r) => DropdownMenuItem<int>(value: r.roleId, child: Text(r.roleName))).toList();
+    if (roleItems.isEmpty) {
+      roleItems = const [
+        DropdownMenuItem(value: 1, child: Text('Manager')),
+        DropdownMenuItem(value: 2, child: Text('Cashier')),
+        DropdownMenuItem(value: 3, child: Text('Warehouse')),
+        DropdownMenuItem(value: 4, child: Text('Admin')),
+      ];
+    }
+    if (!roleItems.any((item) => item.value == _roleId)) {
+      roleItems = List.from(roleItems)..add(DropdownMenuItem<int>(value: _roleId, child: Text('Role ID: $_roleId')));
+    }
 
     return Padding(
       padding: EdgeInsets.only(
@@ -592,6 +643,8 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
                   Expanded(
                     child: DropdownButtonFormField<bool>(
                       initialValue: _gender,
+                      dropdownColor: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
                       decoration: const InputDecoration(labelText: 'Giới tính'),
                       items: const [
                         DropdownMenuItem(value: true, child: Text('Nam')),
@@ -658,13 +711,10 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
                   Expanded(
                     child: DropdownButtonFormField<int>(
                       initialValue: _roleId,
+                      dropdownColor: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
                       decoration: const InputDecoration(labelText: 'Vai trò'),
-                      items: const [
-                        DropdownMenuItem(value: 1, child: Text('Manager')),
-                        DropdownMenuItem(value: 2, child: Text('Cashier')),
-                        DropdownMenuItem(value: 3, child: Text('Warehouse')),
-                        DropdownMenuItem(value: 4, child: Text('Admin')),
-                      ],
+                      items: roleItems,
                       onChanged: (val) => setState(() => _roleId = val!),
                     ),
                   ),
@@ -672,6 +722,8 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
                   Expanded(
                     child: DropdownButtonFormField<int>(
                       initialValue: _status,
+                      dropdownColor: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
                       decoration: const InputDecoration(labelText: 'Trạng thái'),
                       items: const [
                         DropdownMenuItem(value: 1, child: Text('Hoạt động')),
@@ -683,53 +735,59 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
                 ],
               ),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Ngày sinh: ${_dateOfBirth.day}/${_dateOfBirth.month}/${_dateOfBirth.year}'),
-                  TextButton(
-                    onPressed: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: _dateOfBirth,
-                        firstDate: DateTime(1960),
-                        lastDate: DateTime.now(),
-                      );
-                      if (picked != null) {
-                        setState(() => _dateOfBirth = picked);
-                      }
-                    },
-                    child: const Text('Chọn'),
-                  ),
-                ],
+              TextFormField(
+                controller: TextEditingController(
+                  text: "${_dateOfBirth.day}/${_dateOfBirth.month}/${_dateOfBirth.year}",
+                ),
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Ngày sinh *',
+                  suffixIcon: Icon(Icons.calendar_today_rounded),
+                ),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _dateOfBirth,
+                    firstDate: DateTime(1960),
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) {
+                    setState(() => _dateOfBirth = picked);
+                  }
+                },
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Ngày vào làm: ${_hireDate.day}/${_hireDate.month}/${_hireDate.year}'),
-                  TextButton(
-                    onPressed: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: _hireDate,
-                        firstDate: DateTime(2015),
-                        lastDate: DateTime.now(),
-                      );
-                      if (picked != null) {
-                        setState(() => _hireDate = picked);
-                      }
-                    },
-                    child: const Text('Chọn'),
-                  ),
-                ],
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: TextEditingController(
+                  text: "${_hireDate.day}/${_hireDate.month}/${_hireDate.year}",
+                ),
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Ngày vào làm *',
+                  suffixIcon: Icon(Icons.calendar_today_rounded),
+                ),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _hireDate,
+                    firstDate: DateTime(2015),
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) {
+                    setState(() => _hireDate = picked);
+                  }
+                },
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
+              const SizedBox(height: 24),
+              FilledButton(
                 onPressed: _isSaving ? null : _submit,
-                style: ElevatedButton.styleFrom(
+                style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: _isSaving
                     ? const SizedBox(
@@ -780,5 +838,213 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
         setState(() => _isSaving = false);
       }
     }
+  }
+}
+
+class _EmployeeDetailsSheet extends StatelessWidget {
+  const _EmployeeDetailsSheet({required this.employee, required this.onEdit});
+
+  final Employee employee;
+  final VoidCallback onEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    final initials = employee.fullName.trim().split(' ').last.substring(0, 2).toUpperCase();
+    final isActive = employee.status == 1;
+    final bdate = employee.dateOfBirth;
+    final hdate = employee.hireDate;
+
+    // Formatting currency for salary
+    String formatCurrency(double amount) {
+      final str = amount.toInt().toString();
+      final buffer = StringBuffer();
+      for (int i = 0; i < str.length; i++) {
+        if (i > 0 && (str.length - i) % 3 == 0) {
+          buffer.write('.');
+        }
+        buffer.write(str[i]);
+      }
+      return "${buffer.toString()}đ";
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Chi tiết nhân viên',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close_rounded),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // User Avatar & Name Header
+          Center(
+            child: Column(
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                  ),
+                  child: Center(
+                    child: Text(
+                      initials,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  employee.fullName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '@${employee.username}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Profile Details List
+          _buildDetailRow('Vai trò', employee.roleName.toUpperCase(), isBadge: true),
+          _buildDetailRow('Giới tính', employee.gender ? 'Nam' : 'Nữ'),
+          _buildDetailRow('Số điện thoại', employee.phoneNumber),
+          _buildDetailRow('Email', employee.email ?? 'Chưa cập nhật'),
+          _buildDetailRow('Địa chỉ', employee.address ?? 'Chưa cập nhật'),
+          _buildDetailRow('Lương cơ bản', formatCurrency(employee.salary), isMonospace: true),
+          _buildDetailRow('Ngày sinh', "${bdate.day}/${bdate.month}/${bdate.year}"),
+          _buildDetailRow('Ngày vào làm', "${hdate.day}/${hdate.month}/${hdate.year}"),
+          _buildDetailRow(
+            'Trạng thái',
+            isActive ? 'Đang hoạt động' : 'Đã vô hiệu hóa',
+            valueColor: isActive ? const Color(0xFF15803D) : AppColors.statusError,
+          ),
+          const SizedBox(height: 24),
+          // Actions
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit_rounded, size: 18),
+                  label: const Text('Chỉnh sửa'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    minimumSize: const Size(0, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text('Đóng'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(
+    String label,
+    String value, {
+    bool isBadge = false,
+    bool isMonospace = false,
+    Color? valueColor,
+  }) {
+    Widget valueWidget;
+    if (isBadge) {
+      valueWidget = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE0F2FE),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          value,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF0369A1),
+          ),
+        ),
+      );
+    } else {
+      valueWidget = Text(
+        value,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          fontFamily: isMonospace ? 'JetBrains Mono' : null,
+          color: valueColor ?? AppColors.textDark,
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.only(bottom: 8),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: AppColors.borderGray, width: 0.5)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textMuted,
+              ),
+            ),
+            valueWidget,
+          ],
+        ),
+      ),
+    );
   }
 }

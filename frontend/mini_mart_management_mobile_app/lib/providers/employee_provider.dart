@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/employee.dart';
+import 'package:mini_mart_management_mobile_app/models/role.dart';
 import 'package:mini_mart_management_mobile_app/repositories/employee_repository.dart';
 
 class EmployeeProvider extends ChangeNotifier {
@@ -9,10 +10,12 @@ class EmployeeProvider extends ChangeNotifier {
   final EmployeeRepository _employeeRepository;
 
   List<Employee> _employees = [];
+  List<Role> _roles = [];
   bool _isLoading = false;
   String? _error;
 
   List<Employee> get employees => _employees;
+  List<Role> get roles => _roles;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -27,6 +30,23 @@ class EmployeeProvider extends ChangeNotifier {
       _error = e.message;
     } catch (_) {
       _error = 'Đã xảy ra lỗi khi tải danh sách nhân viên.';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchRoles() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _roles = await _employeeRepository.getRoles();
+    } on ApiException catch (e) {
+      _error = e.message;
+    } catch (_) {
+      _error = 'Đã xảy ra lỗi khi tải danh sách vai trò.';
     } finally {
       _isLoading = false;
       notifyListeners();
