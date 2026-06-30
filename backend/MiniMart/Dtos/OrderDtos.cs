@@ -66,7 +66,7 @@ namespace MiniMart.DTOs
         public int? CustomerPointBalance { get; set; } 
         public PaymentMethod PaymentMethod { get; set; }
         public OrderStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; }
+
         public List<OrderDetailDto> Items { get; set; } = new();
         public DateTime OrderDate { get; set; }
     }
@@ -75,7 +75,7 @@ namespace MiniMart.DTOs
     {
         public int OrderId { get; set; }
         public string OrderCode { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
+
         public string CashierName { get; set; } = string.Empty;
         public string? CustomerName { get; set; }
         public string? CustomerPhone { get; set; }

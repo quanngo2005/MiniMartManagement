@@ -55,7 +55,7 @@ namespace MiniMart.Repositories.RepoImplement
             {
                 OrderId = order.OrderId,
                 OrderCode = order.OrderCode,
-                CreatedAt = DateTime.Now,
+
                 CashierName = order.Employee?.FullName ?? "",
                 CustomerName = order.Customer?.FullName,
                 CustomerPhone = order.Customer?.PhoneNumber,
@@ -227,7 +227,7 @@ namespace MiniMart.Repositories.RepoImplement
                     CustomerPointBalance = customer?.Point,
                     PaymentMethod = request.PaymentMethod,
                     Status = OrderStatus.Completed,
-                    CreatedAt = DateTime.Now,
+
                     Items = orderDetails.Select(od => new OrderDetailDto
                     {
                         ProductId = od.ProductId,
