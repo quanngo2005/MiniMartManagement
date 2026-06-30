@@ -149,6 +149,7 @@ lib/
 - **Repositories**: call services, parse/validate responses, throw typed exceptions from `core/`. No HTTP code.
 - **Providers**: call repositories, expose state + loading/error flags. No HTTP calls.
 - **Screens**: `context.watch` / `Consumer` only. No business logic, no service calls, no raw HTTP.
+- **Widgets**: accept typed parameters — never raw `Map<String, dynamic>`.
 
 ### JWT Flow
 
