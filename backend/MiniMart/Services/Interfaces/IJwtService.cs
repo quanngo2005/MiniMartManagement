@@ -1,6 +1,6 @@
 using MiniMart.Models;
 
-namespace MiniMart.Services
+namespace MiniMart.Services.Interfaces
 {
     public interface IJwtService
     {

@@ -13,3 +13,5 @@
 - [API route auth and OData controller gotcha](api-route-auth-odata-controller.md) - REST/OData mixed controllers should use ControllerBase so auth returns 401/403 instead of route parse fallout.
 - [Batch schema drift](batch-schema-drift.md) - Batches migration repair for missing Quantity, TotalPrice, and IsDeleted columns.
 - [Flutter Stitch login screen](flutter-stitch-login-screen.md) - frontend app location, downloaded Stitch references, and Dart/Flutter verification notes.
+- [Flutter Stitch category screen](flutter-stitch-category-screen.md) - category management Stitch screen implementation and verification notes.
+- [Current ERD source](current-erd-source.md) - current entity/FK source pointers and ERD caveats.

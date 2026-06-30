@@ -6,7 +6,7 @@ using MiniMart.Models;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Utils;
 
-namespace MiniMart.Services
+namespace MiniMart.Services.Implementations
 {
     public class VnPayService : IPaymentGatewayService
     {
@@ -74,10 +74,10 @@ namespace MiniMart.Services
 
             return new PaymentCallbackResult
             {
-                IsSuccess = (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00"),
+                IsSuccess = vnp_ResponseCode == "00" && vnp_TransactionStatus == "00",
                 TransactionRef = vnp_TxnRef,
                 Amount = vnpAmount / 100, 
-                ErrorMessage = (vnp_ResponseCode == "00") ? "" : $"Giao dịch thất bại (Mã lỗi VNPAY: {vnp_ResponseCode})"
+                ErrorMessage = vnp_ResponseCode == "00" ? "" : $"Giao dịch thất bại (Mã lỗi VNPAY: {vnp_ResponseCode})"
             };
         }
     }

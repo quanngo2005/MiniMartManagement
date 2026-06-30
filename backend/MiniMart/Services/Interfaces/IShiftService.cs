@@ -1,6 +1,6 @@
 using MiniMart.DTOs;
 
-namespace MiniMart.Services
+namespace MiniMart.Services.Interfaces
 {
     public interface IShiftService
     {

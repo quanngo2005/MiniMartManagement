@@ -11,6 +11,8 @@ using MiniMart.Repositories.RepoImplement;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services;
 using MiniMart.Shared.Extensions;
+using MiniMart.Middleware;
+using MiniMart.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
@@ -58,6 +60,7 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<MiniMart.Services.Interfaces.IPaymentGatewayService, MiniMart.Services.VnPayService>();
 
 builder.Services.AddControllers()
