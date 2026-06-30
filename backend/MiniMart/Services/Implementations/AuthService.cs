@@ -7,6 +7,7 @@ using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Shared.Settings;
+using MiniMart.Services.Interfaces;
 
 namespace MiniMart.Services
 {

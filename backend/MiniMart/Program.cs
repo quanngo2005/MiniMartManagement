@@ -9,6 +9,7 @@ using MiniMart.Repositories.RepoImplement;
 using MiniMart.Services;
 using MiniMart.Shared.Extensions;
 using MiniMart.Middleware;
+using MiniMart.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
