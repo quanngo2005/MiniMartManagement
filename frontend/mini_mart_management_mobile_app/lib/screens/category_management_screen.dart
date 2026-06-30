@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/category_summary.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/categories/category_stat_card.dart';
 import 'package:mini_mart_management_mobile_app/widgets/categories/category_tree_card.dart';
@@ -211,6 +212,10 @@ class CategoryManagementScreen extends StatelessWidget {
         if (index == 2) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const EmployeeManagementScreen()),
+          );
+        } else if (index == 3) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const ShiftManagementScreen()),
           );
         }
       },
