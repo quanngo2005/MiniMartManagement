@@ -15,10 +15,12 @@ namespace MiniMart.Controllers
         private const string RefreshTokenCookieName = "refresh_token";
 
         private readonly IAuthService _authService;
+        private readonly IWebHostEnvironment _environment;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IWebHostEnvironment environment)
         {
             _authService = authService;
+            _environment = environment;
         }
 
         [HttpGet("csrf-token")]
@@ -29,7 +31,7 @@ namespace MiniMart.Controllers
             {
                 HttpOnly = false,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = CookieSameSite,
                 Path = "/"
             });
 
@@ -120,7 +122,7 @@ namespace MiniMart.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = CookieSameSite,
                 Path = "/",
                 Expires = tokens.AccessTokenExpiresAt
             });
@@ -129,11 +131,15 @@ namespace MiniMart.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = CookieSameSite,
                 Path = "/api/auth",
                 Expires = tokens.RefreshTokenExpiresAt
             });
         }
+
+        private SameSiteMode CookieSameSite => _environment.IsDevelopment()
+            ? SameSiteMode.None
+            : SameSiteMode.Strict;
 
         private void DeleteTokenCookies()
         {

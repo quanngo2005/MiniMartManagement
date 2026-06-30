@@ -1,11 +1,11 @@
 using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using Microsoft.Extensions.Options;
-using MiniMart.Data;
 using MiniMart.DTOs;
 using MiniMart.Shared.Exceptions;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
+using MiniMart.Repositories.RepoInterface;
 using MiniMart.Shared.Settings;
 
 namespace MiniMart.Services
@@ -16,25 +16,29 @@ namespace MiniMart.Services
         private const int LockoutMinutes = 15;
         private const int MaxActiveDevices = 3;
 
-        private readonly MiniMartDbContext _dbContext;
+        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IJwtService _jwtService;
         private readonly JwtSettings _jwtSettings;
+        private readonly IMapper _mapper;
 
         public AuthService(
-            MiniMartDbContext dbContext,
+            IEmployeeRepository employeeRepository,
+            IRefreshTokenRepository refreshTokenRepository,
             IJwtService jwtService,
-            IOptions<JwtSettings> jwtSettings)
+            IOptions<JwtSettings> jwtSettings,
+            IMapper mapper)
         {
-            _dbContext = dbContext;
+            _employeeRepository = employeeRepository;
+            _refreshTokenRepository = refreshTokenRepository;
             _jwtService = jwtService;
             _jwtSettings = jwtSettings.Value;
+            _mapper = mapper;
         }
 
         public async Task<(AuthResponse Response, TokenPair Tokens)> LoginAsync(LoginRequest request)
         {
-            var employee = await _dbContext.Employees
-                .Include(e => e.Role)
-                .FirstOrDefaultAsync(e => e.Username == request.Username);
+            var employee = await _employeeRepository.GetByUsernameAsync(request.Username);
 
             if (employee == null)
             {
@@ -52,16 +56,15 @@ namespace MiniMart.Services
                     employee.LockoutEnd = DateTime.UtcNow.AddMinutes(LockoutMinutes);
                 }
 
-                await _dbContext.SaveChangesAsync();
+                await _employeeRepository.SaveChangesAsync();
                 throw new UnauthorizedDomainException("Invalid username or password.");
             }
 
             employee.FailedLoginAttempts = 0;
             employee.LockoutEnd = null;
 
-            var tokens = CreateTokenPair(employee, request.RememberMe);
+            var tokens = await CreateTokenPairAsync(employee, request.RememberMe);
             await EnforceDeviceLimitAsync(employee.EmployeeId);
-            await _dbContext.SaveChangesAsync();
 
             return (CreateAuthResponse(employee, tokens.AccessTokenExpiresAt), tokens);
         }
@@ -69,10 +72,7 @@ namespace MiniMart.Services
         public async Task<(AuthResponse Response, TokenPair Tokens)> RefreshTokenAsync(string refreshToken)
         {
             var tokenHash = _jwtService.HashToken(refreshToken);
-            var storedToken = await _dbContext.RefreshTokens
-                .Include(rt => rt.Employee)
-                .ThenInclude(e => e.Role)
-                .FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash);
+            var storedToken = await _refreshTokenRepository.GetByTokenHashAsync(tokenHash);
 
             if (storedToken == null)
             {
@@ -92,13 +92,11 @@ namespace MiniMart.Services
 
             EnsureCanAuthenticate(storedToken.Employee);
 
-            var tokens = CreateTokenPair(
+            var tokens = await CreateTokenPairAsync(
                 storedToken.Employee,
                 storedToken.ExpiresAt > DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays));
 
-            storedToken.RevokedAt = DateTime.UtcNow;
-
-            await _dbContext.SaveChangesAsync();
+            await _refreshTokenRepository.RevokeAsync(storedToken);
 
             return (CreateAuthResponse(storedToken.Employee, tokens.AccessTokenExpiresAt), tokens);
         }
@@ -106,76 +104,51 @@ namespace MiniMart.Services
         public async Task LogoutAsync(string refreshToken)
         {
             var tokenHash = _jwtService.HashToken(refreshToken);
-            var storedToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash);
+            var storedToken = await _refreshTokenRepository.GetByTokenHashAsync(tokenHash);
 
             if (storedToken != null && storedToken.RevokedAt == null)
             {
-                storedToken.RevokedAt = DateTime.UtcNow;
-                await _dbContext.SaveChangesAsync();
+                await _refreshTokenRepository.RevokeAsync(storedToken);
             }
         }
 
         public async Task LogoutAllAsync(int employeeId)
         {
-            var activeTokens = await _dbContext.RefreshTokens
-                .Where(rt => rt.EmployeeId == employeeId && rt.RevokedAt == null && rt.ExpiresAt > DateTime.UtcNow)
-                .ToListAsync();
-
-            foreach (var token in activeTokens)
-            {
-                token.RevokedAt = DateTime.UtcNow;
-            }
-
-            await _dbContext.SaveChangesAsync();
+            await _refreshTokenRepository.RevokeAllForEmployeeAsync(employeeId);
         }
 
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
         {
-            var usernameExists = await _dbContext.Employees.AnyAsync(e => e.Username == request.Username);
+            var usernameExists = await _employeeRepository.UsernameExistsAsync(request.Username);
             if (usernameExists)
             {
                 throw new DomainException("Username already exists.");
             }
 
-            var phoneExists = await _dbContext.Employees.AnyAsync(e => e.PhoneNumber == request.PhoneNumber);
+            var phoneExists = await _employeeRepository.PhoneNumberExistsAsync(request.PhoneNumber);
             if (phoneExists)
             {
                 throw new DomainException("Phone number already exists.");
             }
 
-            var role = await _dbContext.Roles.FirstOrDefaultAsync(r => r.RoleId == request.RoleId && r.Status);
-            if (role == null)
+            var roleExists = await _employeeRepository.ActiveRoleExistsAsync(request.RoleId);
+            if (!roleExists)
             {
                 throw new DomainException("Role is invalid or inactive.");
             }
 
-            var employee = new Employee
-            {
-                FullName = request.FullName,
-                Gender = request.Gender,
-                DateOfBirth = request.DateOfBirth,
-                PhoneNumber = request.PhoneNumber,
-                Email = request.Email,
-                Address = request.Address,
-                Username = request.Username,
-                PasswordHash = HashPassword(request.Password),
-                Salary = request.Salary,
-                HireDate = request.HireDate,
-                Avatar = request.Avatar,
-                Status = EmployeeStatus.Active,
-                RoleId = request.RoleId,
-                Role = role
-            };
+            var employee = _mapper.Map<Employee>(request);
+            employee.PasswordHash = HashPassword(request.Password);
 
-            _dbContext.Employees.Add(employee);
-            await _dbContext.SaveChangesAsync();
+            var created = await _employeeRepository.CreateEmployeeAsync(employee);
+            var createdWithRole = await _employeeRepository.GetEmployeeByIdAsync(created.EmployeeId);
 
-            return CreateAuthResponse(employee, DateTime.UtcNow);
+            return CreateAuthResponse(createdWithRole ?? created, DateTime.UtcNow);
         }
 
         public async Task ChangePasswordAsync(int employeeId, ChangePasswordRequest request)
         {
-            var employee = await _dbContext.Employees.FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+            var employee = await _employeeRepository.GetEmployeeByIdAsync(employeeId);
             if (employee == null)
             {
                 throw new UnauthorizedDomainException();
@@ -187,14 +160,13 @@ namespace MiniMart.Services
             }
 
             employee.PasswordHash = HashPassword(request.NewPassword);
+            await _employeeRepository.SaveChangesAsync();
             await LogoutAllAsync(employeeId);
         }
 
         public async Task<EmployeeUserDto> GetCurrentUserAsync(int employeeId)
         {
-            var employee = await _dbContext.Employees
-                .Include(e => e.Role)
-                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+            var employee = await _employeeRepository.GetEmployeeByIdAsync(employeeId);
 
             if (employee == null)
             {
@@ -206,9 +178,7 @@ namespace MiniMart.Services
 
         public async Task<EmployeeUserDto> ToggleActiveAsync(int employeeId, bool isActive)
         {
-            var employee = await _dbContext.Employees
-                .Include(e => e.Role)
-                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+            var employee = await _employeeRepository.GetEmployeeByIdAsync(employeeId);
 
             if (employee == null)
             {
@@ -222,13 +192,13 @@ namespace MiniMart.Services
             }
             else
             {
-                await _dbContext.SaveChangesAsync();
+                await _employeeRepository.SaveChangesAsync();
             }
 
             return MapUser(employee);
         }
 
-        private TokenPair CreateTokenPair(
+        private async Task<TokenPair> CreateTokenPairAsync(
             Employee employee,
             bool rememberMe)
         {
@@ -237,7 +207,7 @@ namespace MiniMart.Services
             var refreshExpiresAt = DateTime.UtcNow.AddDays(
                 rememberMe ? _jwtSettings.RememberMeRefreshTokenExpirationDays : _jwtSettings.RefreshTokenExpirationDays);
 
-            _dbContext.RefreshTokens.Add(new RefreshToken
+            await _refreshTokenRepository.CreateAsync(new RefreshToken
             {
                 TokenHash = _jwtService.HashToken(refreshToken),
                 ExpiresAt = refreshExpiresAt,
@@ -255,15 +225,14 @@ namespace MiniMart.Services
 
         private async Task EnforceDeviceLimitAsync(int employeeId)
         {
-            var tokensToRevoke = await _dbContext.RefreshTokens
-                .Where(rt => rt.EmployeeId == employeeId && rt.RevokedAt == null && rt.ExpiresAt > DateTime.UtcNow)
-                .OrderByDescending(rt => rt.RefreshTokenId)
-                .Skip(MaxActiveDevices)
-                .ToListAsync();
+            var tokensToRevoke = await _refreshTokenRepository.GetActiveTokensAsync(
+                employeeId,
+                MaxActiveDevices,
+                int.MaxValue);
 
             foreach (var token in tokensToRevoke)
             {
-                token.RevokedAt = DateTime.UtcNow;
+                await _refreshTokenRepository.RevokeAsync(token);
             }
         }
 
@@ -280,7 +249,7 @@ namespace MiniMart.Services
             }
         }
 
-        private static AuthResponse CreateAuthResponse(Employee employee, DateTime accessTokenExpiresAt)
+        private AuthResponse CreateAuthResponse(Employee employee, DateTime accessTokenExpiresAt)
         {
             return new AuthResponse
             {
@@ -289,18 +258,9 @@ namespace MiniMart.Services
             };
         }
 
-        private static EmployeeUserDto MapUser(Employee employee)
+        private EmployeeUserDto MapUser(Employee employee)
         {
-            return new EmployeeUserDto
-            {
-                EmployeeId = employee.EmployeeId,
-                FullName = employee.FullName,
-                Username = employee.Username,
-                Email = employee.Email,
-                Status = employee.Status,
-                RoleId = employee.RoleId,
-                RoleName = employee.Role?.RoleName ?? string.Empty
-            };
+            return _mapper.Map<EmployeeUserDto>(employee);
         }
 
         private static string HashPassword(string password)

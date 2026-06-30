@@ -13,7 +13,11 @@ namespace MiniMart.DTOs
         public decimal TotalPrice { get; set; }
         public bool Status { get; set; }
         public int ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public string ProductCode { get; set; } = string.Empty;
         public int ReceiptId { get; set; }
+        public string ReceiptCode { get; set; } = string.Empty;
+        public DateTime ImportDate { get; set; }
     }
 
     public class CreateBatchDto

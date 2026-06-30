@@ -9,3 +9,7 @@
 - [Phase 3 operational tables](phase3-operational-tables.md) - payments, point transactions, order returns, return inventory references, and minimum stock thresholds.
 - [Phase 4 promotion overlap guard](phase4-promotion-overlap-guard.md) - SaveChanges validation that rejects overlapping active promotions for the same product and promotion type.
 - [Package architecture](package-architecture.md) - package-level structure and current runtime dependency direction.
+- [Inventory CRUD architecture](inventory-crud-architecture.md) - current inventory source anchors and proposed CRUD layering.
+- [API route auth and OData controller gotcha](api-route-auth-odata-controller.md) - REST/OData mixed controllers should use ControllerBase so auth returns 401/403 instead of route parse fallout.
+- [Batch schema drift](batch-schema-drift.md) - Batches migration repair for missing Quantity, TotalPrice, and IsDeleted columns.
+- [Flutter Stitch login screen](flutter-stitch-login-screen.md) - frontend app location, downloaded Stitch references, and Dart/Flutter verification notes.

@@ -3,14 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
 using MiniMart.Middleware;
+using MiniMart.Mapping;
 using MiniMart.Models;
 using MiniMart.Repositories.Implementations;
 using MiniMart.Repositories.Interfaces;
 using MiniMart.Repositories.RepoImplement;
 using MiniMart.Repositories.RepoInterface;
+using MiniMart.Services;
 using MiniMart.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
 
 // ── OData EDM Model ──────────────────────────────────────────────
 var odataBuilder = new ODataConventionModelBuilder();
@@ -41,7 +44,16 @@ builder.Services.AddDbContext<MiniMartDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
+builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
+builder.Services.AddScoped<IBatchRepository, BatchRepository>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IBatchService, BatchService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IShiftService, ShiftService>();
+builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
+
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -63,6 +75,19 @@ builder.Services.AddControllers()
 // ── Swagger ───────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(DevelopmentCorsPolicy, policy =>
+    {
+        policy.SetIsOriginAllowed(origin =>
+            Uri.TryCreate(origin, UriKind.Absolute, out var uri) &&
+            (uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+             uri.Host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase)))
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 builder.Services.AddMiniMartAuthentication(builder.Configuration);
 
 var app = builder.Build();
@@ -84,6 +109,10 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(DevelopmentCorsPolicy);
+}
 app.UseMiddleware<CsrfMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
