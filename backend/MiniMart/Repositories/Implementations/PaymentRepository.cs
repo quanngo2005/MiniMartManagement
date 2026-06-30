@@ -1,23 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MiniMart.Data;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.Interfaces;
-using MiniMart.Shared.Utils;
+using MiniMart.Services.Interfaces; 
 
 namespace MiniMart.Repositories.Implementations
 {
     public class PaymentRepository : IPaymentRepository
     {
         private readonly MiniMartDbContext _context;
-        private readonly IConfiguration _configuration;
+        private readonly IEnumerable<IPaymentGatewayService> _gateways;
 
-        public PaymentRepository(MiniMartDbContext context, IConfiguration configuration)
+        public PaymentRepository(MiniMartDbContext context, IEnumerable<IPaymentGatewayService> gateways)
         {
             _context = context;
-            _configuration = configuration;
+            _gateways = gateways;
         }
+
         public async Task<PaymentResponseDto> CreatePaymentUrlAsync(PaymentRequestDto request, HttpContext context)
         {
             var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == request.OrderId);
@@ -26,23 +27,15 @@ namespace MiniMart.Repositories.Implementations
                 return new PaymentResponseDto { IsSuccess = false, Message = "Đơn hàng không hợp lệ hoặc đã thanh toán." };
             }
 
+            var gateway = _gateways.FirstOrDefault(g => g.GatewayType == request.PaymentMethod);
+            if (gateway == null)
+            {
+                return new PaymentResponseDto { IsSuccess = false, Message = "Phương thức thanh toán này chưa được hỗ trợ." };
+            }
+
             string txnRef = request.OrderId.ToString() + "_" + DateTime.Now.ToString("HHmmss");
 
-            var vnpay = new VnPayLibrary();
-            vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
-            vnpay.AddRequestData("vnp_Command", "pay");
-            vnpay.AddRequestData("vnp_TmnCode", _configuration["Vnpay:TmnCode"]);
-             
-            vnpay.AddRequestData("vnp_Amount", (order.FinalAmount * 100).ToString("0"));
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
-            vnpay.AddRequestData("vnp_CurrCode", "VND");
-            vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
-            vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang " + order.OrderId);
-            vnpay.AddRequestData("vnp_OrderType", "other");
-            vnpay.AddRequestData("vnp_ReturnUrl", _configuration["Vnpay:ReturnUrl"]);
-            vnpay.AddRequestData("vnp_TxnRef", txnRef);
-            string paymentUrl = vnpay.CreateRequestUrl(_configuration["Vnpay:PaymentUrl"], _configuration["Vnpay:HashSecret"]);
+            string paymentUrl = gateway.CreatePaymentUrl(order, txnRef, context);
 
             var payment = new Payment
             {
@@ -64,33 +57,21 @@ namespace MiniMart.Repositories.Implementations
             };
         }
 
-        public async Task<bool> ProcessVnpayCallbackAsync(VnpayCallbackDto dto)
+        public async Task<bool> ProcessPaymentCallbackAsync(IQueryCollection queryData, PaymentMethod gatewayType)
         {
-            var vnpay = new VnPayLibrary();
-            foreach (var prop in dto.GetType().GetProperties())
-            {
-                var val = prop.GetValue(dto, null)?.ToString();
-                if(!string.IsNullOrEmpty(val) && prop.Name != "vnp_SecrureHashType" && prop.Name != "vnp_SecureHash")
-                {
-                    vnpay.AddResponseData(prop.Name, val);
-                }
-            }
+            var gateway = _gateways.FirstOrDefault(g => g.GatewayType == gatewayType);
+            if (gateway == null) return false;
 
-            bool isValidSignature = vnpay.ValidateSignature(dto.vnp_SecureHash, _configuration["Vnpay:HashSecret"]!);
-            if (!isValidSignature)
-            {
-                return false;
-            }
+            PaymentCallbackResult callbackResult = gateway.ProcessCallback(queryData);
 
-            var payment = await _context.Payments.Include(p => p.Order).FirstOrDefaultAsync(p => p.TransactionRef == dto.vnp_TxnRef);
-            if(payment == null)
-            {
-                return false;
-            }
+            var payment = await _context.Payments.Include(p => p.Order)
+                                .FirstOrDefaultAsync(p => p.TransactionRef == callbackResult.TransactionRef);
+            
+            if(payment == null) return false;
 
             if (payment.Status != PaymentStatus.Pending) return true;
 
-            if(dto.vnp_ResponseCode == "00" && dto.vnp_TransactionStatus == "00")
+            if(callbackResult.IsSuccess)
             {
                 payment.Status = PaymentStatus.Success;
                 payment.PaidAt = DateTime.Now;
@@ -102,6 +83,7 @@ namespace MiniMart.Repositories.Implementations
             {
                 payment.Status = PaymentStatus.Failed;
             }
+            
             await _context.SaveChangesAsync();
             return true;
         }

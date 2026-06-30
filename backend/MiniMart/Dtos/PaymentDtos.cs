@@ -1,4 +1,4 @@
-using MiniMart.Models.Enums;
+﻿using MiniMart.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace MiniMart.DTOs
@@ -30,20 +30,28 @@ namespace MiniMart.DTOs
         public string TransactionRef { get; set; } = string.Empty;
     }
 
-    public class VnpayCallbackDto
+    public class PaymentCallbackResult
     {
-        public string vnp_TmnCode { get; set; } = string.Empty;
-        public string vnp_Amount { get; set; } = string.Empty;
-        public string vnp_BankCode { get; set; } = string.Empty;
-        public string vnp_BankTranNo { get; set; } = string.Empty;
-        public string vnp_CardType { get; set; } = string.Empty;
-        public string vnp_PayDate { get; set; } = string.Empty;
-        public string vnp_OrderInfo { get; set; } = string.Empty;
-        public string vnp_TransactionNo { get; set; } = string.Empty;
-        public string vnp_ResponseCode { get; set; } = string.Empty;
-        public string vnp_TransactionStatus { get; set; } = string.Empty;
-        public string vnp_TxnRef { get; set; } = string.Empty;
-        public string vnp_SecureHash { get; set; } = string.Empty;
+        public bool IsSuccess { get; set; }
+        public string TransactionRef { get; set; } = string.Empty;
+        public decimal Amount { get; set; } 
+        public string ErrorMessage { get; set; } = string.Empty;
     }
+
+    //public class VnpayCallbackDto
+    //{
+    //    public string vnp_TmnCode { get; set; } = string.Empty;
+    //    public string vnp_Amount { get; set; } = string.Empty;
+    //    public string vnp_BankCode { get; set; } = string.Empty;
+    //    public string vnp_BankTranNo { get; set; } = string.Empty;
+    //    public string vnp_CardType { get; set; } = string.Empty;
+    //    public string vnp_PayDate { get; set; } = string.Empty;
+    //    public string vnp_OrderInfo { get; set; } = string.Empty;
+    //    public string vnp_TransactionNo { get; set; } = string.Empty;
+    //    public string vnp_ResponseCode { get; set; } = string.Empty;
+    //    public string vnp_TransactionStatus { get; set; } = string.Empty;
+    //    public string vnp_TxnRef { get; set; } = string.Empty;
+    //    public string vnp_SecureHash { get; set; } = string.Empty;
+    //}
 }
 

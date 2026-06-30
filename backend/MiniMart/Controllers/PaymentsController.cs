@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MiniMart.DTOs;
+using MiniMart.Models.Enums;
 using MiniMart.Repositories.Interfaces;
 
 namespace MiniMart.Controllers
@@ -25,16 +26,43 @@ namespace MiniMart.Controllers
             return Ok(rs);
         }
 
-        [HttpGet("callback")]
-        public async Task<IActionResult> VnpayCallback([FromQuery] VnpayCallbackDto callbackData)
+        [HttpGet("{gateway}/callback")]
+        public async Task<IActionResult> PaymentCallback(string gateway)
         {
-            bool rs = await _paymentRepository.ProcessVnpayCallbackAsync(callbackData);
+            PaymentMethod gatewayType;
+            if (gateway.ToLower() == "vnpay")
+            {
+                gatewayType = PaymentMethod.VNPay;
+            }
+            else if (gateway.ToLower() == "momo")
+            {
+                gatewayType = PaymentMethod.Momo;
+            }
+            else
+            {
+                return BadRequest(new { Message = "Unsupported gateway" });
+            }
+
+            bool rs = await _paymentRepository.ProcessPaymentCallbackAsync(Request.Query, gatewayType);
             
             if (rs)
             {
-                return Ok(new { RspCode = "00", Message = "Confirm Success" });
+                if (gatewayType == PaymentMethod.VNPay)
+                {
+                    return Ok(new { RspCode = "00", Message = "Confirm Success" });
+                }
+                // ===Momo===
+                // ...
+                // ==========
+                return Ok(new { Message = "Success" });
             }
-            return Ok(new { RspCode = "97", Message = "Invalid Signature" });
+
+            if (gatewayType == PaymentMethod.VNPay)
+            {
+                return Ok(new { RspCode = "97", Message = "Invalid Signature" });
+            }
+            
+            return BadRequest(new { Message = "Signature validation failed" });
         }
 
         [HttpGet("{transactionRef}/status")]
