@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using MiniMart.DTOs;
-using MiniMart.Services;
+using MiniMart.Services.Interfaces;
 
 namespace MiniMart.Controllers
 {
