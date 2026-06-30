@@ -48,6 +48,8 @@ builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransaction
 builder.Services.AddScoped<IBatchRepository, BatchRepository>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IBatchService, BatchService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IShiftService, ShiftService>();
 builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
