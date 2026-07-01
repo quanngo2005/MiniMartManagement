@@ -22,6 +22,8 @@ namespace MiniMart.Models
 
         public decimal TotalPrice { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
         public bool Status { get; set; } // true: còn, false: hết
 
         public int ProductId { get; set; }

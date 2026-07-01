@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Product Category Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#b0c8eb",
+                        "border-gray": "#E2E8F0",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#f2f0f3",
+                        "secondary-container": "#6cf8bb",
+                        "primary-container": "#0a2540",
+                        "status-warning": "#F59E0B",
+                        "outline-variant": "#c4c6ce",
+                        "primary": "#000f22",
+                        "surface-container-highest": "#e3e2e5",
+                        "background-slate": "#F8FAFC",
+                        "tertiary-container": "#381d00",
+                        "surface-tint": "#49607e",
+                        "surface": "#faf9fb",
+                        "on-surface-variant": "#43474d",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "background": "#faf9fb",
+                        "outline": "#74777e",
+                        "on-secondary-fixed": "#002113",
+                        "text-muted": "#64748B",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#ae835a",
+                        "on-background": "#1b1c1e",
+                        "secondary": "#006c49",
+                        "tertiary-fixed": "#ffdcbe",
+                        "tertiary": "#1a0b00",
+                        "on-primary-container": "#768dad",
+                        "surface-container": "#efedf0",
+                        "on-tertiary-fixed-variant": "#613f1c",
+                        "surface-bright": "#faf9fb",
+                        "on-tertiary-fixed": "#2d1600",
+                        "on-primary-fixed": "#001c37",
+                        "surface-dim": "#dbd9dc",
+                        "primary-fixed": "#d2e4ff",
+                        "on-primary-fixed-variant": "#314865",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f5f3f6",
+                        "inverse-surface": "#2f3033",
+                        "surface-container-high": "#e9e8ea",
+                        "on-secondary-container": "#00714d",
+                        "on-secondary-fixed-variant": "#005236",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#4edea3",
+                        "primary-fixed-dim": "#b0c8eb",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1b1c1e",
+                        "status-error": "#EF4444",
+                        "surface-variant": "#e3e2e5",
+                        "tertiary-fixed-dim": "#eebd90",
+                        "text-dark": "#334155",
+                        "secondary-fixed": "#6ffbbe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "safe-area": "16px",
+                        "stack-md": "16px",
+                        "gutter": "12px",
+                        "touch-target": "48px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "metadata": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "data-tabular": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            background-color: #F8FAFC;
+        }
+        .indent-1 { padding-left: 12px; }
+        .indent-2 { padding-left: 36px; border-left: 1px solid #E2E8F0; margin-left: 12px; }
+        .indent-3 { padding-left: 48px; border-left: 1px solid #E2E8F0; margin-left: 36px; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen text-on-surface">
+<!-- TopAppBar -->
+<header class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container font-headline-md text-headline-md w-full top-0 sticky border-b border-outline-variant flex items-center justify-between px-safe-area h-touch-target w-full z-40">
+<div class="flex items-center gap-stack-sm">
+<span class="material-symbols-outlined cursor-pointer hover:bg-primary-fixed-dim/10 p-2 rounded-full transition-colors">menu</span>
+<h1 class="font-headline-lg text-headline-lg font-bold">Retail Manager</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined cursor-pointer hover:bg-primary-fixed-dim/10 p-2 rounded-full transition-colors">search</span>
+<span class="material-symbols-outlined cursor-pointer hover:bg-primary-fixed-dim/10 p-2 rounded-full transition-colors">notifications</span>
+</div>
+</header>
+<main class="flex-grow pb-24">
+<!-- Search & Action Bar -->
+<section class="p-safe-area bg-surface border-b border-border-gray">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-primary">Categories</h2>
+<button class="bg-primary text-on-primary h-touch-target px-6 rounded-lg font-bold flex items-center gap-2 active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">add</span>
+                        Add Category
+                    </button>
+</div>
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">search</span>
+<input class="w-full h-12 pl-10 pr-4 bg-surface-container border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary font-body-md text-body-md" placeholder="Search categories (e.g. Dairy, Electronics)..." type="text"/>
+</div>
+</div>
+</section>
+<!-- Category High-Density List -->
+<section class="p-safe-area space-y-gutter">
+<!-- Category Card: Parent -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-lg shadow-sm overflow-hidden">
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">folder</span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-primary font-bold">Fresh Produce</span>
+<span class="text-metadata text-text-muted">452 Products • 3 Subcategories</span>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-text-muted hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-text-muted hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+<!-- Subcategory 1 -->
+<div class="indent-2 border-t border-border-gray/50 py-3 flex items-center justify-between pr-4 hover:bg-surface-container-low transition-colors group/sub">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">subdirectory_arrow_right</span>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-medium">Vegetables</span>
+<span class="text-metadata text-text-muted">210 Products</span>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover/sub:opacity-100 transition-opacity">
+<button class="p-2 text-text-muted hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-text-muted hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+<!-- Sub-Subcategory -->
+<div class="indent-3 border-t border-border-gray/30 py-2 flex items-center justify-between pr-4 hover:bg-surface-container-low transition-colors group/subsub">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">subdirectory_arrow_right</span>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface">Organic Greens</span>
+<span class="text-metadata text-text-muted">45 Products</span>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover/subsub:opacity-100 transition-opacity">
+<button class="p-2 text-text-muted hover:text-primary transition-colors"><span class="material-symbols-outlined text-sm">edit</span></button>
+<button class="p-2 text-text-muted hover:text-error transition-colors"><span class="material-symbols-outlined text-sm">delete</span></button>
+</div>
+</div>
+<!-- Subcategory 2 -->
+<div class="indent-2 border-t border-border-gray/50 py-3 flex items-center justify-between pr-4 hover:bg-surface-container-low transition-colors group/sub">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">subdirectory_arrow_right</span>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-medium">Fruits</span>
+<span class="text-metadata text-text-muted">184 Products</span>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover/sub:opacity-100 transition-opacity">
+<button class="p-2 text-text-muted hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-text-muted hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Category Card: Electronics -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-lg shadow-sm overflow-hidden">
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">devices</span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-primary font-bold">Electronics</span>
+<span class="text-metadata text-text-muted">1,204 Products • 5 Subcategories</span>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-text-muted hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-text-muted hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+<div class="indent-2 border-t border-border-gray/50 py-3 flex items-center justify-between pr-4 hover:bg-surface-container-low transition-colors group/sub">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">subdirectory_arrow_right</span>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-medium">Accessories</span>
+<span class="text-metadata text-text-muted">840 Products</span>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover/sub:opacity-100 transition-opacity">
+<button class="p-2 text-text-muted hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-text-muted hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Category Card: Home & Kitchen -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-lg shadow-sm overflow-hidden">
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">skillet</span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-primary font-bold">Home &amp; Kitchen</span>
+<span class="text-metadata text-text-muted">890 Products</span>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-text-muted hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-text-muted hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Category Card: Frozen Foods -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-lg shadow-sm overflow-hidden">
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">ac_unit</span>
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-primary font-bold">Frozen Foods</span>
+<span class="text-metadata text-text-muted">320 Products</span>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-text-muted hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-text-muted hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Stats/Bento Area -->
+<section class="px-safe-area grid grid-cols-2 gap-gutter py-4">
+<div class="bg-white border border-border-gray rounded-xl p-4 flex flex-col gap-1">
+<span class="text-metadata text-text-muted uppercase tracking-wider">Top Category</span>
+<span class="font-headline-md text-primary">Electronics</span>
+<div class="w-full bg-surface-container-high h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-primary w-4/5 h-full"></div>
+</div>
+</div>
+<div class="bg-white border border-border-gray rounded-xl p-4 flex flex-col gap-1">
+<span class="text-metadata text-text-muted uppercase tracking-wider">Empty Slotted</span>
+<span class="font-headline-md text-status-warning">12 Empty</span>
+<span class="text-metadata text-text-muted">Categories w/o Products</span>
+</div>
+</section>
+</main>
+<!-- FAB for Create -->
+<button class="fixed right-6 bottom-24 bg-primary text-on-primary w-14 h-14 rounded-full shadow-xl flex items-center justify-center z-50 hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-3xl">add_box</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-inverse-surface fixed bottom-0 w-full z-50 border-t border-border-gray shadow-md flex justify-around items-center h-16 w-full px-safe-area pb-2">
+<div class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-metadata text-metadata">Catalog</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-primary-container text-secondary-fixed rounded-xl px-stack-md py-1 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">category</span>
+<span class="font-metadata text-metadata">Categories</span>
+</div>
+<div class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-metadata text-metadata">Suppliers</span>
+</div>
+<div class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-metadata text-metadata">Finances</span>
+</div>
+</nav>
+<script>
+        // Micro-interactions for category list
+        document.querySelectorAll('.group').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.target.closest('button')) return; // Don't trigger if action button clicked
+                const title = item.querySelector('span.font-bold').innerText;
+                console.log('Navigating to category details:', title);
+            });
+        });
+    </script>
+</body></html>

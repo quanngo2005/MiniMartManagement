@@ -200,6 +200,7 @@ BEGIN
         [QuantityRemaining] INT           NOT NULL,
         [Quantity]         INT            NOT NULL,
         [TotalPrice]       DECIMAL(18,2)  NOT NULL,
+        [IsDeleted]        BIT            NOT NULL CONSTRAINT [DF_Batches_IsDeleted] DEFAULT 0,
         [Status]           BIT            NOT NULL,
         [ProductId]        INT            NOT NULL,
         [ReceiptId]        INT            NOT NULL,

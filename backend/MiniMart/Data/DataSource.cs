@@ -8,15 +8,16 @@ namespace MiniMart.Models
         // ========================= ROLES =========================
         public static List<Role> GetRoles() => new List<Role>
         {
-            new Role { RoleId = 1, RoleName = "Quản lý", Description = "Quản lý cửa hàng", Status = true },
-            new Role { RoleId = 2, RoleName = "Thu ngân", Description = "Nhân viên thu ngân", Status = true },
-            new Role { RoleId = 3, RoleName = "Kho", Description = "Nhân viên quản lý kho", Status = true },
+            new Role { RoleId = 1, RoleName = "Manager",  Description = "Quản lý cửa hàng",              Status = true },
+            new Role { RoleId = 2, RoleName = "Cashier",  Description = "Nhân viên thu ngân",             Status = true },
+            new Role { RoleId = 3, RoleName = "Warehouse", Description = "Nhân viên quản lý kho",         Status = true },
+            new Role { RoleId = 4, RoleName = "Admin",    Description = "Quản trị viên hệ thống",         Status = true },
         };
 
         // ========================= EMPLOYEES =========================
         public static List<Employee> GetEmployees() => new List<Employee>
         {
-            new Employee { EmployeeId = 1,  FullName = "Nguyễn Văn An",    Gender = true,  DateOfBirth = new DateTime(1985, 3, 10), PhoneNumber = "0901000001", Email = "an.nguyen@minimart.vn",    Username = "an.nguyen",    PasswordHash = "AQAAAAEAACcQAAAAEHashed1",  Salary = 12000000, HireDate = new DateTime(2020, 1, 5),  Status = EmployeeStatus.Active, RoleId = 1 },
+            new Employee { EmployeeId = 1,  FullName = "Nguyễn Văn An",    Gender = true,  DateOfBirth = new DateTime(1985, 3, 10), PhoneNumber = "0901000001", Email = "an.nguyen@minimart.vn",    Username = "an.nguyen",    PasswordHash = "AQAAAAEAACcQAAAAEHashed1",  Salary = 12000000, HireDate = new DateTime(2020, 1, 5),  Status = EmployeeStatus.Active, RoleId = 4 },
             new Employee { EmployeeId = 2,  FullName = "Trần Thị Bích",    Gender = false, DateOfBirth = new DateTime(1992, 7, 22), PhoneNumber = "0901000002", Email = "bich.tran@minimart.vn",   Username = "bich.tran",    PasswordHash = "AQAAAAEAACcQAAAAEHashed2",  Salary = 8000000,  HireDate = new DateTime(2020, 3, 1),  Status = EmployeeStatus.Active, RoleId = 2 },
             new Employee { EmployeeId = 3,  FullName = "Lê Minh Châu",     Gender = true,  DateOfBirth = new DateTime(1990, 5, 15), PhoneNumber = "0901000003", Email = "chau.le@minimart.vn",     Username = "chau.le",      PasswordHash = "AQAAAAEAACcQAAAAEHashed3",  Salary = 8000000,  HireDate = new DateTime(2020, 4, 1),  Status = EmployeeStatus.Active, RoleId = 2 },
             new Employee { EmployeeId = 4,  FullName = "Phạm Thị Dung",    Gender = false, DateOfBirth = new DateTime(1993, 9, 8),  PhoneNumber = "0901000004", Email = "dung.pham@minimart.vn",   Username = "dung.pham",    PasswordHash = "AQAAAAEAACcQAAAAEHashed4",  Salary = 8500000,  HireDate = new DateTime(2021, 1, 10), Status = EmployeeStatus.Active, RoleId = 3 },
@@ -28,6 +29,8 @@ namespace MiniMart.Models
             new Employee { EmployeeId = 10, FullName = "Trịnh Thị Nga",    Gender = false, DateOfBirth = new DateTime(1996, 10, 7), PhoneNumber = "0901000010", Email = "nga.trinh@minimart.vn",   Username = "nga.trinh",    PasswordHash = "AQAAAAEAACcQAAAAEHashed10", Salary = 8000000,  HireDate = new DateTime(2022, 7, 1),  Status = EmployeeStatus.Active, RoleId = 2 },
             new Employee { EmployeeId = 11, FullName = "Lý Văn Phúc",      Gender = true,  DateOfBirth = new DateTime(1989, 1, 20), PhoneNumber = "0901000011", Email = "phuc.ly@minimart.vn",     Username = "phuc.ly",      PasswordHash = "AQAAAAEAACcQAAAAEHashed11", Salary = 7500000,  HireDate = new DateTime(2023, 2, 1),  Status = EmployeeStatus.Inactive, RoleId = 2 },
             new Employee { EmployeeId = 12, FullName = "Phan Thị Quỳnh",   Gender = false, DateOfBirth = new DateTime(1997, 5, 14), PhoneNumber = "0901000012", Email = "quynh.phan@minimart.vn",  Username = "quynh.phan",   PasswordHash = "AQAAAAEAACcQAAAAEHashed12", Salary = 8000000,  HireDate = new DateTime(2023, 4, 15), Status = EmployeeStatus.Active, RoleId = 2 },
+            new Employee { EmployeeId = 13, FullName = "Admin Test",        Gender = true,  DateOfBirth = new DateTime(1990, 1, 1),  PhoneNumber = "0901000013", Email = "admin.test@minimart.vn",  Username = "admin.test",   PasswordHash = "PBKDF2-SHA256:100000:vECvXvSIQjcJHLryzwWLiA==:bpMkS8sN5DSw0AfpAUBvxc4IScpN1iWkTzLPrhFSk5g=",  Salary = 15000000, HireDate = new DateTime(2024, 1, 1), Status = EmployeeStatus.Active, RoleId = 4 },
+            new Employee { EmployeeId = 14, FullName = "Manager Test",      Gender = true,  DateOfBirth = new DateTime(1990, 1, 2),  PhoneNumber = "0901000014", Email = "manager.test@minimart.vn", Username = "manager.test", PasswordHash = "PBKDF2-SHA256:100000:CZNdjBIPynM3lzo4e7gK7A==:xiVhxkMlNdGago6CisgLJpYB9nXckw5sQW4HjrIVN1I=", Salary = 13000000, HireDate = new DateTime(2024, 1, 1), Status = EmployeeStatus.Active, RoleId = 1 },
         };
 
         // ========================= CUSTOMERS =========================

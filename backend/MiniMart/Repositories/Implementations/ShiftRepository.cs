@@ -64,7 +64,7 @@ namespace MiniMart.Repositories.RepoImplement
             var shift = await _context.Shifts.FindAsync(id);
             if (shift == null) return false;
 
-            _context.Shifts.Remove(shift);
+            shift.Status = ShiftStatus.Cancelled;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -75,6 +75,14 @@ namespace MiniMart.Repositories.RepoImplement
                 .Include(s => s.Employee)
                 .Include(s => s.Cashier)
                 .FirstOrDefaultAsync(s => s.Status == ShiftStatus.Working);
+        }
+
+        public async Task<Shift?> GetActiveShiftByCashierIdAsync(int cashierId)
+        {
+            return await _context.Shifts
+                .Include(s => s.Employee)
+                .Include(s => s.Cashier)
+                .FirstOrDefaultAsync(s => s.Status == ShiftStatus.Working && s.CashierId == cashierId);
         }
 
         public async Task<bool> EmployeeExistsAsync(int employeeId)
