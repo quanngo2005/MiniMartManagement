@@ -69,27 +69,43 @@ class Shift {
     };
   }
 
-  static int _readInt(Map<String, dynamic> json, String camelKey, String pascalKey) {
+  static int _readInt(
+    Map<String, dynamic> json,
+    String camelKey,
+    String pascalKey,
+  ) {
     final value = json[camelKey] ?? json[pascalKey];
     if (value is int) return value;
     if (value is num) return value.toInt();
     throw FormatException('Invalid $camelKey.');
   }
 
-  static double _readDouble(Map<String, dynamic> json, String camelKey, String pascalKey) {
+  static double _readDouble(
+    Map<String, dynamic> json,
+    String camelKey,
+    String pascalKey,
+  ) {
     final value = json[camelKey] ?? json[pascalKey];
     if (value is double) return value;
     if (value is num) return value.toDouble();
     throw FormatException('Invalid $camelKey.');
   }
 
-  static String _readString(Map<String, dynamic> json, String camelKey, String pascalKey) {
+  static String _readString(
+    Map<String, dynamic> json,
+    String camelKey,
+    String pascalKey,
+  ) {
     final value = json[camelKey] ?? json[pascalKey];
     if (value is String) return value;
     throw FormatException('Invalid $camelKey.');
   }
 
-  static String? _readNullableString(Map<String, dynamic> json, String camelKey, String pascalKey) {
+  static String? _readNullableString(
+    Map<String, dynamic> json,
+    String camelKey,
+    String pascalKey,
+  ) {
     final value = json[camelKey] ?? json[pascalKey];
     if (value == null || value is String) return value;
     throw FormatException('Invalid $camelKey.');

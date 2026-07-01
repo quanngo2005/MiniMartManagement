@@ -13,7 +13,9 @@ class ShiftRepository {
     } on ApiException {
       rethrow;
     } catch (e) {
-      throw ApiException('Không thể tải danh sách ca làm việc: ${e.toString()}');
+      throw ApiException(
+        'Không thể tải danh sách ca làm việc: ${e.toString()}',
+      );
     }
   }
 
@@ -33,7 +35,9 @@ class ShiftRepository {
     } on ApiException {
       rethrow;
     } catch (e) {
-      throw ApiException('Không thể tải thông tin ca làm việc hiện tại: ${e.toString()}');
+      throw ApiException(
+        'Không thể tải thông tin ca làm việc hiện tại: ${e.toString()}',
+      );
     }
   }
 

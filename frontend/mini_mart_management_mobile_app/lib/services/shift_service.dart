@@ -7,7 +7,7 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory.dar
 
 class ShiftService {
   ShiftService({http.Client? client})
-      : _client = client ?? createConfiguredClient();
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 
@@ -135,10 +135,7 @@ class ShiftService {
       headers['Cookie'] = csrfToken.cookieHeader!;
     }
 
-    final body = {
-      'endCash': endCash,
-      'note': note,
-    };
+    final body = {'endCash': endCash, 'note': note};
 
     final response = await _client.post(
       ApiConfig.uri('/api/shifts/$shiftId/close'),

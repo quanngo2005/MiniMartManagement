@@ -23,7 +23,8 @@ class MiniMartManagementApp extends StatelessWidget {
           create: (_) => AuthProvider(AuthRepository(AuthService())),
         ),
         ChangeNotifierProvider(
-          create: (_) => EmployeeProvider(EmployeeRepository(EmployeeService())),
+          create: (_) =>
+              EmployeeProvider(EmployeeRepository(EmployeeService())),
         ),
         ChangeNotifierProvider(
           create: (_) => ShiftProvider(ShiftRepository(ShiftService())),
