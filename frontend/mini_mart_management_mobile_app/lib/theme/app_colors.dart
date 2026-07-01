@@ -12,6 +12,8 @@ abstract final class AppColors {
   static const Color secondaryFixed = Color(0xFF6FFFBE);
   static const Color statusWarning = Color(0xFFF59E0B);
   static const Color statusError = Color(0xFFEF4444);
+  static const Color warningContainer = Color(0xFFFFF4DE);
+  static const Color errorContainer = Color(0xFFFFDAD6);
   static const Color surface = Color(0xFFFAF9FB);
   static const Color surfaceBright = Color(0xFFFAF9FB);
   static const Color surfaceContainerHigh = Color(0xFFE9E8EA);

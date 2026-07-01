@@ -1,4 +1,5 @@
 ﻿using MiniMart.Models.Base;
+using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
@@ -16,7 +17,7 @@ namespace MiniMart.Models
 
         public decimal DebtAmount { get; set; }
 
-        public bool ReceiptStatus { get; set; }
+        public ReceiptStatus ReceiptStatus { get; set; }
 
         public string? Note { get; set; } 
 

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chứng Từ Hàng Hóa | Retail Logic</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Shared Style Context & Typography -->
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .filled-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC; /* Tier 1 (Base) per Style Guidance */
+        }
+        /* Custom scrollbar for high density information */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#6cf8bb",
+                    "tertiary-fixed": "#ffdcbe",
+                    "primary": "#000f22",
+                    "surface-container": "#efedf0",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#6ffbbe",
+                    "background-slate": "#F8FAFC",
+                    "surface-dim": "#dbd9dc",
+                    "outline-variant": "#c4c6ce",
+                    "status-warning": "#F59E0B",
+                    "inverse-primary": "#b0c8eb",
+                    "on-tertiary": "#ffffff",
+                    "background": "#faf9fb",
+                    "secondary": "#006c49",
+                    "tertiary-container": "#381d00",
+                    "surface-container-high": "#e9e8ea",
+                    "surface-bright": "#faf9fb",
+                    "surface": "#faf9fb",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#001c37",
+                    "on-secondary-fixed-variant": "#005236",
+                    "primary-container": "#0a2540",
+                    "inverse-surface": "#2f3033",
+                    "surface-container-highest": "#e3e2e5",
+                    "on-tertiary-fixed": "#2d1600",
+                    "inverse-on-surface": "#f2f0f3",
+                    "on-tertiary-container": "#ae835a",
+                    "primary-fixed": "#d2e4ff",
+                    "surface-tint": "#49607e",
+                    "outline": "#74777e",
+                    "on-tertiary-fixed-variant": "#613f1c",
+                    "status-error": "#EF4444",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#314865",
+                    "surface-container-lowest": "#ffffff",
+                    "text-muted": "#64748B",
+                    "on-surface-variant": "#43474d",
+                    "border-gray": "#E2E8F0",
+                    "surface-container-low": "#f5f3f6",
+                    "on-error-container": "#93000a",
+                    "on-background": "#1b1c1e",
+                    "tertiary": "#1a0b00",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e3e2e5",
+                    "primary-fixed-dim": "#b0c8eb",
+                    "on-secondary-container": "#00714d",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#768dad",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-secondary-fixed": "#002113",
+                    "text-dark": "#334155",
+                    "tertiary-fixed-dim": "#eebd90",
+                    "on-surface": "#1b1c1e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "touch-target": "48px",
+                    "gutter": "12px",
+                    "safe-area": "16px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px"
+            },
+            "fontFamily": {
+                    "metadata": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "data-tabular": ["JetBrains Mono"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-slate min-h-screen flex flex-col">
+<!-- TopAppBar (From Shared Component JSON) -->
+<header class="bg-surface-bright dark:bg-surface-container-highest text-primary dark:text-primary-fixed border-b border-outline-variant dark:border-outline w-full top-0 sticky z-50 flex justify-between items-center px-gutter h-touch-target">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">storefront</span>
+<h1 class="font-headline-md text-headline-md font-bold">Cửa hàng #402 | Nhập/Xuất</h1>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">account_circle</span>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow px-safe-area pt-gutter pb-32">
+<!-- Filter & Search Bar -->
+<div class="flex gap-stack-sm mb-stack-md">
+<div class="relative flex-grow">
+<input class="w-full bg-surface-container-lowest border border-border-gray rounded-lg h-touch-target pl-12 pr-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Tìm kiếm chứng từ..." type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+</div>
+<button class="bg-surface-container-lowest border border-border-gray rounded-lg w-touch-target h-touch-target flex items-center justify-center hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-2 gap-gutter mb-6">
+<div class="bg-surface-container-lowest border border-border-gray p-4 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-secondary-fixed-variant font-metadata text-metadata">Tổng Nhập</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">download</span>
+</div>
+<div class="font-headline-md text-headline-md text-primary">1,284</div>
+<div class="text-metadata text-secondary mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +12%
+                </div>
+</div>
+<div class="bg-surface-container-lowest border border-border-gray p-4 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-tertiary-fixed-variant font-metadata text-metadata">Tổng Xuất</span>
+<span class="material-symbols-outlined text-on-tertiary-container text-[20px]">upload</span>
+</div>
+<div class="font-headline-md text-headline-md text-primary">842</div>
+<div class="text-metadata text-on-tertiary-container mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_down</span> -5%
+                </div>
+</div>
+</div>
+<!-- Documents List -->
+<div class="space-y-gutter">
+<!-- Header Label -->
+<h2 class="font-headline-md text-headline-md text-primary mb-2">Danh sách chứng từ</h2>
+<!-- Document Card 1: Completed Import -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-gutter shadow-sm active:scale-[0.98] transition-transform cursor-pointer">
+<div class="flex justify-between items-start mb-stack-sm">
+<div class="flex flex-col">
+<span class="font-data-tabular text-data-tabular text-primary font-bold">#IMP-20231024-001</span>
+<span class="font-metadata text-metadata text-outline">Hôm nay, 14:30</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-metadata text-metadata">Hoàn thành</span>
+</div>
+<div class="flex items-center justify-between mt-stack-md pt-stack-md border-t border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined filled-icon">archive</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-primary">Nhập kho tổng</span>
+<span class="font-metadata text-metadata text-outline">48 mặt hàng</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+<!-- Document Card 2: Pending Export -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-gutter shadow-sm active:scale-[0.98] transition-transform cursor-pointer">
+<div class="flex justify-between items-start mb-stack-sm">
+<div class="flex flex-col">
+<span class="font-data-tabular text-data-tabular text-primary font-bold">#EXP-20231024-042</span>
+<span class="font-metadata text-metadata text-outline">Hôm nay, 09:15</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-status-warning/20 text-status-warning font-metadata text-metadata">Chờ xử lý</span>
+</div>
+<div class="flex items-center justify-between mt-stack-md pt-stack-md border-t border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined filled-icon">unarchive</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-primary">Xuất kho sỉ</span>
+<span class="font-metadata text-metadata text-outline">12 mặt hàng</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+<!-- Document Card 3: Cancelled Import -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-gutter shadow-sm active:scale-[0.98] transition-transform cursor-pointer opacity-75">
+<div class="flex justify-between items-start mb-stack-sm">
+<div class="flex flex-col">
+<span class="font-data-tabular text-data-tabular text-primary font-bold">#IMP-20231023-089</span>
+<span class="font-metadata text-metadata text-outline">Hôm qua, 17:50</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-error-container text-on-error-container font-metadata text-metadata">Đã hủy</span>
+</div>
+<div class="flex items-center justify-between mt-stack-md pt-stack-md border-t border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-outline">
+<span class="material-symbols-outlined">block</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-primary">Nhập hoàn trả</span>
+<span class="font-metadata text-metadata text-outline">0 mặt hàng</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+<!-- Document Card 4: Completed Import -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-gutter shadow-sm active:scale-[0.98] transition-transform cursor-pointer">
+<div class="flex justify-between items-start mb-stack-sm">
+<div class="flex flex-col">
+<span class="font-data-tabular text-data-tabular text-primary font-bold">#IMP-20231023-055</span>
+<span class="font-metadata text-metadata text-outline">Hôm qua, 11:20</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-metadata text-metadata">Hoàn thành</span>
+</div>
+<div class="flex items-center justify-between mt-stack-md pt-stack-md border-t border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined filled-icon">archive</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-primary">Nhập thực phẩm tươi</span>
+<span class="font-metadata text-metadata text-outline">156 mặt hàng</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (As per guidance: "Create Document") -->
+<button class="fixed bottom-24 right-6 w-[56px] h-[56px] bg-primary text-on-primary rounded-2xl shadow-lg flex items-center justify-center active:scale-90 transition-transform z-50">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+<!-- BottomNavBar (From Shared Component JSON) -->
+<nav class="fixed bottom-0 w-full z-50 h-touch-target bg-surface-container-lowest dark:bg-primary-container border-t border-outline-variant dark:border-outline shadow-sm flex justify-around items-center px-safe-area pb-safe">
+<!-- Checkout -->
+<button class="flex flex-col items-center justify-center text-outline dark:text-outline-variant px-4 py-1 hover:bg-surface-variant dark:hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined">point_of_sale</span>
+<span class="font-metadata text-metadata">Checkout</span>
+</button>
+<!-- Inventory (ACTIVE TAB) -->
+<button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-4 py-1 transition-transform active:scale-95">
+<span class="material-symbols-outlined filled-icon">inventory_2</span>
+<span class="font-metadata text-metadata">Inventory</span>
+</button>
+<!-- Returns -->
+<button class="flex flex-col items-center justify-center text-outline dark:text-outline-variant px-4 py-1 hover:bg-surface-variant dark:hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined">assignment_return</span>
+<span class="font-metadata text-metadata">Returns</span>
+</button>
+<!-- Settings -->
+<button class="flex flex-col items-center justify-center text-outline dark:text-outline-variant px-4 py-1 hover:bg-surface-variant dark:hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-metadata text-metadata">Settings</span>
+</button>
+</nav>
+<!-- Micro-interactions Script -->
+<script>
+        document.querySelectorAll('.active\\:scale-\\[0\\.98\\]').forEach(card => {
+            card.addEventListener('click', () => {
+                // Flash effect to simulate navigation feedback
+                card.classList.add('bg-surface-container');
+                setTimeout(() => {
+                    card.classList.remove('bg-surface-container');
+                }, 150);
+            });
+        });
+
+        // FAB ripple simulation
+        const fab = document.querySelector('button.fixed.bottom-24');
+        fab.addEventListener('click', function(e) {
+            const ripple = document.createElement('div');
+            ripple.className = 'absolute bg-white/30 rounded-full animate-ping pointer-events-none';
+            ripple.style.width = '100px';
+            ripple.style.height = '100px';
+            ripple.style.left = '-22px';
+            ripple.style.top = '-22px';
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+    </script>
+</body></html>

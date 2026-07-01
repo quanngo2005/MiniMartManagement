@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/customer_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/inventory_provider.dart';
+import 'package:mini_mart_management_mobile_app/repositories/auth_repository.dart';
+import 'package:mini_mart_management_mobile_app/repositories/inventory_repository.dart';
+import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
+import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
+import 'package:mini_mart_management_mobile_app/services/inventory_service.dart';
 import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/promotion_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
@@ -32,7 +38,12 @@ class MiniMartManagementApp extends StatelessWidget {
           create: (_) => AuthProvider(AuthRepository(AuthService())),
         ),
         ChangeNotifierProvider(
-          create: (_) => EmployeeProvider(EmployeeRepository(EmployeeService())),
+          create: (_) =>
+              InventoryProvider(InventoryRepository(InventoryService())),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              EmployeeProvider(EmployeeRepository(EmployeeService())),
         ),
         ChangeNotifierProvider(
           create: (_) => ShiftProvider(ShiftRepository(ShiftService())),

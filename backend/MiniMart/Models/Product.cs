@@ -14,6 +14,7 @@ namespace MiniMart.Models
 
         public decimal SellingPrice { get; set; }
 
+        // Fast-read stock cache. Source of truth is the sum of active batch QuantityRemaining values.
         public int StockQuantity { get; set; }
 
         public int MinimumStock { get; set; }

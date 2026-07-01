@@ -15,6 +15,7 @@ class AuthProvider extends ChangeNotifier {
   EmployeeUser? get currentUser => _currentUser;
   String? get errorMessage => _errorMessage;
   bool get isLoading => _isLoading;
+  bool get isAuthenticated => _currentUser != null;
 
   Future<EmployeeUser?> login({
     required String username,
@@ -31,6 +32,10 @@ class AuthProvider extends ChangeNotifier {
       );
       _currentUser = response.user;
       return _currentUser;
+    } on UnauthorizedException {
+      _currentUser = null;
+      _errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+      return null;
     } on ApiException catch (error) {
       _errorMessage = error.message;
       return null;
@@ -41,5 +46,12 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> logout() async {
+    await _authRepository.logout();
+    _currentUser = null;
+    _errorMessage = null;
+    notifyListeners();
   }
 }

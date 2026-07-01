@@ -8,7 +8,7 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory.dar
 
 class EmployeeService {
   EmployeeService({http.Client? client})
-      : _client = client ?? createConfiguredClient();
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 
@@ -27,7 +27,7 @@ class EmployeeService {
     if (data is List) {
       return data.map((json) => Employee.fromJson(json)).toList();
     }
-    
+
     // In case OData or envelope shape is returned
     if (data is Map<String, dynamic>) {
       final value = data['value'] ?? data['Value'];

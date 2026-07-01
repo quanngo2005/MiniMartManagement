@@ -185,6 +185,8 @@ namespace MiniMart.Repositories.RepoImplement
                 {
                     var product = await _context.Products.FindAsync(item.ProductId);
                     int previousStock = product!.StockQuantity;
+                    // TODO: Allocate sale quantity from active batches by FEFO, decrement Batch.QuantityRemaining,
+                    // and write one InventoryTransaction per affected batch with BatchId for expiry traceability.
                     product.StockQuantity -= item.Quantity;
 
                     _context.InventoryTransactions.Add(new InventoryTransaction

@@ -12,7 +12,8 @@ class EmployeeManagementScreen extends StatefulWidget {
   const EmployeeManagementScreen({super.key});
 
   @override
-  State<EmployeeManagementScreen> createState() => _EmployeeManagementScreenState();
+  State<EmployeeManagementScreen> createState() =>
+      _EmployeeManagementScreenState();
 }
 
 class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
@@ -67,7 +68,10 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
               slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -77,18 +81,23 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
                           children: [
                             Text(
                               'Quản lý người dùng',
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              style: Theme.of(context).textTheme.headlineSmall
+                                  ?.copyWith(
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w800,
                                   ),
                             ),
                             FilledButton.icon(
                               onPressed: () => _showAddEmployeeDialog(context),
-                              icon: const Icon(Icons.person_add_alt_1_rounded, size: 20),
+                              icon: const Icon(
+                                Icons.person_add_alt_1_rounded,
+                                size: 20,
+                              ),
                               label: const Text('Add User'),
                               style: FilledButton.styleFrom(
                                 backgroundColor: AppColors.primary,
-                                foregroundColor: AppColors.surfaceContainerLowest,
+                                foregroundColor:
+                                    AppColors.surfaceContainerLowest,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -110,15 +119,27 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildStatCard('Tổng số', '$totalCount', AppColors.primary),
+                              child: _buildStatCard(
+                                'Tổng số',
+                                '$totalCount',
+                                AppColors.primary,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: _buildStatCard('Admin', '$adminCount', AppColors.primaryContainer),
+                              child: _buildStatCard(
+                                'Admin',
+                                '$adminCount',
+                                AppColors.primaryContainer,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: _buildStatCard('Đang trực', '$activeCount', AppColors.secondary),
+                              child: _buildStatCard(
+                                'Đang trực',
+                                '$activeCount',
+                                AppColors.secondary,
+                              ),
                             ),
                           ],
                         ),
@@ -135,16 +156,24 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.error_outline_rounded, color: AppColors.statusError, size: 48),
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              color: AppColors.statusError,
+                              size: 48,
+                            ),
                             const SizedBox(height: 12),
                             Text(
                               error,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(color: AppColors.statusError),
+                              style: const TextStyle(
+                                color: AppColors.statusError,
+                              ),
                             ),
                             const SizedBox(height: 16),
                             ElevatedButton(
-                              onPressed: () => context.read<EmployeeProvider>().fetchEmployees(),
+                              onPressed: () => context
+                                  .read<EmployeeProvider>()
+                                  .fetchEmployees(),
                               child: const Text('Thử lại'),
                             ),
                           ],
@@ -155,9 +184,7 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
                 else if (!isLoading && filteredEmployees.isEmpty)
                   const SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(
-                      child: Text('Không tìm thấy nhân viên nào.'),
-                    ),
+                    child: Center(child: Text('Không tìm thấy nhân viên nào.')),
                   )
                 else
                   SliverPadding(
@@ -179,9 +206,9 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đang quét mã vạch...')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Đang quét mã vạch...')));
         },
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.surfaceContainerLowest,
@@ -204,9 +231,9 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
       title: Text(
         'Store #402 | North Branch',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w700,
-            ),
+          color: AppColors.primary,
+          fontWeight: FontWeight.w700,
+        ),
       ),
       actions: [
         Padding(
@@ -220,7 +247,11 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
               border: Border.all(color: AppColors.borderGray),
             ),
             child: const Center(
-              child: Icon(Icons.person_rounded, size: 20, color: AppColors.primary),
+              child: Icon(
+                Icons.person_rounded,
+                size: 20,
+                color: AppColors.primary,
+              ),
             ),
           ),
         ),
@@ -246,7 +277,10 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+          ),
           const SizedBox(height: 4),
           Text(
             value,
@@ -262,7 +296,12 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
   }
 
   Widget _buildEmployeeCard(BuildContext context, Employee emp) {
-    final initials = emp.fullName.trim().split(' ').last.substring(0, 2).toUpperCase();
+    final initials = emp.fullName
+        .trim()
+        .split(' ')
+        .last
+        .substring(0, 2)
+        .toUpperCase();
     final isActive = emp.status == 1;
 
     // Role badge colors
@@ -308,131 +347,155 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
               ),
             ],
           ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                        ),
-                        child: Center(
-                          child: Text(
-                            initials,
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                          ),
+                          child: Center(
+                            child: Text(
+                              initials,
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              emp.fullName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: badgeBg,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                emp.roleName.toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 10,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                emp.fullName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: badgeText,
+                                  color: AppColors.primary,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Switch(
-                  value: isActive,
-                  onChanged: (val) {
-                    context.read<EmployeeProvider>().toggleEmployeeStatus(emp.employeeId, emp.status);
-                  },
-                  activeThumbColor: Colors.white,
-                  activeTrackColor: const Color(0xFF006C49),
-                  inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: AppColors.borderGray,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.only(top: 12),
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
-              ),
-              child: Column(
-                children: [
-                  if (emp.email != null && emp.email!.isNotEmpty)
-                    Row(
-                      children: [
-                        const Icon(Icons.mail_outline_rounded, size: 16, color: AppColors.textMuted),
-                        const SizedBox(width: 8),
-                        Text(
-                          emp.email!,
-                          style: const TextStyle(fontSize: 12, color: AppColors.textDark),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: badgeBg,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  emp.roleName.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: badgeText,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  if (emp.email != null && emp.email!.isNotEmpty) const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.call_outlined, size: 16, color: AppColors.textMuted),
-                      const SizedBox(width: 8),
-                      Text(
-                        emp.phoneNumber,
-                        style: const TextStyle(fontSize: 12, color: AppColors.textDark),
-                      ),
-                    ],
+                  ),
+                  Switch(
+                    value: isActive,
+                    onChanged: (val) {
+                      context.read<EmployeeProvider>().toggleEmployeeStatus(
+                        emp.employeeId,
+                        emp.status,
+                      );
+                    },
+                    activeThumbColor: Colors.white,
+                    activeTrackColor: const Color(0xFF006C49),
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: AppColors.borderGray,
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton.icon(
-                  onPressed: () => _showEditEmployeeDialog(context, emp),
-                  icon: const Icon(Icons.edit_rounded, size: 16),
-                  label: const Text('Edit'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.only(top: 12),
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
                 ),
-              ],
-            ),
-          ],
+                child: Column(
+                  children: [
+                    if (emp.email != null && emp.email!.isNotEmpty)
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.mail_outline_rounded,
+                            size: 16,
+                            color: AppColors.textMuted,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            emp.email!,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (emp.email != null && emp.email!.isNotEmpty)
+                      const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.call_outlined,
+                          size: 16,
+                          color: AppColors.textMuted,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          emp.phoneNumber,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton.icon(
+                    onPressed: () => _showEditEmployeeDialog(context, emp),
+                    icon: const Icon(Icons.edit_rounded, size: 16),
+                    label: const Text('Edit'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -451,7 +514,9 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
       ),
       builder: (ctx) => _EmployeeFormSheet(
         onSave: (data) async {
-          final success = await context.read<EmployeeProvider>().createEmployee(data);
+          final success = await context.read<EmployeeProvider>().createEmployee(
+            data,
+          );
           if (success && ctx.mounted) {
             Navigator.pop(ctx);
           }
@@ -471,7 +536,10 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
       builder: (ctx) => _EmployeeFormSheet(
         employee: emp,
         onSave: (data) async {
-          final success = await context.read<EmployeeProvider>().updateEmployee(emp.employeeId, data);
+          final success = await context.read<EmployeeProvider>().updateEmployee(
+            emp.employeeId,
+            data,
+          );
           if (success && ctx.mounted) {
             Navigator.pop(ctx);
           }
@@ -555,7 +623,12 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
         uniqueRoles.add(r);
       }
     }
-    var roleItems = uniqueRoles.map((r) => DropdownMenuItem<int>(value: r.roleId, child: Text(r.roleName))).toList();
+    var roleItems = uniqueRoles
+        .map(
+          (r) =>
+              DropdownMenuItem<int>(value: r.roleId, child: Text(r.roleName)),
+        )
+        .toList();
     if (roleItems.isEmpty) {
       roleItems = const [
         DropdownMenuItem(value: 1, child: Text('Manager')),
@@ -565,7 +638,13 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
       ];
     }
     if (!roleItems.any((item) => item.value == _roleId)) {
-      roleItems = List.from(roleItems)..add(DropdownMenuItem<int>(value: _roleId, child: Text('Role ID: $_roleId')));
+      roleItems = List.from(roleItems)
+        ..add(
+          DropdownMenuItem<int>(
+            value: _roleId,
+            child: Text('Role ID: $_roleId'),
+          ),
+        );
     }
 
     return Padding(
@@ -595,7 +674,9 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
               TextFormField(
                 initialValue: _fullName,
                 decoration: const InputDecoration(labelText: 'Họ và tên *'),
-                validator: (val) => val == null || val.isEmpty ? 'Vui lòng nhập họ và tên' : null,
+                validator: (val) => val == null || val.isEmpty
+                    ? 'Vui lòng nhập họ và tên'
+                    : null,
                 onSaved: (val) => _fullName = val!,
               ),
               const SizedBox(height: 12),
@@ -604,9 +685,13 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _username,
-                      decoration: const InputDecoration(labelText: 'Tên đăng nhập *'),
+                      decoration: const InputDecoration(
+                        labelText: 'Tên đăng nhập *',
+                      ),
                       enabled: !isEdit,
-                      validator: (val) => val == null || val.isEmpty ? 'Nhập tên đăng nhập' : null,
+                      validator: (val) => val == null || val.isEmpty
+                          ? 'Nhập tên đăng nhập'
+                          : null,
                       onSaved: (val) => _username = val!,
                     ),
                   ),
@@ -629,7 +714,9 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
               const SizedBox(height: 12),
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: isEdit ? 'Mật khẩu mới (bỏ trống nếu giữ nguyên)' : 'Mật khẩu *',
+                  labelText: isEdit
+                      ? 'Mật khẩu mới (bỏ trống nếu giữ nguyên)'
+                      : 'Mật khẩu *',
                 ),
                 obscureText: true,
                 validator: (val) {
@@ -646,9 +733,13 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _phoneNumber,
-                      decoration: const InputDecoration(labelText: 'Số điện thoại *'),
+                      decoration: const InputDecoration(
+                        labelText: 'Số điện thoại *',
+                      ),
                       keyboardType: TextInputType.phone,
-                      validator: (val) => val == null || val.isEmpty ? 'Nhập số điện thoại' : null,
+                      validator: (val) => val == null || val.isEmpty
+                          ? 'Nhập số điện thoại'
+                          : null,
                       onSaved: (val) => _phoneNumber = val!,
                     ),
                   ),
@@ -656,9 +747,12 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _salary.toStringAsFixed(0),
-                      decoration: const InputDecoration(labelText: 'Lương (VND)'),
+                      decoration: const InputDecoration(
+                        labelText: 'Lương (VND)',
+                      ),
                       keyboardType: TextInputType.number,
-                      onSaved: (val) => _salary = double.tryParse(val ?? '') ?? 8000000,
+                      onSaved: (val) =>
+                          _salary = double.tryParse(val ?? '') ?? 8000000,
                     ),
                   ),
                 ],
@@ -695,7 +789,9 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
                       initialValue: _status,
                       dropdownColor: Colors.white,
                       borderRadius: BorderRadius.circular(8),
-                      decoration: const InputDecoration(labelText: 'Trạng thái'),
+                      decoration: const InputDecoration(
+                        labelText: 'Trạng thái',
+                      ),
                       items: const [
                         DropdownMenuItem(value: 1, child: Text('Hoạt động')),
                         DropdownMenuItem(value: 0, child: Text('Vô hiệu hóa')),
@@ -708,7 +804,8 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: TextEditingController(
-                  text: "${_dateOfBirth.day}/${_dateOfBirth.month}/${_dateOfBirth.year}",
+                  text:
+                      "${_dateOfBirth.day}/${_dateOfBirth.month}/${_dateOfBirth.year}",
                 ),
                 readOnly: true,
                 decoration: const InputDecoration(
@@ -764,7 +861,10 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
                       )
                     : const Text('Lưu'),
               ),
@@ -820,7 +920,12 @@ class _EmployeeDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initials = employee.fullName.trim().split(' ').last.substring(0, 2).toUpperCase();
+    final initials = employee.fullName
+        .trim()
+        .split(' ')
+        .last
+        .substring(0, 2)
+        .toUpperCase();
     final isActive = employee.status == 1;
     final bdate = employee.dateOfBirth;
     final hdate = employee.hireDate;
@@ -850,9 +955,9 @@ class _EmployeeDetailsSheet extends StatelessWidget {
               Text(
                 'Chi tiết nhân viên',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
@@ -905,18 +1010,34 @@ class _EmployeeDetailsSheet extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           // Profile Details List
-          _buildDetailRow('Vai trò', employee.roleName.toUpperCase(), isBadge: true),
+          _buildDetailRow(
+            'Vai trò',
+            employee.roleName.toUpperCase(),
+            isBadge: true,
+          ),
           _buildDetailRow('Giới tính', employee.gender ? 'Nam' : 'Nữ'),
           _buildDetailRow('Số điện thoại', employee.phoneNumber),
           _buildDetailRow('Email', employee.email ?? 'Chưa cập nhật'),
           _buildDetailRow('Địa chỉ', employee.address ?? 'Chưa cập nhật'),
-          _buildDetailRow('Lương cơ bản', formatCurrency(employee.salary), isMonospace: true),
-          _buildDetailRow('Ngày sinh', "${bdate.day}/${bdate.month}/${bdate.year}"),
-          _buildDetailRow('Ngày vào làm', "${hdate.day}/${hdate.month}/${hdate.year}"),
+          _buildDetailRow(
+            'Lương cơ bản',
+            formatCurrency(employee.salary),
+            isMonospace: true,
+          ),
+          _buildDetailRow(
+            'Ngày sinh',
+            "${bdate.day}/${bdate.month}/${bdate.year}",
+          ),
+          _buildDetailRow(
+            'Ngày vào làm',
+            "${hdate.day}/${hdate.month}/${hdate.year}",
+          ),
           _buildDetailRow(
             'Trạng thái',
             isActive ? 'Đang hoạt động' : 'Đã vô hiệu hóa',
-            valueColor: isActive ? const Color(0xFF15803D) : AppColors.statusError,
+            valueColor: isActive
+                ? const Color(0xFF15803D)
+                : AppColors.statusError,
           ),
           const SizedBox(height: 24),
           // Actions
@@ -1000,17 +1121,16 @@ class _EmployeeDetailsSheet extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.only(bottom: 8),
         decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: AppColors.borderGray, width: 0.5)),
+          border: Border(
+            bottom: BorderSide(color: AppColors.borderGray, width: 0.5),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textMuted,
-              ),
+              style: const TextStyle(fontSize: 14, color: AppColors.textMuted),
             ),
             valueWidget,
           ],
