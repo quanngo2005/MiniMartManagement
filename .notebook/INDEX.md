@@ -14,4 +14,7 @@
 - [Batch schema drift](batch-schema-drift.md) - Batches migration repair for missing Quantity, TotalPrice, and IsDeleted columns.
 - [Flutter Stitch login screen](flutter-stitch-login-screen.md) - frontend app location, downloaded Stitch references, and Dart/Flutter verification notes.
 - [Flutter Stitch category screen](flutter-stitch-category-screen.md) - category management Stitch screen implementation and verification notes.
+- [Flutter Stitch inventory documents screens](flutter-stitch-inventory-documents.md) - goods document list and receipt/detail Stitch screen implementation notes.
 - [Current ERD source](current-erd-source.md) - current entity/FK source pointers and ERD caveats.
+- [Core flow decision report](core-flow-decision-report.md) - source-backed recommendation to center the project on POS checkout, with supporting auth, shift, inventory, payments, and reporting flows.
+- [Flutter inventory API models](flutter-inventory-api-models.md) - Dart model mapping for inventory status, batch, and inventory transaction DTOs.

@@ -54,6 +54,46 @@
       "key": "test_role_id",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "warehouse_employee_id",
+      "value": "4",
+      "type": "string"
+    },
+    {
+      "key": "import_supplier_id",
+      "value": "2",
+      "type": "string"
+    },
+    {
+      "key": "import_product_id_1",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "import_product_barcode_2",
+      "value": "8934588011002",
+      "type": "string"
+    },
+    {
+      "key": "test_import_receipt_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "import_receipt_code",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "import_batch_code_1",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "import_batch_code_2",
+      "value": "",
+      "type": "string"
     }
   ],
   "auth": {
@@ -1518,6 +1558,394 @@
       ]
     },
     {
+      "name": "Import Product Flow",
+      "item": [
+        {
+          "name": "Search Product - Warehouse (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('warehouse_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Warehouse can search active products for import', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.value).to.be.an('array');",
+                  "    pm.expect(body.value.length).to.be.greaterThan(0);",
+                  "    pm.expect(body.value[0].productId).to.eq(Number(pm.collectionVariables.get('import_product_id_1')));",
+                  "    pm.expect(body.value[0].status).to.eq(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/odata/Products?$filter=Status eq true and ProductId eq {{import_product_id_1}}&$select=ProductId,ProductCode,Barcode,ProductName,StockQuantity,Status,SupplierId,SupplierName",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "odata",
+                "Products"
+              ],
+              "query": [
+                {
+                  "key": "$filter",
+                  "value": "Status eq true and ProductId eq {{import_product_id_1}}"
+                },
+                {
+                  "key": "$select",
+                  "value": "ProductId,ProductCode,Barcode,ProductName,StockQuantity,Status,SupplierId,SupplierName"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Lookup Product By Barcode - Warehouse (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('warehouse_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Warehouse can lookup active product by barcode', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.productId).to.be.a('number');",
+                  "    pm.expect(body.barcode).to.eq(pm.collectionVariables.get('import_product_barcode_2'));",
+                  "    pm.expect(body.status).to.eq(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products/barcode/{{import_product_barcode_2}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "barcode",
+                "{{import_product_barcode_2}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Pending Receipt With Batch Lines - Warehouse (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('warehouse_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}",
+                  "const suffix = Date.now().toString();",
+                  "pm.collectionVariables.set('import_receipt_code', 'PN-IMPORT-' + suffix);",
+                  "pm.collectionVariables.set('import_batch_code_1', 'AQUA-' + suffix);",
+                  "pm.collectionVariables.set('import_batch_code_2', 'LAVIE-' + suffix);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Warehouse creates pending receipt with import batch lines', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.receiptId).to.be.a('number');",
+                  "    pm.expect(body.receiptCode).to.eq(pm.collectionVariables.get('import_receipt_code'));",
+                  "    pm.expect(body.receiptStatus).to.eq(1);",
+                  "    pm.expect(body.batchLines).to.be.an('array').with.lengthOf(2);",
+                  "    pm.expect(body.batchLines[0].quantity).to.eq(30);",
+                  "});",
+                  "const receiptId = pm.response.json().receiptId;",
+                  "if (receiptId) pm.collectionVariables.set('test_import_receipt_id', receiptId.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiptCode\": \"{{import_receipt_code}}\",\n  \"importDate\": \"2026-07-01T09:30:00\",\n  \"totalAmount\": 360000,\n  \"paidAmount\": 200000,\n  \"debtAmount\": 160000,\n  \"receiptStatus\": 1,\n  \"note\": \"Postman import product flow - pending receipt\",\n  \"supplierId\": {{import_supplier_id}},\n  \"employeeId\": {{warehouse_employee_id}},\n  \"batchLines\": [\n    {\n      \"productId\": {{import_product_id_1}},\n      \"barcode\": null,\n      \"batchCode\": \"{{import_batch_code_1}}\",\n      \"manufactureDate\": \"2026-06-20T00:00:00\",\n      \"expiryDate\": \"2027-06-20T00:00:00\",\n      \"importPrice\": 5000,\n      \"quantity\": 30\n    },\n    {\n      \"productId\": null,\n      \"barcode\": \"{{import_product_barcode_2}}\",\n      \"batchCode\": \"{{import_batch_code_2}}\",\n      \"manufactureDate\": \"2026-06-18T00:00:00\",\n      \"expiryDate\": \"2027-06-18T00:00:00\",\n      \"importPrice\": 4200,\n      \"quantity\": 50\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/receipts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "receipts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Pending Receipt Batch Lines - Warehouse (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('warehouse_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Warehouse updates pending receipt before stock import', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.receiptId).to.eq(Number(pm.collectionVariables.get('test_import_receipt_id')));",
+                  "    pm.expect(body.receiptStatus).to.eq(1);",
+                  "    pm.expect(body.totalAmount).to.eq(410000);",
+                  "    pm.expect(body.batchLines).to.be.an('array').with.lengthOf(2);",
+                  "    pm.expect(body.batchLines[0].quantity).to.eq(40);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiptCode\": \"{{import_receipt_code}}\",\n  \"importDate\": \"2026-07-01T10:00:00\",\n  \"totalAmount\": 410000,\n  \"paidAmount\": 250000,\n  \"debtAmount\": 160000,\n  \"receiptStatus\": 1,\n  \"note\": \"Postman import product flow - adjusted before completion\",\n  \"supplierId\": {{import_supplier_id}},\n  \"employeeId\": {{warehouse_employee_id}},\n  \"batchLines\": [\n    {\n      \"productId\": {{import_product_id_1}},\n      \"barcode\": null,\n      \"batchCode\": \"{{import_batch_code_1}}-UPD\",\n      \"manufactureDate\": \"2026-06-20T00:00:00\",\n      \"expiryDate\": \"2027-06-20T00:00:00\",\n      \"importPrice\": 5000,\n      \"quantity\": 40\n    },\n    {\n      \"productId\": null,\n      \"barcode\": \"{{import_product_barcode_2}}\",\n      \"batchCode\": \"{{import_batch_code_2}}-UPD\",\n      \"manufactureDate\": \"2026-06-18T00:00:00\",\n      \"expiryDate\": \"2027-06-18T00:00:00\",\n      \"importPrice\": 4200,\n      \"quantity\": 50\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/receipts/{{test_import_receipt_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "receipts",
+                "{{test_import_receipt_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete Receipt Import Stock - Warehouse (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('warehouse_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Warehouse completes pending receipt and imports stock', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.receiptId).to.eq(Number(pm.collectionVariables.get('test_import_receipt_id')));",
+                  "    pm.expect(body.receiptStatus).to.eq(2);",
+                  "    pm.expect(body.batchLines).to.be.an('array').with.lengthOf(2);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/receipts/{{test_import_receipt_id}}/complete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "receipts",
+                "{{test_import_receipt_id}}",
+                "complete"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete Receipt Again - Warehouse (expect 422)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('warehouse_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Completed receipt cannot be completed twice', () => {",
+                  "    pm.response.to.have.status(422);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eq(false);",
+                  "    pm.expect(body.message).to.include('Only pending receipts can be completed');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/receipts/{{test_import_receipt_id}}/complete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "receipts",
+                "{{test_import_receipt_id}}",
+                "complete"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Completed Receipt - Warehouse (expect 422)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('warehouse_token');",
+                  "pm.request.headers.remove('Authorization');",
+                  "if (token) {",
+                  "    pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Completed receipt cannot be updated', () => {",
+                  "    pm.response.to.have.status(422);",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eq(false);",
+                  "    pm.expect(body.message).to.include('Only pending receipts can be updated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiptCode\": \"{{import_receipt_code}}\",\n  \"importDate\": \"2026-07-01T10:00:00\",\n  \"totalAmount\": 410000,\n  \"paidAmount\": 250000,\n  \"debtAmount\": 160000,\n  \"receiptStatus\": 1,\n  \"note\": \"Postman import product flow - adjusted before completion\",\n  \"supplierId\": {{import_supplier_id}},\n  \"employeeId\": {{warehouse_employee_id}},\n  \"batchLines\": [\n    {\n      \"productId\": {{import_product_id_1}},\n      \"barcode\": null,\n      \"batchCode\": \"{{import_batch_code_1}}-UPD\",\n      \"manufactureDate\": \"2026-06-20T00:00:00\",\n      \"expiryDate\": \"2027-06-20T00:00:00\",\n      \"importPrice\": 5000,\n      \"quantity\": 40\n    },\n    {\n      \"productId\": null,\n      \"barcode\": \"{{import_product_barcode_2}}\",\n      \"batchCode\": \"{{import_batch_code_2}}-UPD\",\n      \"manufactureDate\": \"2026-06-18T00:00:00\",\n      \"expiryDate\": \"2027-06-18T00:00:00\",\n      \"importPrice\": 4200,\n      \"quantity\": 50\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/receipts/{{test_import_receipt_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "receipts",
+                "{{test_import_receipt_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Edge Cases",
       "item": [
         {
@@ -1620,4 +2048,3 @@
     }
   ]
 }
-
