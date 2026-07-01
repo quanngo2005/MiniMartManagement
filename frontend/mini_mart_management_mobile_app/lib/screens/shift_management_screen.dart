@@ -4,8 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:mini_mart_management_mobile_app/models/shift.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
-import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
-import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -212,7 +210,6 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
             ),
         ],
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -819,38 +816,4 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
     );
   }
 
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: 3,
-      backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.primaryContainer,
-      onDestinationSelected: (index) {
-        if (index == 0 || index == 1) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const CategoryManagementScreen()),
-          );
-        } else if (index == 2) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const EmployeeManagementScreen()),
-          );
-        }
-      },
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.inventory_2_outlined),
-          label: 'Catalog',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.category_outlined),
-          label: 'Categories',
-        ),
-        NavigationDestination(icon: Icon(Icons.group_outlined), label: 'Staff'),
-        NavigationDestination(
-          selectedIcon: Icon(Icons.settings_rounded),
-          icon: Icon(Icons.settings_outlined),
-          label: 'Settings',
-        ),
-      ],
-    );
-  }
 }

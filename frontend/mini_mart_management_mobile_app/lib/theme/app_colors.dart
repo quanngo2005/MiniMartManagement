@@ -8,6 +8,7 @@ abstract final class AppColors {
   static const Color primaryContainer = Color(0xFF0A2540);
   static const Color secondary = Color(0xFF006C49);
   static const Color secondaryFixed = Color(0xFF6FFFBE);
+  static const Color onTertiaryContainer = Color(0xFFAE835A);
   static const Color statusWarning = Color(0xFFF59E0B);
   static const Color statusError = Color(0xFFEF4444);
   static const Color warningContainer = Color(0xFFFFF4DE);

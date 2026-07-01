@@ -45,25 +45,31 @@ namespace MiniMart.Services.Implementations
             return receipt == null ? null : _mapper.Map<ReceiptDto>(receipt);
         }
 
-        public async Task<ReceiptDto> CreateReceiptAsync(CreateReceiptDto createDto)
+        public async Task<ReceiptDto> CreateReceiptAsync(CreateReceiptDto createDto, int employeeId)
         {
             if (!await _receiptRepository.SupplierExistsAsync(createDto.SupplierId))
                 throw new DomainException("Supplier ID does not exist.", StatusCodes.Status422UnprocessableEntity);
 
-            if (!await _receiptRepository.EmployeeExistsAsync(createDto.EmployeeId))
+            if (!await _receiptRepository.EmployeeExistsAsync(employeeId))
                 throw new DomainException("Employee ID does not exist.", StatusCodes.Status422UnprocessableEntity);
 
+            var importDate = GetVietnamNow();
             var receipt = _mapper.Map<Receipt>(createDto);
+            receipt.ReceiptCode = GenerateReceiptCode(importDate);
+            receipt.ImportDate = importDate;
+            receipt.EmployeeId = employeeId;
             receipt.ReceiptStatus = ReceiptStatus.Pending;
 
             if (createDto.BatchLines != null && createDto.BatchLines.Count > 0)
             {
-                foreach (var line in createDto.BatchLines)
+                for (var i = 0; i < createDto.BatchLines.Count; i++)
                 {
-                    var batch = await BuildBatchFromLineAsync(line, receipt);
+                    var batch = await BuildBatchFromLineAsync(createDto.BatchLines[i], receipt, importDate, i + 1);
                     receipt.Batches.Add(batch);
                 }
             }
+
+            ApplyServerCalculatedTotals(receipt, createDto.PaidAmount);
 
             var created = await _receiptRepository.CreateReceiptAsync(receipt);
             var createdWithDetails = await _receiptRepository.GetReceiptByIdAsync(created.ReceiptId);
@@ -82,22 +88,30 @@ namespace MiniMart.Services.Implementations
             if (!await _receiptRepository.SupplierExistsAsync(updateDto.SupplierId))
                 throw new DomainException("Supplier ID does not exist.", StatusCodes.Status422UnprocessableEntity);
 
-            if (!await _receiptRepository.EmployeeExistsAsync(updateDto.EmployeeId))
-                throw new DomainException("Employee ID does not exist.", StatusCodes.Status422UnprocessableEntity);
-
+            var receiptCode = existing.ReceiptCode;
+            var importDate = existing.ImportDate;
+            var employeeId = existing.EmployeeId;
+            var status = existing.ReceiptStatus;
             _mapper.Map(updateDto, existing);
             existing.ReceiptId = id;
+            existing.ReceiptCode = receiptCode;
+            existing.ImportDate = importDate;
+            existing.EmployeeId = employeeId;
+            existing.ReceiptStatus = status;
 
             await _receiptRepository.DeleteBatchesByReceiptIdAsync(id);
+            existing.Batches.Clear();
 
             if (updateDto.BatchLines != null && updateDto.BatchLines.Count > 0)
             {
-                foreach (var line in updateDto.BatchLines)
+                for (var i = 0; i < updateDto.BatchLines.Count; i++)
                 {
-                    var batch = await BuildBatchFromLineAsync(line, existing);
+                    var batch = await BuildBatchFromLineAsync(updateDto.BatchLines[i], existing, importDate, i + 1);
                     existing.Batches.Add(batch);
                 }
             }
+
+            ApplyServerCalculatedTotals(existing, updateDto.PaidAmount);
 
             var updated = await _receiptRepository.UpdateReceiptAsync(existing);
             if (updated == null)
@@ -162,7 +176,11 @@ namespace MiniMart.Services.Implementations
             return _mapper.Map<ReceiptDto>(completed!);
         }
 
-        private async Task<Batch> BuildBatchFromLineAsync(ReceiptBatchLineDto line, Receipt receipt)
+        private async Task<Batch> BuildBatchFromLineAsync(
+            ReceiptBatchLineDto line,
+            Receipt receipt,
+            DateTime receiptTimestamp,
+            int lineNumber)
         {
             int productId;
 
@@ -184,9 +202,6 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException("Each batch line must specify either ProductId or Barcode.", StatusCodes.Status400BadRequest);
             }
 
-            if (string.IsNullOrWhiteSpace(line.BatchCode))
-                throw new DomainException("BatchCode is required.", StatusCodes.Status400BadRequest);
-
             if (line.Quantity <= 0)
                 throw new DomainException("Quantity must be greater than zero.", StatusCodes.Status422UnprocessableEntity);
 
@@ -195,7 +210,9 @@ namespace MiniMart.Services.Implementations
 
             return new Batch
             {
-                BatchCode = line.BatchCode,
+                BatchCode = string.IsNullOrWhiteSpace(line.BatchCode)
+                    ? GenerateBatchCode(productId, receiptTimestamp, lineNumber)
+                    : line.BatchCode,
                 ProductId = productId,
                 ManufactureDate = line.ManufactureDate,
                 ExpiryDate = line.ExpiryDate,
@@ -208,6 +225,35 @@ namespace MiniMart.Services.Implementations
                 IsDeleted = false,
                 ReceiptId = receipt.ReceiptId
             };
+        }
+
+        private static void ApplyServerCalculatedTotals(Receipt receipt, decimal paidAmount)
+        {
+            if (paidAmount < 0)
+                throw new DomainException("Paid amount cannot be negative.", StatusCodes.Status422UnprocessableEntity);
+
+            var totalAmount = receipt.Batches.Sum(batch => batch.ImportPrice * batch.QuantityImported);
+            if (paidAmount > totalAmount)
+                throw new DomainException("Paid amount cannot exceed total amount.", StatusCodes.Status422UnprocessableEntity);
+
+            receipt.TotalAmount = totalAmount;
+            receipt.PaidAmount = paidAmount;
+            receipt.DebtAmount = totalAmount - paidAmount;
+        }
+
+        private static DateTime GetVietnamNow()
+        {
+            return DateTime.UtcNow.AddHours(7);
+        }
+
+        private static string GenerateReceiptCode(DateTime timestamp)
+        {
+            return $"PN-{timestamp:yyyyMMddHHmmssfff}";
+        }
+
+        private static string GenerateBatchCode(int productId, DateTime timestamp, int lineNumber)
+        {
+            return $"LOT-P{productId}-{timestamp:yyyyMMddHHmmssfff}-{lineNumber:D2}";
         }
     }
 }

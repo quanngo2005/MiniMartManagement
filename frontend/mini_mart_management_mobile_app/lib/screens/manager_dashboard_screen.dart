@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
-import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
 class ManagerDashboardScreen extends StatelessWidget {
@@ -77,7 +76,6 @@ class ManagerDashboardScreen extends StatelessWidget {
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.qr_code_scanner_rounded),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -183,35 +181,6 @@ class ManagerDashboardScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: 0,
-      backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.secondaryFixed,
-      onDestinationSelected: (index) {
-        if (index == 1) {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const InventoryTransactionsScreen(),
-            ),
-          );
-        }
-      },
-      destinations: const [
-        NavigationDestination(
-          selectedIcon: Icon(Icons.home_rounded),
-          icon: Icon(Icons.home_outlined),
-          label: 'Home',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.inventory_2_outlined),
-          selectedIcon: Icon(Icons.inventory_rounded),
-          label: 'Inventory',
-        ),
-      ],
     );
   }
 

@@ -6,10 +6,14 @@ class ReceiptActionBar extends StatelessWidget {
     super.key,
     required this.onExport,
     required this.onShare,
+    this.onComplete,
+    this.isCompleting = false,
   });
 
   final VoidCallback onExport;
   final VoidCallback onShare;
+  final VoidCallback? onComplete;
+  final bool isCompleting;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +46,19 @@ class ReceiptActionBar extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: onShare,
-                  icon: const Icon(Icons.share_outlined),
-                  label: const Text('Chia sẻ'),
+                  onPressed: isCompleting ? null : onComplete ?? onShare,
+                  icon: Icon(
+                    onComplete == null
+                        ? Icons.share_outlined
+                        : Icons.check_circle_outline_rounded,
+                  ),
+                  label: Text(
+                    isCompleting
+                        ? 'Đang xử lý'
+                        : onComplete == null
+                            ? 'Chia sẻ'
+                            : 'Hoàn thành',
+                  ),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.surfaceContainerLowest,
