@@ -1,158 +1,148 @@
 import 'package:flutter/material.dart';
-import 'package:mini_mart_management_mobile_app/models/inventory_document.dart';
 import 'package:mini_mart_management_mobile_app/models/receipt.dart';
+import 'package:mini_mart_management_mobile_app/models/receipt_inventory_document_mapper.dart';
+import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/create_inventory_receipt_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_document_receipt_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
-import 'package:mini_mart_management_mobile_app/widgets/categories/category_stat_card.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/inventory_document_card.dart';
+import 'package:provider/provider.dart';
 
-class InventoryDocumentsScreen extends StatelessWidget {
+class InventoryDocumentsScreen extends StatefulWidget {
   const InventoryDocumentsScreen({super.key});
 
-  static const List<InventoryDocument> _documents = [
-    InventoryDocument(
-      id: '#IMP-20231024-001',
-      createdAt: 'Hôm nay, 14:30',
-      type: 'Nhập kho tổng',
-      store: 'Cửa hàng #402',
-      warehouse: 'Kho tổng',
-      supplier: 'NCC Minh Long',
-      createdBy: 'Nguyễn Văn An',
-      status: InventoryDocumentStatus.completed,
-      itemCount: 48,
-      icon: Icons.archive_rounded,
-      iconColor: AppColors.secondary,
-      lines: [
-        InventoryDocumentLine(
-          sku: 'MLK-001',
-          name: 'Sữa tươi 1L',
-          quantity: 24,
-          unitPrice: 25000,
-          lineTotal: 600000,
-        ),
-        InventoryDocumentLine(
-          sku: 'RIC-005',
-          name: 'Gạo thơm 5kg',
-          quantity: 10,
-          unitPrice: 145000,
-          lineTotal: 1450000,
-        ),
-        InventoryDocumentLine(
-          sku: 'OIL-002',
-          name: 'Dầu ăn 2L',
-          quantity: 15,
-          unitPrice: 85000,
-          lineTotal: 1275000,
-        ),
-        InventoryDocumentLine(
-          sku: 'CKB-011',
-          name: 'Bánh quy bơ',
-          quantity: 20,
-          unitPrice: 35000,
-          lineTotal: 700000,
-        ),
-      ],
-      notes: 'Hàng nhập đủ số lượng, bao bì nguyên vẹn.',
-    ),
-    InventoryDocument(
-      id: '#EXP-20231024-042',
-      createdAt: 'Hôm nay, 09:15',
-      type: 'Xuất kho sỉ',
-      store: 'Cửa hàng #402',
-      warehouse: 'Kho tổng',
-      supplier: 'Khách sỉ An Phú',
-      createdBy: 'Trần Minh Khoa',
-      status: InventoryDocumentStatus.pending,
-      itemCount: 12,
-      icon: Icons.unarchive_rounded,
-      iconColor: AppColors.statusWarning,
-    ),
-    InventoryDocument(
-      id: '#TRF-20231023-089',
-      createdAt: 'Hôm qua, 17:50',
-      type: 'Nhận hoàn trả',
-      store: 'Cửa hàng #402',
-      warehouse: 'Kho kiểm hàng',
-      supplier: 'Quầy thu ngân',
-      createdBy: 'Lê Thu Hà',
-      status: InventoryDocumentStatus.cancelled,
-      itemCount: 0,
-      icon: Icons.block_rounded,
-      iconColor: AppColors.statusError,
-    ),
-    InventoryDocument(
-      id: '#IMP-20231023-055',
-      createdAt: 'Hôm qua, 11:20',
-      type: 'Nhập thực phẩm tươi',
-      store: 'Cửa hàng #402',
-      warehouse: 'Kho lạnh',
-      supplier: 'NCC Rau Sạch',
-      createdBy: 'Nguyễn Văn An',
-      status: InventoryDocumentStatus.completed,
-      itemCount: 156,
-      icon: Icons.archive_rounded,
-      iconColor: AppColors.secondary,
-    ),
-  ];
+  @override
+  State<InventoryDocumentsScreen> createState() =>
+      _InventoryDocumentsScreenState();
+}
+
+class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ReceiptProvider>().loadReceipts();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final receipts = context.select<ReceiptProvider, List<Receipt>>(
+      (provider) => provider.receipts,
+    );
+    final isLoading = context.select<ReceiptProvider, bool>(
+      (provider) => provider.isLoading,
+    );
+    final errorMessage = context.select<ReceiptProvider, String?>(
+      (provider) => provider.errorMessage,
+    );
+
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: _buildFilters(context)),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              sliver: SliverGrid.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.45,
-                children: const [
-                  CategoryStatCard(
-                    label: 'Tổng Nhập',
-                    value: '1,284',
-                    caption: '+12%',
-                    valueColor: AppColors.primary,
+        child: RefreshIndicator(
+          onRefresh: () => context.read<ReceiptProvider>().loadReceipts(),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(child: _buildFilters(context)),
+              SliverToBoxAdapter(child: _buildStats(receipts)),
+              if (isLoading && receipts.isEmpty)
+                const SliverFillRemaining(child: LoadingOverlay())
+              else if (errorMessage != null && receipts.isEmpty)
+                SliverFillRemaining(
+                  child: ErrorBanner(
+                    message: errorMessage,
+                    onRetry: () =>
+                        context.read<ReceiptProvider>().loadReceipts(),
                   ),
-                  CategoryStatCard(
-                    label: 'Tổng Xuất',
-                    value: '842',
-                    caption: '-5%',
-                    valueColor: AppColors.primary,
+                )
+              else if (receipts.isEmpty)
+                const SliverFillRemaining(
+                  child: EmptyState(
+                    message: 'Chưa có chứng từ nhập hàng.',
+                    icon: Icons.receipt_long_outlined,
                   ),
-                ],
-              ),
-            ),
-            SliverToBoxAdapter(child: _buildSectionTitle(context)),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 88),
-              sliver: SliverList.separated(
-                itemCount: _documents.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final document = _documents[index];
-                  return InventoryDocumentCard(
-                    document: document,
-                    onTap: () => _openDocument(context, document),
-                  );
-                },
-              ),
-            ),
-          ],
+                )
+              else ...[
+                if (errorMessage != null)
+                  SliverToBoxAdapter(
+                    child: ErrorBanner(
+                      message: errorMessage,
+                      onRetry: () =>
+                          context.read<ReceiptProvider>().loadReceipts(),
+                    ),
+                  ),
+                SliverToBoxAdapter(child: _buildSectionTitle(context)),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 88),
+                  sliver: SliverList.separated(
+                    itemCount: receipts.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final receipt = receipts[index];
+                      return InventoryDocumentCard(
+                        document: receipt.toInventoryDocument(),
+                        onTap: () => _openDocument(context, receipt),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openCreateReceipt(context),
-        tooltip: 'Tạo chứng từ',
+        tooltip: 'Tạo receipt nhập hàng',
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.add_rounded),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildStats(List<Receipt> receipts) {
+    final importedQuantity = receipts.fold<int>(
+      0,
+      (total, receipt) => total + receipt.batchLines.fold<int>(
+        0,
+        (lineTotal, line) => lineTotal + line.quantity,
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: GridView.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 1.48,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          _InventoryStatCard(
+            label: 'Tổng Nhập',
+            value: _formatNumber(importedQuantity),
+            trend: '${receipts.length} chứng từ',
+            trendIcon: Icons.receipt_long_rounded,
+            actionIcon: Icons.download_rounded,
+            accentColor: AppColors.secondary,
+          ),
+          const _InventoryStatCard(
+            label: 'Tổng Xuất',
+            value: '0',
+            trend: 'Từ receipt nhập',
+            trendIcon: Icons.trending_down_rounded,
+            actionIcon: Icons.upload_rounded,
+            accentColor: AppColors.onTertiaryContainer,
+          ),
+        ],
+      ),
     );
   }
 
@@ -231,55 +221,136 @@ class InventoryDocumentsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigationBar() {
-    return NavigationBar(
-      selectedIndex: 1,
-      backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.secondaryFixed,
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.inventory_2_outlined),
-          label: 'Checkout',
-        ),
-        NavigationDestination(
-          selectedIcon: Icon(Icons.inventory_rounded),
-          icon: Icon(Icons.inventory_2_outlined),
-          label: 'Inventory',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.receipt_long_outlined),
-          label: 'Returns',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
-          label: 'Settings',
-        ),
-      ],
+  void _openDocument(BuildContext context, Receipt receipt) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => InventoryDocumentReceiptScreen(receipt: receipt),
+      ),
     );
   }
 
   Future<void> _openCreateReceipt(BuildContext context) async {
-    final receipt = await Navigator.of(context).push<CreateReceipt>(
+    final draft = await Navigator.of(context).push<CreateReceipt>(
       MaterialPageRoute<CreateReceipt>(
         builder: (_) => const CreateInventoryReceiptScreen(),
       ),
     );
-    if (!context.mounted || receipt == null) return;
+    if (!context.mounted || draft == null) return;
 
-    _showActionSnackBar(context, 'Đã tạo ${receipt.receiptCode}');
+    final created = await context.read<ReceiptProvider>().createReceipt(draft);
+    if (!context.mounted) return;
+
+    final provider = context.read<ReceiptProvider>();
+    final message = created
+        ? 'Đã tạo ${draft.receiptCode}.'
+        : provider.errorMessage ?? 'Không thể tạo phiếu nhập.';
+    _showActionSnackBar(context, message);
   }
 
-  void _openDocument(BuildContext context, InventoryDocument document) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => InventoryDocumentReceiptScreen(document: document),
-      ),
-    );
+  String _formatNumber(int value) {
+    final text = value.toString();
+    final buffer = StringBuffer();
+    for (var index = 0; index < text.length; index++) {
+      final remaining = text.length - index;
+      buffer.write(text[index]);
+      if (remaining > 1 && remaining % 3 == 1) {
+        buffer.write(',');
+      }
+    }
+    return buffer.toString();
   }
 
   void _showActionSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class _InventoryStatCard extends StatelessWidget {
+  const _InventoryStatCard({
+    required this.label,
+    required this.value,
+    required this.trend,
+    required this.trendIcon,
+    required this.actionIcon,
+    required this.accentColor,
+  });
+
+  final String label;
+  final String value;
+  final String trend;
+  final IconData trendIcon;
+  final IconData actionIcon;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        border: Border.all(color: AppColors.borderGray),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: accentColor,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+                Icon(actionIcon, size: 18, color: accentColor),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.titleMedium?.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const Spacer(),
+            Row(
+              children: [
+                Icon(trendIcon, size: 14, color: accentColor),
+                const SizedBox(width: 4),
+                Text(
+                  trend,
+                  style: textTheme.labelSmall?.copyWith(
+                    color: accentColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

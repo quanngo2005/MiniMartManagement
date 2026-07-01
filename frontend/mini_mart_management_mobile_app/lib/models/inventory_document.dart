@@ -62,6 +62,7 @@ class InventoryDocument {
     required this.iconColor,
     this.lines = const [],
     this.discount = 0,
+    this.totalAmount,
     this.notes,
   });
 
@@ -78,11 +79,12 @@ class InventoryDocument {
   final Color iconColor;
   final List<InventoryDocumentLine> lines;
   final int discount;
+  final int? totalAmount;
   final String? notes;
 
   int get subtotal {
     return lines.fold(0, (total, line) => total + line.lineTotal);
   }
 
-  int get total => subtotal - discount;
+  int get total => totalAmount ?? subtotal - discount;
 }

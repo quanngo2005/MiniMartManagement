@@ -17,7 +17,7 @@ class InventoryDocumentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return DecoratedBox(
+    final card = DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         border: Border.all(color: AppColors.borderGray),
@@ -124,5 +124,11 @@ class InventoryDocumentCard extends StatelessWidget {
         ),
       ),
     );
+
+    if (document.status == InventoryDocumentStatus.cancelled) {
+      return Opacity(opacity: 0.75, child: card);
+    }
+
+    return card;
   }
 }

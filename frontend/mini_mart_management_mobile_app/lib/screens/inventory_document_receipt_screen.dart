@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/inventory_document.dart';
+import 'package:mini_mart_management_mobile_app/models/receipt.dart';
+import 'package:mini_mart_management_mobile_app/models/receipt_inventory_document_mapper.dart';
+import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/document_status_badge.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/receipt_action_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/receipt_goods_list.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/receipt_metadata_grid.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/receipt_summary_card.dart';
+import 'package:provider/provider.dart';
 
 class InventoryDocumentReceiptScreen extends StatelessWidget {
-  const InventoryDocumentReceiptScreen({super.key, required this.document});
+  const InventoryDocumentReceiptScreen({super.key, required this.receipt});
 
-  final InventoryDocument document;
+  final Receipt receipt;
 
   @override
   Widget build(BuildContext context) {
+    final currentReceipt = context.select<ReceiptProvider, Receipt?>(
+          (provider) => provider.receiptById(receipt.receiptId),
+        ) ??
+        receipt;
+    final isSaving = context.select<ReceiptProvider, bool>(
+      (provider) => provider.isSaving,
+    );
+    final document = currentReceipt.toInventoryDocument();
+    final canComplete = currentReceipt.receiptStatus == ReceiptStatus.pending;
+
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SafeArea(
@@ -24,7 +38,7 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
               sliver: SliverList.list(
                 children: [
-                  _buildHeader(context),
+                  _buildHeader(context, document),
                   const SizedBox(height: 12),
                   ReceiptMetadataGrid(document: document),
                   const SizedBox(height: 12),
@@ -38,7 +52,7 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
                     formatCurrency: _formatCurrency,
                   ),
                   const SizedBox(height: 12),
-                  _buildNotes(context),
+                  _buildNotes(context, document),
                 ],
               ),
             ),
@@ -48,6 +62,10 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
       bottomNavigationBar: ReceiptActionBar(
         onExport: () => _showActionSnackBar(context, 'In / Xuất PDF'),
         onShare: () => _showActionSnackBar(context, 'Chia sẻ chứng từ'),
+        onComplete: canComplete
+            ? () => _completeReceipt(context, currentReceipt.receiptId)
+            : null,
+        isCompleting: isSaving,
       ),
     );
   }
@@ -67,7 +85,7 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, InventoryDocument document) {
     final textTheme = Theme.of(context).textTheme;
 
     return DecoratedBox(
@@ -141,7 +159,7 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotes(BuildContext context) {
+  Widget _buildNotes(BuildContext context, InventoryDocument document) {
     final textTheme = Theme.of(context).textTheme;
 
     return DecoratedBox(
@@ -194,6 +212,19 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
       }
     }
     return '$bufferđ';
+  }
+
+  Future<void> _completeReceipt(BuildContext context, int receiptId) async {
+    final completed = await context.read<ReceiptProvider>().completeReceipt(
+      receiptId,
+    );
+    if (!context.mounted) return;
+
+    final provider = context.read<ReceiptProvider>();
+    final message = completed
+        ? 'Đã hoàn thành chứng từ.'
+        : provider.errorMessage ?? 'Không thể hoàn thành chứng từ.';
+    _showActionSnackBar(context, message);
   }
 
   void _showActionSnackBar(BuildContext context, String message) {

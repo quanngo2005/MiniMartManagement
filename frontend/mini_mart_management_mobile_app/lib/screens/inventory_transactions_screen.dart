@@ -38,7 +38,6 @@ class _InventoryTransactionsScreenState
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.sync_rounded),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -168,33 +167,6 @@ class _InventoryTransactionsScreenState
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return NavigationBar(
-      selectedIndex: 1,
-      backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.secondaryFixed,
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.storefront_outlined),
-          label: 'Checkout',
-        ),
-        NavigationDestination(
-          selectedIcon: Icon(Icons.inventory_rounded),
-          icon: Icon(Icons.inventory_2_outlined),
-          label: 'Inventory',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.receipt_long_outlined),
-          label: 'Returns',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
-          label: 'Settings',
-        ),
-      ],
     );
   }
 

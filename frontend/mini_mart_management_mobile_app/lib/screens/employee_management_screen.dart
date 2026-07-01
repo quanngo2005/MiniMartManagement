@@ -214,7 +214,6 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.qr_code_scanner_rounded),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -498,10 +497,6 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return const AppBottomNavBar(selectedTab: AppNavTab.staff);
   }
 
   void _showAddEmployeeDialog(BuildContext context) {

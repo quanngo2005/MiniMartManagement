@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -44,7 +45,7 @@ namespace MiniMart.Controllers
             if (createDto == null) return BadRequest(new { message = "Invalid receipt data." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var created = await _receiptService.CreateReceiptAsync(createDto);
+            var created = await _receiptService.CreateReceiptAsync(createDto, GetCurrentEmployeeId());
             return CreatedAtAction(nameof(GetById), new { id = created.ReceiptId }, created);
         }
 
@@ -73,6 +74,12 @@ namespace MiniMart.Controllers
         {
             var receipt = await _receiptService.CompleteReceiptAsync(id);
             return Ok(receipt);
+        }
+
+        private int GetCurrentEmployeeId()
+        {
+            var employeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(employeeId, out var id) ? id : 0;
         }
     }
 }
