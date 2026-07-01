@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Quản lý thành viên</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e3e2e5",
+                        "on-secondary-container": "#00714d",
+                        "on-primary-fixed-variant": "#314865",
+                        "inverse-surface": "#2f3033",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#c4c6ce",
+                        "inverse-on-surface": "#f2f0f3",
+                        "tertiary": "#1a0b00",
+                        "on-tertiary-fixed-variant": "#613f1c",
+                        "on-primary-fixed": "#001c37",
+                        "text-muted": "#64748B",
+                        "surface-tint": "#49607e",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#0a2540",
+                        "primary-fixed": "#d2e4ff",
+                        "outline": "#74777e",
+                        "status-warning": "#F59E0B",
+                        "tertiary-fixed-dim": "#eebd90",
+                        "secondary-fixed-dim": "#4edea3",
+                        "error": "#ba1a1a",
+                        "background-slate": "#F8FAFC",
+                        "secondary-fixed": "#6ffbbe",
+                        "text-dark": "#334155",
+                        "surface-dim": "#dbd9dc",
+                        "on-surface-variant": "#43474d",
+                        "surface-container": "#efedf0",
+                        "primary-fixed-dim": "#b0c8eb",
+                        "background": "#faf9fb",
+                        "on-tertiary-fixed": "#2d1600",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffdcbe",
+                        "tertiary-container": "#381d00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#002113",
+                        "on-background": "#1b1c1e",
+                        "status-error": "#EF4444",
+                        "secondary-container": "#6cf8bb",
+                        "surface": "#faf9fb",
+                        "border-gray": "#E2E8F0",
+                        "inverse-primary": "#b0c8eb",
+                        "primary": "#000f22",
+                        "surface-variant": "#e3e2e5",
+                        "surface-container-low": "#f5f3f6",
+                        "secondary": "#006c49",
+                        "on-tertiary-container": "#ae835a",
+                        "on-primary-container": "#768dad",
+                        "on-surface": "#1b1c1e",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#e9e8ea",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-bright": "#faf9fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "gutter": "12px",
+                        "stack-md": "16px",
+                        "touch-target": "48px",
+                        "safe-area": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "data-tabular": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "metadata": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .custom-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-background">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface-container-lowest flex items-center justify-between px-safe h-touch-target border-b border-border-gray">
+<div class="flex items-center gap-stack-md">
+<button class="flex items-center justify-center w-touch-target h-touch-target text-primary hover:bg-surface-container transition-colors active:opacity-80">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Quản lý thành viên</h1>
+</div>
+<div class="flex items-center">
+<button class="flex items-center justify-center w-touch-target h-touch-target text-primary hover:bg-surface-container transition-colors active:opacity-80">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<main class="pt-[64px] pb-[88px] px-safe max-w-md mx-auto">
+<!-- Section 1: Membership Tiers Overview -->
+<section class="mt-stack-md">
+<div class="flex items-center justify-between px-gutter mb-stack-sm">
+<h2 class="font-headline-md text-headline-md text-primary">Phân hạng thành viên</h2>
+<button class="text-primary font-metadata text-metadata underline">Chi tiết</button>
+</div>
+<div class="flex overflow-x-auto gap-gutter px-gutter pb-stack-sm custom-scrollbar">
+<!-- Gold Tier -->
+<div class="flex-shrink-0 w-[240px] bg-surface-container-lowest border border-border-gray p-stack-md rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-stack-md">
+<div class="w-10 h-10 rounded-full bg-[#FFD700] flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<span class="font-metadata text-metadata px-2 py-1 bg-surface-container rounded-full text-primary">Tier 3</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Gold</h3>
+<p class="font-metadata text-metadata text-text-muted mb-stack-md">Yêu cầu: 10,000 điểm</p>
+<div class="space-y-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Giảm giá 10%</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Miễn phí vận chuyển</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Quà tặng sinh nhật</span>
+</div>
+</div>
+</div>
+<!-- Silver Tier -->
+<div class="flex-shrink-0 w-[240px] bg-surface-container-lowest border border-border-gray p-stack-md rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-stack-md">
+<div class="w-10 h-10 rounded-full bg-[#C0C0C0] flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary" style="font-variation-settings: 'FILL' 1;">stars</span>
+</div>
+<span class="font-metadata text-metadata px-2 py-1 bg-surface-container rounded-full text-primary">Tier 2</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Silver</h3>
+<p class="font-metadata text-metadata text-text-muted mb-stack-md">Yêu cầu: 5,000 điểm</p>
+<div class="space-y-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Giảm giá 5%</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Giao hàng ưu tiên</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">radio_button_unchecked</span>
+<span class="font-body-md text-body-md text-text-muted italic">Tier tiếp theo: Gold</span>
+</div>
+</div>
+</div>
+<!-- Bronze Tier -->
+<div class="flex-shrink-0 w-[240px] bg-surface-container-lowest border border-border-gray p-stack-md rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-stack-md">
+<div class="w-10 h-10 rounded-full bg-[#CD7F32] flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+</div>
+<span class="font-metadata text-metadata px-2 py-1 bg-surface-container rounded-full text-primary">Tier 1</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Bronze</h3>
+<p class="font-metadata text-metadata text-text-muted mb-stack-md">Yêu cầu: 1,000 điểm</p>
+<div class="space-y-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Giảm giá 2%</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">radio_button_unchecked</span>
+<span class="font-body-md text-body-md text-text-muted italic">Mở khóa sau 1k điểm</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Customer Distribution Analytics -->
+<section class="mt-stack-md px-safe">
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-stack-md shadow-sm">
+<h3 class="font-headline-md text-headline-md text-primary mb-stack-md">Phân bổ khách hàng</h3>
+<div class="space-y-4">
+<!-- Progress Bars as simple Bar Chart -->
+<div>
+<div class="flex justify-between items-end mb-1">
+<span class="font-body-md text-body-md text-primary font-bold">Bronze</span>
+<span class="font-data-tabular text-data-tabular text-text-muted">65% (4,230)</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-[#CD7F32] h-full" style="width: 65%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-1">
+<span class="font-body-md text-body-md text-primary font-bold">Silver</span>
+<span class="font-data-tabular text-data-tabular text-text-muted">25% (1,620)</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-[#C0C0C0] h-full" style="width: 25%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-1">
+<span class="font-body-md text-body-md text-primary font-bold">Gold</span>
+<span class="font-data-tabular text-data-tabular text-text-muted">10% (650)</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-[#FFD700] h-full" style="width: 10%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Recent Tier Upgrades -->
+<section class="mt-stack-md px-safe mb-8">
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl overflow-hidden shadow-sm">
+<div class="p-stack-md border-b border-border-gray flex items-center justify-between">
+<h3 class="font-headline-md text-headline-md text-primary">Nâng hạng gần đây</h3>
+<span class="material-symbols-outlined text-text-muted">history</span>
+</div>
+<div class="divide-y divide-border-gray">
+<!-- Item 1 -->
+<div class="p-stack-md flex items-center justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a young professional man with short dark hair and a friendly expression, soft studio lighting on a neutral grey background, high clarity retail employee profile photo." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwa6Jotk3wqCrNax27G2yrKgW9JFomFBvrMaBv2PemIP_Hx-fIZgnuJq5vHvY3WXyXB8RkK0p4H4w0kc61ALeDi2N2Gr6JdnggMFAW_Cc-4-3cCC-A53vsyja-DQZ6P0MyEk8qO31-NzSLoh-gK4Gjb0HtpGL0CzRipAGXtmLp0I_yPbAW8obcNj976xwhmohEjng1k4ENxdbCEPTt4uBRjdB6qYJHKwFRYMadf-1MgTrBxzVjnhsTWz_q_5XRZOJ-_Rxt8HoOK-un"/>
+</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-bold">Trần Văn An</p>
+<p class="font-metadata text-metadata text-text-muted">Mã: #MB0923</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-metadata text-metadata text-text-muted line-through">Bronze</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">arrow_forward</span>
+<span class="font-metadata text-metadata text-secondary-container bg-on-secondary-fixed-variant px-2 py-0.5 rounded-full font-bold">Silver</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-stack-md flex items-center justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a middle-aged woman with glasses smiling, warm natural lighting, professional office setting background, focused and clear retail management application style profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQEGfGUV5m4e-_gUs3lxb_HzIy5fGp2v2RFTbm_tyfCX6_nV4lWHJj6RSn1HiGlnQf9JBYkNLZ57BUYo4ru2hyEZLqNKW4dI0krwx3m6RksLEQzDdDIS0PIG8PiN6ICUOVdqa2rVEsjKjt39VKw1ZXHhCtMycej-p1FD-np5qCaS55SyCz23KTDt5v9VIiyC8t6Jy7erap_8-lrlX8QodaEIxmZOEYT_dR_9aQW66ccrutqDfIMvBLZyDSXSbNDN5B3gSVhluuHXu5"/>
+</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-bold">Lê Thị Mai</p>
+<p class="font-metadata text-metadata text-text-muted">Mã: #MB1045</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-metadata text-metadata text-text-muted line-through">Silver</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">arrow_forward</span>
+<span class="font-metadata text-metadata text-secondary-container bg-on-secondary-fixed-variant px-2 py-0.5 rounded-full font-bold">Gold</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="p-stack-md flex items-center justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up headshot of a younger man with trendy spectacles and a slight smile, vibrant but professional lighting, indoor retail environment bokeh background, corporate identity photo style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXY2xHqpcpdkzhUdfob_u_iSeBOWSBQ6rvPDypKi2s5XoVsoBapdjy94cD4Q4Jpl--JV1oHjKDa7O-Jl7p6e9rlb8VfkyW5U0nJVCLI6f8SiLs9ixu5tXaOoYbfdz54rbsApHhpB94QUHGUr_WpKoGKNMb46FIfnpcZDuECjWioDoZya90b7WY6-XVF35r5a76QenaokLRrf55DiKRpMa729Y9OLIgY1FJEPJGjdhbI9rIqudcj8XhqB9hnFKoHftS1vU2oI9uQkmE"/>
+</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-bold">Phạm Minh Hoàng</p>
+<p class="font-metadata text-metadata text-text-muted">Mã: #MB1182</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-metadata text-metadata text-text-muted line-through">Bronze</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">arrow_forward</span>
+<span class="font-metadata text-metadata text-secondary-container bg-on-secondary-fixed-variant px-2 py-0.5 rounded-full font-bold">Silver</span>
+</div>
+</div>
+</div>
+<button class="w-full p-stack-md text-primary font-metadata text-metadata text-center border-t border-border-gray hover:bg-surface-container transition-colors active:opacity-80">
+                    Xem tất cả nâng hạng
+                </button>
+</div>
+</section>
+</main>
+<!-- FAB: Create Member -->
+<button class="fixed bottom-[88px] right-safe w-[56px] h-[56px] bg-primary-container text-white rounded-full shadow-lg flex items-center justify-center z-50 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined">person_add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 h-[72px] bg-surface-container-lowest border-t border-border-gray flex justify-around items-center px-gutter pb-safe">
+<button class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-low transition-all active:scale-95">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-metadata text-metadata">Inventory</span>
+</button>
+<button class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-low transition-all active:scale-95">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-metadata text-metadata">Sales</span>
+</button>
+<button class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-low transition-all active:scale-95">
+<span class="material-symbols-outlined">campaign</span>
+<span class="font-metadata text-metadata">Campaigns</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary font-bold hover:bg-surface-container-low transition-all active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-metadata text-metadata">Staff</span>
+</button>
+</nav>
+<script>
+        // Simple micro-interaction for active state simulation
+        document.querySelectorAll('nav button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('nav button').forEach(b => {
+                    b.classList.remove('text-primary', 'font-bold');
+                    b.classList.add('text-text-muted');
+                    b.querySelector('span.material-symbols-outlined').style.fontVariationSettings = "'FILL' 0";
+                });
+                this.classList.add('text-primary', 'font-bold');
+                this.classList.remove('text-text-muted');
+                this.querySelector('span.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
+            });
+        });
+    </script>
+</body></html>
