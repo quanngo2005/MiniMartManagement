@@ -45,9 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       await Navigator.of(context).pushReplacement(
-        MaterialPageRoute<void>(
-          builder: (_) => MockRoleScreen(user: user),
-        ),
+        MaterialPageRoute<void>(builder: (_) => MockRoleScreen(user: user)),
       );
     }
   }
