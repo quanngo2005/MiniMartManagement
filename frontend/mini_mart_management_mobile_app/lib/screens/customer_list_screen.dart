@@ -3,8 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/customer_summary.dart';
 import '../providers/customer_provider.dart';
-import '../screens/category_management_screen.dart';
-import '../screens/employee_management_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/customers/customer_card.dart';
 import 'customer_profile_screen.dart';
@@ -69,23 +67,26 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.person_add_outlined),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.surfaceContainerLowest,
       foregroundColor: AppColors.primary,
-      titleSpacing: 0,
-      automaticallyImplyLeading: false,
-      leading: const Padding(
-        padding: EdgeInsets.only(left: 12),
-        child: Icon(Icons.storefront, color: AppColors.primary),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          } else {
+            Navigator.of(context).pushReplacementNamed('/members');
+          }
+        },
       ),
       title: Text(
-        'Quản lý Khách hàng',
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+        'Danh sách khách hàng',
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
             ),
@@ -272,42 +273,6 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
           if (success && context.mounted) Navigator.pop(context);
         },
       ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: 3,
-      backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.primaryContainer,
-      onDestinationSelected: (index) {
-        if (index == 0 || index == 1) {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (_) => const CategoryManagementScreen()));
-        } else if (index == 2) {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (_) => const EmployeeManagementScreen()));
-        } else if (index == 4) {
-          Navigator.of(context).pushReplacementNamed('/promotions');
-        } else if (index == 3) {
-          Navigator.of(context).pushReplacementNamed('/members');
-        }
-      },
-      destinations: const [
-        NavigationDestination(
-            icon: Icon(Icons.inventory_2_outlined), label: 'Catalog'),
-        NavigationDestination(
-            icon: Icon(Icons.category_outlined), label: 'Categories'),
-        NavigationDestination(
-            icon: Icon(Icons.group_outlined), label: 'Staff'),
-        NavigationDestination(
-          selectedIcon: Icon(Icons.people_alt_rounded),
-          icon: Icon(Icons.people_alt_outlined),
-          label: 'Customers',
-        ),
-        NavigationDestination(
-            icon: Icon(Icons.local_offer_outlined), label: 'Promotions'),
-      ],
     );
   }
 }

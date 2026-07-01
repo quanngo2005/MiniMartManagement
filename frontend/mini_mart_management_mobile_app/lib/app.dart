@@ -54,7 +54,7 @@ class MiniMartManagementApp extends StatelessWidget {
         home: const LoginScreen(),
         routes: {
           '/members': (_) => const MemberManagementScreen(),
-          '/promotions': (_) => PromotionManagementScreen(),
+          '/promotions': (_) => const PromotionManagementScreen(),
         },
       ),
     );

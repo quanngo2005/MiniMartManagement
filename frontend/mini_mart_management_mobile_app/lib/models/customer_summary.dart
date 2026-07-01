@@ -1,3 +1,5 @@
+import 'package:mini_mart_management_mobile_app/core/membership_tier_utils.dart';
+
 class CustomerSummary {
   final int customerId;
   final String customerCode;
@@ -35,6 +37,6 @@ class CustomerSummary {
   // Convenience getter — screens dùng customer.id (String) để navigate
   String get id => customerId.toString();
 
-  // Screens dùng customer.tier để hiển thị TierBadge — giữ placeholder
-  String get tier => '';
+  // Screens dùng customer.tier để hiển thị TierBadge
+  String get tier => MembershipTierUtils.tierNameForPoints(points);
 }
