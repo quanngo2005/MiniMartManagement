@@ -12,5 +12,7 @@ namespace MiniMart.Repositories.RepoInterface
         Task<bool> PhoneNumberExistsAsync(string phoneNumber, int? excludeId = null);
         Task<bool> CustomerCodeExistsAsync(string customerCode, int? excludeId = null);
         Task<bool> UpdatePointsAsync(int customerId, int delta);
+        Task<List<Order>> GetCustomerOrdersAsync(int customerId);
+        Task<List<PointTransaction>> GetCustomerPointTransactionsAsync(int customerId);
     }
 }

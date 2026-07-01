@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/customer_summary.dart';
 import '../../theme/app_colors.dart';
-import 'tier_badge.dart';
 
 class CustomerCard extends StatelessWidget {
   const CustomerCard({
@@ -14,9 +13,17 @@ class CustomerCard extends StatelessWidget {
   final CustomerSummary customer;
   final VoidCallback onTap;
 
+  // Tính tier từ điểm — theo thang điểm tiêu chuẩn
+  static String _tierFromPoints(int points) {
+    if (points >= 2000) return 'gold';
+    if (points >= 500) return 'silver';
+    return 'bronze';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final tier = _tierFromPoints(customer.points);
+    final fmt = NumberFormat('#,###');
 
     return InkWell(
       onTap: onTap,
@@ -38,55 +45,75 @@ class CustomerCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      customer.name,
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
+            // Left: name, phone, points
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          customer.name,
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    TierBadge(tier: customer.tier),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  customer.phone,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textMuted,
+                      const SizedBox(width: 6),
+                      _TierChip(tier: tier),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.stars, size: 16, color: AppColors.secondary),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${NumberFormat('#,###').format(customer.points)} điểm',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: AppColors.secondary,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 4),
+                  Text(
+                    customer.phone,
+                    style: const TextStyle(
+                        color: AppColors.textMuted, fontSize: 13),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.stars,
+                          size: 15, color: AppColors.secondary),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${fmt.format(customer.points)} điểm',
+                        style: const TextStyle(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
+            // Right: status + chevron
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  customer.customerStatus ? 'Đang HĐ' : 'Ngừng HĐ',
-                  style: textTheme.bodySmall?.copyWith(
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
                     color: customer.customerStatus
-                        ? AppColors.secondary
-                        : AppColors.textMuted,
-                    fontWeight: FontWeight.w500,
+                        ? const Color(0xFFD1FAE5)
+                        : AppColors.surfaceContainerHigh,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    customer.customerStatus ? 'Hoạt động' : 'Ngừng HĐ',
+                    style: TextStyle(
+                      color: customer.customerStatus
+                          ? const Color(0xFF065F46)
+                          : AppColors.textMuted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -95,6 +122,48 @@ class CustomerCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TierChip extends StatelessWidget {
+  const _TierChip({required this.tier});
+  final String tier;
+
+  @override
+  Widget build(BuildContext context) {
+    Color bg;
+    Color fg;
+    String label;
+
+    switch (tier.toLowerCase()) {
+      case 'gold':
+        bg = AppColors.tierGoldBg;
+        fg = AppColors.tierGoldText;
+        label = 'GOLD';
+        break;
+      case 'silver':
+        bg = AppColors.tierSilverBg;
+        fg = AppColors.tierSilverText;
+        label = 'SILVER';
+        break;
+      default:
+        bg = AppColors.tierBronzeBg;
+        fg = AppColors.tierBronzeText;
+        label = 'BRONZE';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+            color: fg, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
       ),
     );
   }

@@ -11,6 +11,8 @@ import 'package:mini_mart_management_mobile_app/repositories/employee_repository
 import 'package:mini_mart_management_mobile_app/repositories/promotion_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/shift_repository.dart';
 import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
 import 'package:mini_mart_management_mobile_app/services/customer_service.dart';
 import 'package:mini_mart_management_mobile_app/services/employee_service.dart';
@@ -50,6 +52,10 @@ class MiniMartManagementApp extends StatelessWidget {
         title: 'Quản lý Siêu thị',
         theme: AppTheme.light,
         home: const LoginScreen(),
+        routes: {
+          '/members': (_) => const MemberManagementScreen(),
+          '/promotions': (_) => PromotionManagementScreen(),
+        },
       ),
     );
   }

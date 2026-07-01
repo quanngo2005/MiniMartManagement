@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
@@ -10,8 +10,8 @@ namespace MiniMart.Controllers
 {
     [ApiController]
     [Route("api/customers")]
-    [Route("odata/Customers")]
-    public class CustomersController : ODataController
+    [Authorize(Policy = "AnyEmployee")]
+    public class CustomersController : ControllerBase
     {
         private readonly ICustomerRepository _customerRepository;
 
@@ -125,6 +125,7 @@ namespace MiniMart.Controllers
         // DELETE: /api/customers/{id}
         // Xóa khách hàng khỏi hệ thống (Manager)
         [HttpDelete("{id}")]
+        [Authorize(Policy = "ManagerUp")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
             var success = await _customerRepository.DeleteCustomerAsync(id);
@@ -144,6 +145,51 @@ namespace MiniMart.Controllers
                 return NotFound(new { message = $"Customer with ID {id} not found." });
 
             return Ok(new { customerId = customer.CustomerId, fullName = customer.FullName, point = customer.Point });
+        }
+
+        // GET: /api/customers/{id}/orders
+        // Lịch sử mua hàng của khách hàng (Manager, Cashier)
+        [HttpGet("{id}/orders")]
+        public async Task<ActionResult<object>> GetCustomerOrders(int id)
+        {
+            var customer = await _customerRepository.GetCustomerByIdAsync(id);
+            if (customer == null)
+                return NotFound(new { message = $"Customer with ID {id} not found." });
+
+            var orders = await _customerRepository.GetCustomerOrdersAsync(id);
+            var result = orders.Select(o => new
+            {
+                o.OrderId,
+                o.OrderCode,
+                o.OrderDate,
+                o.FinalAmount,
+                o.Status,
+                ItemCount = o.OrderDetails.Count
+            });
+            return Ok(result);
+        }
+
+        // GET: /api/customers/{id}/point-transactions
+        // Lịch sử tích/trừ điểm (Manager, Cashier)
+        [HttpGet("{id}/point-transactions")]
+        public async Task<ActionResult<object>> GetCustomerPointTransactions(int id)
+        {
+            var customer = await _customerRepository.GetCustomerByIdAsync(id);
+            if (customer == null)
+                return NotFound(new { message = $"Customer with ID {id} not found." });
+
+            var txns = await _customerRepository.GetCustomerPointTransactionsAsync(id);
+            var result = txns.Select(t => new
+            {
+                t.PointTransactionId,
+                t.TransactionType,
+                t.Delta,
+                t.BalanceAfter,
+                t.Note,
+                t.OrderId,
+                TransactionDate = t.Order != null ? t.Order.OrderDate : (DateTime?)null
+            });
+            return Ok(result);
         }
 
         // PUT: /api/customers/{id}/points

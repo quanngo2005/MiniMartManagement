@@ -1,4 +1,6 @@
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
+import 'package:mini_mart_management_mobile_app/models/customer_order.dart';
+import 'package:mini_mart_management_mobile_app/models/customer_point_transaction.dart';
 import 'package:mini_mart_management_mobile_app/models/customer_summary.dart';
 import 'package:mini_mart_management_mobile_app/services/customer_service.dart';
 
@@ -76,6 +78,26 @@ class CustomerRepository {
       rethrow;
     } catch (e) {
       throw ApiException('Không thể cập nhật điểm khách hàng: ${e.toString()}');
+    }
+  }
+
+  Future<List<CustomerOrder>> getCustomerOrders(int id) async {
+    try {
+      return await _customerService.getCustomerOrders(id);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Không thể tải lịch sử mua hàng: ${e.toString()}');
+    }
+  }
+
+  Future<List<CustomerPointTransaction>> getCustomerPointTransactions(int id) async {
+    try {
+      return await _customerService.getCustomerPointTransactions(id);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Không thể tải lịch sử điểm: ${e.toString()}');
     }
   }
 }

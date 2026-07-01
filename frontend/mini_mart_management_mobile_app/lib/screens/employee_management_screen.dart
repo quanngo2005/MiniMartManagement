@@ -3,6 +3,7 @@ import 'package:mini_mart_management_mobile_app/models/employee.dart';
 import 'package:mini_mart_management_mobile_app/models/role.dart';
 import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
 import 'package:provider/provider.dart';
@@ -446,6 +447,10 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const CategoryManagementScreen()),
           );
+        } else if (index == 3) {
+          Navigator.of(context).pushReplacementNamed('/members');
+        } else if (index == 4) {
+          Navigator.of(context).pushReplacementNamed('/promotions');
         }
       },
       destinations: const [
@@ -463,8 +468,12 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
           label: 'Staff',
         ),
         NavigationDestination(
-          icon: Icon(Icons.payments_outlined),
-          label: 'Finance',
+          icon: Icon(Icons.people_alt_outlined),
+          label: 'Customers',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.local_offer_outlined),
+          label: 'Promotions',
         ),
       ],
     );

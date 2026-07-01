@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
+import 'package:mini_mart_management_mobile_app/models/customer_order.dart';
+import 'package:mini_mart_management_mobile_app/models/customer_point_transaction.dart';
 import 'package:mini_mart_management_mobile_app/models/customer_summary.dart';
 import 'package:mini_mart_management_mobile_app/repositories/customer_repository.dart';
 
@@ -11,6 +13,10 @@ class CustomerProvider with ChangeNotifier {
   List<CustomerSummary> _customers = [];
   bool _isLoading = false;
   String? _error;
+
+  // Per-customer cache
+  final Map<int, List<CustomerOrder>> _ordersCache = {};
+  final Map<int, List<CustomerPointTransaction>> _txnCache = {};
 
   List<CustomerSummary> get customers => _customers;
   bool get isLoading => _isLoading;
@@ -58,9 +64,7 @@ class CustomerProvider with ChangeNotifier {
   Future<bool> updateCustomer(int id, Map<String, dynamic> data) async {
     try {
       final updated = await _customerRepository.updateCustomer(id, data);
-      _customers = _customers
-          .map((c) => c.customerId == id ? updated : c)
-          .toList();
+      _customers = _customers.map((c) => c.customerId == id ? updated : c).toList();
       notifyListeners();
       return true;
     } on ApiException catch (e) {
@@ -70,17 +74,9 @@ class CustomerProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> deleteCustomer(int id) async {
-    try {
-      await _customerRepository.deleteCustomer(id);
-      _customers = _customers.where((c) => c.customerId != id).toList();
-      notifyListeners();
-      return true;
-    } on ApiException catch (e) {
-      _error = e.message;
-      notifyListeners();
-      return false;
-    }
+  /// Soft delete — set customerStatus = false
+  Future<bool> disableCustomer(int id) async {
+    return updateCustomer(id, {'customerStatus': false});
   }
 
   Future<int?> fetchCustomerPoints(int id) async {
@@ -95,8 +91,7 @@ class CustomerProvider with ChangeNotifier {
 
   Future<bool> updateCustomerPoints(int customerId, int delta) async {
     try {
-      final newPoints =
-          await _customerRepository.updateCustomerPoints(customerId, delta);
+      final newPoints = await _customerRepository.updateCustomerPoints(customerId, delta);
       _customers = _customers.map((c) {
         if (c.customerId == customerId) {
           return CustomerSummary(
@@ -118,6 +113,32 @@ class CustomerProvider with ChangeNotifier {
       _error = e.message;
       notifyListeners();
       return false;
+    }
+  }
+
+  Future<List<CustomerOrder>> fetchCustomerOrders(int id) async {
+    if (_ordersCache.containsKey(id)) return _ordersCache[id]!;
+    try {
+      final orders = await _customerRepository.getCustomerOrders(id);
+      _ordersCache[id] = orders;
+      return orders;
+    } on ApiException catch (e) {
+      _error = e.message;
+      notifyListeners();
+      return [];
+    }
+  }
+
+  Future<List<CustomerPointTransaction>> fetchCustomerPointTransactions(int id) async {
+    if (_txnCache.containsKey(id)) return _txnCache[id]!;
+    try {
+      final txns = await _customerRepository.getCustomerPointTransactions(id);
+      _txnCache[id] = txns;
+      return txns;
+    } on ApiException catch (e) {
+      _error = e.message;
+      notifyListeners();
+      return [];
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/category_summary.dart';
+import 'package:mini_mart_management_mobile_app/screens/customer_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/categories/category_stat_card.dart';
@@ -212,6 +213,12 @@ class CategoryManagementScreen extends StatelessWidget {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const EmployeeManagementScreen()),
           );
+        } else if (index == 3) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const CustomerListScreen()),
+          );
+        } else if (index == 4) {
+          Navigator.of(context).pushReplacementNamed('/promotions');
         }
       },
       destinations: const [
@@ -229,8 +236,12 @@ class CategoryManagementScreen extends StatelessWidget {
           label: 'Staff',
         ),
         NavigationDestination(
-          icon: Icon(Icons.payments_outlined),
-          label: 'Finances',
+          icon: Icon(Icons.people_alt_outlined),
+          label: 'Customers',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.local_offer_outlined),
+          label: 'Promotions',
         ),
       ],
     );

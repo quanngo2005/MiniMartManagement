@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
+import 'package:mini_mart_management_mobile_app/models/customer_order.dart';
+import 'package:mini_mart_management_mobile_app/models/customer_point_transaction.dart';
 import 'package:mini_mart_management_mobile_app/models/customer_summary.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
@@ -19,7 +21,7 @@ class CustomerService {
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_readMessage(responseJson));
+      throw ApiException('[${response.statusCode}] ${_readMessage(responseJson)}');
     }
 
     final data = responseJson['data'] ?? responseJson['Data'] ?? responseJson;
@@ -32,7 +34,7 @@ class CustomerService {
         return value.map((j) => CustomerSummary.fromJson(j)).toList();
       }
     }
-    throw const ApiException('Không thể đọc danh sách khách hàng.');
+    throw ApiException('[${response.statusCode}] Không thể parse response: ${response.body.substring(0, response.body.length.clamp(0, 200))}');
   }
 
   Future<CustomerSummary> getCustomerById(int id) async {
@@ -118,6 +120,34 @@ class CustomerService {
     }
   }
 
+  Future<List<CustomerOrder>> getCustomerOrders(int id) async {
+    final response = await _client.get(
+      ApiConfig.uri('/api/customers/$id/orders'),
+      headers: const {'Accept': 'application/json'},
+    );
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException('[${response.statusCode}] ${_readMessage(responseJson)}');
+    }
+    final data = responseJson['data'] ?? responseJson['Data'] ?? responseJson;
+    final list = data is List ? data : (data is Map ? data['value'] ?? [] : []);
+    return (list as List).map((j) => CustomerOrder.fromJson(j)).toList();
+  }
+
+  Future<List<CustomerPointTransaction>> getCustomerPointTransactions(int id) async {
+    final response = await _client.get(
+      ApiConfig.uri('/api/customers/$id/point-transactions'),
+      headers: const {'Accept': 'application/json'},
+    );
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException('[${response.statusCode}] ${_readMessage(responseJson)}');
+    }
+    final data = responseJson['data'] ?? responseJson['Data'] ?? responseJson;
+    final list = data is List ? data : (data is Map ? data['value'] ?? [] : []);
+    return (list as List).map((j) => CustomerPointTransaction.fromJson(j)).toList();
+  }
+
   Future<Map<String, dynamic>> getCustomerPoints(int id) async {
     final response = await _client.get(
       ApiConfig.uri('/api/customers/$id/points'),
@@ -189,13 +219,15 @@ class CustomerService {
       if (decoded is Map<String, dynamic>) return decoded;
       if (decoded is List) return {'data': decoded};
     } on FormatException {
-      throw const ApiException('Server returned an invalid response.');
+      // body không phải JSON (HTML error page, etc.)
+      return {'message': 'Server error (${response.statusCode})'};
     }
-    throw const ApiException('Server returned an unexpected response.');
+    return {'message': 'Unexpected response format'};
   }
 
   String _readMessage(Map<String, dynamic> json) {
-    final message = json['message'] ?? json['Message'];
+    final message = json['message'] ?? json['Message']
+        ?? json['title'] ?? json['Title'];
     return message is String && message.isNotEmpty
         ? message
         : 'Yêu cầu thất bại. Vui lòng thử lại.';
