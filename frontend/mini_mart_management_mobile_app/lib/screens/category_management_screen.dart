@@ -224,10 +224,7 @@ class CategoryManagementScreen extends StatelessWidget {
           icon: Icon(Icons.category_outlined),
           label: 'Categories',
         ),
-        NavigationDestination(
-          icon: Icon(Icons.group_outlined),
-          label: 'Staff',
-        ),
+        NavigationDestination(icon: Icon(Icons.group_outlined), label: 'Staff'),
         NavigationDestination(
           icon: Icon(Icons.payments_outlined),
           label: 'Finances',

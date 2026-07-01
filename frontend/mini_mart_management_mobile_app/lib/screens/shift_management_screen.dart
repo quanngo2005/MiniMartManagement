@@ -16,7 +16,8 @@ class ShiftManagementScreen extends StatefulWidget {
   State<ShiftManagementScreen> createState() => _ShiftManagementScreenState();
 }
 
-class _ShiftManagementScreenState extends State<ShiftManagementScreen> with SingleTickerProviderStateMixin {
+class _ShiftManagementScreenState extends State<ShiftManagementScreen>
+    with SingleTickerProviderStateMixin {
   Timer? _timer;
   late AnimationController _pulseController;
   final _startCashController = TextEditingController(text: '1000000');
@@ -68,7 +69,8 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
   }
 
   Future<void> _handleOpenShift(int cashierId) async {
-    final startCash = double.tryParse(_startCashController.text.replaceAll('.', '')) ?? 0.0;
+    final startCash =
+        double.tryParse(_startCashController.text.replaceAll('.', '')) ?? 0.0;
     if (startCash <= 0) {
       _showErrorSnackBar('Vui lòng nhập tiền mặt đầu ca hợp lệ.');
       return;
@@ -76,10 +78,12 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
 
     setState(() => _isProcessing = true);
     final success = await context.read<ShiftProvider>().openNewShift(
-          cashierId: cashierId,
-          startCash: startCash,
-          note: _openNoteController.text.trim().isEmpty ? null : _openNoteController.text.trim(),
-        );
+      cashierId: cashierId,
+      startCash: startCash,
+      note: _openNoteController.text.trim().isEmpty
+          ? null
+          : _openNoteController.text.trim(),
+    );
 
     if (!mounted) return;
     setState(() => _isProcessing = false);
@@ -88,7 +92,8 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
       _openNoteController.clear();
       _showSuccessSnackBar('Đã mở ca làm việc thành công.');
     } else {
-      final error = context.read<ShiftProvider>().error ?? 'Không thể mở ca làm việc.';
+      final error =
+          context.read<ShiftProvider>().error ?? 'Không thể mở ca làm việc.';
       _showErrorSnackBar(error);
     }
   }
@@ -102,10 +107,12 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
 
     setState(() => _isProcessing = true);
     final success = await context.read<ShiftProvider>().closeShift(
-          shiftId: shiftId,
-          endCash: endCash,
-          note: _closeNoteController.text.trim().isEmpty ? null : _closeNoteController.text.trim(),
-        );
+      shiftId: shiftId,
+      endCash: endCash,
+      note: _closeNoteController.text.trim().isEmpty
+          ? null
+          : _closeNoteController.text.trim(),
+    );
 
     if (!mounted) return;
     setState(() => _isProcessing = false);
@@ -115,26 +122,21 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
       _closeNoteController.clear();
       _showSuccessSnackBar('Đã đóng ca làm việc và chốt doanh thu thành công.');
     } else {
-      final error = context.read<ShiftProvider>().error ?? 'Không thể đóng ca làm việc.';
+      final error =
+          context.read<ShiftProvider>().error ?? 'Không thể đóng ca làm việc.';
       _showErrorSnackBar(error);
     }
   }
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.statusError,
-      ),
+      SnackBar(content: Text(message), backgroundColor: AppColors.statusError),
     );
   }
 
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.secondary,
-      ),
+      SnackBar(content: Text(message), backgroundColor: AppColors.secondary),
     );
   }
 
@@ -156,9 +158,9 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
                 'Store #402 | Quản lý ca',
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -167,10 +169,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
         elevation: 0,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(
-            color: AppColors.borderGray,
-            height: 1,
-          ),
+          child: Container(color: AppColors.borderGray, height: 1),
         ),
       ),
       body: Stack(
@@ -182,7 +181,10 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (activeShift != null) ...[
-                    _buildActiveShiftCard(activeShift, currentUser?.fullName ?? 'Nhân viên'),
+                    _buildActiveShiftCard(
+                      activeShift,
+                      currentUser?.fullName ?? 'Nhân viên',
+                    ),
                     const SizedBox(height: 16),
                     _buildBentoMetrics(activeShift),
                     const SizedBox(height: 16),
@@ -286,7 +288,10 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.person_outline_rounded, color: AppColors.primary),
+                child: const Icon(
+                  Icons.person_outline_rounded,
+                  color: AppColors.primary,
+                ),
               ),
             ],
           ),
@@ -304,7 +309,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
                   const SizedBox(height: 2),
                   Text(
                     staffName,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textDark,
+                    ),
                   ),
                 ],
               ),
@@ -318,7 +327,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
                   const SizedBox(height: 2),
                   Text(
                     "${shift.startTime.hour.toString().padLeft(2, '0')}:${shift.startTime.minute.toString().padLeft(2, '0')} | ${shift.startTime.day.toString().padLeft(2, '0')}/${shift.startTime.month.toString().padLeft(2, '0')}",
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textDark,
+                    ),
                   ),
                 ],
               ),
@@ -332,7 +345,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Icons.schedule_rounded, size: 14, color: AppColors.textMuted),
+                      const Icon(
+                        Icons.schedule_rounded,
+                        size: 14,
+                        color: AppColors.textMuted,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         durationStr,
@@ -377,7 +394,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
               color: AppColors.statusError.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.report_gmailerrorred_rounded, color: AppColors.statusError, size: 24),
+            child: const Icon(
+              Icons.report_gmailerrorred_rounded,
+              color: AppColors.statusError,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 12),
           const Expanded(
@@ -386,7 +407,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
               children: [
                 Text(
                   'Không có ca làm việc hoạt động',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
                 ),
                 SizedBox(height: 2),
                 Text(
@@ -414,7 +439,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
         children: [
           const Text(
             'Mở ca làm việc mới',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textDark),
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textDark,
+            ),
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -456,7 +485,8 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
 
   Widget _buildBentoMetrics(Shift shift) {
     final currentCash = shift.startCash + shift.revenue;
-    final expectedEndCash = currentCash + 1550000; // Mock target for visual alignment
+    final expectedEndCash =
+        currentCash + 1550000; // Mock target for visual alignment
 
     return Column(
       children: [
@@ -489,10 +519,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
                 ),
               ),
               const SizedBox(height: 12),
-              Container(
-                height: 1,
-                color: Colors.white.withValues(alpha: 0.1),
-              ),
+              Container(height: 1, color: Colors.white.withValues(alpha: 0.1)),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -532,16 +559,27 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
                   children: [
                     Text(
                       'Giao dịch',
-                      style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                     SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.receipt_long_rounded, color: AppColors.secondary, size: 20),
+                        Icon(
+                          Icons.receipt_long_rounded,
+                          color: AppColors.secondary,
+                          size: 20,
+                        ),
                         SizedBox(width: 6),
                         Text(
                           '142',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textDark,
+                          ),
                         ),
                       ],
                     ),
@@ -563,16 +601,27 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
                   children: [
                     Text(
                       'Tốc độ phục vụ',
-                      style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                     SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.speed_rounded, color: AppColors.statusWarning, size: 20),
+                        Icon(
+                          Icons.speed_rounded,
+                          color: AppColors.statusWarning,
+                          size: 20,
+                        ),
                         SizedBox(width: 6),
                         Text(
                           '1.2m',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textDark,
+                          ),
                         ),
                       ],
                     ),
@@ -612,7 +661,10 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
             style: const TextStyle(color: AppColors.textMuted),
             decoration: const InputDecoration(
               labelText: 'Tiền mặt đầu ca (VNĐ)',
-              suffixIcon: Icon(Icons.lock_outline_rounded, color: AppColors.textMuted),
+              suffixIcon: Icon(
+                Icons.lock_outline_rounded,
+                color: AppColors.textMuted,
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -628,7 +680,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
           const SizedBox(height: 4),
           const Text(
             'Vui lòng kiểm đếm thực tế và nhập số dư hiện có',
-            style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontStyle: FontStyle.italic),
+            style: TextStyle(
+              fontSize: 11,
+              color: AppColors.textMuted,
+              fontStyle: FontStyle.italic,
+            ),
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -660,11 +716,19 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
             children: [
               Text(
                 'DOANH THU THEO GIỜ',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textMuted,
+                ),
               ),
               Text(
                 '+12% vs Hôm qua',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.secondary),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.secondary,
+                ),
               ),
             ],
           ),
@@ -701,7 +765,9 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
           child: Container(
             decoration: BoxDecoration(
               color: color,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(2),
+              ),
             ),
           ),
         ),
@@ -720,9 +786,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
         minimumSize: const Size(double.infinity, 56),
         shadowColor: AppColors.primary.withValues(alpha: 0.2),
         elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -732,7 +796,9 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Kết thúc ca làm việc?'),
-        content: const Text('Hành động này sẽ thực hiện đối soát số dư tiền mặt thực tế và khóa phiên làm việc hiện tại.'),
+        content: const Text(
+          'Hành động này sẽ thực hiện đối soát số dư tiền mặt thực tế và khóa phiên làm việc hiện tại.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -743,7 +809,9 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
               Navigator.pop(ctx);
               _handleCloseShift(shiftId);
             },
-            style: FilledButton.styleFrom(backgroundColor: AppColors.statusError),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.statusError,
+            ),
             child: const Text('Xác nhận Đóng ca'),
           ),
         ],
@@ -776,10 +844,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen> with Sing
           icon: Icon(Icons.category_outlined),
           label: 'Categories',
         ),
-        NavigationDestination(
-          icon: Icon(Icons.group_outlined),
-          label: 'Staff',
-        ),
+        NavigationDestination(icon: Icon(Icons.group_outlined), label: 'Staff'),
         NavigationDestination(
           selectedIcon: Icon(Icons.settings_rounded),
           icon: Icon(Icons.settings_outlined),

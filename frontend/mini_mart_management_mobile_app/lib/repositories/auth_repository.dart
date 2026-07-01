@@ -19,4 +19,8 @@ class AuthRepository {
       throw const ApiException('Login response could not be read.');
     }
   }
+
+  Future<void> logout() async {
+    await _authService.logout();
+  }
 }

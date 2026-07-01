@@ -12,6 +12,23 @@ class AuthService {
 
   final http.Client _client;
 
+  Future<void> logout() async {
+    try {
+      final csrfToken = await _fetchCsrfToken();
+      final headers = <String, String>{
+        'Accept': 'application/json',
+        'X-XSRF-TOKEN': csrfToken.value,
+      };
+      if (csrfToken.cookieHeader != null) {
+        headers['Cookie'] = csrfToken.cookieHeader!;
+      }
+      await _client.post(ApiConfig.uri('/api/auth/logout'), headers: headers);
+    } catch (_) {
+    } finally {
+      clearClientCookies();
+    }
+  }
+
   Future<AuthResponse> login({
     required String username,
     required String password,
