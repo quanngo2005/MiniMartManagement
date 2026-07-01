@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
 using MiniMart.DTOs;
 using MiniMart.Services.Interfaces;
 
@@ -9,30 +8,30 @@ namespace MiniMart.Controllers
 {
     [ApiController]
     [Authorize(Policy = "ManagerUp")]
-    [Route("api/staffs")]
-    [Route("odata/staffs")]
-    public class StaffsController : ControllerBase
+    [Route("api/employees")]
+    [Route("odata/employees")]
+    public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
 
-        public StaffsController(IEmployeeService employeeService)
+        public EmployeesController(IEmployeeService employeeService)
         {
             _employeeService = employeeService;
         }
 
-        // GET: /api/staffs
+        // GET: /api/employees
         // Lấy danh sách tất cả nhân viên trong hệ thống (Manager)
         [HttpGet]
         [EnableQuery]
-        public ActionResult<IQueryable<EmployeeDto>> GetAllStaffs()
+        public ActionResult<IQueryable<EmployeeDto>> GetAllEmployees()
         {
             return Ok(_employeeService.GetAllEmployeesQueryable());
         }
 
-        // GET: /api/staffs/{id}
+        // GET: /api/employees/{id}
         // Xem thông tin chi tiết nhân viên theo ID (Manager)
         [HttpGet("{id}")]
-        public async Task<ActionResult<EmployeeDto>> GetStaffById(int id)
+        public async Task<ActionResult<EmployeeDto>> GetEmployeeById(int id)
         {
             var employee = await _employeeService.GetEmployeeByIdAsync(id);
             if (employee == null)
@@ -42,22 +41,22 @@ namespace MiniMart.Controllers
             return Ok(employee);
         }
 
-        // POST: /api/staffs
+        // POST: /api/employees
         // Tạo tài khoản nhân viên mới (Manager)
         [HttpPost]
-        public async Task<ActionResult<EmployeeDto>> CreateStaff([FromBody] CreateEmployeeDto createDto)
+        public async Task<ActionResult<EmployeeDto>> CreateEmployee([FromBody] CreateEmployeeDto createDto)
         {
             if (createDto == null) return BadRequest(new { message = "Invalid employee data." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var created = await _employeeService.CreateEmployeeAsync(createDto);
-            return CreatedAtAction(nameof(GetStaffById), new { id = created.EmployeeId }, created);
+            return CreatedAtAction(nameof(GetEmployeeById), new { id = created.EmployeeId }, created);
         }
 
-        // PUT: /api/staffs/{id}
+        // PUT: /api/employees/{id}
         // Cập nhật thông tin/quyền nhân viên (Manager)
         [HttpPut("{id}")]
-        public async Task<ActionResult<EmployeeDto>> UpdateStaff(int id, [FromBody] UpdateEmployeeDto updateDto)
+        public async Task<ActionResult<EmployeeDto>> UpdateEmployee(int id, [FromBody] UpdateEmployeeDto updateDto)
         {
             if (updateDto == null) return BadRequest(new { message = "Invalid update data." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -66,10 +65,10 @@ namespace MiniMart.Controllers
             return Ok(updated);
         }
 
-        // DELETE: /api/staffs/{id}
+        // DELETE: /api/employees/{id}
         // Vô hiệu hóa tài khoản nhân viên (Manager)
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DisableStaff(int id)
+        public async Task<IActionResult> DisableEmployee(int id)
         {
             await _employeeService.DeleteEmployeeAsync(id);
             return NoContent();

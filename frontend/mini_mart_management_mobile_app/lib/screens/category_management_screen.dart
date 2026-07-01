@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/category_summary.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/categories/category_stat_card.dart';
 import 'package:mini_mart_management_mobile_app/widgets/categories/category_tree_card.dart';
@@ -112,7 +113,7 @@ class CategoryManagementScreen extends StatelessWidget {
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.add_box_outlined),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -201,11 +202,18 @@ class CategoryManagementScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigationBar() {
+  Widget _buildBottomNavigationBar(BuildContext context) {
     return NavigationBar(
       selectedIndex: 1,
       backgroundColor: AppColors.surface,
       indicatorColor: AppColors.primaryContainer,
+      onDestinationSelected: (index) {
+        if (index == 2) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const EmployeeManagementScreen()),
+          );
+        }
+      },
       destinations: const [
         NavigationDestination(
           icon: Icon(Icons.inventory_2_outlined),
@@ -217,8 +225,8 @@ class CategoryManagementScreen extends StatelessWidget {
           label: 'Categories',
         ),
         NavigationDestination(
-          icon: Icon(Icons.local_shipping_outlined),
-          label: 'Suppliers',
+          icon: Icon(Icons.group_outlined),
+          label: 'Staff',
         ),
         NavigationDestination(
           icon: Icon(Icons.payments_outlined),

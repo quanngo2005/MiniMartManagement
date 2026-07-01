@@ -21,7 +21,7 @@ const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
 // ── OData EDM Model ──────────────────────────────────────────────
 var odataBuilder = new ODataConventionModelBuilder();
 odataBuilder.EntitySet<Role>("Roles");
-odataBuilder.EntitySet<Employee>("staffs");
+odataBuilder.EntitySet<Employee>("employees");
 odataBuilder.EntitySet<Customer>("Customers");
 odataBuilder.EntitySet<Supplier>("Suppliers");
 odataBuilder.EntitySet<Category>("Categories");

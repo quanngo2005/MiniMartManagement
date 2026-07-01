@@ -8,7 +8,8 @@ namespace MiniMart.Mapping
     {
         public EmployeeMappingProfile()
         {
-            CreateMap<Employee, EmployeeDto>();
+            CreateMap<Employee, EmployeeDto>()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role != null ? src.Role.RoleName : string.Empty));
 
             CreateMap<CreateEmployeeDto, Employee>()
                 .ForMember(dest => dest.EmployeeId, opt => opt.Ignore())

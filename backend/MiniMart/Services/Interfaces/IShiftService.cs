@@ -12,5 +12,6 @@ namespace MiniMart.Services.Interfaces
         Task<ShiftDto> OpenShiftAsync(OpenShiftRequest openRequest, int currentUserId, bool isManagerOrAdmin);
         Task<ShiftDto> CloseShiftAsync(int id, CloseShiftRequest closeRequest, int currentUserId, bool isManagerOrAdmin);
         Task<ShiftDto?> GetActiveShiftAsync();
+        Task<ShiftDto?> GetActiveShiftByCashierIdAsync(int cashierId);
     }
 }
