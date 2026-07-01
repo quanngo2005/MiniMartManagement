@@ -87,9 +87,9 @@ namespace MiniMart.Services.Implementations
 
         public async Task<ShiftDto> OpenShiftAsync(OpenShiftRequest openRequest, int currentUserId, bool isManagerOrAdmin)
         {
-            var activeShift = await _shiftRepository.GetActiveShiftAsync();
+            var activeShift = await _shiftRepository.GetActiveShiftByCashierIdAsync(openRequest.CashierId);
             if (activeShift != null)
-                throw new DomainException("There is already an active working shift.", StatusCodes.Status409Conflict);
+                throw new DomainException("There is already an active working shift for this cashier.", StatusCodes.Status409Conflict);
 
             var shift = await _shiftRepository.GetShiftByIdAsync(openRequest.ShiftId);
             if (shift == null || shift.Status == ShiftStatus.Cancelled)
@@ -147,6 +147,12 @@ namespace MiniMart.Services.Implementations
         public async Task<ShiftDto?> GetActiveShiftAsync()
         {
             var activeShift = await _shiftRepository.GetActiveShiftAsync();
+            return activeShift == null ? null : _mapper.Map<ShiftDto>(activeShift);
+        }
+
+        public async Task<ShiftDto?> GetActiveShiftByCashierIdAsync(int cashierId)
+        {
+            var activeShift = await _shiftRepository.GetActiveShiftByCashierIdAsync(cashierId);
             return activeShift == null ? null : _mapper.Map<ShiftDto>(activeShift);
         }
     }

@@ -10,6 +10,7 @@ namespace MiniMart.Repositories.RepoInterface
         Task<Shift?> UpdateShiftAsync(Shift shift);
         Task<bool> DeleteShiftAsync(int id);
         Task<Shift?> GetActiveShiftAsync();
+        Task<Shift?> GetActiveShiftByCashierIdAsync(int cashierId);
         Task<bool> EmployeeExistsAsync(int employeeId);
     }
 }
