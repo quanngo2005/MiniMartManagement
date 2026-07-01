@@ -1,4 +1,4 @@
-﻿using MiniMart.DTOs;
+using MiniMart.DTOs;
 using MiniMart.Models;
 
 namespace MiniMart.Repositories.RepoInterface
@@ -19,6 +19,9 @@ namespace MiniMart.Repositories.RepoInterface
 
         // POST /api/orders/checkout 
         Task<CheckoutResponseDto> CheckoutAsync(CheckoutRequestDto request);
+
+        // Cập nhật tồn kho và điểm khi thanh toán thành công
+        Task ConfirmOrderCompletionAsync(int orderId);
 
         // Kiểm tra nghiệp vụ
         Task<Shift?> GetActiveShiftAsync(int shiftId); //BR-POS-01

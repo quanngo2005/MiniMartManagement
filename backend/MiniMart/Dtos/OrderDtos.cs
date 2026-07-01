@@ -21,6 +21,7 @@ namespace MiniMart.DTOs
 
     public class CreateOrderDto
     {
+        public int ShiftId { get; set; }
         public string OrderCode { get; set; } = string.Empty;
         public decimal SubTotal { get; set; }
         public decimal TaxAmount { get; set; }
