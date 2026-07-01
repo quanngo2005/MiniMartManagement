@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>RetailMaster Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#eebd90",
+                    "primary": "#000f22",
+                    "outline-variant": "#c4c6ce",
+                    "surface-variant": "#e3e2e5",
+                    "surface-container-high": "#e9e8ea",
+                    "on-background": "#1b1c1e",
+                    "on-error-container": "#93000a",
+                    "background": "#faf9fb",
+                    "status-warning": "#F59E0B",
+                    "tertiary-container": "#381d00",
+                    "text-dark": "#334155",
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#6cf8bb",
+                    "primary-fixed": "#d2e4ff",
+                    "primary-fixed-dim": "#b0c8eb",
+                    "on-tertiary-fixed": "#2d1600",
+                    "on-surface": "#1b1c1e",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-tertiary-container": "#ae835a",
+                    "inverse-surface": "#2f3033",
+                    "surface-tint": "#49607e",
+                    "surface-bright": "#faf9fb",
+                    "status-error": "#EF4444",
+                    "inverse-on-surface": "#f2f0f3",
+                    "outline": "#74777e",
+                    "on-primary-fixed-variant": "#314865",
+                    "tertiary": "#1a0b00",
+                    "on-secondary-container": "#00714d",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-primary-container": "#768dad",
+                    "inverse-primary": "#b0c8eb",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-surface-variant": "#43474d",
+                    "primary-container": "#0a2540",
+                    "surface-container": "#efedf0",
+                    "surface-container-low": "#f5f3f6",
+                    "error": "#ba1a1a",
+                    "secondary": "#006c49",
+                    "surface": "#faf9fb",
+                    "border-gray": "#E2E8F0",
+                    "surface-container-highest": "#e3e2e5",
+                    "text-muted": "#64748B",
+                    "on-secondary-fixed": "#002113",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#613f1c",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#ffdcbe",
+                    "on-primary-fixed": "#001c37",
+                    "background-slate": "#F8FAFC",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#dbd9dc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "safe-area": "16px",
+                    "stack-sm": "8px",
+                    "gutter": "12px",
+                    "stack-md": "16px",
+                    "touch-target": "48px"
+            },
+            "fontFamily": {
+                    "metadata": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "data-tabular": ["JetBrains Mono"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body { background-color: #F8FAFC; font-family: 'Inter', sans-serif; }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .sparkline-container { width: 60px; height: 24px; }
+      .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); }
+      @keyframes pulse-soft {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+      .live-indicator { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface antialiased pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-primary-container w-full top-0 border-b border-border-gray dark:border-outline-variant flex justify-between items-center px-safe w-full h-touch-target sticky z-40">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">storefront</span>
+<div class="flex flex-col">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed leading-tight">RetailMaster</h1>
+<span class="text-metadata font-metadata text-on-surface-variant flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed-dim live-indicator"></span>
+                    Ca sáng: 08:00 - 16:00
+                </span>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a retail manager in their late 30s, wearing a clean corporate uniform, captured in a bright and high-contrast professional retail setting with soft overhead lighting. The aesthetic is clean and modern, reflecting an efficient and authoritative management persona." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9a2WpmpCTTP6xXV2eNvfeQiVleWxIaxgis0rtm7ywQoHlMIYqEDQ5cn9v2sB-FPyGFqU2pNz8wJ4dXngNSri_Rtpz508lZN2cTIVgSOlfWPZi3TeXQrJ5um0gU-9IHESoL-JNPuuUSZa3TShJXP2U4A_hwVRiMXs8Fs1P4x7S9SFgcudXMVLy3bfdRLCBj7wzv-X5uuuDCsCib3nBH86GHuO_zaaqzx-aA2PgAlxlqvWHoOeu8Zhud6T7vd8egBh-8K3SRC_km_aK"/>
+</div>
+</header>
+<main class="p-safe space-y-gutter">
+<!-- Top Metrics Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<!-- Revenue Today -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-3 shadow-sm flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-metadata font-metadata text-on-surface-variant">Doanh thu ngày</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">trending_up</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-primary tracking-tight">45.2M</div>
+<div class="flex items-center justify-between mt-1">
+<span class="text-[10px] text-secondary font-bold">+12.5%</span>
+<div class="sparkline-container overflow-hidden">
+<svg class="w-full h-full stroke-secondary fill-none stroke-[2]" viewbox="0 0 60 24">
+<path d="M0,20 Q10,5 20,15 T40,10 T60,5"></path>
+</svg>
+</div>
+</div>
+</div>
+</div>
+<!-- Orders -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-3 shadow-sm flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-metadata font-metadata text-on-surface-variant">Đơn hàng</span>
+<span class="material-symbols-outlined text-on-primary-fixed-variant text-[20px]">shopping_cart</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-primary tracking-tight">342</div>
+<div class="text-[10px] text-on-surface-variant mt-1">Trung bình 14 đơn/giờ</div>
+</div>
+</div>
+<!-- Low Stock -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-3 shadow-sm flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-metadata font-metadata text-on-surface-variant">Hàng sắp hết</span>
+<span class="material-symbols-outlined text-error text-[20px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-error tracking-tight">18</div>
+<div class="text-[10px] text-error font-bold mt-1">Cần nhập kho ngay</div>
+</div>
+</div>
+<!-- Shift Revenue -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-3 shadow-sm flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-metadata font-metadata text-on-surface-variant">Doanh thu ca</span>
+<span class="material-symbols-outlined text-status-warning text-[20px]">payments</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-primary tracking-tight">12.8M</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-status-warning h-full w-[65%]"></div>
+</div>
+<div class="text-[10px] text-on-surface-variant mt-1 text-right">65% mục tiêu</div>
+</div>
+</div>
+</div>
+<!-- Real-time Sales Activity -->
+<section class="bg-surface-container-lowest border border-border-gray rounded-xl overflow-hidden shadow-sm">
+<div class="p-4 border-b border-border-gray flex justify-between items-center">
+<h2 class="font-headline-md text-body-lg font-bold text-primary">Hoạt động bán hàng thời gian thực</h2>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase tracking-wider">Trực tiếp</span>
+</div>
+<div class="p-4 h-48 relative">
+<!-- Data Visualization Placeholder using SVG for high precision UI feel -->
+<svg class="w-full h-full overflow-visible" viewbox="0 0 400 120">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#006c49" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#006c49" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,100 L40,80 L80,95 L120,60 L160,70 L200,40 L240,55 L280,30 L320,45 L360,20 L400,10" fill="none" stroke="#006c49" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+<path d="M0,100 L40,80 L80,95 L120,60 L160,70 L200,40 L240,55 L280,30 L320,45 L360,20 L400,10 L400,120 L0,120 Z" fill="url(#chartGradient)" vector-effect="non-scaling-stroke"></path>
+<!-- Grid Lines -->
+<line stroke="#E2E8F0" stroke-width="1" x1="0" x2="400" y1="120" y2="120"></line>
+<line stroke="#E2E8F0" stroke-dasharray="4" stroke-width="1" x1="0" x2="400" y1="80" y2="80"></line>
+<line stroke="#E2E8F0" stroke-dasharray="4" stroke-width="1" x1="0" x2="400" y1="40" y2="40"></line>
+</svg>
+<div class="absolute bottom-2 left-4 right-4 flex justify-between text-metadata text-on-surface-variant font-data-tabular">
+<span>08:00</span>
+<span>10:00</span>
+<span>12:00</span>
+<span>14:00</span>
+<span>Hiện tại</span>
+</div>
+</div>
+</section>
+<!-- Quick Actions & Status List -->
+<div class="grid grid-cols-1 gap-gutter">
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-4">
+<h3 class="text-body-md font-bold mb-3 text-primary uppercase tracking-tight">Thông báo quan trọng</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-3 p-2 bg-surface-container-low rounded-lg border border-border-gray">
+<div class="w-10 h-10 flex items-center justify-center bg-error-container text-error rounded-full">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<div class="flex-1">
+<p class="text-body-md font-bold text-primary">Sữa tươi TH True Milk (1L)</p>
+<p class="text-metadata text-on-surface-variant">Còn lại 5 hộp - Cần đặt hàng</p>
+</div>
+<span class="text-metadata font-data-tabular text-on-surface-variant">10:45</span>
+</div>
+<div class="flex items-center gap-3 p-2 bg-surface-container-low rounded-lg border border-border-gray">
+<div class="w-10 h-10 flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full">
+<span class="material-symbols-outlined">person_check</span>
+</div>
+<div class="flex-1">
+<p class="text-body-md font-bold text-primary">Nguyễn Văn A</p>
+<p class="text-metadata text-on-surface-variant">Đã bắt đầu ca trực (Quầy 02)</p>
+</div>
+<span class="text-metadata font-data-tabular text-on-surface-variant">08:02</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB: Scanner -->
+<button class="fixed bottom-24 right-4 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 z-50">
+<span class="material-symbols-outlined" style="font-variation-settings: 'opsz' 40;">barcode_reader</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-primary-container fixed bottom-0 w-full z-50 border-t border-border-gray dark:border-outline-variant shadow-lg flex justify-around items-center w-full h-[72px] px-safe pb-safe">
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container dark:bg-secondary-fixed-dim dark:text-on-secondary-fixed rounded-xl px-3 py-1 scale-95 transition-transform duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-metadata text-metadata mt-0.5">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:bg-surface-container-low dark:hover:bg-primary scale-95 transition-transform duration-100" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-metadata text-metadata mt-0.5">Analytics</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:bg-surface-container-low dark:hover:bg-primary scale-95 transition-transform duration-100" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-metadata text-metadata mt-0.5">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:bg-surface-container-low dark:hover:bg-primary scale-95 transition-transform duration-100" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-metadata text-metadata mt-0.5">Staff</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for dashboard cards
+        document.querySelectorAll('.bg-surface-container-lowest').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Simple real-time update simulation
+        setInterval(() => {
+            const revenueElement = document.querySelector('.font-headline-md.text-primary.tracking-tight');
+            if (revenueElement && revenueElement.innerText.includes('45.2M')) {
+                // Occasional minor fluctuation for "live" feel
+                if(Math.random() > 0.7) {
+                    revenueElement.classList.add('transition-colors', 'text-secondary');
+                    setTimeout(() => revenueElement.classList.remove('text-secondary'), 1000);
+                }
+            }
+        }, 5000);
+    </script>
+</body></html>

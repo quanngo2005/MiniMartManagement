@@ -12,10 +12,7 @@ class AuthRepository {
     required String password,
   }) async {
     try {
-      return await _authService.login(
-        username: username,
-        password: password,
-      );
+      return await _authService.login(username: username, password: password);
     } on ApiException {
       rethrow;
     } on FormatException {

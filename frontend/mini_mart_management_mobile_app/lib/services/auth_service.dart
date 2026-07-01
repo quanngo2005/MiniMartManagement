@@ -7,7 +7,8 @@ import 'package:mini_mart_management_mobile_app/models/auth_response.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
 class AuthService {
-  AuthService({http.Client? client}) : _client = client ?? createConfiguredClient();
+  AuthService({http.Client? client})
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 
