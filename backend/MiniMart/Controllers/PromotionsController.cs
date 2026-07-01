@@ -1,7 +1,6 @@
-using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
@@ -10,8 +9,8 @@ namespace MiniMart.Controllers
 {
     [ApiController]
     [Route("api/promotions")]
-    [Route("odata/Promotions")]
-    public class PromotionsController : ODataController
+    [Authorize(Policy = "ManagerUp")]
+    public class PromotionsController : ControllerBase
     {
         private readonly IPromotionRepository _promotionRepository;
 
@@ -50,6 +49,7 @@ namespace MiniMart.Controllers
         // GET: /api/promotions/{id}
         // Xem chi tiết khuyến mãi theo ID (Manager, Cashier)
         [HttpGet("{id}")]
+        [Authorize(Policy = "AnyEmployee")]
         public async Task<ActionResult<PromotionDto>> GetPromotionById(int id)
         {
             var promotion = await _promotionRepository.GetPromotionByIdAsync(id);

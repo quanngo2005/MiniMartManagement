@@ -93,6 +93,9 @@ namespace MiniMart.Data
             // BATCH (SỬA LỖI CASCADE PATHS TẠI ĐÂY)
             // =========================
             modelBuilder.Entity<Batch>()
+                .ToTable(t => t.UseSqlOutputClause(false));
+
+            modelBuilder.Entity<Batch>()
                 .HasOne(b => b.Receipt)
                 .WithMany(r => r.Batches)
                 .HasForeignKey(b => b.ReceiptId)

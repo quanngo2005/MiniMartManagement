@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
+import 'package:mini_mart_management_mobile_app/screens/manager_navigation_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/mock_role_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/dotted_background.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
@@ -46,10 +48,16 @@ class _LoginScreenState extends State<LoginScreen> {
     if (user != null) {
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(
-          builder: (_) => MockRoleScreen(user: user),
+          builder: (_) => _isManager(user)
+              ? ManagerNavigationScreen(user: user)
+              : MockRoleScreen(user: user),
         ),
       );
     }
+  }
+
+  bool _isManager(EmployeeUser user) {
+    return user.roleId == 1 || user.roleName.toLowerCase() == 'manager';
   }
 
   void _togglePasswordVisibility() {

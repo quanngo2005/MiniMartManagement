@@ -177,11 +177,11 @@ namespace MiniMart.Models
         // ========================= RECEIPTS =========================
         public static List<Receipt> GetReceipts() => new List<Receipt>
         {
-            new Receipt { ReceiptId = 1, ReceiptCode = "PN001", ImportDate = new DateTime(2024, 1, 10), TotalAmount = 5000000, PaidAmount = 5000000, DebtAmount = 0, ReceiptStatus = true, SupplierId = 1, EmployeeId = 4 },
-            new Receipt { ReceiptId = 2, ReceiptCode = "PN002", ImportDate = new DateTime(2024, 1, 15), TotalAmount = 7500000, PaidAmount = 7500000, DebtAmount = 0, ReceiptStatus = true, SupplierId = 2, EmployeeId = 4 },
-            new Receipt { ReceiptId = 3, ReceiptCode = "PN003", ImportDate = new DateTime(2024, 2, 5),  TotalAmount = 4200000, PaidAmount = 2000000, DebtAmount = 2200000, ReceiptStatus = true, SupplierId = 3, EmployeeId = 7 },
-            new Receipt { ReceiptId = 4, ReceiptCode = "PN004", ImportDate = new DateTime(2024, 3, 1),  TotalAmount = 6800000, PaidAmount = 6800000, DebtAmount = 0, ReceiptStatus = true, SupplierId = 4, EmployeeId = 9 },
-            new Receipt { ReceiptId = 5, ReceiptCode = "PN005", ImportDate = new DateTime(2024, 4, 10), TotalAmount = 3500000, PaidAmount = 3500000, DebtAmount = 0, ReceiptStatus = true, SupplierId = 5, EmployeeId = 4 },
+            new Receipt { ReceiptId = 1, ReceiptCode = "PN001", ImportDate = new DateTime(2024, 1, 10), TotalAmount = 5000000, PaidAmount = 5000000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 1, EmployeeId = 4 },
+            new Receipt { ReceiptId = 2, ReceiptCode = "PN002", ImportDate = new DateTime(2024, 1, 15), TotalAmount = 7500000, PaidAmount = 7500000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 2, EmployeeId = 4 },
+            new Receipt { ReceiptId = 3, ReceiptCode = "PN003", ImportDate = new DateTime(2024, 2, 5),  TotalAmount = 4200000, PaidAmount = 2000000, DebtAmount = 2200000, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 3, EmployeeId = 7 },
+            new Receipt { ReceiptId = 4, ReceiptCode = "PN004", ImportDate = new DateTime(2024, 3, 1),  TotalAmount = 6800000, PaidAmount = 6800000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 4, EmployeeId = 9 },
+            new Receipt { ReceiptId = 5, ReceiptCode = "PN005", ImportDate = new DateTime(2024, 4, 10), TotalAmount = 3500000, PaidAmount = 3500000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 5, EmployeeId = 4 },
         };
 
         // ========================= BATCHES =========================

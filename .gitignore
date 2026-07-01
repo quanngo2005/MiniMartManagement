@@ -57,3 +57,6 @@ nunit-*.xml
 *.db-shm
 /backend/.vs
 /frontend/stitch_assets
+.agents/AGENTS.md
+.agents/skills/code_review_graph/SKILL.md
+.vscode/mcp.json

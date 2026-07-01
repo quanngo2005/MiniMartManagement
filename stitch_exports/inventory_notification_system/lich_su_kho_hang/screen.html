@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nhật Ký Giao Dịch Kho | Store #402</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Use the provided Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#6cf8bb",
+                    "tertiary-fixed": "#ffdcbe",
+                    "primary": "#000f22",
+                    "surface-container": "#efedf0",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#6ffbbe",
+                    "background-slate": "#F8FAFC",
+                    "surface-dim": "#dbd9dc",
+                    "outline-variant": "#c4c6ce",
+                    "status-warning": "#F59E0B",
+                    "inverse-primary": "#b0c8eb",
+                    "on-tertiary": "#ffffff",
+                    "background": "#faf9fb",
+                    "secondary": "#006c49",
+                    "tertiary-container": "#381d00",
+                    "surface-container-high": "#e9e8ea",
+                    "surface-bright": "#faf9fb",
+                    "surface": "#faf9fb",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#001c37",
+                    "on-secondary-fixed-variant": "#005236",
+                    "primary-container": "#0a2540",
+                    "inverse-surface": "#2f3033",
+                    "surface-container-highest": "#e3e2e5",
+                    "on-tertiary-fixed": "#2d1600",
+                    "inverse-on-surface": "#f2f0f3",
+                    "on-tertiary-container": "#ae835a",
+                    "primary-fixed": "#d2e4ff",
+                    "surface-tint": "#49607e",
+                    "outline": "#74777e",
+                    "on-tertiary-fixed-variant": "#613f1c",
+                    "status-error": "#EF4444",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#314865",
+                    "surface-container-lowest": "#ffffff",
+                    "text-muted": "#64748B",
+                    "on-surface-variant": "#43474d",
+                    "border-gray": "#E2E8F0",
+                    "surface-container-low": "#f5f3f6",
+                    "on-error-container": "#93000a",
+                    "on-background": "#1b1c1e",
+                    "tertiary": "#1a0b00",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e3e2e5",
+                    "primary-fixed-dim": "#b0c8eb",
+                    "on-secondary-container": "#00714d",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#768dad",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-secondary-fixed": "#002113",
+                    "text-dark": "#334155",
+                    "tertiary-fixed-dim": "#eebd90",
+                    "on-surface": "#1b1c1e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "touch-target": "48px",
+                    "gutter": "12px",
+                    "safe-area": "16px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px"
+            },
+            "fontFamily": {
+                    "metadata": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "data-tabular": ["JetBrains Mono"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F8FAFC; /* background-slate */
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .transaction-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .transaction-card:active {
+            transform: scale(0.98);
+            background-color: #f1f5f9;
+        }
+        /* Custom scrollbar for high density data */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen text-on-background">
+<!-- TopAppBar -->
+<header class="bg-surface-bright dark:bg-surface-container-highest w-full top-0 sticky z-50 border-b border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch-target">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">storefront</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Store #402 | Shift Active</h1>
+</div>
+<button class="w-touch-target h-touch-target flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">account_circle</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-safe-area pb-24 max-w-md mx-auto w-full space-y-4 pt-4">
+<!-- Search & Filter Bar -->
+<section class="space-y-3 bg-surface-container-lowest p-3 border border-border-gray shadow-sm">
+<div class="relative">
+<input class="w-full h-touch-target pl-12 pr-4 bg-background border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md" placeholder="Tìm kiếm sản phẩm hoặc SKU..." type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+<button class="flex items-center gap-1 px-4 py-2 bg-primary text-white rounded-full font-metadata text-metadata whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+                    Tất cả Loại
+                </button>
+<button class="flex items-center gap-1 px-4 py-2 bg-surface-container text-on-surface-variant border border-outline-variant rounded-full font-metadata text-metadata whitespace-nowrap">
+                    Hôm nay
+                </button>
+<button class="flex items-center gap-1 px-4 py-2 bg-surface-container text-on-surface-variant border border-outline-variant rounded-full font-metadata text-metadata whitespace-nowrap">
+                    Tuần này
+                </button>
+</div>
+</section>
+<!-- Transaction List Grouped by Day -->
+<section class="space-y-6">
+<!-- Group Header -->
+<div class="space-y-3">
+<div class="flex justify-between items-end border-b-2 border-primary/10 pb-1">
+<h2 class="font-headline-md text-headline-md text-primary">Hôm nay, 24 Tháng 5</h2>
+<span class="font-metadata text-metadata text-text-muted">14 giao dịch</span>
+</div>
+<!-- Transaction Items -->
+<div class="space-y-gutter">
+<!-- Item 1: Sale -->
+<div class="transaction-card bg-surface-container-lowest p-gutter border border-border-gray flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">point_of_sale</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-body-md truncate text-primary">Sữa Tươi Tiệt Trùng Vinamilk 1L</h3>
+<span class="font-data-tabular text-data-tabular font-bold text-error">-2</span>
+</div>
+<div class="flex justify-between items-center mt-1">
+<span class="font-metadata text-metadata text-outline">SKU: VNM-100293</span>
+<span class="font-metadata text-metadata text-text-muted">14:22 • Bán hàng</span>
+</div>
+</div>
+</div>
+<!-- Item 2: Restock -->
+<div class="transaction-card bg-surface-container-lowest p-gutter border border-border-gray flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-primary-fixed">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-body-md truncate text-primary">Mì Hảo Hảo Tôm Chua Cay (Thùng)</h3>
+<span class="font-data-tabular text-data-tabular font-bold text-secondary">+50</span>
+</div>
+<div class="flex justify-between items-center mt-1">
+<span class="font-metadata text-metadata text-outline">SKU: ACE-449102</span>
+<span class="font-metadata text-metadata text-text-muted">11:05 • Nhập kho</span>
+</div>
+</div>
+</div>
+<!-- Item 3: Adjustment -->
+<div class="transaction-card bg-surface-container-lowest p-gutter border border-border-gray flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined">edit_note</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-body-md truncate text-primary">Trứng Gà Ta (Vỉ 10 quả)</h3>
+<span class="font-data-tabular text-data-tabular font-bold text-status-warning">-3</span>
+</div>
+<div class="flex justify-between items-center mt-1">
+<span class="font-metadata text-metadata text-outline">SKU: EGG-002199</span>
+<span class="font-metadata text-metadata text-text-muted">09:45 • Điều chỉnh (Hư hỏng)</span>
+</div>
+</div>
+</div>
+<!-- Item 4: Refund -->
+<div class="transaction-card bg-surface-container-lowest p-gutter border border-border-gray flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-error-container flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined">assignment_return</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-body-md truncate text-primary">Dầu Ăn Neptune Light 2L</h3>
+<span class="font-data-tabular text-data-tabular font-bold text-secondary">+1</span>
+</div>
+<div class="flex justify-between items-center mt-1">
+<span class="font-metadata text-metadata text-outline">SKU: NEP-200911</span>
+<span class="font-metadata text-metadata text-text-muted">08:12 • Trả hàng</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Yesterday Group -->
+<div class="space-y-3">
+<div class="flex justify-between items-end border-b-2 border-primary/10 pb-1">
+<h2 class="font-headline-md text-headline-md text-primary opacity-60">Hôm qua, 23 Tháng 5</h2>
+</div>
+<div class="space-y-gutter opacity-80">
+<div class="transaction-card bg-surface-container-lowest p-gutter border border-border-gray flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">point_of_sale</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-body-md truncate text-primary">Gạo ST25 Túi 5kg</h3>
+<span class="font-data-tabular text-data-tabular font-bold text-error">-10</span>
+</div>
+<div class="flex justify-between items-center mt-1">
+<span class="font-metadata text-metadata text-outline">SKU: RICE-ST25</span>
+<span class="font-metadata text-metadata text-text-muted">21:58 • Bán hàng</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB (Contextual for Creating Log/Scanner) -->
+<button class="fixed right-6 bottom-24 w-14 h-14 bg-primary text-white rounded-xl shadow-lg flex items-center justify-center active:scale-95 transition-transform z-50">
+<span class="material-symbols-outlined text-[32px]">barcode_scanner</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 h-touch-target bg-surface-container-lowest dark:bg-primary-container border-t border-outline-variant dark:border-outline shadow-sm flex justify-around items-center px-safe-area pb-safe">
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant px-4 py-1 hover:bg-surface-variant dark:hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">point_of_sale</span>
+<span class="font-metadata text-metadata">Checkout</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-4 py-1 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-metadata text-metadata">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant px-4 py-1 hover:bg-surface-variant dark:hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">assignment_return</span>
+<span class="font-metadata text-metadata">Returns</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant px-4 py-1 hover:bg-surface-variant dark:hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-metadata text-metadata">Settings</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for filter buttons
+        const filterButtons = document.querySelectorAll('button[class*="rounded-full"]');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Clear active states of siblings in the same container
+                this.parentElement.querySelectorAll('button').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('bg-surface-container', 'text-on-surface-variant');
+                });
+                // Set active state
+                this.classList.remove('bg-surface-container', 'text-on-surface-variant');
+                this.classList.add('bg-primary', 'text-white');
+            });
+        });
+
+        // Pull to refresh simulation (visual only)
+        let touchstartY = 0;
+        let touchendY = 0;
+        
+        document.addEventListener('touchstart', e => {
+            touchstartY = e.changedTouches[0].screenY;
+        }, false);
+
+        document.addEventListener('touchend', e => {
+            touchendY = e.changedTouches[0].screenY;
+            if (touchendY > touchstartY + 100 && window.scrollY === 0) {
+                console.log('Refreshing data...');
+                // Trigger skeleton loading would go here
+            }
+        }, false);
+    </script>
+</body></html>

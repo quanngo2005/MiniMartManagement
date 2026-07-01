@@ -84,5 +84,23 @@ namespace MiniMart.Repositories.RepoImplement
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<Order>> GetCustomerOrdersAsync(int customerId)
+        {
+            return await _context.Orders
+                .Where(o => o.CustomerId == customerId)
+                .Include(o => o.OrderDetails)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+        }
+
+        public async Task<List<PointTransaction>> GetCustomerPointTransactionsAsync(int customerId)
+        {
+            return await _context.PointTransactions
+                .Where(pt => pt.CustomerId == customerId)
+                .Include(pt => pt.Order)
+                .OrderByDescending(pt => pt.PointTransactionId)
+                .ToListAsync();
+        }
     }
 }
