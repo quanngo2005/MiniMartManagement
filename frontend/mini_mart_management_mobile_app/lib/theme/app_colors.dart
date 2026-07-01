@@ -17,4 +17,12 @@ abstract final class AppColors {
   static const Color surfaceContainerLowest = Color(0xFFFFFFFF);
   static const Color textDark = Color(0xFF334155);
   static const Color textMuted = Color(0xFF64748B);
+
+  // Tier Colors
+  static const Color tierGoldBg = Color(0xFFFEF3C7);
+  static const Color tierGoldText = Color(0xFF92400E);
+  static const Color tierSilverBg = Color(0xFFE2E8F0);
+  static const Color tierSilverText = Color(0xFF475569);
+  static const Color tierBronzeBg = Color(0xFFFDE6D2);
+  static const Color tierBronzeText = Color(0xFF9A3412);
 }
