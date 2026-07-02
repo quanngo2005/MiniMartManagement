@@ -69,7 +69,7 @@ class ManagerDashboardScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: () => _showActionSnackBar(context, 'Quét mã vạch'),
         tooltip: 'Quét mã vạch',
         backgroundColor: AppColors.primary,

@@ -31,7 +31,7 @@ class _InventoryTransactionsScreenState
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SafeArea(child: _buildBody(context)),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: () => context.read<InventoryProvider>().loadTransactions(),
         tooltip: 'Tải lại',
         backgroundColor: AppColors.primary,

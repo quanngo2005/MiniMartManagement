@@ -64,7 +64,7 @@ class ShiftProvider extends ChangeNotifier {
     try {
       final now = DateTime.now();
       final newShiftPayload = {
-        'shiftName': 'Ca làm việc ngày ${now.day}/${now.month}',
+        'shiftName': 'Ca làm việc ${now.hour}:${now.minute}',
         'startTime': now.toIso8601String(),
         'endTime': now.add(const Duration(hours: 8)).toIso8601String(),
         'workDate': DateTime(now.year, now.month, now.day).toIso8601String(),
@@ -73,7 +73,7 @@ class ShiftProvider extends ChangeNotifier {
         'revenue': 0.0,
         'status': 1, // Pending
         'employeeId': cashierId,
-        'note': note,
+        'note': note ?? '',
       };
 
       final createdShift = await _shiftRepository.createShift(newShiftPayload);

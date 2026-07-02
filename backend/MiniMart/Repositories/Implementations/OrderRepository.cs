@@ -109,7 +109,7 @@ namespace MiniMart.Repositories.RepoImplement
                 {
                     loyaltyPointsUsed = Math.Min(request.LoyaltyPointsToUse, customer.Point);
                     // BR-LYT-02
-                    loyaltyDiscount = (loyaltyPointsUsed / 100m) * 1000m;
+                    loyaltyDiscount = loyaltyPointsUsed * 1000m;
                 }
             }
 
@@ -165,7 +165,7 @@ namespace MiniMart.Repositories.RepoImplement
                     FinalAmount = finalAmount,
                     PaidAmount = request.PaidAmount,
                     ChangeAmount = changeAmount,
-                    Status = OrderStatus.Completed,
+                    Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
                     OrderDate = DateTime.Now,
                     Note = request.Note,
                     EmployeeId = request.EmployeeId,
@@ -181,36 +181,38 @@ namespace MiniMart.Repositories.RepoImplement
 
                 await _context.OrderDetails.AddRangeAsync(orderDetails);
 
-                foreach (var item in request.Items)
+                int pointsEarned = 0;
+                if (request.PaymentMethod == PaymentMethod.Cash)
                 {
-                    var product = await _context.Products.FindAsync(item.ProductId);
-                    int previousStock = product!.StockQuantity;
-                    // TODO: Allocate sale quantity from active batches by FEFO, decrement Batch.QuantityRemaining,
-                    // and write one InventoryTransaction per affected batch with BatchId for expiry traceability.
-                    product.StockQuantity -= item.Quantity;
-
-                    _context.InventoryTransactions.Add(new InventoryTransaction
+                    foreach (var item in request.Items)
                     {
-                        TransactionType = InventoryTransactionType.Sale,
-                        Quantity = item.Quantity,
-                        PreviousStock = previousStock,
-                        CurrentStock = product.StockQuantity,
-                        ReferenceType = ReferenceType.Order,
-                        ReferenceId = order.OrderId,
-                        ProductId = item.ProductId,
-                        EmployeeId = request.EmployeeId,
-                        Note = $"Bán hàng - Đơn {order.OrderCode}"
-                    });
-                }
+                        var product = await _context.Products.FindAsync(item.ProductId);
+                        int previousStock = product!.StockQuantity;
+                        product.StockQuantity -= item.Quantity;
 
-                int pointsEarned = (int)(finalAmount / 10000);
-                if (customer != null)
-                {
-                    customer.Point -= loyaltyPointsUsed;   
-                    customer.Point += pointsEarned;        
-                }
+                        _context.InventoryTransactions.Add(new InventoryTransaction
+                        {
+                            TransactionType = InventoryTransactionType.Sale,
+                            Quantity = item.Quantity,
+                            PreviousStock = previousStock,
+                            CurrentStock = product.StockQuantity,
+                            ReferenceType = ReferenceType.Order,
+                            ReferenceId = order.OrderId,
+                            ProductId = item.ProductId,
+                            EmployeeId = request.EmployeeId,
+                            Note = $"Bán hàng - Đơn {order.OrderCode}"
+                        });
+                    }
 
-                shift.Revenue += finalAmount;
+                    pointsEarned = (int)(finalAmount / 50000);
+                    if (customer != null)
+                    {
+                        customer.Point -= loyaltyPointsUsed;   
+                        customer.Point += pointsEarned;        
+                    }
+
+                    shift.Revenue += finalAmount;
+                }
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -228,7 +230,7 @@ namespace MiniMart.Repositories.RepoImplement
                     LoyaltyPointsEarned = pointsEarned,
                     CustomerPointBalance = customer?.Point,
                     PaymentMethod = request.PaymentMethod,
-                    Status = OrderStatus.Completed,
+                    Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
 
                     Items = orderDetails.Select(od => new OrderDetailDto
                     {
@@ -262,6 +264,69 @@ namespace MiniMart.Repositories.RepoImplement
         public async Task<Product?> GetProductByIdAsync(int productId)
         {
             return await _context.Products.FindAsync(productId);
+        }
+
+        public async Task ConfirmOrderCompletionAsync(int orderId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .Include(o => o.Customer)
+                .Include(o => o.Shift)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+            if (order == null || order.Status != OrderStatus.Pending) return;
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                foreach (var detail in order.OrderDetails)
+                {
+                    var product = await _context.Products.FindAsync(detail.ProductId);
+                    if (product != null)
+                    {
+                        int previousStock = product.StockQuantity;
+                        product.StockQuantity -= detail.Quantity;
+
+                        _context.InventoryTransactions.Add(new InventoryTransaction
+                        {
+                            TransactionType = InventoryTransactionType.Sale,
+                            Quantity = detail.Quantity,
+                            PreviousStock = previousStock,
+                            CurrentStock = product.StockQuantity,
+                            ReferenceType = ReferenceType.Order,
+                            ReferenceId = order.OrderId,
+                            ProductId = detail.ProductId,
+                            EmployeeId = order.EmployeeId,
+                            Note = $"Bán hàng - Đơn {order.OrderCode}"
+                        });
+                    }
+                }
+
+                // Tính toán điểm ngược lại từ DiscountAmount (1 điểm = 1000 VND)
+                int loyaltyPointsUsed = (int)(order.DiscountAmount / 1000m);
+                int pointsEarned = (int)(order.FinalAmount / 50000);
+
+                if (order.Customer != null)
+                {
+                    order.Customer.Point -= loyaltyPointsUsed;
+                    order.Customer.Point += pointsEarned;
+                }
+
+                if (order.Shift != null)
+                {
+                    order.Shift.Revenue += order.FinalAmount;
+                }
+
+                order.Status = OrderStatus.Completed;
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }

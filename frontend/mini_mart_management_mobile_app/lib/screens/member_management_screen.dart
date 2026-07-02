@@ -67,7 +67,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: _openCustomerList,
         backgroundColor: AppColors.primaryContainer,
         foregroundColor: Colors.white,

@@ -8,5 +8,6 @@ namespace MiniMart.Repositories.Interfaces
         Task<PaymentResponseDto> CreatePaymentUrlAsync(PaymentRequestDto request, Microsoft.AspNetCore.Http.HttpContext context);
         Task<bool> ProcessPaymentCallbackAsync(IQueryCollection queryData, PaymentMethod gatewayType);
         Task<PaymentDto?> GetPaymentStatusAsync(string transactionRef);
+        Task<bool> MockPaymentSuccessAsync(string transactionRef);
     }
 }

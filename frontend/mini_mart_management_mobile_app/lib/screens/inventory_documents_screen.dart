@@ -96,7 +96,7 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: () => _openCreateReceipt(context),
         tooltip: 'Tạo receipt nhập hàng',
         backgroundColor: AppColors.primary,

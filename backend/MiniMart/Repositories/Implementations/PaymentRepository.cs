@@ -4,6 +4,7 @@ using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.Interfaces;
+using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces; 
 
 namespace MiniMart.Repositories.Implementations
@@ -12,11 +13,13 @@ namespace MiniMart.Repositories.Implementations
     {
         private readonly MiniMartDbContext _context;
         private readonly IEnumerable<IPaymentGatewayService> _gateways;
+        private readonly IOrderRepository _orderRepository;
 
-        public PaymentRepository(MiniMartDbContext context, IEnumerable<IPaymentGatewayService> gateways)
+        public PaymentRepository(MiniMartDbContext context, IEnumerable<IPaymentGatewayService> gateways, IOrderRepository orderRepository)
         {
             _context = context;
             _gateways = gateways;
+            _orderRepository = orderRepository;
         }
 
         public async Task<PaymentResponseDto> CreatePaymentUrlAsync(PaymentRequestDto request, HttpContext context)
@@ -75,9 +78,10 @@ namespace MiniMart.Repositories.Implementations
             {
                 payment.Status = PaymentStatus.Success;
                 payment.PaidAt = DateTime.Now;
-
-                payment.Order.Status = OrderStatus.Completed;
                 payment.Order.PaidAmount = payment.Order.FinalAmount;
+
+                await _context.SaveChangesAsync();
+                await _orderRepository.ConfirmOrderCompletionAsync(payment.OrderId);
             }
             else
             {
@@ -102,6 +106,24 @@ namespace MiniMart.Repositories.Implementations
                 TransactionRef = payment.TransactionRef,
                 PaidAt = payment.PaidAt
             };
+        }
+
+        public async Task<bool> MockPaymentSuccessAsync(string transactionRef)
+        {
+            var payment = await _context.Payments
+                .Include(p => p.Order)
+                .FirstOrDefaultAsync(p => p.TransactionRef == transactionRef);
+
+            if (payment == null || payment.Status == PaymentStatus.Success) return false;
+
+            payment.Status = PaymentStatus.Success;
+            payment.PaidAt = DateTime.Now;
+            payment.Order.PaidAmount = payment.Order.FinalAmount;
+
+            await _context.SaveChangesAsync();
+            await _orderRepository.ConfirmOrderCompletionAsync(payment.OrderId);
+
+            return true;
         }
     }
 }
