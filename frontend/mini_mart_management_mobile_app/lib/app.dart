@@ -17,15 +17,12 @@ import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart
 import 'package:mini_mart_management_mobile_app/providers/promotion_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/tier_provider.dart';
-import 'package:mini_mart_management_mobile_app/repositories/auth_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/customer_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/employee_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/promotion_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/shift_repository.dart';
-import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
-import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
 import 'package:mini_mart_management_mobile_app/services/customer_service.dart';
 import 'package:mini_mart_management_mobile_app/services/employee_service.dart';
 import 'package:mini_mart_management_mobile_app/services/promotion_service.dart';

@@ -30,7 +30,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           const ShiftManagementScreen(),
           const InventoryTransactionsScreen(),
           const InventoryDocumentsScreen(),
-          const EmployeeManagementScreen(),
+          const EmployeeManagementScreen(showBottomNavBar: false),
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(
