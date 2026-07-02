@@ -506,35 +506,7 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: 2,
-      backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.primaryContainer,
-      onDestinationSelected: (index) {
-        if (index == 0 || index == 1) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const CategoryManagementScreen()),
-          );
-        } else if (index == 3) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const SupplierManagementScreen()),
-          );
-        }
-      },
-      destinations: const [
-        NavigationDestination(icon: Icon(Icons.inventory_2_outlined), label: 'Catalog'),
-        NavigationDestination(icon: Icon(Icons.category_outlined), label: 'Categories'),
-        NavigationDestination(
-          selectedIcon: Icon(Icons.group_rounded),
-          icon: Icon(Icons.group_outlined),
-          label: 'Staff',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.local_shipping_outlined),
-          label: 'Suppliers',
-        ),
-      ],
-    );
+    return const AppBottomNavBar(selectedTab: AppNavTab.staff);
   }
 
   void _showAddEmployeeDialog(BuildContext context) {

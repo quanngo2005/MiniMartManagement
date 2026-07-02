@@ -1,11 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/category_summary.dart';
-<<<<<<< HEAD
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
-=======
-import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
-import 'package:mini_mart_management_mobile_app/screens/supplier_management_screen.dart';
->>>>>>> kiet_dev
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/categories/category_stat_card.dart';
 import 'package:mini_mart_management_mobile_app/widgets/categories/category_tree_card.dart';
@@ -74,14 +69,14 @@ class CategoryManagementScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               sliver: SliverList.separated(
                 itemCount: _categories.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   return CategoryTreeCard(
                     category: _categories[index],
                     onEdit: (category) =>
-                        _showActionSnackBar(context, 'Edit ${category.name}'),
+                        _showActionSnackBar(context, 'Edit category'),
                     onDelete: (category) =>
-                        _showActionSnackBar(context, 'Delete ${category.name}'),
+                        _showActionSnackBar(context, 'Delete category'),
                   );
                 },
               ),
@@ -111,14 +106,15 @@ class CategoryManagementScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _showActionSnackBar(context, 'Add category'),
         tooltip: 'Add category',
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.add_box_outlined),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
+      bottomNavigationBar: const AppBottomNavBar(selectedTab: AppNavTab.categories),
     );
   }
 
@@ -156,7 +152,6 @@ class CategoryManagementScreen extends StatelessWidget {
 
   Widget _buildSearchSection(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
     return DecoratedBox(
       decoration: const BoxDecoration(
         color: AppColors.surface,
@@ -197,7 +192,7 @@ class CategoryManagementScreen extends StatelessWidget {
             TextField(
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.search_rounded),
-                hintText: 'Search categories (e.g. Dairy, Electronics)...',
+                hintText: 'Search categories...',
               ),
               textInputAction: TextInputAction.search,
             ),
@@ -205,42 +200,6 @@ class CategoryManagementScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-<<<<<<< HEAD
-    return const AppBottomNavBar(selectedTab: AppNavTab.categories);
-=======
-    return NavigationBar(
-      selectedIndex: 1,
-      backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.primaryContainer,
-      onDestinationSelected: (index) {
-        if (index == 2) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const EmployeeManagementScreen()),
-          );
-        } else if (index == 3) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const SupplierManagementScreen()),
-          );
-        }
-      },
-      destinations: const [
-        NavigationDestination(icon: Icon(Icons.inventory_2_outlined), label: 'Catalog'),
-        NavigationDestination(
-          selectedIcon: Icon(Icons.category_rounded),
-          icon: Icon(Icons.category_outlined),
-          label: 'Categories',
-        ),
-        NavigationDestination(icon: Icon(Icons.group_outlined), label: 'Staff'),
-        NavigationDestination(
-          icon: Icon(Icons.local_shipping_outlined),
-          label: 'Suppliers',
-        ),
-      ],
-    );
->>>>>>> kiet_dev
   }
 
   void _showActionSnackBar(BuildContext context, String message) {
