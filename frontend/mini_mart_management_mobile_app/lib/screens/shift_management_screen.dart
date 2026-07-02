@@ -94,6 +94,9 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
     if (success) {
       _openNoteController.clear();
       _showSuccessSnackBar('Đã mở ca làm việc thành công.');
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
     } else {
       final error =
           context.read<ShiftProvider>().error ?? 'Không thể mở ca làm việc.';
@@ -150,9 +153,12 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
     final currentUser = authProvider.currentUser;
     final activeShift = shiftProvider.currentShift;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
+    return PopScope(
+      canPop: activeShift != null,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: activeShift != null,
+          title: Row(
           children: [
             const Icon(Icons.storefront_rounded, color: AppColors.primary),
             const SizedBox(width: 8),
@@ -215,7 +221,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
             ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildActiveShiftCard(Shift shift, String staffName) {
@@ -575,8 +581,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
 
   Widget _buildBentoMetrics(Shift shift) {
     final currentCash = shift.startCash + shift.revenue;
-    final expectedEndCash =
-        currentCash + 1550000; // Mock target for visual alignment
+    final expectedEndCash = currentCash;
 
     return Column(
       children: [
