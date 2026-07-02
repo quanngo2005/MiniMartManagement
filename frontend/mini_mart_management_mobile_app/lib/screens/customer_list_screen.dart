@@ -61,7 +61,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: () => _showAddCustomerDialog(context),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.surfaceContainerLowest,

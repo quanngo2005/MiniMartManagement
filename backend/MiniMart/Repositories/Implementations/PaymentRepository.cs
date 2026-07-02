@@ -107,5 +107,23 @@ namespace MiniMart.Repositories.Implementations
                 PaidAt = payment.PaidAt
             };
         }
+
+        public async Task<bool> MockPaymentSuccessAsync(string transactionRef)
+        {
+            var payment = await _context.Payments
+                .Include(p => p.Order)
+                .FirstOrDefaultAsync(p => p.TransactionRef == transactionRef);
+
+            if (payment == null || payment.Status == PaymentStatus.Success) return false;
+
+            payment.Status = PaymentStatus.Success;
+            payment.PaidAt = DateTime.Now;
+            payment.Order.PaidAmount = payment.Order.FinalAmount;
+
+            await _context.SaveChangesAsync();
+            await _orderRepository.ConfirmOrderCompletionAsync(payment.OrderId);
+
+            return true;
+        }
     }
 }

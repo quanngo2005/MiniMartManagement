@@ -79,7 +79,7 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: _scrollToForm,
         backgroundColor: AppColors.secondary,
         foregroundColor: Colors.white,

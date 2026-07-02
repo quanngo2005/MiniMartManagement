@@ -109,7 +109,7 @@ namespace MiniMart.Repositories.RepoImplement
                 {
                     loyaltyPointsUsed = Math.Min(request.LoyaltyPointsToUse, customer.Point);
                     // BR-LYT-02
-                    loyaltyDiscount = (loyaltyPointsUsed / 100m) * 1000m;
+                    loyaltyDiscount = loyaltyPointsUsed * 1000m;
                 }
             }
 
@@ -204,7 +204,7 @@ namespace MiniMart.Repositories.RepoImplement
                         });
                     }
 
-                    pointsEarned = (int)(finalAmount / 10000);
+                    pointsEarned = (int)(finalAmount / 50000);
                     if (customer != null)
                     {
                         customer.Point -= loyaltyPointsUsed;   
@@ -302,9 +302,9 @@ namespace MiniMart.Repositories.RepoImplement
                     }
                 }
 
-                // Tính toán điểm ngược lại từ DiscountAmount (100 điểm = 1000 VND)
-                int loyaltyPointsUsed = (int)((order.DiscountAmount / 1000m) * 100m);
-                int pointsEarned = (int)(order.FinalAmount / 10000);
+                // Tính toán điểm ngược lại từ DiscountAmount (1 điểm = 1000 VND)
+                int loyaltyPointsUsed = (int)(order.DiscountAmount / 1000m);
+                int pointsEarned = (int)(order.FinalAmount / 50000);
 
                 if (order.Customer != null)
                 {
