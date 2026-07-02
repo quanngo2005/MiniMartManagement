@@ -44,6 +44,16 @@ class ManagerBottomNavigationBar extends StatelessWidget {
           icon: Icon(Icons.group_outlined),
           label: 'Staff',
         ),
+        NavigationDestination(
+          selectedIcon: Icon(Icons.people_alt_rounded),
+          icon: Icon(Icons.people_alt_outlined),
+          label: 'Customers',
+        ),
+        NavigationDestination(
+          selectedIcon: Icon(Icons.local_offer_rounded),
+          icon: Icon(Icons.local_offer_outlined),
+          label: 'Promotions',
+        ),
       ],
     );
   }

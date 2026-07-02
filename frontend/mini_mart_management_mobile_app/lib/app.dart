@@ -9,6 +9,7 @@ import 'package:mini_mart_management_mobile_app/repositories/inventory_lookup_re
 import 'package:mini_mart_management_mobile_app/repositories/inventory_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/receipt_repository.dart';
 import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_lookup_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_service.dart';
@@ -79,6 +80,7 @@ class MiniMartManagementApp extends StatelessWidget {
         theme: AppTheme.light,
         home: const LoginScreen(),
         routes: {
+          '/catalog': (_) => const InventoryTransactionsScreen(),
           '/members': (_) => const MemberManagementScreen(),
           '/promotions': (_) => const PromotionManagementScreen(),
         },
