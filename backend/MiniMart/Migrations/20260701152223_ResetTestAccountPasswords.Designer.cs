@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniMart.Data;
 
@@ -11,9 +12,11 @@ using MiniMart.Data;
 namespace MiniMart.Migrations
 {
     [DbContext(typeof(MiniMartDbContext))]
-    partial class MiniMartDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260701152223_ResetTestAccountPasswords")]
+    partial class ResetTestAccountPasswords
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,11 +79,6 @@ namespace MiniMart.Migrations
                     b.HasIndex("ReceiptId");
 
                     b.ToTable("Batches");
-<<<<<<< HEAD
-
-                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
-=======
->>>>>>> kiet_dev
 
                     b.HasData(
                         new
@@ -3024,8 +3022,8 @@ namespace MiniMart.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReceiptStatus")
-                        .HasColumnType("int");
+                    b.Property<bool>("ReceiptStatus")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("int");
@@ -3051,7 +3049,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 5000000m,
                             ReceiptCode = "PN001",
-                            ReceiptStatus = 2,
+                            ReceiptStatus = true,
                             SupplierId = 1,
                             TotalAmount = 5000000m
                         },
@@ -3063,7 +3061,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 7500000m,
                             ReceiptCode = "PN002",
-                            ReceiptStatus = 2,
+                            ReceiptStatus = true,
                             SupplierId = 2,
                             TotalAmount = 7500000m
                         },
@@ -3075,7 +3073,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 2000000m,
                             ReceiptCode = "PN003",
-                            ReceiptStatus = 2,
+                            ReceiptStatus = true,
                             SupplierId = 3,
                             TotalAmount = 4200000m
                         },
@@ -3087,7 +3085,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 6800000m,
                             ReceiptCode = "PN004",
-                            ReceiptStatus = 2,
+                            ReceiptStatus = true,
                             SupplierId = 4,
                             TotalAmount = 6800000m
                         },
@@ -3099,7 +3097,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 3500000m,
                             ReceiptCode = "PN005",
-                            ReceiptStatus = 2,
+                            ReceiptStatus = true,
                             SupplierId = 5,
                             TotalAmount = 3500000m
                         });
@@ -3221,10 +3219,6 @@ namespace MiniMart.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("ShiftCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ShiftName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -3234,9 +3228,6 @@ namespace MiniMart.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("StartedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
@@ -3263,7 +3254,6 @@ namespace MiniMart.Migrations
                             EndCash = 3200000m,
                             EndTime = new DateTime(2024, 6, 1, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 2700000m,
-                            ShiftCode = "SA-20240601",
                             ShiftName = "Ca sáng",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 1, 6, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3279,7 +3269,6 @@ namespace MiniMart.Migrations
                             EndCash = 4100000m,
                             EndTime = new DateTime(2024, 6, 1, 22, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 3600000m,
-                            ShiftCode = "CH-20240601",
                             ShiftName = "Ca chiều",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 1, 14, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3295,7 +3284,6 @@ namespace MiniMart.Migrations
                             EndCash = 2800000m,
                             EndTime = new DateTime(2024, 6, 2, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 2300000m,
-                            ShiftCode = "SA-20240602",
                             ShiftName = "Ca sáng",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 2, 6, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3311,7 +3299,6 @@ namespace MiniMart.Migrations
                             EndCash = 5200000m,
                             EndTime = new DateTime(2024, 6, 2, 22, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 4700000m,
-                            ShiftCode = "CH-20240602",
                             ShiftName = "Ca chiều",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 2, 14, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3326,7 +3313,6 @@ namespace MiniMart.Migrations
                             EndCash = 0m,
                             EndTime = new DateTime(2024, 6, 3, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 0m,
-                            ShiftCode = "SA-20240603",
                             ShiftName = "Ca sáng",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 3, 6, 0, 0, 0, DateTimeKind.Unspecified),
