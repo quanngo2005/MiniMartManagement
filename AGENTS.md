@@ -423,7 +423,7 @@ class ProductListScreen extends StatelessWidget {
 - Private builder methods are acceptable for screen-specific UI that won't be reused
 - If a `_build*` method would be useful in another screen → promote it to `widgets/`
 - Screens do not have `Column` with 200 lines of children — break it up
-
+- After code, run only `dart format lib` and `dart analyze lib` for verify
 ---
 
 ### 10. Reuse Checklist — Before Writing Any Widget

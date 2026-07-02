@@ -13,7 +13,9 @@ namespace MiniMart.DTOs
         public string? ImageUrl { get; set; }
         public bool Status { get; set; }
         public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
         public int SupplierId { get; set; }
+        public string SupplierName { get; set; } = string.Empty;
     }
 
     public class CreateProductDto

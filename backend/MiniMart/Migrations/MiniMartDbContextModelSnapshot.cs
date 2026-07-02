@@ -75,7 +75,9 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("ReceiptId");
 
-                    b.ToTable("Batches", (string)null);
+                    b.ToTable("Batches");
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
 
                     b.HasData(
                         new
@@ -361,7 +363,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("TaxRateId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
 
                     b.HasData(
                         new
@@ -510,7 +512,7 @@ namespace MiniMart.Migrations
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
 
                     b.HasData(
                         new
@@ -813,7 +815,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("EInvoices", (string)null);
+                    b.ToTable("EInvoices");
                 });
 
             modelBuilder.Entity("MiniMart.Models.EInvoiceDetail", b =>
@@ -871,7 +873,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("OrderDetailId");
 
-                    b.ToTable("EInvoiceDetails", (string)null);
+                    b.ToTable("EInvoiceDetails");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Employee", b =>
@@ -943,7 +945,7 @@ namespace MiniMart.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Employees", (string)null);
+                    b.ToTable("Employees");
 
                     b.HasData(
                         new
@@ -1218,7 +1220,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("InventoryTransactions", (string)null);
+                    b.ToTable("InventoryTransactions");
 
                     b.HasData(
                         new
@@ -1425,7 +1427,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
 
                     b.HasData(
                         new
@@ -1628,7 +1630,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderDetails", (string)null);
+                    b.ToTable("OrderDetails");
 
                     b.HasData(
                         new
@@ -2027,7 +2029,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("OriginalOrderId");
 
-                    b.ToTable("OrderReturns", null, t =>
+                    b.ToTable("OrderReturns", t =>
                         {
                             t.HasCheckConstraint("CK_OrderReturns_RefundMethod", "[RefundMethod] IN (1,2,3,4,5,6)");
 
@@ -2066,7 +2068,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderReturnDetails", (string)null);
+                    b.ToTable("OrderReturnDetails");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Payment", b =>
@@ -2100,7 +2102,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("Payments", null, t =>
+                    b.ToTable("Payments", t =>
                         {
                             t.HasCheckConstraint("CK_Payments_PaymentMethod", "[PaymentMethod] IN (1,2,3,4,5,6)");
                         });
@@ -2138,7 +2140,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("PointTransactions", null, t =>
+                    b.ToTable("PointTransactions", t =>
                         {
                             t.HasCheckConstraint("CK_PointTransactions_TransactionType", "[TransactionType] IN (1,2,3,4)");
                         });
@@ -2202,7 +2204,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
 
                     b.HasData(
                         new
@@ -2972,7 +2974,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("GiftProductId");
 
-                    b.ToTable("Promotions", (string)null);
+                    b.ToTable("Promotions");
                 });
 
             modelBuilder.Entity("MiniMart.Models.PromotionProduct", b =>
@@ -2987,7 +2989,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("PromotionProducts", (string)null);
+                    b.ToTable("PromotionProducts");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Receipt", b =>
@@ -3019,8 +3021,8 @@ namespace MiniMart.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("ReceiptStatus")
-                        .HasColumnType("bit");
+                    b.Property<int>("ReceiptStatus")
+                        .HasColumnType("int");
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("int");
@@ -3035,7 +3037,7 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("Receipts", (string)null);
+                    b.ToTable("Receipts");
 
                     b.HasData(
                         new
@@ -3046,7 +3048,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 5000000m,
                             ReceiptCode = "PN001",
-                            ReceiptStatus = true,
+                            ReceiptStatus = 2,
                             SupplierId = 1,
                             TotalAmount = 5000000m
                         },
@@ -3058,7 +3060,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 7500000m,
                             ReceiptCode = "PN002",
-                            ReceiptStatus = true,
+                            ReceiptStatus = 2,
                             SupplierId = 2,
                             TotalAmount = 7500000m
                         },
@@ -3070,7 +3072,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 2000000m,
                             ReceiptCode = "PN003",
-                            ReceiptStatus = true,
+                            ReceiptStatus = 2,
                             SupplierId = 3,
                             TotalAmount = 4200000m
                         },
@@ -3082,7 +3084,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 6800000m,
                             ReceiptCode = "PN004",
-                            ReceiptStatus = true,
+                            ReceiptStatus = 2,
                             SupplierId = 4,
                             TotalAmount = 6800000m
                         },
@@ -3094,7 +3096,7 @@ namespace MiniMart.Migrations
                             ImportDate = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 3500000m,
                             ReceiptCode = "PN005",
-                            ReceiptStatus = true,
+                            ReceiptStatus = 2,
                             SupplierId = 5,
                             TotalAmount = 3500000m
                         });
@@ -3152,7 +3154,7 @@ namespace MiniMart.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -3216,6 +3218,10 @@ namespace MiniMart.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("ShiftCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ShiftName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -3225,6 +3231,9 @@ namespace MiniMart.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("StartedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
@@ -3251,6 +3260,7 @@ namespace MiniMart.Migrations
                             EndCash = 3200000m,
                             EndTime = new DateTime(2024, 6, 1, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 2700000m,
+                            ShiftCode = "SA-20240601",
                             ShiftName = "Ca sáng",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 1, 6, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3266,6 +3276,7 @@ namespace MiniMart.Migrations
                             EndCash = 4100000m,
                             EndTime = new DateTime(2024, 6, 1, 22, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 3600000m,
+                            ShiftCode = "CH-20240601",
                             ShiftName = "Ca chiều",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 1, 14, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3281,6 +3292,7 @@ namespace MiniMart.Migrations
                             EndCash = 2800000m,
                             EndTime = new DateTime(2024, 6, 2, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 2300000m,
+                            ShiftCode = "SA-20240602",
                             ShiftName = "Ca sáng",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 2, 6, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3296,6 +3308,7 @@ namespace MiniMart.Migrations
                             EndCash = 5200000m,
                             EndTime = new DateTime(2024, 6, 2, 22, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 4700000m,
+                            ShiftCode = "CH-20240602",
                             ShiftName = "Ca chiều",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 2, 14, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3310,6 +3323,7 @@ namespace MiniMart.Migrations
                             EndCash = 0m,
                             EndTime = new DateTime(2024, 6, 3, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 0m,
+                            ShiftCode = "SA-20240603",
                             ShiftName = "Ca sáng",
                             StartCash = 500000m,
                             StartTime = new DateTime(2024, 6, 3, 6, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3369,7 +3383,7 @@ namespace MiniMart.Migrations
                     b.HasIndex("SupplierCode")
                         .IsUnique();
 
-                    b.ToTable("Suppliers", (string)null);
+                    b.ToTable("Suppliers");
 
                     b.HasData(
                         new
@@ -3472,7 +3486,7 @@ namespace MiniMart.Migrations
 
                     b.HasKey("TaxRateId");
 
-                    b.ToTable("TaxRates", (string)null);
+                    b.ToTable("TaxRates");
 
                     b.HasData(
                         new

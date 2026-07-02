@@ -1,4 +1,4 @@
-﻿using MiniMart.Models.Base;
+using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
@@ -6,6 +6,8 @@ namespace MiniMart.Models
     public class Shift : BaseEntity
     {
         public int ShiftId { get; set; }
+
+        public string ShiftCode { get; set; } = string.Empty;
 
         public string ShiftName { get; set; }
 
@@ -24,6 +26,8 @@ namespace MiniMart.Models
         public ShiftStatus Status { get; set; }
 
         public string? Note { get; set; }
+
+        public DateTime? StartedAt { get; set; }
 
         public DateTime? ClosedAt { get; set; }
 

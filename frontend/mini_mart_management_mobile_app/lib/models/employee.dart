@@ -36,7 +36,9 @@ class Employee {
       employeeId: _readInt(json, 'employeeId', 'EmployeeId'),
       fullName: _readString(json, 'fullName', 'FullName'),
       gender: _readBool(json, 'gender', 'Gender'),
-      dateOfBirth: DateTime.parse(_readString(json, 'dateOfBirth', 'DateOfBirth')),
+      dateOfBirth: DateTime.parse(
+        _readString(json, 'dateOfBirth', 'DateOfBirth'),
+      ),
       phoneNumber: _readString(json, 'phoneNumber', 'PhoneNumber'),
       email: _readNullableString(json, 'email', 'Email'),
       address: _readNullableString(json, 'address', 'Address'),
@@ -69,33 +71,53 @@ class Employee {
     };
   }
 
-  static int _readInt(Map<String, dynamic> json, String camelKey, String pascalKey) {
+  static int _readInt(
+    Map<String, dynamic> json,
+    String camelKey,
+    String pascalKey,
+  ) {
     final value = json[camelKey] ?? json[pascalKey];
     if (value is int) return value;
     if (value is num) return value.toInt();
     throw FormatException('Invalid $camelKey.');
   }
 
-  static double _readDouble(Map<String, dynamic> json, String camelKey, String pascalKey) {
+  static double _readDouble(
+    Map<String, dynamic> json,
+    String camelKey,
+    String pascalKey,
+  ) {
     final value = json[camelKey] ?? json[pascalKey];
     if (value is double) return value;
     if (value is num) return value.toDouble();
     throw FormatException('Invalid $camelKey.');
   }
 
-  static String _readString(Map<String, dynamic> json, String camelKey, String pascalKey) {
+  static String _readString(
+    Map<String, dynamic> json,
+    String camelKey,
+    String pascalKey,
+  ) {
     final value = json[camelKey] ?? json[pascalKey];
     if (value is String) return value;
     throw FormatException('Invalid $camelKey.');
   }
 
-  static bool _readBool(Map<String, dynamic> json, String camelKey, String pascalKey) {
+  static bool _readBool(
+    Map<String, dynamic> json,
+    String camelKey,
+    String pascalKey,
+  ) {
     final value = json[camelKey] ?? json[pascalKey];
     if (value is bool) return value;
     throw FormatException('Invalid $camelKey.');
   }
 
-  static String? _readNullableString(Map<String, dynamic> json, String camelKey, String pascalKey) {
+  static String? _readNullableString(
+    Map<String, dynamic> json,
+    String camelKey,
+    String pascalKey,
+  ) {
     final value = json[camelKey] ?? json[pascalKey];
     if (value == null || value is String) return value;
     throw FormatException('Invalid $camelKey.');

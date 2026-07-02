@@ -1,6 +1,7 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
@@ -45,6 +46,24 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException("Cashier ID does not exist.", StatusCodes.Status422UnprocessableEntity);
 
             var shift = _mapper.Map<Shift>(createDto);
+
+            // Determine if morning or afternoon based on StartTime hour
+            var hour = createDto.StartTime.Hour;
+            var isMorning = hour >= 6 && hour < 14;
+
+            shift.ShiftName = isMorning ? "Ca sáng" : "Ca chiều";
+            shift.StartTime = createDto.WorkDate.Date.AddHours(isMorning ? 6 : 14);
+            shift.EndTime = createDto.WorkDate.Date.AddHours(isMorning ? 14 : 22);
+            shift.ShiftCode = (isMorning ? "SA-" : "CH-") + createDto.WorkDate.ToString("yyyyMMdd") + "-" + shift.EmployeeId;
+
+            // Verify shift slot uniqueness for the employee
+            var alreadyExists = await _shiftRepository.GetAllShiftsQueryable()
+                .AnyAsync(s => s.Status != ShiftStatus.Cancelled
+                    && s.ShiftCode == shift.ShiftCode
+                    && (s.EmployeeId == shift.EmployeeId || s.CashierId == shift.EmployeeId));
+            if (alreadyExists)
+                throw new DomainException("Nhân viên đã có ca làm việc này trong ngày.", StatusCodes.Status409Conflict);
+
             var created = await _shiftRepository.CreateShiftAsync(shift);
             var createdWithDetails = await _shiftRepository.GetShiftByIdAsync(created.ShiftId);
             return _mapper.Map<ShiftDto>(createdWithDetails ?? created);
@@ -64,6 +83,24 @@ namespace MiniMart.Services.Implementations
 
             _mapper.Map(updateDto, existing);
             existing.ShiftId = id;
+
+            // Determine if morning or afternoon based on StartTime hour
+            var hour = updateDto.StartTime.Hour;
+            var isMorning = hour >= 6 && hour < 14;
+
+            existing.ShiftName = isMorning ? "Ca sáng" : "Ca chiều";
+            existing.StartTime = updateDto.WorkDate.Date.AddHours(isMorning ? 6 : 14);
+            existing.EndTime = updateDto.WorkDate.Date.AddHours(isMorning ? 14 : 22);
+            existing.ShiftCode = (isMorning ? "SA-" : "CH-") + updateDto.WorkDate.ToString("yyyyMMdd") + "-" + updateDto.EmployeeId;
+
+            // Verify shift slot uniqueness for the employee (excluding current shift)
+            var alreadyExists = await _shiftRepository.GetAllShiftsQueryable()
+                .AnyAsync(s => s.ShiftId != id
+                    && s.Status != ShiftStatus.Cancelled
+                    && s.ShiftCode == existing.ShiftCode
+                    && (s.EmployeeId == updateDto.EmployeeId || s.CashierId == updateDto.EmployeeId));
+            if (alreadyExists)
+                throw new DomainException("Nhân viên đã có ca làm việc này trong ngày.", StatusCodes.Status409Conflict);
 
             var updated = await _shiftRepository.UpdateShiftAsync(existing);
             if (updated == null)
@@ -87,9 +124,9 @@ namespace MiniMart.Services.Implementations
 
         public async Task<ShiftDto> OpenShiftAsync(OpenShiftRequest openRequest, int currentUserId, bool isManagerOrAdmin)
         {
-            var activeShift = await _shiftRepository.GetActiveShiftAsync();
+            var activeShift = await _shiftRepository.GetActiveShiftByCashierIdAsync(openRequest.CashierId);
             if (activeShift != null)
-                throw new DomainException("There is already an active working shift.", StatusCodes.Status409Conflict);
+                throw new DomainException("There is already an active working shift for this cashier.", StatusCodes.Status409Conflict);
 
             var shift = await _shiftRepository.GetShiftByIdAsync(openRequest.ShiftId);
             if (shift == null || shift.Status == ShiftStatus.Cancelled)
@@ -104,10 +141,19 @@ namespace MiniMart.Services.Implementations
             if (!isManagerOrAdmin && openRequest.CashierId != currentUserId)
                 throw new DomainException("Forbidden: You cannot open a shift for another cashier.", StatusCodes.Status403Forbidden);
 
+            // Check if cashier already has an active or closed shift with the same ShiftCode
+            var alreadyExists = await _shiftRepository.GetAllShiftsQueryable()
+                .AnyAsync(s => s.ShiftId != shift.ShiftId
+                    && s.Status != ShiftStatus.Cancelled
+                    && s.ShiftCode == shift.ShiftCode
+                    && (s.EmployeeId == openRequest.CashierId || s.CashierId == openRequest.CashierId));
+            if (alreadyExists)
+                throw new DomainException("Nhân viên đã có ca làm việc này trong ngày.", StatusCodes.Status409Conflict);
+
             shift.CashierId = openRequest.CashierId;
             shift.StartCash = openRequest.StartCash;
             shift.Status = ShiftStatus.Working;
-            shift.StartTime = DateTime.Now;
+            shift.StartedAt = DateTime.Now;
             if (!string.IsNullOrEmpty(openRequest.Note))
             {
                 shift.Note = openRequest.Note;
@@ -131,7 +177,6 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException("Forbidden: You cannot close a shift for another cashier.", StatusCodes.Status403Forbidden);
 
             shift.EndCash = closeRequest.EndCash;
-            shift.Revenue = shift.EndCash - shift.StartCash;
             shift.Status = ShiftStatus.Closed;
             shift.ClosedAt = DateTime.Now;
             if (!string.IsNullOrEmpty(closeRequest.Note))
@@ -147,6 +192,12 @@ namespace MiniMart.Services.Implementations
         public async Task<ShiftDto?> GetActiveShiftAsync()
         {
             var activeShift = await _shiftRepository.GetActiveShiftAsync();
+            return activeShift == null ? null : _mapper.Map<ShiftDto>(activeShift);
+        }
+
+        public async Task<ShiftDto?> GetActiveShiftByCashierIdAsync(int cashierId)
+        {
+            var activeShift = await _shiftRepository.GetActiveShiftByCashierIdAsync(cashierId);
             return activeShift == null ? null : _mapper.Map<ShiftDto>(activeShift);
         }
     }

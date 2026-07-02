@@ -16,6 +16,7 @@ namespace MiniMart.Models
 
         public int QuantityImported { get; set; }
 
+        // Source of truth for FEFO allocation and expiry traceability.
         public int QuantityRemaining { get; set; }
 
         public int Quantity { get; set; }

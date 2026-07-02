@@ -85,7 +85,8 @@ namespace MiniMart.Controllers
                 Status = OrderStatus.Pending,
                 Note = createDto.Note,
                 EmployeeId = createDto.EmployeeId,
-                CustomerId = createDto.CustomerId
+                CustomerId = createDto.CustomerId,
+                ShiftId = createDto.ShiftId
             };
 
             var created = await _orderRepository.CreateOrderAsync(order);

@@ -7,9 +7,27 @@ import 'package:mini_mart_management_mobile_app/models/auth_response.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
 class AuthService {
-  AuthService({http.Client? client}) : _client = client ?? createConfiguredClient();
+  AuthService({http.Client? client})
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
+
+  Future<void> logout() async {
+    try {
+      final csrfToken = await _fetchCsrfToken();
+      final headers = <String, String>{
+        'Accept': 'application/json',
+        'X-XSRF-TOKEN': csrfToken.value,
+      };
+      if (csrfToken.cookieHeader != null) {
+        headers['Cookie'] = csrfToken.cookieHeader!;
+      }
+      await _client.post(ApiConfig.uri('/api/auth/logout'), headers: headers);
+    } catch (_) {
+    } finally {
+      clearClientCookies();
+    }
+  }
 
   Future<AuthResponse> login({
     required String username,

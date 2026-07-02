@@ -102,7 +102,7 @@ class EmployeeProvider extends ChangeNotifier {
     // 0 is Inactive, 1 is Active
     final nextStatus = currentStatus == 1 ? 0 : 1;
     final employee = _employees.firstWhere((e) => e.employeeId == id);
-    
+
     // Optimistic UI update
     final index = _employees.indexWhere((e) => e.employeeId == id);
     if (index != -1) {
@@ -152,7 +152,9 @@ class EmployeeProvider extends ChangeNotifier {
         _employees[index] = employee;
         notifyListeners();
       }
-      _error = e is ApiException ? e.message : 'Không thể thay đổi trạng thái nhân viên.';
+      _error = e is ApiException
+          ? e.message
+          : 'Không thể thay đổi trạng thái nhân viên.';
       return false;
     }
   }

@@ -21,7 +21,7 @@ namespace MiniMart.Controllers
 
         // GET: /api/shifts OR /odata/Shifts
         // Lấy danh sách tất cả ca làm việc (Manager)
-        [Authorize(Policy = "ManagerUp")]
+        [Authorize(Policy = "AnyEmployee")]
         [HttpGet]
         [EnableQuery]
         public ActionResult<IQueryable<ShiftDto>> GetAllShifts()
@@ -45,7 +45,7 @@ namespace MiniMart.Controllers
 
         // POST: /api/shifts
         // Tạo mới ca làm việc (Manager)
-        [Authorize(Policy = "ManagerUp")]
+        [Authorize(Policy = "AnyEmployee")]
         [HttpPost]
         public async Task<ActionResult<ShiftDto>> CreateShift([FromBody] CreateShiftDto createDto)
         {
@@ -117,11 +117,24 @@ namespace MiniMart.Controllers
         [HttpGet("current")]
         public async Task<ActionResult<ShiftDto>> GetCurrentShift()
         {
-            var activeShift = await _shiftService.GetActiveShiftAsync();
+            var currentUserId = GetCurrentEmployeeId();
+            var isManagerOrAdmin = User.IsInRole("Manager") || User.IsInRole("Admin");
+
+            ShiftDto? activeShift;
+            if (isManagerOrAdmin)
+            {
+                activeShift = await _shiftService.GetActiveShiftAsync();
+            }
+            else
+            {
+                activeShift = await _shiftService.GetActiveShiftByCashierIdAsync(currentUserId);
+            }
+
             if (activeShift == null)
             {
                 return NotFound(new { message = "No active working shift found." });
             }
+
             return Ok(activeShift);
         }
 

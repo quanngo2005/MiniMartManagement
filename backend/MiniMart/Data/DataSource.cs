@@ -177,11 +177,11 @@ namespace MiniMart.Models
         // ========================= RECEIPTS =========================
         public static List<Receipt> GetReceipts() => new List<Receipt>
         {
-            new Receipt { ReceiptId = 1, ReceiptCode = "PN001", ImportDate = new DateTime(2024, 1, 10), TotalAmount = 5000000, PaidAmount = 5000000, DebtAmount = 0, ReceiptStatus = true, SupplierId = 1, EmployeeId = 4 },
-            new Receipt { ReceiptId = 2, ReceiptCode = "PN002", ImportDate = new DateTime(2024, 1, 15), TotalAmount = 7500000, PaidAmount = 7500000, DebtAmount = 0, ReceiptStatus = true, SupplierId = 2, EmployeeId = 4 },
-            new Receipt { ReceiptId = 3, ReceiptCode = "PN003", ImportDate = new DateTime(2024, 2, 5),  TotalAmount = 4200000, PaidAmount = 2000000, DebtAmount = 2200000, ReceiptStatus = true, SupplierId = 3, EmployeeId = 7 },
-            new Receipt { ReceiptId = 4, ReceiptCode = "PN004", ImportDate = new DateTime(2024, 3, 1),  TotalAmount = 6800000, PaidAmount = 6800000, DebtAmount = 0, ReceiptStatus = true, SupplierId = 4, EmployeeId = 9 },
-            new Receipt { ReceiptId = 5, ReceiptCode = "PN005", ImportDate = new DateTime(2024, 4, 10), TotalAmount = 3500000, PaidAmount = 3500000, DebtAmount = 0, ReceiptStatus = true, SupplierId = 5, EmployeeId = 4 },
+            new Receipt { ReceiptId = 1, ReceiptCode = "PN001", ImportDate = new DateTime(2024, 1, 10), TotalAmount = 5000000, PaidAmount = 5000000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 1, EmployeeId = 4 },
+            new Receipt { ReceiptId = 2, ReceiptCode = "PN002", ImportDate = new DateTime(2024, 1, 15), TotalAmount = 7500000, PaidAmount = 7500000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 2, EmployeeId = 4 },
+            new Receipt { ReceiptId = 3, ReceiptCode = "PN003", ImportDate = new DateTime(2024, 2, 5),  TotalAmount = 4200000, PaidAmount = 2000000, DebtAmount = 2200000, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 3, EmployeeId = 7 },
+            new Receipt { ReceiptId = 4, ReceiptCode = "PN004", ImportDate = new DateTime(2024, 3, 1),  TotalAmount = 6800000, PaidAmount = 6800000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 4, EmployeeId = 9 },
+            new Receipt { ReceiptId = 5, ReceiptCode = "PN005", ImportDate = new DateTime(2024, 4, 10), TotalAmount = 3500000, PaidAmount = 3500000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 5, EmployeeId = 4 },
         };
 
         // ========================= BATCHES =========================
@@ -208,11 +208,11 @@ namespace MiniMart.Models
         // ========================= SHIFTS =========================
         public static List<Shift> GetShifts() => new List<Shift>
         {
-            new Shift { ShiftId = 1, ShiftName = "Ca sáng",   StartTime = new DateTime(2024, 6, 1, 6, 0, 0),  EndTime = new DateTime(2024, 6, 1, 14, 0, 0),  WorkDate = new DateTime(2024, 6, 1), StartCash = 500000, EndCash = 3200000, Revenue = 2700000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 2,  ClosedAt = new DateTime(2024, 6, 1, 14, 5, 0) },
-            new Shift { ShiftId = 2, ShiftName = "Ca chiều",  StartTime = new DateTime(2024, 6, 1, 14, 0, 0), EndTime = new DateTime(2024, 6, 1, 22, 0, 0), WorkDate = new DateTime(2024, 6, 1), StartCash = 500000, EndCash = 4100000, Revenue = 3600000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 3,  ClosedAt = new DateTime(2024, 6, 1, 22, 10, 0) },
-            new Shift { ShiftId = 3, ShiftName = "Ca sáng",   StartTime = new DateTime(2024, 6, 2, 6, 0, 0),  EndTime = new DateTime(2024, 6, 2, 14, 0, 0),  WorkDate = new DateTime(2024, 6, 2), StartCash = 500000, EndCash = 2800000, Revenue = 2300000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 5,  ClosedAt = new DateTime(2024, 6, 2, 14, 2, 0) },
-            new Shift { ShiftId = 4, ShiftName = "Ca chiều",  StartTime = new DateTime(2024, 6, 2, 14, 0, 0), EndTime = new DateTime(2024, 6, 2, 22, 0, 0), WorkDate = new DateTime(2024, 6, 2), StartCash = 500000, EndCash = 5200000, Revenue = 4700000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 6,  ClosedAt = new DateTime(2024, 6, 2, 22, 8, 0) },
-            new Shift { ShiftId = 5, ShiftName = "Ca sáng",   StartTime = new DateTime(2024, 6, 3, 6, 0, 0),  EndTime = new DateTime(2024, 6, 3, 14, 0, 0),  WorkDate = new DateTime(2024, 6, 3), StartCash = 500000, EndCash = 0,       Revenue = 0,       Status = ShiftStatus.Working, EmployeeId = 1, CashierId = 10, ClosedAt = null },
+            new Shift { ShiftId = 1, ShiftCode = "SA-20240601", ShiftName = "Ca sáng",   StartTime = new DateTime(2024, 6, 1, 6, 0, 0),  EndTime = new DateTime(2024, 6, 1, 14, 0, 0),  WorkDate = new DateTime(2024, 6, 1), StartCash = 500000, EndCash = 3200000, Revenue = 2700000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 2,  ClosedAt = new DateTime(2024, 6, 1, 14, 5, 0) },
+            new Shift { ShiftId = 2, ShiftCode = "CH-20240601", ShiftName = "Ca chiều",  StartTime = new DateTime(2024, 6, 1, 14, 0, 0), EndTime = new DateTime(2024, 6, 1, 22, 0, 0), WorkDate = new DateTime(2024, 6, 1), StartCash = 500000, EndCash = 4100000, Revenue = 3600000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 3,  ClosedAt = new DateTime(2024, 6, 1, 22, 10, 0) },
+            new Shift { ShiftId = 3, ShiftCode = "SA-20240602", ShiftName = "Ca sáng",   StartTime = new DateTime(2024, 6, 2, 6, 0, 0),  EndTime = new DateTime(2024, 6, 2, 14, 0, 0),  WorkDate = new DateTime(2024, 6, 2), StartCash = 500000, EndCash = 2800000, Revenue = 2300000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 5,  ClosedAt = new DateTime(2024, 6, 2, 14, 2, 0) },
+            new Shift { ShiftId = 4, ShiftCode = "CH-20240602", ShiftName = "Ca chiều",  StartTime = new DateTime(2024, 6, 2, 14, 0, 0), EndTime = new DateTime(2024, 6, 2, 22, 0, 0), WorkDate = new DateTime(2024, 6, 2), StartCash = 500000, EndCash = 5200000, Revenue = 4700000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 6,  ClosedAt = new DateTime(2024, 6, 2, 22, 8, 0) },
+            new Shift { ShiftId = 5, ShiftCode = "SA-20240603", ShiftName = "Ca sáng",   StartTime = new DateTime(2024, 6, 3, 6, 0, 0),  EndTime = new DateTime(2024, 6, 3, 14, 0, 0),  WorkDate = new DateTime(2024, 6, 3), StartCash = 500000, EndCash = 0,       Revenue = 0,       Status = ShiftStatus.Working, EmployeeId = 1, CashierId = 10, ClosedAt = null },
         };
 
         // ========================= ORDERS =========================

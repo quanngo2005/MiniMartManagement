@@ -1,8 +1,19 @@
+import 'package:flutter/foundation.dart';
+
 abstract final class ApiConfig {
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://localhost:5005',
-  );
+  static String get baseUrl {
+    const envUrl = String.fromEnvironment('API_BASE_URL');
+    if (envUrl.isNotEmpty) {
+      return envUrl;
+    }
+    if (kIsWeb) {
+      return 'http://localhost:5005';
+    }
+    // Dynamic mapping for mobile emulators
+    return defaultTargetPlatform == TargetPlatform.android
+        ? 'http://10.0.2.2:5005'
+        : 'http://localhost:5005';
+  }
 
   static Uri uri(String path) {
     final normalizedPath = path.startsWith('/') ? path : '/$path';

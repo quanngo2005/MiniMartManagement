@@ -16,3 +16,4 @@
 
 - Phase 2 docs mention `PointTransactions` and `OrderReturns` check constraints, but those tables are introduced in Phase 3. Add their constraints when those tables are created.
 - Do not change `Orders.PromotionDiscount` through drop/add migrations; preserve data with `RenameColumn`.
+- Because `Batches` has `trg_Batches_SyncStock`, EF Core SQL Server must not use its default `OUTPUT` save path for this table. `MiniMartDbContext.OnModelCreating()` configures `Batch` with `UseSqlOutputClause(false)`.
