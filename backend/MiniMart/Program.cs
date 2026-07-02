@@ -5,13 +5,6 @@ using MiniMart.Data;
 using MiniMart.Mapping;
 using MiniMart.Middleware;
 using MiniMart.Models;
-using MiniMart.Repositories.Implementations;
-using MiniMart.Repositories.Interfaces;
-using MiniMart.Repositories.RepoImplement;
-using MiniMart.Repositories.RepoInterface;
-using MiniMart.Services;
-using MiniMart.Services.Implementations;
-using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,37 +33,16 @@ odataBuilder.EntitySet<Shift>("Shifts");
 odataBuilder.EntitySet<InventoryTransaction>("InventoryTransactions");
 odataBuilder.EntitySet<Promotion>("Promotions");
 
-// ── Services ─────────────────────────────────────────────────────
+// ── Infrastructure ────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
-builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
-builder.Services.AddScoped<IBatchRepository, BatchRepository>();
-builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
-builder.Services.AddScoped<IInventoryService, InventoryService>();
-builder.Services.AddScoped<IBatchService, BatchService>();
-builder.Services.AddScoped<IReceiptService, ReceiptService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<IShiftService, ShiftService>();
-builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
-
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IReportRepository, ReportRepository>();
-builder.Services.AddScoped<MiniMart.Services.Interfaces.IPaymentGatewayService, VnPayService>();
+builder.Services.AddRepositories();
+builder.Services.AddAppServices();
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 
 builder.Services.AddControllers()
-
     .AddOData(options => options
         .Select()
         .Filter()
