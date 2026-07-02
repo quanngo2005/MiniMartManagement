@@ -42,6 +42,7 @@ namespace MiniMart.Repositories.RepoImplement
             var existing = await _context.Shifts.FindAsync(shift.ShiftId);
             if (existing == null) return null;
 
+            existing.ShiftCode = shift.ShiftCode;
             existing.ShiftName = shift.ShiftName;
             existing.StartTime = shift.StartTime;
             existing.EndTime = shift.EndTime;
@@ -51,6 +52,7 @@ namespace MiniMart.Repositories.RepoImplement
             existing.Revenue = shift.Revenue;
             existing.Status = shift.Status;
             existing.Note = shift.Note;
+            existing.StartedAt = shift.StartedAt;
             existing.ClosedAt = shift.ClosedAt;
             existing.EmployeeId = shift.EmployeeId;
             existing.CashierId = shift.CashierId;

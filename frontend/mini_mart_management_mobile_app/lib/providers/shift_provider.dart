@@ -55,6 +55,7 @@ class ShiftProvider extends ChangeNotifier {
   Future<bool> openNewShift({
     required int cashierId,
     required double startCash,
+    bool isMorning = true,
     String? note,
   }) async {
     _isLoading = true;
@@ -63,10 +64,17 @@ class ShiftProvider extends ChangeNotifier {
 
     try {
       final now = DateTime.now();
+      final dateStr = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
+      final shiftCode = (isMorning ? 'SA-' : 'CH-') + dateStr;
+      final shiftName = isMorning ? 'Ca sáng' : 'Ca chiều';
+      final startTimeStr = DateTime(now.year, now.month, now.day, isMorning ? 6 : 14).toIso8601String();
+      final endTimeStr = DateTime(now.year, now.month, now.day, isMorning ? 14 : 22).toIso8601String();
+
       final newShiftPayload = {
-        'shiftName': 'Ca làm việc ${now.hour}:${now.minute}',
-        'startTime': now.toIso8601String(),
-        'endTime': now.add(const Duration(hours: 8)).toIso8601String(),
+        'shiftCode': shiftCode,
+        'shiftName': shiftName,
+        'startTime': startTimeStr,
+        'endTime': endTimeStr,
         'workDate': DateTime(now.year, now.month, now.day).toIso8601String(),
         'startCash': startCash,
         'endCash': 0.0,

@@ -23,10 +23,14 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
   final _openNoteController = TextEditingController();
   final _closeNoteController = TextEditingController();
   bool _isProcessing = false;
+  bool _selectedIsMorning = true;
 
   @override
   void initState() {
     super.initState();
+    final hour = DateTime.now().hour;
+    _selectedIsMorning = hour >= 6 && hour < 14;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ShiftProvider>().fetchCurrentShift();
     });
@@ -78,6 +82,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
     final success = await context.read<ShiftProvider>().openNewShift(
       cashierId: cashierId,
       startCash: startCash,
+      isMorning: _selectedIsMorning,
       note: _openNoteController.text.trim().isEmpty
           ? null
           : _openNoteController.text.trim(),
@@ -214,7 +219,8 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
   }
 
   Widget _buildActiveShiftCard(Shift shift, String staffName) {
-    final duration = DateTime.now().difference(shift.startTime);
+    final diff = DateTime.now().difference(shift.startedAt ?? shift.startTime);
+    final duration = diff.isNegative ? Duration.zero : diff;
     final h = duration.inHours.toString().padLeft(2, '0');
     final m = (duration.inMinutes % 60).toString().padLeft(2, '0');
     final s = (duration.inSeconds % 60).toString().padLeft(2, '0');
@@ -240,45 +246,51 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'CA LÀM VIỆC HIỆN TẠI',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textMuted,
-                      letterSpacing: 1.1,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'CA LÀM VIỆC HIỆN TẠI',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textMuted,
+                        letterSpacing: 1.1,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      FadeTransition(
-                        opacity: _pulseController,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.secondary,
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        FadeTransition(
+                          opacity: _pulseController,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.secondary,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      const Text(
-                        'Ca đang hoạt động',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Ca đang hoạt động: ${shift.shiftName} (${shift.shiftCode}) [${shift.startTime.hour.toString().padLeft(2, '0')}h - ${shift.endTime.hour.toString().padLeft(2, '0')}h]',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.secondary,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -318,12 +330,14 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Bắt đầu lúc',
+                    'Vào ca thực tế',
                     style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    "${shift.startTime.hour.toString().padLeft(2, '0')}:${shift.startTime.minute.toString().padLeft(2, '0')} | ${shift.startTime.day.toString().padLeft(2, '0')}/${shift.startTime.month.toString().padLeft(2, '0')}",
+                    shift.startedAt != null
+                        ? "${shift.startedAt!.hour.toString().padLeft(2, '0')}:${shift.startedAt!.minute.toString().padLeft(2, '0')} | ${shift.startedAt!.day.toString().padLeft(2, '0')}/${shift.startedAt!.month.toString().padLeft(2, '0')}"
+                        : "Chưa nhận ca",
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -441,6 +455,85 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
               fontWeight: FontWeight.bold,
               color: AppColors.textDark,
             ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Chọn ca làm việc *',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textMuted,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () => setState(() => _selectedIsMorning = true),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: _selectedIsMorning
+                          ? AppColors.secondary.withValues(alpha: 0.1)
+                          : Colors.white,
+                      border: Border.all(
+                        color: _selectedIsMorning
+                            ? AppColors.secondary
+                            : AppColors.borderGray,
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Ca sáng (06h - 14h)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: _selectedIsMorning
+                              ? AppColors.secondary
+                              : AppColors.textDark,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: InkWell(
+                  onTap: () => setState(() => _selectedIsMorning = false),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: !_selectedIsMorning
+                          ? AppColors.secondary.withValues(alpha: 0.1)
+                          : Colors.white,
+                      border: Border.all(
+                        color: !_selectedIsMorning
+                            ? AppColors.secondary
+                            : AppColors.borderGray,
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Ca chiều (14h - 22h)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: !_selectedIsMorning
+                              ? AppColors.secondary
+                              : AppColors.textDark,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           TextFormField(

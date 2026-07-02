@@ -5,6 +5,7 @@ namespace MiniMart.DTOs
     public class ShiftDto
     {
         public int ShiftId { get; set; }
+        public string ShiftCode { get; set; } = string.Empty;
         public string ShiftName { get; set; } = string.Empty;
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
@@ -14,6 +15,7 @@ namespace MiniMart.DTOs
         public decimal Revenue { get; set; }
         public ShiftStatus Status { get; set; }
         public string? Note { get; set; }
+        public DateTime? StartedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
         public int EmployeeId { get; set; }
         public int? CashierId { get; set; }
@@ -21,6 +23,7 @@ namespace MiniMart.DTOs
 
     public class CreateShiftDto
     {
+        public string ShiftCode { get; set; } = string.Empty;
         public string ShiftName { get; set; } = string.Empty;
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
@@ -30,6 +33,7 @@ namespace MiniMart.DTOs
         public decimal Revenue { get; set; }
         public ShiftStatus Status { get; set; }
         public string? Note { get; set; }
+        public DateTime? StartedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
         public int EmployeeId { get; set; }
         public int? CashierId { get; set; }
@@ -37,6 +41,7 @@ namespace MiniMart.DTOs
 
     public class UpdateShiftDto
     {
+        public string ShiftCode { get; set; } = string.Empty;
         public string ShiftName { get; set; } = string.Empty;
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
@@ -46,6 +51,7 @@ namespace MiniMart.DTOs
         public decimal Revenue { get; set; }
         public ShiftStatus Status { get; set; }
         public string? Note { get; set; }
+        public DateTime? StartedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
         public int EmployeeId { get; set; }
         public int? CashierId { get; set; }
