@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
 enum AppNavTab { catalog, categories, staff, customers, promotions }
@@ -20,6 +21,11 @@ class AppBottomNavBar extends StatelessWidget {
 
     switch (index) {
       case 0:
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute<void>(
+            builder: (_) => const InventoryTransactionsScreen(),
+          ),
+        );
       case 1:
         Navigator.of(context).pushReplacement(
           MaterialPageRoute<void>(

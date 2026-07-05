@@ -74,5 +74,13 @@ namespace MiniMart.Controllers
 
             return Ok(payment);
         }
+
+        [HttpPost("{transactionRef}/mock-success")]
+        public async Task<IActionResult> MockSuccess(string transactionRef)
+        {
+            bool rs = await _paymentRepository.MockPaymentSuccessAsync(transactionRef);
+            if (!rs) return BadRequest(new { Message = "Mock failed. Payment not found or already paid." });
+            return Ok(new { Message = "Mock success" });
+        }
     }
 }

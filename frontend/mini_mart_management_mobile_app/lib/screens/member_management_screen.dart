@@ -13,7 +13,9 @@ import 'package:mini_mart_management_mobile_app/widgets/members/tier_distributio
 import 'package:mini_mart_management_mobile_app/widgets/members/tier_overview_card.dart';
 
 class MemberManagementScreen extends StatefulWidget {
-  const MemberManagementScreen({super.key});
+  const MemberManagementScreen({this.showBottomNavBar = true, super.key});
+
+  final bool showBottomNavBar;
 
   @override
   State<MemberManagementScreen> createState() => _MemberManagementScreenState();
@@ -67,15 +69,15 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: _openCustomerList,
         backgroundColor: AppColors.primaryContainer,
         foregroundColor: Colors.white,
         child: const Icon(Icons.person_add_outlined),
       ),
-      bottomNavigationBar: const AppBottomNavBar(
-        selectedTab: AppNavTab.customers,
-      ),
+      bottomNavigationBar: widget.showBottomNavBar
+          ? const AppBottomNavBar(selectedTab: AppNavTab.customers)
+          : null,
     );
   }
 

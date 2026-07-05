@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/customer_summary.dart';
 import '../providers/customer_provider.dart';
@@ -61,7 +60,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: () => _showAddCustomerDialog(context),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.surfaceContainerLowest,

@@ -6,10 +6,13 @@ import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dar
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_transactions/inventory_transaction_card.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 
 class InventoryTransactionsScreen extends StatefulWidget {
-  const InventoryTransactionsScreen({super.key});
+  const InventoryTransactionsScreen({this.showBottomNavBar = true, super.key});
+
+  final bool showBottomNavBar;
 
   @override
   State<InventoryTransactionsScreen> createState() =>
@@ -31,13 +34,16 @@ class _InventoryTransactionsScreenState
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SafeArea(child: _buildBody(context)),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: () => context.read<InventoryProvider>().loadTransactions(),
         tooltip: 'Tải lại',
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.sync_rounded),
       ),
+      bottomNavigationBar: widget.showBottomNavBar
+          ? const AppBottomNavBar(selectedTab: AppNavTab.catalog)
+          : null,
     );
   }
 

@@ -106,7 +106,7 @@ class CategoryManagementScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: () => _showActionSnackBar(context, 'Add category'),
         tooltip: 'Add category',
         backgroundColor: AppColors.primary,

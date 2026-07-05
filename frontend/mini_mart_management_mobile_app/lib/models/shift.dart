@@ -1,6 +1,7 @@
 class Shift {
   const Shift({
     required this.shiftId,
+    required this.shiftCode,
     required this.shiftName,
     required this.startTime,
     required this.endTime,
@@ -10,12 +11,14 @@ class Shift {
     required this.revenue,
     required this.status,
     this.note,
+    this.startedAt,
     this.closedAt,
     required this.employeeId,
     this.cashierId,
   });
 
   final int shiftId;
+  final String shiftCode;
   final String shiftName;
   final DateTime startTime;
   final DateTime endTime;
@@ -25,6 +28,7 @@ class Shift {
   final double revenue;
   final int status; // 1 = Pending, 2 = Working, 3 = Closed, 4 = Cancelled
   final String? note;
+  final DateTime? startedAt;
   final DateTime? closedAt;
   final int employeeId;
   final int? cashierId;
@@ -32,6 +36,7 @@ class Shift {
   factory Shift.fromJson(Map<String, dynamic> json) {
     return Shift(
       shiftId: _readInt(json, 'shiftId', 'ShiftId'),
+      shiftCode: _readString(json, 'shiftCode', 'ShiftCode'),
       shiftName: _readString(json, 'shiftName', 'ShiftName'),
       startTime: DateTime.parse(_readString(json, 'startTime', 'StartTime')),
       endTime: DateTime.parse(_readString(json, 'endTime', 'EndTime')),
@@ -41,6 +46,9 @@ class Shift {
       revenue: _readDouble(json, 'revenue', 'Revenue'),
       status: _readInt(json, 'status', 'Status'),
       note: _readNullableString(json, 'note', 'Note'),
+      startedAt: json['startedAt'] != null || json['StartedAt'] != null
+          ? DateTime.parse(_readString(json, 'startedAt', 'StartedAt'))
+          : null,
       closedAt: json['closedAt'] != null || json['ClosedAt'] != null
           ? DateTime.parse(_readString(json, 'closedAt', 'ClosedAt'))
           : null,
@@ -54,6 +62,7 @@ class Shift {
   Map<String, dynamic> toJson() {
     return {
       'shiftId': shiftId,
+      'shiftCode': shiftCode,
       'shiftName': shiftName,
       'startTime': startTime.toIso8601String(),
       'endTime': endTime.toIso8601String(),
@@ -63,6 +72,7 @@ class Shift {
       'revenue': revenue,
       'status': status,
       'note': note,
+      'startedAt': startedAt?.toIso8601String(),
       'closedAt': closedAt?.toIso8601String(),
       'employeeId': employeeId,
       'cashierId': cashierId,

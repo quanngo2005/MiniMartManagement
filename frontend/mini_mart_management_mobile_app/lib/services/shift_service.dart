@@ -192,6 +192,15 @@ class ShiftService {
   }
 
   String _readMessage(Map<String, dynamic> responseJson) {
+    if (responseJson.containsKey('errors')) {
+      final errors = responseJson['errors'] as Map<String, dynamic>;
+      if (errors.isNotEmpty) {
+        final firstError = errors.values.first;
+        if (firstError is List && firstError.isNotEmpty) {
+          return firstError.first.toString();
+        }
+      }
+    }
     final message = responseJson['message'] ?? responseJson['Message'];
     return message is String && message.isNotEmpty
         ? message

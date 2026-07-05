@@ -8,7 +8,9 @@ import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_ba
 import 'package:mini_mart_management_mobile_app/widgets/promotions/promotion_rule_card.dart';
 
 class PromotionManagementScreen extends StatefulWidget {
-  const PromotionManagementScreen({super.key});
+  const PromotionManagementScreen({this.showBottomNavBar = true, super.key});
+
+  final bool showBottomNavBar;
 
   @override
   State<PromotionManagementScreen> createState() =>
@@ -79,16 +81,16 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(heroTag: null,
         onPressed: _scrollToForm,
         backgroundColor: AppColors.secondary,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.add, size: 32),
       ),
-      bottomNavigationBar: const AppBottomNavBar(
-        selectedTab: AppNavTab.promotions,
-      ),
+      bottomNavigationBar: widget.showBottomNavBar
+          ? const AppBottomNavBar(selectedTab: AppNavTab.promotions)
+          : null,
     );
   }
 
@@ -131,7 +133,7 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Đang chạy & Lịch trình',
+              'Danh sách chương trình',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.primary,
@@ -144,7 +146,7 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                '${provider.promotions.length} Tổng cộng',
+                '${provider.promotions.length} chương trình',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -270,7 +272,6 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
   final _discountCtrl = TextEditingController(text: '0.00');
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(const Duration(days: 30));
-  int _conditionType = 0;
   int _discountType = 0;
   bool _isSaving = false;
 
@@ -308,7 +309,7 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
                     color: AppColors.primary, size: 22),
                 const SizedBox(width: 8),
                 Text(
-                  'Tạo quy tắc mới',
+                  'Tạo chương trình mới',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -317,31 +318,32 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
               ],
             ),
             const SizedBox(height: 16),
-            _fieldLabel('Rule Name'),
+            _fieldLabel('Tên chương trình'),
             TextFormField(
               controller: _nameCtrl,
               decoration: const InputDecoration(
-                hintText: 'Tên chương trình...',
+                hintText: 'Ví dụ: Giảm 10% cuối tuần...',
               ),
               validator: (v) => v == null || v.isEmpty ? 'Bắt buộc' : null,
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildConditionDropdown()),
-                const SizedBox(width: 12),
                 Expanded(child: _buildDiscountTypeDropdown()),
               ],
             ),
             const SizedBox(height: 16),
-            _fieldLabel('Discount Value'),
+            _fieldLabel('Giá trị giảm'),
             TextFormField(
               controller: _discountCtrl,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
-                suffixText: _discountType == 0 ? '%' : 'đ',
+                suffixText: _discountType == 0 ? '%' : (_discountType == 1 ? 'đ' : ''),
+                hintText: _discountType == 2 ? 'Không áp dụng' : null,
               ),
+              enabled: _discountType != 2,
               validator: (v) {
+                if (_discountType == 2) return null;
                 if (v == null || v.isEmpty) return 'Bắt buộc';
                 if (double.tryParse(v) == null) return 'Số không hợp lệ';
                 return null;
@@ -353,7 +355,7 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
                 Expanded(
                   child: _buildDateField(
                     context,
-                    'Start Date',
+                    'Ngày bắt đầu',
                     _startDate,
                     () => _pickDate(context, isStart: true),
                   ),
@@ -362,7 +364,7 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
                 Expanded(
                   child: _buildDateField(
                     context,
-                    'End Date',
+                    'Ngày kết thúc',
                     _endDate,
                     () => _pickDate(context, isStart: false),
                   ),
@@ -379,13 +381,10 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
                     ? const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                       )
                     : const Icon(Icons.save_outlined),
-                label: const Text('Lưu quy tắc'),
+                label: const Text('Lưu chương trình'),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -411,37 +410,18 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
     );
   }
 
-  Widget _buildConditionDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _fieldLabel('Condition'),
-        DropdownButtonFormField<int>(
-          value: _conditionType,
-          decoration: const InputDecoration(),
-          items: const [
-            DropdownMenuItem(value: 0, child: Text('Min order value')),
-            DropdownMenuItem(value: 1, child: Text('Specific category')),
-            DropdownMenuItem(value: 2, child: Text('Customer tier')),
-          ],
-          onChanged: (v) => setState(() => _conditionType = v ?? 0),
-        ),
-      ],
-    );
-  }
-
   Widget _buildDiscountTypeDropdown() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _fieldLabel('Discount Type'),
+        _fieldLabel('Loại khuyến mãi'),
         DropdownButtonFormField<int>(
           value: _discountType,
           decoration: const InputDecoration(),
           items: const [
-            DropdownMenuItem(value: 0, child: Text('Percentage')),
-            DropdownMenuItem(value: 1, child: Text('Fixed amount')),
-            DropdownMenuItem(value: 2, child: Text('Buy X get Y')),
+            DropdownMenuItem(value: 0, child: Text('Giảm theo % (PercentDiscount)')),
+            DropdownMenuItem(value: 1, child: Text('Giảm tiền mặt (FixedAmount)')),
+            DropdownMenuItem(value: 2, child: Text('Mua X Tặng Y (BuyXGetYFree)')),
           ],
           onChanged: (v) => setState(() => _discountType = v ?? 0),
         ),
@@ -505,6 +485,7 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
 
     setState(() => _isSaving = true);
     final discount = double.tryParse(_discountCtrl.text) ?? 0;
+    // type 0 = PercentDiscount, type 1 = BuyXGetYFree
     final promotionType = _discountType == 2 ? 1 : 0;
 
     await widget.onSave({
