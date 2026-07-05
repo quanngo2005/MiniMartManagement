@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-<<<<<<< HEAD
-=======
 using Microsoft.AspNetCore.OData.Routing.Controllers;
->>>>>>> kiet_dev
 using MiniMart.DTOs;
 using MiniMart.Services.Interfaces;
 
@@ -13,12 +10,8 @@ namespace MiniMart.Controllers
     [ApiController]
     [Route("api/products")]
     [Route("odata/Products")]
-<<<<<<< HEAD
-    public class ProductsController : ControllerBase
-=======
     [Authorize]
     public class ProductsController : ODataController
->>>>>>> kiet_dev
     {
         private readonly IProductService _productService;
 
@@ -27,36 +20,6 @@ namespace MiniMart.Controllers
             _productService = productService;
         }
 
-<<<<<<< HEAD
-        [Authorize(Policy = "AnyEmployee")]
-        [HttpGet]
-        [EnableQuery]
-        public ActionResult<IQueryable<ProductDto>> GetAll()
-        {
-            return Ok(_productService.GetAllProductsQueryable());
-        }
-
-        [Authorize(Policy = "AnyEmployee")]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ProductDto>> GetById(int id)
-        {
-            var product = await _productService.GetProductByIdAsync(id);
-            if (product == null)
-                return NotFound(new { message = $"Product with ID {id} not found." });
-
-            return Ok(product);
-        }
-
-        [Authorize(Policy = "AnyEmployee")]
-        [HttpGet("barcode/{barcode}")]
-        public async Task<ActionResult<ProductDto>> GetByBarcode(string barcode)
-        {
-            var product = await _productService.GetProductByBarcodeAsync(barcode);
-            return Ok(product);
-        }
-    }
-}
-=======
         // GET /api/products  — hỗ trợ OData $filter, $orderby, $top, $skip
         [HttpGet]
         [EnableQuery]
@@ -140,4 +103,3 @@ namespace MiniMart.Controllers
         }
     }
 }
->>>>>>> kiet_dev

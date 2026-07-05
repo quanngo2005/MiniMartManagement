@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mini_mart_management_mobile_app/models/product_lookup.dart';
+import 'package:mini_mart_management_mobile_app/models/cart_item.dart';
 import 'package:mini_mart_management_mobile_app/providers/cart_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
@@ -30,6 +32,52 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isSearchingCustomer = false;
   bool _showCreateCustomerButton = false;
   List<ProductLookup> _productSuggestions = [];
+  
+  final TextEditingController _customerGivenAmountController = TextEditingController();
+  final TextEditingController _pointsToUseController = TextEditingController();
+
+  void _rebuildOnChange() {
+    setState(() {});
+  }
+
+  void _resetForm() {
+    setState(() {
+      _customerPhoneController.clear();
+      _customerGivenAmountController.clear();
+      _pointsToUseController.clear();
+      _isSearchingCustomer = false;
+      _showCreateCustomerButton = false;
+      _productSuggestions.clear();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _customerGivenAmountController.addListener(_rebuildOnChange);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final shiftProvider = context.read<ShiftProvider>();
+      await shiftProvider.fetchCurrentShift();
+      if (mounted && shiftProvider.currentShift == null) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const ShiftManagementScreen(),
+            fullscreenDialog: true,
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _productSearchController.dispose();
+    _customerPhoneController.dispose();
+    _customerGivenAmountController.removeListener(_rebuildOnChange);
+    _customerGivenAmountController.dispose();
+    _pointsToUseController.dispose();
+    super.dispose();
+  }
 
   Future<void> _searchCustomer() async {
     final phone = _customerPhoneController.text.trim();
@@ -155,12 +203,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'quantity': i.quantity,
       }).toList();
 
+      final givenStr = _customerGivenAmountController.text.replaceAll(RegExp(r'[^0-9]'), '');
+      final givenAmount = double.tryParse(givenStr) ?? cart.totalAmount;
+      if (cart.paymentMethod == 1 && givenAmount < cart.totalAmount) {
+        _showError('Tiền khách đưa không đủ.');
+        return;
+      }
+
       final response = await orderRepo.checkout(
         employeeId: currentUser.employeeId,
         shiftId: shiftProvider.currentShift!.shiftId,
         customerId: cart.selectedCustomerId,
+        loyaltyPointsToUse: cart.pointsToUse,
         paymentMethod: cart.paymentMethod,
-        paidAmount: cart.totalAmount,
+        paidAmount: cart.paymentMethod == 1 ? givenAmount : cart.finalAmount,
         items: items,
       );
 
@@ -211,6 +267,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       _showSuccess('Thanh toán thành công!');
       cart.clearCart();
+      _resetForm();
     } catch (e) {
       _showError(e.toString());
     }
@@ -329,6 +386,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (isPaid && mounted) {
       _showSuccess('Thanh toán VNPAY thành công!');
       context.read<CartProvider>().clearCart();
+      _resetForm();
     }
   }
 
@@ -444,11 +502,58 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  void _showEditQuantityDialog(CartItem item) {
+    final TextEditingController qtyController = TextEditingController(text: item.quantity.toString());
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Nhập số lượng'),
+        content: TextField(
+          controller: qtyController,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'Số lượng',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Hủy'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final newQty = int.tryParse(qtyController.text) ?? -1;
+              if (newQty < 0) {
+                _showError('Số lượng không hợp lệ.');
+                return;
+              }
+              if (newQty > item.product.stockQuantity) {
+                _showError('Không đủ hàng tồn. Tồn kho: ${item.product.stockQuantity}');
+                return;
+              }
+              Navigator.pop(ctx);
+              context.read<CartProvider>().setQuantity(item.product.productId, newQty);
+            },
+            child: const Text('Xác nhận'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
     final shiftProvider = context.watch<ShiftProvider>();
     final isShiftActive = shiftProvider.currentShift != null;
+
+    final givenStr = _customerGivenAmountController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final givenAmount = double.tryParse(givenStr) ?? 0.0;
+    double changeAmount = givenAmount - cart.finalAmount;
+    final isShort = givenStr.isNotEmpty && changeAmount < 0;
+    if (changeAmount < 0) changeAmount = 0.0;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
@@ -539,7 +644,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.close, color: AppColors.primaryContainer),
-                          onPressed: () => cart.clearCustomer(),
+                          onPressed: () {
+                            cart.clearCustomer();
+                            _pointsToUseController.clear();
+                          },
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                         ),
@@ -573,7 +681,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   decoration: InputDecoration(
                     hintText: 'Tìm sản phẩm (tên hoặc mã)...',
                     prefixIcon: const Icon(Icons.search),
-                    suffixIcon: const Icon(Icons.qr_code_scanner),
+                    suffixIcon: const Icon(Icons.barcode_reader),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
@@ -640,26 +748,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                       border: Border(bottom: BorderSide(color: AppColors.outlineVariant)),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Row(
+                        Row(
                           children: [
                             Icon(Icons.shopping_cart_outlined),
                             SizedBox(width: 8),
                             Text('Giỏ hàng', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                           ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '${cart.items.length} Món',
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
-                          ),
                         ),
                       ],
                     ),
@@ -705,17 +802,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                 constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                                                 padding: EdgeInsets.zero,
                                               ),
-                                              SizedBox(
-                                                width: 32,
-                                                child: Text(
-                                                  '${item.quantity}',
-                                                  textAlign: TextAlign.center,
-                                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                              InkWell(
+                                                onTap: () => _showEditQuantityDialog(item),
+                                                child: SizedBox(
+                                                  width: 32,
+                                                  height: 36,
+                                                  child: Center(
+                                                    child: Text(
+                                                      '${item.quantity}',
+                                                      textAlign: TextAlign.center,
+                                                      style: const TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                               IconButton(
                                                 icon: const Icon(Icons.add, size: 20),
-                                                onPressed: () => cart.updateQuantity(item.product.productId, 1),
+                                                onPressed: () {
+                                                  if (item.quantity >= item.product.stockQuantity) {
+                                                    _showError('Không đủ hàng tồn. Tồn kho: ${item.product.stockQuantity}');
+                                                  } else {
+                                                    cart.updateQuantity(item.product.productId, 1);
+                                                  }
+                                                },
                                                 constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                                                 padding: EdgeInsets.zero,
                                               ),
@@ -759,6 +868,58 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     _buildPaymentChip(cart, 5, 'VNPAY', Icons.account_balance_wallet_outlined),
                   ],
                 ),
+                if (cart.paymentMethod == 1) ...[
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _customerGivenAmountController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            TextInputFormatter.withFunction((oldValue, newValue) {
+                              if (newValue.text.isEmpty) return newValue;
+                              final intValue = int.tryParse(newValue.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+                              final formatted = NumberFormat.decimalPattern('vi_VN').format(intValue);
+                              return TextEditingValue(
+                                text: formatted,
+                                selection: TextSelection.collapsed(offset: formatted.length),
+                              );
+                            }),
+                          ],
+                          style: TextStyle(
+                            fontSize: 20, 
+                            fontWeight: FontWeight.bold,
+                            color: isShort ? AppColors.statusError : AppColors.textDark,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Tiền khách đưa',
+                            prefixText: 'đ ',
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: TextEditingController(text: currencyFormatter.format(changeAmount)),
+                          readOnly: true,
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.secondary),
+                          decoration: const InputDecoration(
+                            labelText: 'Tiền thối lại',
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: AppColors.surfaceContainerLow,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -777,12 +938,55 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             child: Column(
               children: [
+                if (cart.selectedCustomerPoints != null && cart.selectedCustomerPoints! > 0) ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _pointsToUseController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          onChanged: (val) {
+                            final points = int.tryParse(val) ?? 0;
+                            cart.setPointsToUse(points);
+                            if (points > cart.maxPointsCanUse) {
+                              _pointsToUseController.text = cart.maxPointsCanUse.toString();
+                              _pointsToUseController.selection = TextSelection.collapsed(offset: _pointsToUseController.text.length);
+                            }
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Dùng điểm tích lũy',
+                            hintText: 'Nhập số điểm...',
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        '- ${currencyFormatter.format(cart.discountAmount)}',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.statusError),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (cart.pointsToUse > 0) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Tạm tính', style: TextStyle(fontSize: 16, color: AppColors.textMuted)),
+                      Text(currencyFormatter.format(cart.totalAmount), style: const TextStyle(fontSize: 16, color: AppColors.textDark)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('TỔNG CỘNG', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
                     Text(
-                      currencyFormatter.format(cart.totalAmount),
+                      currencyFormatter.format(cart.finalAmount),
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.secondary),
                     ),
                   ],

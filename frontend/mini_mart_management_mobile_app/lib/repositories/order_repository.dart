@@ -9,6 +9,7 @@ class OrderRepository {
     required int employeeId,
     required int shiftId,
     int? customerId,
+    int loyaltyPointsToUse = 0,
     required int paymentMethod,
     required double paidAmount,
     required List<Map<String, dynamic>> items,
@@ -17,7 +18,7 @@ class OrderRepository {
       'employeeId': employeeId,
       'shiftId': shiftId,
       'customerId': customerId,
-      'loyaltyPointsToUse': 0, // No points applied for now
+      'loyaltyPointsToUse': loyaltyPointsToUse,
       'paymentMethod': paymentMethod,
       'paidAmount': paidAmount,
       'note': '',

@@ -54,7 +54,7 @@ namespace MiniMart.Services.Implementations
             shift.ShiftName = isMorning ? "Ca sáng" : "Ca chiều";
             shift.StartTime = createDto.WorkDate.Date.AddHours(isMorning ? 6 : 14);
             shift.EndTime = createDto.WorkDate.Date.AddHours(isMorning ? 14 : 22);
-            shift.ShiftCode = (isMorning ? "SA-" : "CH-") + createDto.WorkDate.ToString("yyyyMMdd");
+            shift.ShiftCode = (isMorning ? "SA-" : "CH-") + createDto.WorkDate.ToString("yyyyMMdd") + "-" + shift.EmployeeId;
 
             // Verify shift slot uniqueness for the employee
             var alreadyExists = await _shiftRepository.GetAllShiftsQueryable()
@@ -91,7 +91,7 @@ namespace MiniMart.Services.Implementations
             existing.ShiftName = isMorning ? "Ca sáng" : "Ca chiều";
             existing.StartTime = updateDto.WorkDate.Date.AddHours(isMorning ? 6 : 14);
             existing.EndTime = updateDto.WorkDate.Date.AddHours(isMorning ? 14 : 22);
-            existing.ShiftCode = (isMorning ? "SA-" : "CH-") + updateDto.WorkDate.ToString("yyyyMMdd");
+            existing.ShiftCode = (isMorning ? "SA-" : "CH-") + updateDto.WorkDate.ToString("yyyyMMdd") + "-" + updateDto.EmployeeId;
 
             // Verify shift slot uniqueness for the employee (excluding current shift)
             var alreadyExists = await _shiftRepository.GetAllShiftsQueryable()
@@ -177,7 +177,6 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException("Forbidden: You cannot close a shift for another cashier.", StatusCodes.Status403Forbidden);
 
             shift.EndCash = closeRequest.EndCash;
-            shift.Revenue = shift.EndCash - shift.StartCash;
             shift.Status = ShiftStatus.Closed;
             shift.ClosedAt = DateTime.Now;
             if (!string.IsNullOrEmpty(closeRequest.Note))
