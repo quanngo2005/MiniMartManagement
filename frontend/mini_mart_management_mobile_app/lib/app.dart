@@ -4,16 +4,19 @@ import 'package:mini_mart_management_mobile_app/providers/inventory_lookup_provi
 import 'package:mini_mart_management_mobile_app/providers/customer_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/inventory_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/auth_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/inventory_lookup_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/inventory_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/receipt_repository.dart';
+import 'package:mini_mart_management_mobile_app/repositories/supplier_repository.dart';
 import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_lookup_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_service.dart';
 import 'package:mini_mart_management_mobile_app/services/receipt_service.dart';
+import 'package:mini_mart_management_mobile_app/services/supplier_service.dart';
 import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/promotion_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
@@ -73,6 +76,9 @@ class MiniMartManagementApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => TierProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         Provider<OrderRepository>(create: (_) => OrderRepository()),
+        ChangeNotifierProvider(
+          create: (_) => SupplierProvider(SupplierRepository(SupplierService())),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

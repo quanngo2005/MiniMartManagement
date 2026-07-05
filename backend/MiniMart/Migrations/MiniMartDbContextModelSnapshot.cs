@@ -76,11 +76,6 @@ namespace MiniMart.Migrations
                     b.HasIndex("ReceiptId");
 
                     b.ToTable("Batches");
-<<<<<<< HEAD
-
-                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
-=======
->>>>>>> kiet_dev
 
                     b.HasData(
                         new
@@ -3955,3 +3950,4 @@ namespace MiniMart.Migrations
         }
     }
 }
+

@@ -3,11 +3,7 @@ using MiniMart.Data;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
 
-<<<<<<< HEAD
-namespace MiniMart.Repositories.Implementations
-=======
 namespace MiniMart.Repositories.RepoImplement
->>>>>>> kiet_dev
 {
     public class SupplierRepository : ISupplierRepository
     {
@@ -18,28 +14,6 @@ namespace MiniMart.Repositories.RepoImplement
             _context = context;
         }
 
-<<<<<<< HEAD
-        public IQueryable<Supplier> GetActiveSuppliersQueryable(string? search)
-        {
-            var query = _context.Suppliers.Where(s => s.Status);
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                var keyword = search.Trim();
-                query = query.Where(s =>
-                    s.SupplierName.Contains(keyword) ||
-                    s.SupplierCode.Contains(keyword) ||
-                    s.PhoneNumber.Contains(keyword));
-            }
-
-            return query.OrderBy(s => s.SupplierName);
-        }
-
-        public async Task<Supplier?> GetActiveSupplierByIdAsync(int id)
-        {
-            return await _context.Suppliers
-                .FirstOrDefaultAsync(s => s.SupplierId == id && s.Status);
-=======
         public IQueryable<Supplier> GetAllQueryable()
         {
             return _context.Suppliers.AsQueryable();
@@ -94,7 +68,6 @@ namespace MiniMart.Repositories.RepoImplement
             return excludeId.HasValue
                 ? await _context.Suppliers.AnyAsync(s => s.SupplierCode == supplierCode && s.SupplierId != excludeId.Value)
                 : await _context.Suppliers.AnyAsync(s => s.SupplierCode == supplierCode);
->>>>>>> kiet_dev
         }
     }
 }

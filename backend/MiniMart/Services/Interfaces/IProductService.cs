@@ -4,13 +4,6 @@ namespace MiniMart.Services.Interfaces
 {
     public interface IProductService
     {
-<<<<<<< HEAD
-        IQueryable<ProductDto> GetAllProductsQueryable();
-        Task<ProductDto?> GetProductByIdAsync(int id);
-        Task<ProductDto?> GetProductByBarcodeAsync(string barcode);
-    }
-}
-=======
         IQueryable<ProductResponseDto> GetAllQueryable();
         Task<ProductResponseDto?> GetByIdAsync(int id);
         Task<ProductResponseDto?> GetByBarcodeAsync(string barcode);
@@ -22,4 +15,3 @@ namespace MiniMart.Services.Interfaces
         Task<IEnumerable<ProductResponseDto>> GetNearExpirationAsync(int days);
     }
 }
->>>>>>> kiet_dev

@@ -1,17 +1,11 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-<<<<<<< HEAD
-using MiniMart.DTOs;
-using MiniMart.Repositories.RepoInterface;
-using MiniMart.Services.Interfaces;
-=======
 using Microsoft.AspNetCore.Http;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
->>>>>>> kiet_dev
 
 namespace MiniMart.Services.Implementations
 {
@@ -26,19 +20,6 @@ namespace MiniMart.Services.Implementations
             _mapper = mapper;
         }
 
-<<<<<<< HEAD
-        public IQueryable<SupplierDto> GetActiveSuppliersQueryable(string? search)
-        {
-            return _supplierRepository
-                .GetActiveSuppliersQueryable(search)
-                .ProjectTo<SupplierDto>(_mapper.ConfigurationProvider);
-        }
-
-        public async Task<SupplierDto?> GetActiveSupplierByIdAsync(int id)
-        {
-            var supplier = await _supplierRepository.GetActiveSupplierByIdAsync(id);
-            return supplier == null ? null : _mapper.Map<SupplierDto>(supplier);
-=======
         public IQueryable<SupplierResponseDto> GetAllQueryable()
         {
             return _supplierRepository.GetAllQueryable()
@@ -81,7 +62,6 @@ namespace MiniMart.Services.Implementations
             var success = await _supplierRepository.DeleteAsync(id);
             if (!success)
                 throw new DomainException($"Supplier with ID {id} not found.", StatusCodes.Status404NotFound);
->>>>>>> kiet_dev
         }
     }
 }

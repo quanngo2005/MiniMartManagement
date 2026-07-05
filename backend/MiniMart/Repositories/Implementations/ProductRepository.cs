@@ -3,11 +3,7 @@ using MiniMart.Data;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
 
-<<<<<<< HEAD
-namespace MiniMart.Repositories.Implementations
-=======
 namespace MiniMart.Repositories.RepoImplement
->>>>>>> kiet_dev
 {
     public class ProductRepository : IProductRepository
     {
@@ -18,17 +14,6 @@ namespace MiniMart.Repositories.RepoImplement
             _context = context;
         }
 
-<<<<<<< HEAD
-        public IQueryable<Product> GetAllProductsQueryable()
-        {
-            return _context.Products
-                .Include(p => p.Category)
-                .Include(p => p.Supplier)
-                .Where(p => p.Status);
-        }
-
-        public async Task<Product?> GetProductByIdAsync(int id)
-=======
         public IQueryable<Product> GetAllQueryable()
         {
             return _context.Products
@@ -37,32 +22,18 @@ namespace MiniMart.Repositories.RepoImplement
         }
 
         public async Task<Product?> GetByIdAsync(int id)
->>>>>>> kiet_dev
         {
             return await _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.Supplier)
-<<<<<<< HEAD
-                .FirstOrDefaultAsync(p => p.ProductId == id && p.Status);
-        }
-
-        public async Task<Product?> GetProductByBarcodeAsync(string barcode)
-=======
                 .FirstOrDefaultAsync(p => p.ProductId == id);
         }
 
         public async Task<Product?> GetByBarcodeAsync(string barcode)
->>>>>>> kiet_dev
         {
             return await _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.Supplier)
-<<<<<<< HEAD
-                .FirstOrDefaultAsync(p => p.Barcode == barcode && p.Status);
-        }
-    }
-}
-=======
                 .FirstOrDefaultAsync(p => p.Barcode == barcode);
         }
 
@@ -163,4 +134,3 @@ namespace MiniMart.Repositories.RepoImplement
         }
     }
 }
->>>>>>> kiet_dev

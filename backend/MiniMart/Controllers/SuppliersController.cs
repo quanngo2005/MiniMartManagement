@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-<<<<<<< HEAD
-=======
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
->>>>>>> kiet_dev
 using MiniMart.DTOs;
 using MiniMart.Services.Interfaces;
 
@@ -12,13 +8,9 @@ namespace MiniMart.Controllers
 {
     [ApiController]
     [Route("api/suppliers")]
-<<<<<<< HEAD
-    public class SuppliersController : ControllerBase
-=======
     [Route("odata/Suppliers")]
     [Authorize(Policy = "WarehouseUp")]
-    public class SuppliersController : ODataController
->>>>>>> kiet_dev
+    public class SuppliersController : ControllerBase
     {
         private readonly ISupplierService _supplierService;
 
@@ -27,25 +19,6 @@ namespace MiniMart.Controllers
             _supplierService = supplierService;
         }
 
-<<<<<<< HEAD
-        [Authorize(Policy = "WarehouseUp")]
-        [HttpGet]
-        public ActionResult<IQueryable<SupplierDto>> GetAll([FromQuery] string? search)
-        {
-            return Ok(_supplierService.GetActiveSuppliersQueryable(search));
-        }
-
-        [Authorize(Policy = "WarehouseUp")]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<SupplierDto>> GetById(int id)
-        {
-            var supplier = await _supplierService.GetActiveSupplierByIdAsync(id);
-            if (supplier == null)
-                return NotFound(new { message = $"Supplier with ID {id} not found." });
-
-            return Ok(supplier);
-        }
-=======
         // GET /api/suppliers
         [HttpGet]
         [EnableQuery]
@@ -94,6 +67,5 @@ namespace MiniMart.Controllers
             await _supplierService.DeleteAsync(id);
             return NoContent();
         }
->>>>>>> kiet_dev
     }
 }

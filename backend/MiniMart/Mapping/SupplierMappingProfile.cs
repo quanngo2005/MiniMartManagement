@@ -8,9 +8,6 @@ namespace MiniMart.Mapping
     {
         public SupplierMappingProfile()
         {
-<<<<<<< HEAD
-            CreateMap<Supplier, SupplierDto>();
-=======
             CreateMap<Supplier, SupplierResponseDto>();
 
             CreateMap<SupplierCreateDto, Supplier>()
@@ -21,7 +18,6 @@ namespace MiniMart.Mapping
             CreateMap<SupplierUpdateDto, Supplier>()
                 .ForMember(dest => dest.SupplierId, opt => opt.Ignore())
                 .ForMember(dest => dest.Products, opt => opt.Ignore());
->>>>>>> kiet_dev
         }
     }
 }

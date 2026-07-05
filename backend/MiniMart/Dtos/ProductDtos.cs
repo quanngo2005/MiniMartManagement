@@ -12,7 +12,9 @@ namespace MiniMart.DTOs
         public string? ImageUrl { get; set; }
         public bool Status { get; set; } = true;
         public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
         public int SupplierId { get; set; }
+        public string SupplierName { get; set; } = string.Empty;
     }
 
     public class ProductUpdateDto
@@ -42,15 +44,8 @@ namespace MiniMart.DTOs
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
         public bool Status { get; set; }
-<<<<<<< HEAD
-        public int CategoryId { get; set; }
-        public string CategoryName { get; set; } = string.Empty;
-        public int SupplierId { get; set; }
-        public string SupplierName { get; set; } = string.Empty;
-=======
         public ProductCategoryDto? Category { get; set; }
         public ProductSupplierDto? Supplier { get; set; }
->>>>>>> kiet_dev
     }
 
     public class ProductCategoryDto

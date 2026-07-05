@@ -19,7 +19,7 @@ class SupplierService {
 
     final json = _decode(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_message(json));
+      throw ApiException('Lỗi ${response.statusCode}: ${_message(json)}');
     }
 
     final data = json['value'] ?? json['data'] ?? json['Data'] ?? json;

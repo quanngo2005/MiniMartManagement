@@ -1,4 +1,4 @@
-﻿class Supplier {
+class Supplier {
   const Supplier({
     required this.supplierId,
     required this.supplierCode,

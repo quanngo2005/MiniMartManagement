@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/category_summary.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
@@ -74,9 +74,9 @@ class CategoryManagementScreen extends StatelessWidget {
                   return CategoryTreeCard(
                     category: _categories[index],
                     onEdit: (category) =>
-                        _showActionSnackBar(context, 'Edit category'),
+                        _showActionSnackBar(context, 'Edit ${category.name}'),
                     onDelete: (category) =>
-                        _showActionSnackBar(context, 'Delete category'),
+                        _showActionSnackBar(context, 'Delete ${category.name}'),
                   );
                 },
               ),
@@ -152,6 +152,7 @@ class CategoryManagementScreen extends StatelessWidget {
 
   Widget _buildSearchSection(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
     return DecoratedBox(
       decoration: const BoxDecoration(
         color: AppColors.surface,
@@ -192,7 +193,7 @@ class CategoryManagementScreen extends StatelessWidget {
             TextField(
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.search_rounded),
-                hintText: 'Search categories...',
+                hintText: 'Search categories (e.g. Dairy, Electronics)...',
               ),
               textInputAction: TextInputAction.search,
             ),
