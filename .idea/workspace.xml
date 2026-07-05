@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="121dffde-9d4f-4fc3-a0fd-4ee9d3b8cca4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Controllers/ProductsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Controllers/ProductsController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Controllers/SuppliersController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Controllers/SuppliersController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Dtos/ProductDtos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Dtos/ProductDtos.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Mapping/ProductMappingProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Mapping/ProductMappingProfile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Mapping/SupplierMappingProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Mapping/SupplierMappingProfile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Migrations/MiniMartDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Migrations/MiniMartDbContextModelSnapshot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/ProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/ProductRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/SupplierRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/SupplierRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/IProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/IProductRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/ISupplierRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/ISupplierRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/ProductService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/SupplierService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/SupplierService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Services/Interfaces/IProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Interfaces/IProductService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Services/Interfaces/ISupplierService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Interfaces/ISupplierService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/appsettings.Development.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/appsettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/app.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/app.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/models/supplier.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/models/supplier.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/category_management_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/category_management_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/services/supplier_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/services/supplier_service.dart" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3G0O7rd90hCSgYBTQtWvc8N729g" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Flutter.main.dart.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;kiet__dev&quot;,
+    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/MiniMart/MiniMart&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="main.dart" type="FlutterRunConfigurationType" factoryName="Flutter" temporary="true" nameIsGenerated="true">
+      <option name="filePath" value="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/main.dart" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Flutter.main.dart" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="121dffde-9d4f-4fc3-a0fd-4ee9d3b8cca4" name="Changes" comment="" />
+      <created>1783104856037</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1783104856037</updated>
+    </task>
+    <servers />
+  </component>
+</project>

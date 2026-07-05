@@ -5,13 +5,6 @@ using MiniMart.Data;
 using MiniMart.Mapping;
 using MiniMart.Middleware;
 using MiniMart.Models;
-using MiniMart.Repositories.Implementations;
-using MiniMart.Repositories.Interfaces;
-using MiniMart.Repositories.RepoImplement;
-using MiniMart.Repositories.RepoInterface;
-using MiniMart.Services;
-using MiniMart.Services.Implementations;
-using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,7 +33,7 @@ odataBuilder.EntitySet<Shift>("Shifts");
 odataBuilder.EntitySet<InventoryTransaction>("InventoryTransactions");
 odataBuilder.EntitySet<Promotion>("Promotions");
 
-// ── Services ─────────────────────────────────────────────────────
+// ── Infrastructure ────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -76,7 +69,6 @@ builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<MiniMart.Services.Interfaces.IPaymentGatewayService, VnPayService>();
 
 builder.Services.AddControllers()
-
     .AddOData(options => options
         .Select()
         .Filter()
