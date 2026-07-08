@@ -39,7 +39,10 @@ class CustomerRepository {
     }
   }
 
-  Future<CustomerSummary> updateCustomer(int id, Map<String, dynamic> data) async {
+  Future<CustomerSummary> updateCustomer(
+    int id,
+    Map<String, dynamic> data,
+  ) async {
     try {
       return await _customerService.updateCustomer(id, data);
     } on ApiException {
@@ -91,7 +94,9 @@ class CustomerRepository {
     }
   }
 
-  Future<List<CustomerPointTransaction>> getCustomerPointTransactions(int id) async {
+  Future<List<CustomerPointTransaction>> getCustomerPointTransactions(
+    int id,
+  ) async {
     try {
       return await _customerService.getCustomerPointTransactions(id);
     } on ApiException {

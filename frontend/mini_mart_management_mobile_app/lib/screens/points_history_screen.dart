@@ -29,7 +29,10 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
 
   Future<void> _load() async {
     final id = int.tryParse(widget.customerId);
-    if (id == null) { setState(() => _isLoading = false); return; }
+    if (id == null) {
+      setState(() => _isLoading = false);
+      return;
+    }
     final provider = context.read<CustomerProvider>();
     final customer = await provider.getCustomerById(id);
     final txns = await provider.fetchCustomerPointTransactions(id);
@@ -46,10 +49,19 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
     setState(() {
       _selectedTab = tab;
       switch (tab) {
-        case 1: _filtered = _allTxns.where((t) => t.transactionType == 1).toList(); break;
-        case 2: _filtered = _allTxns.where((t) => t.transactionType == 2).toList(); break;
-        case 3: _filtered = _allTxns.where((t) => t.transactionType == 3 || t.transactionType == 4).toList(); break;
-        default: _filtered = _allTxns;
+        case 1:
+          _filtered = _allTxns.where((t) => t.transactionType == 1).toList();
+          break;
+        case 2:
+          _filtered = _allTxns.where((t) => t.transactionType == 2).toList();
+          break;
+        case 3:
+          _filtered = _allTxns
+              .where((t) => t.transactionType == 3 || t.transactionType == 4)
+              .toList();
+          break;
+        default:
+          _filtered = _allTxns;
       }
     });
   }
@@ -57,8 +69,12 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
   int get _monthlyEarn {
     final now = DateTime.now();
     return _allTxns
-        .where((t) => t.isPositive &&
-            (t.createdAt?.month == now.month && t.createdAt?.year == now.year))
+        .where(
+          (t) =>
+              t.isPositive &&
+              (t.createdAt?.month == now.month &&
+                  t.createdAt?.year == now.year),
+        )
         .fold(0, (sum, t) => sum + t.delta);
   }
 
@@ -100,14 +116,31 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(children: const [
-                        Icon(Icons.toll_outlined, size: 14, color: AppColors.textMuted),
-                        SizedBox(width: 4),
-                        Text('TOTAL BALANCE', style: TextStyle(fontSize: 10, color: AppColors.textMuted, fontWeight: FontWeight.bold)),
-                      ]),
+                      Row(
+                        children: const [
+                          Icon(
+                            Icons.toll_outlined,
+                            size: 14,
+                            color: AppColors.textMuted,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'TOTAL BALANCE',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 6),
-                      Text('${fmt.format(points)} PTS',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                      Text(
+                        '${fmt.format(points)} PTS',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -124,15 +157,32 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(children: const [
-                        Icon(Icons.trending_up, size: 14, color: AppColors.secondary),
-                        SizedBox(width: 4),
-                        Text('MONTHLY EARN', style: TextStyle(fontSize: 10, color: AppColors.textMuted, fontWeight: FontWeight.bold)),
-                      ]),
+                      Row(
+                        children: const [
+                          Icon(
+                            Icons.trending_up,
+                            size: 14,
+                            color: AppColors.secondary,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'MONTHLY EARN',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 6),
-                      Text('+${fmt.format(_monthlyEarn)} PTS',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold, color: AppColors.secondary)),
+                      Text(
+                        '+${fmt.format(_monthlyEarn)} PTS',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -163,12 +213,14 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: Text('LATEST TRANSACTIONS',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                  color: AppColors.textMuted,
-                )),
+            child: Text(
+              'LATEST TRANSACTIONS',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.8,
+                color: AppColors.textMuted,
+              ),
+            ),
           ),
         ),
 
@@ -177,7 +229,8 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
               ? const Center(child: Text('Không có giao dịch nào.'))
               : ListView.separated(
                   itemCount: _filtered.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1, indent: 16, endIndent: 16),
+                  separatorBuilder: (_, __) =>
+                      const Divider(height: 1, indent: 16, endIndent: 16),
                   itemBuilder: (_, i) => _buildTxnTile(context, _filtered[i]),
                 ),
         ),
@@ -185,8 +238,14 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
         // End label
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Text('END OF RECENT HISTORY',
-              style: TextStyle(fontSize: 11, color: AppColors.textMuted.withOpacity(0.7), letterSpacing: 0.5)),
+          child: Text(
+            'END OF RECENT HISTORY',
+            style: TextStyle(
+              fontSize: 11,
+              color: AppColors.textMuted.withOpacity(0.7),
+              letterSpacing: 0.5,
+            ),
+          ),
         ),
       ],
     );
@@ -202,7 +261,9 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? AppColors.primary : AppColors.borderGray),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.borderGray,
+          ),
         ),
         child: Text(
           label,
@@ -256,14 +317,24 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(txn.note ?? txn.typeLabel,
-                    style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textDark)),
+                Text(
+                  txn.note ?? txn.typeLabel,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
+                ),
                 const SizedBox(height: 3),
                 Text(
                   txn.createdAt != null
-                      ? DateFormat('MMM dd, yyyy • HH:mm').format(txn.createdAt!)
+                      ? DateFormat(
+                          'MMM dd, yyyy • HH:mm',
+                        ).format(txn.createdAt!)
                       : '—',
-                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                  ),
                 ),
               ],
             ),
@@ -276,8 +347,13 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold, color: color),
               ),
               const SizedBox(height: 3),
-              Text(txn.refCode,
-                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+              Text(
+                txn.refCode,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textMuted,
+                ),
+              ),
             ],
           ),
         ],

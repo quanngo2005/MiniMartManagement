@@ -60,11 +60,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   bool _isManager(EmployeeUser user) {
-    return user.roleId == 1 || user.roleId == 5 || user.roleName.toLowerCase() == 'manager' || user.roleName.toLowerCase() == 'quản lý';
+    return user.roleId == 1 ||
+        user.roleId == 5 ||
+        user.roleName.toLowerCase() == 'manager' ||
+        user.roleName.toLowerCase() == 'quản lý';
   }
 
   bool _isCashier(EmployeeUser user) {
-    return user.roleId == 2 || user.roleId == 6 || user.roleName.toLowerCase() == 'cashier' || user.roleName.toLowerCase() == 'thu ngân';
+    return user.roleId == 2 ||
+        user.roleId == 6 ||
+        user.roleName.toLowerCase() == 'cashier' ||
+        user.roleName.toLowerCase() == 'thu ngân';
   }
 
   void _togglePasswordVisibility() {

@@ -24,13 +24,19 @@ class PromotionRuleCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.borderGray),
         boxShadow: const [
-          BoxShadow(color: Color(0x0A000000), blurRadius: 2, offset: Offset(0, 1)),
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
         ],
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border(left: BorderSide(color: _borderColor(statusKey), width: 4)),
+          border: Border(
+            left: BorderSide(color: _borderColor(statusKey), width: 4),
+          ),
         ),
         child: Opacity(
           opacity: isEnded ? 0.75 : 1,
@@ -48,19 +54,29 @@ class PromotionRuleCard extends StatelessWidget {
                         children: [
                           Text(
                             promotion.name,
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: isEnded ? AppColors.textMuted : AppColors.primary,
+                                  color: isEnded
+                                      ? AppColors.textMuted
+                                      : AppColors.primary,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Icon(Icons.calendar_today_outlined, size: 13, color: AppColors.textMuted),
+                              const Icon(
+                                Icons.calendar_today_outlined,
+                                size: 13,
+                                color: AppColors.textMuted,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 '${DateFormat('dd/MM/yyyy').format(promotion.startDate)} → ${DateFormat('dd/MM/yyyy').format(promotion.endDate)}',
-                                style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textMuted,
+                                ),
                               ),
                             ],
                           ),
@@ -75,7 +91,9 @@ class PromotionRuleCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.only(top: 8),
                   decoration: const BoxDecoration(
-                    border: Border(top: BorderSide(color: AppColors.borderGray)),
+                    border: Border(
+                      top: BorderSide(color: AppColors.borderGray),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -89,14 +107,18 @@ class PromotionRuleCard extends StatelessWidget {
                           color: isEnded
                               ? AppColors.textMuted
                               : statusKey == 'active'
-                                  ? AppColors.secondary
-                                  : AppColors.primary,
+                              ? AppColors.secondary
+                              : AppColors.primary,
                         ),
                       ),
                       const SizedBox(width: 12),
                       GestureDetector(
                         onTap: onDelete,
-                        child: const Icon(Icons.delete_outline, size: 18, color: AppColors.statusError),
+                        child: const Icon(
+                          Icons.delete_outline,
+                          size: 18,
+                          color: AppColors.statusError,
+                        ),
                       ),
                     ],
                   ),
@@ -111,23 +133,30 @@ class PromotionRuleCard extends StatelessWidget {
 
   String _statusKey(String status) {
     switch (status) {
-      case 'Active': return 'active';
-      case 'Upcoming': return 'scheduled';
-      default: return 'ended';
+      case 'Active':
+        return 'active';
+      case 'Upcoming':
+        return 'scheduled';
+      default:
+        return 'ended';
     }
   }
 
   Color _borderColor(String statusKey) {
     switch (statusKey) {
-      case 'active': return AppColors.secondary;
-      case 'scheduled': return AppColors.primary;
-      default: return AppColors.outlineVariant;
+      case 'active':
+        return AppColors.secondary;
+      case 'scheduled':
+        return AppColors.primary;
+      default:
+        return AppColors.outlineVariant;
     }
   }
 
   String _discountLabel(Promotion p) {
     if (p.type == 1) return 'M${p.buyQuantity ?? 2}T${p.giftQuantity ?? 1}';
-    if (p.discountAmount != null) return '-${NumberFormat('#,###').format(p.discountAmount)}đ';
+    if (p.discountAmount != null)
+      return '-${NumberFormat('#,###').format(p.discountAmount)}đ';
     return '-${p.discountPercent?.toStringAsFixed(0) ?? '0'}%';
   }
 }
@@ -197,7 +226,10 @@ class _StatusBadge extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(4),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -208,7 +240,14 @@ class _StatusBadge extends StatelessWidget {
               margin: const EdgeInsets.only(right: 4),
               decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
             ),
-          Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: fg)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: fg,
+            ),
+          ),
         ],
       ),
     );

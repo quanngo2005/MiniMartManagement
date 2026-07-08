@@ -7,10 +7,7 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 enum AppNavTab { catalog, categories, staff, customers, promotions }
 
 class AppBottomNavBar extends StatelessWidget {
-  const AppBottomNavBar({
-    super.key,
-    required this.selectedTab,
-  });
+  const AppBottomNavBar({super.key, required this.selectedTab});
 
   final AppNavTab selectedTab;
 

@@ -22,7 +22,11 @@ class Supplier {
       supplierName: _readString(json, 'supplierName', 'SupplierName'),
       phoneNumber: _readString(json, 'phoneNumber', 'PhoneNumber'),
       status: _readBool(json, 'status', 'Status'),
-      contactPerson: _readNullableString(json, 'contactPerson', 'ContactPerson'),
+      contactPerson: _readNullableString(
+        json,
+        'contactPerson',
+        'ContactPerson',
+      ),
     );
   }
 }
@@ -34,7 +38,11 @@ int _readInt(Map<String, dynamic> json, String camelKey, String pascalKey) {
   throw FormatException('Invalid $camelKey.');
 }
 
-String _readString(Map<String, dynamic> json, String camelKey, String pascalKey) {
+String _readString(
+  Map<String, dynamic> json,
+  String camelKey,
+  String pascalKey,
+) {
   final value = json[camelKey] ?? json[pascalKey];
   if (value is String) return value;
   throw FormatException('Invalid $camelKey.');
