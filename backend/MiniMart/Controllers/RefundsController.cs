@@ -21,7 +21,7 @@ namespace MiniMart.Controllers
 
         // GET /api/refunds
         [HttpGet]
-        [Authorize(Policy = "ManagerUp")]
+        [Authorize(Policy = "AnyEmployee")]
         public ActionResult<IEnumerable<OrderReturnDto>> GetAll()
         {
             return Ok(_orderReturnService.GetAllOrderReturnsQueryable().ToList());
@@ -57,6 +57,17 @@ namespace MiniMart.Controllers
         {
             var rejected = await _orderReturnService.RejectOrderReturnAsync(id, rejectDto);
             return Ok(rejected);
+        }
+
+        // POST /api/refunds/{id}/confirm-cash-refund
+        [HttpPost("{id}/confirm-cash-refund")]
+        public async Task<ActionResult<OrderReturnDto>> ConfirmCashRefund(int id)
+        {
+            var cashierId = GetCurrentEmployeeId();
+            if (cashierId == 0) return Unauthorized(new { message = "Không xác định được danh tính nhân viên." });
+
+            var result = await _orderReturnService.ConfirmCashRefundAsync(id, cashierId);
+            return Ok(result);
         }
 
         // POST /api/refunds/upload

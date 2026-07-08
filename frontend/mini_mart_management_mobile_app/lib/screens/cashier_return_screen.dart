@@ -67,7 +67,10 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
     setState(() => _isUploadingImage = true);
     try {
       final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: source, imageQuality: 50);
+      final XFile? image = await picker.pickImage(
+        source: source,
+        imageQuality: 50,
+      );
       if (image != null) {
         setState(() {
           _localImagePath = image.path;
@@ -79,9 +82,9 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi chọn ảnh: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Lỗi chọn ảnh: $e')));
     } finally {
       if (mounted) {
         setState(() => _isUploadingImage = false);
@@ -97,7 +100,10 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
           child: Wrap(
             children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.photo_camera, color: AppColors.secondary),
+                leading: const Icon(
+                  Icons.photo_camera,
+                  color: AppColors.secondary,
+                ),
                 title: const Text('Chụp ảnh mới'),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -105,7 +111,10 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_library, color: AppColors.secondary),
+                leading: const Icon(
+                  Icons.photo_library,
+                  color: AppColors.secondary,
+                ),
                 title: const Text('Chọn từ thư viện'),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -113,7 +122,10 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.flash_on, color: AppColors.primaryContainer),
+                leading: const Icon(
+                  Icons.flash_on,
+                  color: AppColors.primaryContainer,
+                ),
                 title: const Text('Tự động tạo ảnh minh chứng (giả lập)'),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -213,7 +225,9 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã tạo ảnh minh chứng giả lập thành công.')),
+        const SnackBar(
+          content: Text('Đã tạo ảnh minh chứng giả lập thành công.'),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
@@ -366,7 +380,91 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
     );
   }
 
+  int _activeSubTab = 0; // 0 = Tạo yêu cầu, 1 = Lịch sử hoàn trả
+
   Widget _buildBody() {
+    return Column(
+      children: [
+        Container(
+          color: Colors.white,
+          child: Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () => setState(() => _activeSubTab = 0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: _activeSubTab == 0
+                              ? AppColors.secondary
+                              : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Tạo yêu cầu',
+                      style: TextStyle(
+                        fontWeight: _activeSubTab == 0
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        color: _activeSubTab == 0
+                            ? AppColors.secondary
+                            : AppColors.textDark,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    setState(() => _activeSubTab = 1);
+                    context.read<OrderReturnProvider>().loadAllReturns();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: _activeSubTab == 1
+                              ? AppColors.secondary
+                              : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Lịch sử hoàn trả',
+                      style: TextStyle(
+                        fontWeight: _activeSubTab == 1
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        color: _activeSubTab == 1
+                            ? AppColors.secondary
+                            : AppColors.textDark,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _activeSubTab == 0
+              ? _buildCreationForm()
+              : _buildHistoryList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCreationForm() {
     final provider = context.watch<OrderReturnProvider>();
     final currentOrder = provider.currentOrder;
     final isLoading = provider.isLoading;
@@ -911,6 +1009,233 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
       ),
+    );
+  }
+
+  Widget _buildHistoryList() {
+    final provider = context.watch<OrderReturnProvider>();
+    final returns = provider.allReturns;
+    final isLoading = provider.isLoading;
+    final error = provider.errorMessage;
+
+    if (isLoading && returns.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (error != null && returns.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Text(
+            error,
+            style: const TextStyle(color: AppColors.statusError),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    if (returns.isEmpty) {
+      return const Center(
+        child: Text(
+          'Chưa có yêu cầu hoàn trả nào.',
+          style: TextStyle(color: AppColors.textMuted),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => context.read<OrderReturnProvider>().loadAllReturns(),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: returns.length,
+        itemBuilder: (context, index) {
+          final r = returns[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        r.returnCode,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryContainer,
+                        ),
+                      ),
+                      _buildHistoryStatusBadge(r.status, r.statusLabel),
+                    ],
+                  ),
+                  const Divider(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Đơn gốc: ${r.originalOrderCode}',
+                        style: const TextStyle(
+                          color: AppColors.textDark,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        DateFormat('dd/MM/yyyy HH:mm').format(r.orderDate),
+                        style: const TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Phân loại: ${r.classifyLabel}',
+                        style: TextStyle(
+                          color: r.classify == 1
+                              ? AppColors.statusError
+                              : AppColors.secondary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        'Hoàn: ${NumberFormat('#,###').format(r.refundAmount)}đ',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Lý do: ${r.reason}',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 13,
+                    ),
+                  ),
+                  if (r.status == 2) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _confirmCashRefundDialog(
+                          r.orderReturnId,
+                          r.refundAmount,
+                        ),
+                        icon: const Icon(Icons.attach_money, size: 18),
+                        label: const Text('Trả Tiền Mặt'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildHistoryStatusBadge(int status, String label) {
+    Color bg;
+    Color fg;
+    switch (status) {
+      case 2: // Approved
+        bg = Colors.green.shade50;
+        fg = Colors.green.shade700;
+        break;
+      case 3: // Rejected
+        bg = AppColors.statusError.withOpacity(0.1);
+        fg = AppColors.statusError;
+        break;
+      case 4: // Completed
+        bg = Colors.blue.shade50;
+        fg = Colors.blue.shade700;
+        break;
+      default: // Pending
+        bg = AppColors.statusWarning.withOpacity(0.1);
+        fg = AppColors.statusWarning;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: fg, fontSize: 11, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  void _confirmCashRefundDialog(int id, double amount) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Xác nhận hoàn tiền'),
+          content: Text(
+            'Bạn có chắc chắn đã hoàn số tiền ${NumberFormat('#,###').format(amount)}đ bằng tiền mặt từ két cho khách hàng?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                final provider = context.read<OrderReturnProvider>();
+                final success = await provider.confirmCashRefund(id);
+                if (!mounted) return;
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Xác nhận đã hoàn tiền mặt thành công!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        provider.errorMessage ?? 'Xác nhận thất bại.',
+                      ),
+                      backgroundColor: AppColors.statusError,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              child: const Text('Xác nhận đã trả'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

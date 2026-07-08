@@ -162,22 +162,6 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException("Yêu cầu hoàn trả này đã được xử lý rồi.", StatusCodes.Status400BadRequest);
             }
 
-            // Verify the linked shift is still active or valid
-            if (orderReturn.ShiftId == null)
-            {
-                throw new DomainException("Yêu cầu hoàn tiền không liên kết với ca làm việc nào.", StatusCodes.Status400BadRequest);
-            }
-
-            var shift = await _shiftRepository.GetShiftByIdAsync(orderReturn.ShiftId.Value);
-            if (shift == null)
-            {
-                throw new DomainException("Không tìm thấy ca làm việc liên kết để hoàn tiền.", StatusCodes.Status400BadRequest);
-            }
-
-            // Deduct RefundAmount from Shift.Revenue
-            shift.Revenue -= orderReturn.RefundAmount;
-            await _shiftRepository.UpdateShiftAsync(shift);
-
             // Handle Inventory Restocking based on Return Classification
             foreach (var detail in orderReturn.OrderReturnDetails)
             {
@@ -294,6 +278,39 @@ namespace MiniMart.Services.Implementations
                     TotalPrice = od.TotalPrice
                 }).ToList()
             };
+        }
+
+        public async Task<OrderReturnDto> ConfirmCashRefundAsync(int id, int cashierId)
+        {
+            var orderReturn = await _orderReturnRepository.GetByIdAsync(id);
+            if (orderReturn == null)
+            {
+                throw new DomainException("Không tìm thấy yêu cầu hoàn tiền.", StatusCodes.Status404NotFound);
+            }
+
+            if (orderReturn.Status != OrderReturnStatus.Approved)
+            {
+                throw new DomainException("Yêu cầu hoàn trả này chưa được phê duyệt bởi Quản lý hoặc đã hoàn tất.", StatusCodes.Status400BadRequest);
+            }
+
+            // Get active shift of cashier
+            var activeShift = await _shiftRepository.GetActiveShiftByCashierIdAsync(cashierId);
+            if (activeShift == null)
+            {
+                throw new DomainException("Bạn hiện không trong ca làm việc nào hoạt động. Vui lòng mở ca trước khi hoàn tiền.", StatusCodes.Status400BadRequest);
+            }
+
+            // Deduct from shift revenue
+            activeShift.Revenue -= orderReturn.RefundAmount;
+            await _shiftRepository.UpdateShiftAsync(activeShift);
+
+            // Update orderReturn status and update it to the actual shift where the cash refund occurred
+            orderReturn.Status = OrderReturnStatus.Completed;
+            orderReturn.ShiftId = activeShift.ShiftId;
+
+            await _orderReturnRepository.UpdateAsync(orderReturn);
+
+            return _mapper.Map<OrderReturnDto>(orderReturn);
         }
     }
 }

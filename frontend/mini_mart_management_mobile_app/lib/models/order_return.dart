@@ -13,7 +13,7 @@ class OrderReturn {
   final double refundAmount;
   final int refundMethod;
   final int? eInvoiceId;
-  final int status; // 1 = Pending, 2 = Approved, 3 = Rejected
+  final int status; // 1 = Pending, 2 = Approved, 3 = Rejected, 4 = Completed
   final int classify; // 1 = Product Error, 2 = No Longer Needed
   final String? imageEvidence;
   final int? shiftId;
@@ -91,9 +91,11 @@ class OrderReturn {
   String get statusLabel {
     switch (status) {
       case 2:
-        return 'Đã duyệt';
+        return 'Đã duyệt (Chờ hoàn tiền)';
       case 3:
         return 'Từ chối';
+      case 4:
+        return 'Đã hoàn tiền';
       default:
         return 'Chờ duyệt';
     }
