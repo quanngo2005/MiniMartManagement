@@ -145,4 +145,25 @@ class OrderReturnProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> confirmCashRefund(int id) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _orderReturnRepository.confirmCashRefund(id);
+      await loadAllReturns();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      return false;
+    } catch (e) {
+      _errorMessage = 'Không thể xác nhận hoàn tiền mặt: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

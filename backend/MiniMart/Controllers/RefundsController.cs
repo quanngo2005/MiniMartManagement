@@ -59,6 +59,17 @@ namespace MiniMart.Controllers
             return Ok(rejected);
         }
 
+        // POST /api/refunds/{id}/confirm-cash-refund
+        [HttpPost("{id}/confirm-cash-refund")]
+        public async Task<ActionResult<OrderReturnDto>> ConfirmCashRefund(int id)
+        {
+            var cashierId = GetCurrentEmployeeId();
+            if (cashierId == 0) return Unauthorized(new { message = "Không xác định được danh tính nhân viên." });
+
+            var result = await _orderReturnService.ConfirmCashRefundAsync(id, cashierId);
+            return Ok(result);
+        }
+
         // POST /api/refunds/upload
         [HttpPost("upload")]
         [AllowAnonymous] // Cho phép upload ảnh trước khi gửi request

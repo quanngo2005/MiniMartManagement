@@ -63,7 +63,11 @@ class OrderReturnService {
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Tạo yêu cầu hoàn trả thất bại');
+      throw ApiException(
+        responseJson is Map<String, dynamic>
+            ? _readMessage(responseJson)
+            : 'Tạo yêu cầu hoàn trả thất bại',
+      );
     }
 
     if (responseJson is Map<String, dynamic>) {
@@ -90,7 +94,11 @@ class OrderReturnService {
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Upload ảnh thất bại');
+      throw ApiException(
+        responseJson is Map<String, dynamic>
+            ? _readMessage(responseJson)
+            : 'Upload ảnh thất bại',
+      );
     }
 
     if (responseJson is Map<String, dynamic>) {
@@ -117,7 +125,11 @@ class OrderReturnService {
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Duyệt yêu cầu hoàn trả thất bại');
+      throw ApiException(
+        responseJson is Map<String, dynamic>
+            ? _readMessage(responseJson)
+            : 'Duyệt yêu cầu hoàn trả thất bại',
+      );
     }
 
     if (responseJson is Map<String, dynamic>) {
@@ -145,7 +157,41 @@ class OrderReturnService {
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Từ chối yêu cầu hoàn trả thất bại');
+      throw ApiException(
+        responseJson is Map<String, dynamic>
+            ? _readMessage(responseJson)
+            : 'Từ chối yêu cầu hoàn trả thất bại',
+      );
+    }
+
+    if (responseJson is Map<String, dynamic>) {
+      return OrderReturn.fromJson(responseJson);
+    }
+    throw const ApiException('Invalid response structure from server.');
+  }
+
+  Future<OrderReturn> confirmCashRefund(int id) async {
+    final csrfToken = await _fetchCsrfToken();
+    final headers = <String, String>{
+      'Accept': 'application/json',
+      'X-XSRF-TOKEN': csrfToken.value,
+    };
+    if (csrfToken.cookieHeader != null) {
+      headers['Cookie'] = csrfToken.cookieHeader!;
+    }
+
+    final response = await _client.post(
+      ApiConfig.uri('/api/refunds/$id/confirm-cash-refund'),
+      headers: headers,
+    );
+
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(
+        responseJson is Map<String, dynamic>
+            ? _readMessage(responseJson)
+            : 'Xác nhận hoàn tiền mặt thất bại',
+      );
     }
 
     if (responseJson is Map<String, dynamic>) {
@@ -218,10 +264,16 @@ class OrderReturnService {
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Failed to fetch CSRF token');
+      throw ApiException(
+        responseJson is Map<String, dynamic>
+            ? _readMessage(responseJson)
+            : 'Failed to fetch CSRF token',
+      );
     }
 
-    final data = responseJson is Map<String, dynamic> ? (responseJson['data'] ?? responseJson['Data']) : null;
+    final data = responseJson is Map<String, dynamic>
+        ? (responseJson['data'] ?? responseJson['Data'])
+        : null;
     if (data is! Map<String, dynamic>) {
       throw const ApiException('CSRF response is missing token data.');
     }

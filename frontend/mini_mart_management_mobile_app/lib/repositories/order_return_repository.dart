@@ -67,6 +67,16 @@ class OrderReturnRepository {
     }
   }
 
+  Future<OrderReturn> confirmCashRefund(int id) async {
+    try {
+      return await _orderReturnService.confirmCashRefund(id);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Không thể xác nhận hoàn tiền mặt: $e');
+    }
+  }
+
   Future<Map<String, dynamic>> fetchOrderDetailsForReturn(
     String orderCode,
   ) async {
