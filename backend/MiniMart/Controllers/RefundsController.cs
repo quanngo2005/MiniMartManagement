@@ -21,7 +21,7 @@ namespace MiniMart.Controllers
 
         // GET /api/refunds
         [HttpGet]
-        [Authorize(Policy = "ManagerUp")]
+        [Authorize(Policy = "AnyEmployee")]
         public ActionResult<IEnumerable<OrderReturnDto>> GetAll()
         {
             return Ok(_orderReturnService.GetAllOrderReturnsQueryable().ToList());
