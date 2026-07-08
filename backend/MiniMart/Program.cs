@@ -6,6 +6,13 @@ using MiniMart.Mapping;
 using MiniMart.Middleware;
 using MiniMart.Models;
 using MiniMart.Shared.Extensions;
+using MiniMart.Repositories.RepoInterface;
+using MiniMart.Repositories.RepoImplement;
+using MiniMart.Repositories.Implementations;
+using MiniMart.Repositories.Interfaces;
+using MiniMart.Services;
+using MiniMart.Services.Interfaces;
+using MiniMart.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
@@ -56,6 +63,11 @@ builder.Services.AddScoped<IShiftService, ShiftService>();
 builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
 builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 builder.Services.AddAutoMapper(typeof(SupplierMappingProfile));
+builder.Services.AddAutoMapper(typeof(OrderReturnMappingProfile));
+builder.Services.AddScoped<IOrderReturnRepository, OrderReturnRepository>();
+builder.Services.AddScoped<IOrderReturnService, OrderReturnService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IPromotionService, PromotionService>();
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
