@@ -45,18 +45,25 @@ class OrderReturnService {
   }
 
   Future<OrderReturn> createOrderReturn(Map<String, dynamic> payload) async {
+    final csrfToken = await _fetchCsrfToken();
+    final headers = <String, String>{
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'X-XSRF-TOKEN': csrfToken.value,
+    };
+    if (csrfToken.cookieHeader != null) {
+      headers['Cookie'] = csrfToken.cookieHeader!;
+    }
+
     final response = await _client.post(
       ApiConfig.uri('/api/refunds/request'),
-      headers: const {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
+      headers: headers,
       body: jsonEncode(payload),
     );
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_readMessage(responseJson));
+      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Tạo yêu cầu hoàn trả thất bại');
     }
 
     if (responseJson is Map<String, dynamic>) {
@@ -66,8 +73,16 @@ class OrderReturnService {
   }
 
   Future<String> uploadImage(String filePath) async {
+    final csrfToken = await _fetchCsrfToken();
     final uri = ApiConfig.uri('/api/refunds/upload');
     final request = http.MultipartRequest('POST', uri);
+    request.headers.addAll({
+      'Accept': 'application/json',
+      'X-XSRF-TOKEN': csrfToken.value,
+    });
+    if (csrfToken.cookieHeader != null) {
+      request.headers['Cookie'] = csrfToken.cookieHeader!;
+    }
     request.files.add(await http.MultipartFile.fromPath('file', filePath));
 
     final streamedResponse = await _client.send(request);
@@ -75,7 +90,7 @@ class OrderReturnService {
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_readMessage(responseJson));
+      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Upload ảnh thất bại');
     }
 
     if (responseJson is Map<String, dynamic>) {
@@ -86,14 +101,23 @@ class OrderReturnService {
   }
 
   Future<OrderReturn> approveOrderReturn(int id) async {
+    final csrfToken = await _fetchCsrfToken();
+    final headers = <String, String>{
+      'Accept': 'application/json',
+      'X-XSRF-TOKEN': csrfToken.value,
+    };
+    if (csrfToken.cookieHeader != null) {
+      headers['Cookie'] = csrfToken.cookieHeader!;
+    }
+
     final response = await _client.post(
       ApiConfig.uri('/api/refunds/$id/approve'),
-      headers: const {'Accept': 'application/json'},
+      headers: headers,
     );
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_readMessage(responseJson));
+      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Duyệt yêu cầu hoàn trả thất bại');
     }
 
     if (responseJson is Map<String, dynamic>) {
@@ -103,18 +127,25 @@ class OrderReturnService {
   }
 
   Future<OrderReturn> rejectOrderReturn(int id, String note) async {
+    final csrfToken = await _fetchCsrfToken();
+    final headers = <String, String>{
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'X-XSRF-TOKEN': csrfToken.value,
+    };
+    if (csrfToken.cookieHeader != null) {
+      headers['Cookie'] = csrfToken.cookieHeader!;
+    }
+
     final response = await _client.post(
       ApiConfig.uri('/api/refunds/$id/reject'),
-      headers: const {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
+      headers: headers,
       body: jsonEncode({'note': note}),
     );
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_readMessage(responseJson));
+      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Từ chối yêu cầu hoàn trả thất bại');
     }
 
     if (responseJson is Map<String, dynamic>) {
@@ -178,4 +209,45 @@ class OrderReturnService {
     }
     return 'Yêu cầu thất bại. Vui lòng thử lại.';
   }
+
+  Future<_CsrfToken> _fetchCsrfToken() async {
+    final response = await _client.get(
+      ApiConfig.uri('/api/auth/csrf-token'),
+      headers: const {'Accept': 'application/json'},
+    );
+
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(responseJson is Map<String, dynamic> ? _readMessage(responseJson) : 'Failed to fetch CSRF token');
+    }
+
+    final data = responseJson is Map<String, dynamic> ? (responseJson['data'] ?? responseJson['Data']) : null;
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException('CSRF response is missing token data.');
+    }
+
+    final token = data['csrfToken'] ?? data['CsrfToken'];
+    if (token is! String || token.isEmpty) {
+      throw const ApiException('CSRF token is missing.');
+    }
+
+    final cookieToken = _readCookieToken(response.headers['set-cookie']);
+    return _CsrfToken(
+      value: token,
+      cookieHeader: cookieToken == null ? null : 'XSRF-TOKEN=$cookieToken',
+    );
+  }
+
+  String? _readCookieToken(String? setCookieHeader) {
+    if (setCookieHeader == null || setCookieHeader.isEmpty) return null;
+    final match = RegExp(r'XSRF-TOKEN=([^;,\s]+)').firstMatch(setCookieHeader);
+    return match?.group(1);
+  }
+}
+
+class _CsrfToken {
+  const _CsrfToken({required this.value, required this.cookieHeader});
+
+  final String value;
+  final String? cookieHeader;
 }

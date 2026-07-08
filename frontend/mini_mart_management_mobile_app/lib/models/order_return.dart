@@ -42,13 +42,16 @@ class OrderReturn {
   });
 
   factory OrderReturn.fromJson(Map<String, dynamic> json) {
-    var detailsJson =
-        json['orderReturnDetails'] ?? json['OrderReturnDetails'] as List?;
-    List<OrderReturnDetail> details = detailsJson != null
-        ? detailsJson
-              .map((d) => OrderReturnDetail.fromJson(d as Map<String, dynamic>))
-              .toList()
-        : [];
+    final rawDetails = json['orderReturnDetails'] ?? json['OrderReturnDetails'];
+    List<OrderReturnDetail> details = [];
+    if (rawDetails is List) {
+      details = rawDetails.map((d) {
+        if (d is Map) {
+          return OrderReturnDetail.fromJson(Map<String, dynamic>.from(d));
+        }
+        throw Exception('Invalid return detail element format');
+      }).toList();
+    }
 
     return OrderReturn(
       orderReturnId:

@@ -6,6 +6,8 @@ import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_na
 import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path_helper;
 
 class CashierReturnScreen extends StatefulWidget {
   const CashierReturnScreen({super.key});
@@ -59,6 +61,70 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
       _selectedQuantities.clear();
       _localImagePath = null;
     });
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    setState(() => _isUploadingImage = true);
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: source, imageQuality: 50);
+      if (image != null) {
+        setState(() {
+          _localImagePath = image.path;
+        });
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã đính kèm ảnh thành công.')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi chọn ảnh: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isUploadingImage = false);
+      }
+    }
+  }
+
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_camera, color: AppColors.secondary),
+                title: const Text('Chụp ảnh mới'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: AppColors.secondary),
+                title: const Text('Chọn từ thư viện'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.flash_on, color: AppColors.primaryContainer),
+                title: const Text('Tự động tạo ảnh minh chứng (giả lập)'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _mockCaptureImage();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _mockCaptureImage() async {
@@ -147,13 +213,13 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã chụp ảnh minh chứng thành công.')),
+        const SnackBar(content: Text('Đã tạo ảnh minh chứng giả lập thành công.')),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Lỗi chụp ảnh: $e')));
+      ).showSnackBar(SnackBar(content: Text('Lỗi giả lập ảnh: $e')));
     } finally {
       if (mounted) {
         setState(() => _isUploadingImage = false);
@@ -671,7 +737,7 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
         ),
         const SizedBox(height: 8),
         InkWell(
-          onTap: _isUploadingImage ? null : _mockCaptureImage,
+          onTap: _isUploadingImage ? null : _showImagePickerOptions,
           child: Container(
             height: 120,
             width: double.infinity,
@@ -688,7 +754,7 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
                     children: [
                       Center(
                         child: Text(
-                          'Đã đính kèm ảnh minh chứng:\n${Path.basename(_localImagePath!)}',
+                          'Đã đính kèm ảnh minh chứng:\n${path_helper.basename(_localImagePath!)}',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: AppColors.secondary,
