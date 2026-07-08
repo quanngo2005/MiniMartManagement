@@ -77,11 +77,27 @@ namespace MiniMart.Repositories.RepoImplement
             };
         }
 
+        private async Task<string> GenerateNextOrderCodeAsync()
+        {
+            var codes = await _context.Orders
+                .Where(o => o.OrderCode.StartsWith("HD"))
+                .Select(o => o.OrderCode)
+                .ToListAsync();
+
+            var maxNum = codes
+                .Select(c => c.Substring(2))
+                .Select(s => int.TryParse(s, out int n) ? n : 0)
+                .DefaultIfEmpty(0)
+                .Max();
+
+            return $"HD{(maxNum + 1):D3}";
+        }
+
         // CREATE ORDER (Pending) 
         public async Task<Order> CreateOrderAsync(Order order)
         {
             order.Status = OrderStatus.Pending;
-            order.OrderCode = $"ORD-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
+            order.OrderCode = await GenerateNextOrderCodeAsync();
             order.OrderDate = DateTime.Now;
 
             await _context.Orders.AddAsync(order);
@@ -159,7 +175,7 @@ namespace MiniMart.Repositories.RepoImplement
             {
                 var order = new Order
                 {
-                    OrderCode = $"ORD-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}",
+                    OrderCode = await GenerateNextOrderCodeAsync(),
                     SubTotal = subTotal,
                     DiscountAmount = discountAmount,
                     FinalAmount = finalAmount,

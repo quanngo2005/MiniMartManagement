@@ -11,7 +11,7 @@ namespace MiniMart.Controllers
     [Route("api/products")]
     [Route("odata/Products")]
     [Authorize]
-    public class ProductsController : ODataController
+    public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
 

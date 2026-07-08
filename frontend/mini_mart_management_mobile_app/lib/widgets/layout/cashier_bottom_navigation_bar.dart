@@ -6,10 +6,7 @@ import 'package:mini_mart_management_mobile_app/screens/settings_screen.dart';
 enum CashierNavTab { checkout, inventory, returns, settings }
 
 class CashierBottomNavigationBar extends StatelessWidget {
-  const CashierBottomNavigationBar({
-    super.key,
-    required this.selectedTab,
-  });
+  const CashierBottomNavigationBar({super.key, required this.selectedTab});
 
   final CashierNavTab selectedTab;
 
@@ -21,18 +18,24 @@ class CashierBottomNavigationBar extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).pushReplacement(
-          PageRouteBuilder(pageBuilder: (_, __, ___) => const CheckoutScreen(), transitionDuration: Duration.zero),
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const CheckoutScreen(),
+            transitionDuration: Duration.zero,
+          ),
         );
         break;
       case 1:
-      // Navigator.of(context).pushReplacementNamed('/inventory');
+        // Navigator.of(context).pushReplacementNamed('/inventory');
         break;
       case 2:
-      // Navigator.of(context).pushReplacementNamed('/returns');
+        Navigator.of(context).pushReplacementNamed('/returns');
         break;
       case 3:
         Navigator.of(context).pushReplacement(
-          PageRouteBuilder(pageBuilder: (_, __, ___) => const SettingsScreen(), transitionDuration: Duration.zero),
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const SettingsScreen(),
+            transitionDuration: Duration.zero,
+          ),
         );
         break;
     }
