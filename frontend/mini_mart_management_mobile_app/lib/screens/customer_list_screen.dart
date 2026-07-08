@@ -26,7 +26,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
       context.read<CustomerProvider>().fetchCustomers();
     });
     _searchController.addListener(() {
-      setState(() => _searchQuery = _searchController.text.trim().toLowerCase());
+      setState(
+        () => _searchQuery = _searchController.text.trim().toLowerCase(),
+      );
     });
   }
 
@@ -38,11 +40,12 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
 
   List<CustomerSummary> _filtered(List<CustomerSummary> all) {
     return all.where((c) {
-      final matchQuery = _searchQuery.isEmpty ||
+      final matchQuery =
+          _searchQuery.isEmpty ||
           c.name.toLowerCase().contains(_searchQuery) ||
           c.phone.toLowerCase().contains(_searchQuery);
-      final matchTier = _tierFilter == null ||
-          c.tier.toLowerCase() == _tierFilter;
+      final matchTier =
+          _tierFilter == null || c.tier.toLowerCase() == _tierFilter;
       return matchQuery && matchTier;
     }).toList();
   }
@@ -60,7 +63,8 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _showAddCustomerDialog(context),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.surfaceContainerLowest,
@@ -86,9 +90,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
       title: Text(
         'Danh sách khách hàng',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
@@ -152,7 +156,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceContainerHigh,
+          color: isSelected
+              ? AppColors.primary
+              : AppColors.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.outlineVariant,
@@ -217,15 +223,20 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.people_outline,
-                  size: 56, color: AppColors.outlineVariant),
+              Icon(
+                Icons.people_outline,
+                size: 56,
+                color: AppColors.outlineVariant,
+              ),
               const SizedBox(height: 12),
               Text(
                 _searchQuery.isNotEmpty || _tierFilter != null
                     ? 'Không tìm thấy khách hàng phù hợp.'
                     : 'Chưa có khách hàng nào.',
-                style:
-                    const TextStyle(color: AppColors.textMuted, fontSize: 14),
+                style: const TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -267,8 +278,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
       ),
       builder: (_) => _AddCustomerSheet(
         onSave: (data) async {
-          final success =
-              await context.read<CustomerProvider>().createCustomer(data);
+          final success = await context.read<CustomerProvider>().createCustomer(
+            data,
+          );
           if (success && context.mounted) Navigator.pop(context);
         },
       ),
@@ -318,8 +330,9 @@ class _AddCustomerSheetState extends State<_AddCustomerSheet> {
         'fullName': _nameCtrl.text.trim(),
         'phoneNumber': _phoneCtrl.text.trim(),
         'email': _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
-        'address':
-            _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
+        'address': _addressCtrl.text.trim().isEmpty
+            ? null
+            : _addressCtrl.text.trim(),
         'point': 0,
         'customerStatus': true,
       });
@@ -356,11 +369,12 @@ class _AddCustomerSheetState extends State<_AddCustomerSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            Text('Thêm khách hàng mới',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'Thêm khách hàng mới',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             if (_error != null)
               Container(
@@ -371,18 +385,27 @@ class _AddCustomerSheetState extends State<_AddCustomerSheet> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.red.shade200),
                 ),
-                child: Text(_error!,
-                    style: const TextStyle(color: Colors.red, fontSize: 13)),
+                child: Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.red, fontSize: 13),
+                ),
               ),
             _buildField(_codeCtrl, 'Mã khách hàng', required: true),
             const SizedBox(height: 12),
             _buildField(_nameCtrl, 'Họ tên', required: true),
             const SizedBox(height: 12),
-            _buildField(_phoneCtrl, 'Số điện thoại',
-                required: true, keyboardType: TextInputType.phone),
+            _buildField(
+              _phoneCtrl,
+              'Số điện thoại',
+              required: true,
+              keyboardType: TextInputType.phone,
+            ),
             const SizedBox(height: 12),
-            _buildField(_emailCtrl, 'Email (tuỳ chọn)',
-                keyboardType: TextInputType.emailAddress),
+            _buildField(
+              _emailCtrl,
+              'Email (tuỳ chọn)',
+              keyboardType: TextInputType.emailAddress,
+            ),
             const SizedBox(height: 12),
             _buildField(_addressCtrl, 'Địa chỉ (tuỳ chọn)'),
             const SizedBox(height: 20),
@@ -391,14 +414,18 @@ class _AddCustomerSheetState extends State<_AddCustomerSheet> {
               child: FilledButton(
                 onPressed: _isSaving ? null : _submit,
                 style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    minimumSize: const Size(0, 48)),
+                  backgroundColor: AppColors.primary,
+                  minimumSize: const Size(0, 48),
+                ),
                 child: _isSaving
                     ? const SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2))
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Text('Lưu khách hàng'),
               ),
             ),
@@ -408,20 +435,27 @@ class _AddCustomerSheetState extends State<_AddCustomerSheet> {
     );
   }
 
-  Widget _buildField(TextEditingController ctrl, String label,
-      {bool required = false, TextInputType? keyboardType}) {
+  Widget _buildField(
+    TextEditingController ctrl,
+    String label, {
+    bool required = false,
+    TextInputType? keyboardType,
+  }) {
     return TextFormField(
       controller: ctrl,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
       ),
       validator: required
-          ? (v) =>
-              (v == null || v.trim().isEmpty) ? '$label không được trống' : null
+          ? (v) => (v == null || v.trim().isEmpty)
+                ? '$label không được trống'
+                : null
           : null,
     );
   }

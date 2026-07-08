@@ -37,13 +37,21 @@ int _readInt(Map<String, dynamic> json, String camelKey, String pascalKey) {
   throw FormatException('Invalid $camelKey.');
 }
 
-double _readDouble(Map<String, dynamic> json, String camelKey, String pascalKey) {
+double _readDouble(
+  Map<String, dynamic> json,
+  String camelKey,
+  String pascalKey,
+) {
   final value = json[camelKey] ?? json[pascalKey];
   if (value is num) return value.toDouble();
   throw FormatException('Invalid $camelKey.');
 }
 
-String _readString(Map<String, dynamic> json, String camelKey, String pascalKey) {
+String _readString(
+  Map<String, dynamic> json,
+  String camelKey,
+  String pascalKey,
+) {
   final value = json[camelKey] ?? json[pascalKey];
   if (value is String) return value;
   throw FormatException('Invalid $camelKey.');

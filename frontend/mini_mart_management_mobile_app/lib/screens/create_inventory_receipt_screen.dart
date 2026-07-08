@@ -334,22 +334,28 @@ class _CreateInventoryReceiptScreenState
     final query = _supplierSearchController.text.trim().toLowerCase();
     if (query.isEmpty) return suppliers.take(3).toList(growable: false);
 
-    return suppliers.where((supplier) {
-      return supplier.supplierName.toLowerCase().contains(query) ||
-          supplier.supplierCode.toLowerCase().contains(query) ||
-          supplier.phoneNumber.toLowerCase().contains(query);
-    }).take(5).toList(growable: false);
+    return suppliers
+        .where((supplier) {
+          return supplier.supplierName.toLowerCase().contains(query) ||
+              supplier.supplierCode.toLowerCase().contains(query) ||
+              supplier.phoneNumber.toLowerCase().contains(query);
+        })
+        .take(5)
+        .toList(growable: false);
   }
 
   List<ProductLookup> _filterProducts(List<ProductLookup> products) {
     final query = _productSearchController.text.trim().toLowerCase();
     if (query.isEmpty) return const [];
 
-    return products.where((product) {
-      return product.productName.toLowerCase().contains(query) ||
-          product.productCode.toLowerCase().contains(query) ||
-          product.barcode.toLowerCase().contains(query);
-    }).take(5).toList(growable: false);
+    return products
+        .where((product) {
+          return product.productName.toLowerCase().contains(query) ||
+              product.productCode.toLowerCase().contains(query) ||
+              product.barcode.toLowerCase().contains(query);
+        })
+        .take(5)
+        .toList(growable: false);
   }
 
   void _selectSupplier(Supplier supplier) {
@@ -394,10 +400,7 @@ class _CreateInventoryReceiptScreenState
       return;
     }
     if (_lines.any((line) => !line.manufactureDate.isBefore(line.expiryDate))) {
-      _showActionSnackBar(
-        context,
-        'Ngày sản xuất phải trước hạn sử dụng.',
-      );
+      _showActionSnackBar(context, 'Ngày sản xuất phải trước hạn sử dụng.');
       return;
     }
 
@@ -432,7 +435,10 @@ class _CreateInventoryReceiptScreenState
   }
 
   static double _readMoney(String value) {
-    return double.tryParse(value.trim().replaceAll('.', '').replaceAll(',', '')) ?? 0;
+    return double.tryParse(
+          value.trim().replaceAll('.', '').replaceAll(',', ''),
+        ) ??
+        0;
   }
 
   static String _formatDate(DateTime date) {
@@ -604,7 +610,8 @@ class _SupplierSuggestList extends StatelessWidget {
       child: Column(
         children: [
           for (final (index, supplier) in suppliers.indexed) ...[
-            if (index > 0) const Divider(height: 1, color: AppColors.borderGray),
+            if (index > 0)
+              const Divider(height: 1, color: AppColors.borderGray),
             ListTile(
               dense: true,
               leading: const Icon(
@@ -662,10 +669,7 @@ class _SelectedSupplierBanner extends StatelessWidget {
 }
 
 class _ProductSuggestList extends StatelessWidget {
-  const _ProductSuggestList({
-    required this.products,
-    required this.onSelected,
-  });
+  const _ProductSuggestList({required this.products, required this.onSelected});
 
   final List<ProductLookup> products;
   final ValueChanged<ProductLookup> onSelected;
@@ -681,7 +685,8 @@ class _ProductSuggestList extends StatelessWidget {
       child: Column(
         children: [
           for (final (index, product) in products.indexed) ...[
-            if (index > 0) const Divider(height: 1, color: AppColors.borderGray),
+            if (index > 0)
+              const Divider(height: 1, color: AppColors.borderGray),
             ListTile(
               dense: true,
               leading: const Icon(
@@ -689,9 +694,7 @@ class _ProductSuggestList extends StatelessWidget {
                 color: AppColors.secondary,
               ),
               title: Text(product.productName),
-              subtitle: Text(
-                '${product.productCode} • ${product.barcode}',
-              ),
+              subtitle: Text('${product.productCode} • ${product.barcode}'),
               trailing: const Icon(Icons.add_rounded),
               onTap: () => onSelected(product),
             ),
@@ -991,7 +994,8 @@ class _ReceiptProductDraft {
     return ReceiptBatchLine(
       productId: product.productId,
       barcode: product.barcode,
-      batchCode: 'LOT-${product.productCode}-${DateTime.now().millisecondsSinceEpoch}',
+      batchCode:
+          'LOT-${product.productCode}-${DateTime.now().millisecondsSinceEpoch}',
       manufactureDate: manufactureDate,
       expiryDate: expiryDate,
       importPrice: _CreateInventoryReceiptScreenState._readMoney(

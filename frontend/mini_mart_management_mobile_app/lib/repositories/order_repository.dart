@@ -1,7 +1,8 @@
 import 'package:mini_mart_management_mobile_app/services/order_service.dart';
 
 class OrderRepository {
-  OrderRepository({OrderService? service}) : _service = service ?? OrderService();
+  OrderRepository({OrderService? service})
+    : _service = service ?? OrderService();
 
   final OrderService _service;
 

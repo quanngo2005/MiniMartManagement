@@ -18,7 +18,8 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentReceipt = context.select<ReceiptProvider, Receipt?>(
+    final currentReceipt =
+        context.select<ReceiptProvider, Receipt?>(
           (provider) => provider.receiptById(receipt.receiptId),
         ) ??
         receipt;

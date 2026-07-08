@@ -12,7 +12,9 @@ import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/inve
 import 'package:provider/provider.dart';
 
 class InventoryDocumentsScreen extends StatefulWidget {
-  const InventoryDocumentsScreen({super.key});
+  const InventoryDocumentsScreen({this.onMenuTap, super.key});
+
+  final VoidCallback? onMenuTap;
 
   @override
   State<InventoryDocumentsScreen> createState() =>
@@ -96,7 +98,8 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _openCreateReceipt(context),
         tooltip: 'Tạo receipt nhập hàng',
         backgroundColor: AppColors.primary,
@@ -109,10 +112,12 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
   Widget _buildStats(List<Receipt> receipts) {
     final importedQuantity = receipts.fold<int>(
       0,
-      (total, receipt) => total + receipt.batchLines.fold<int>(
-        0,
-        (lineTotal, line) => lineTotal + line.quantity,
-      ),
+      (total, receipt) =>
+          total +
+          receipt.batchLines.fold<int>(
+            0,
+            (lineTotal, line) => lineTotal + line.quantity,
+          ),
     );
 
     return Padding(
@@ -151,7 +156,12 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
       backgroundColor: AppColors.surfaceBright,
       foregroundColor: AppColors.primary,
       titleSpacing: 0,
-      leading: const Icon(Icons.storefront_rounded),
+      leading: widget.onMenuTap != null
+          ? IconButton(
+              icon: const Icon(Icons.menu_rounded),
+              onPressed: widget.onMenuTap,
+            )
+          : const Icon(Icons.storefront_rounded),
       title: Text(
         'Cửa hàng #402 | Nhập/Xuất',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
