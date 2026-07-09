@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Báo cáo Ca làm việc - RetailMaster</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #faf9fb;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c4c6ce;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#eebd90",
+                        "primary": "#000f22",
+                        "outline-variant": "#c4c6ce",
+                        "surface-variant": "#e3e2e5",
+                        "surface-container-high": "#e9e8ea",
+                        "on-background": "#1b1c1e",
+                        "on-error-container": "#93000a",
+                        "background": "#faf9fb",
+                        "status-warning": "#F59E0B",
+                        "tertiary-container": "#381d00",
+                        "text-dark": "#334155",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#6cf8bb",
+                        "primary-fixed": "#d2e4ff",
+                        "primary-fixed-dim": "#b0c8eb",
+                        "on-tertiary-fixed": "#2d1600",
+                        "on-surface": "#1b1c1e",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-tertiary-container": "#ae835a",
+                        "inverse-surface": "#2f3033",
+                        "surface-tint": "#49607e",
+                        "surface-bright": "#faf9fb",
+                        "status-error": "#EF4444",
+                        "inverse-on-surface": "#f2f0f3",
+                        "outline": "#74777e",
+                        "on-primary-fixed-variant": "#314865",
+                        "tertiary": "#1a0b00",
+                        "on-secondary-container": "#00714d",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-primary-container": "#768dad",
+                        "inverse-primary": "#b0c8eb",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-surface-variant": "#43474d",
+                        "primary-container": "#0a2540",
+                        "surface-container": "#efedf0",
+                        "surface-container-low": "#f5f3f6",
+                        "error": "#ba1a1a",
+                        "secondary": "#006c49",
+                        "surface": "#faf9fb",
+                        "border-gray": "#E2E8F0",
+                        "surface-container-highest": "#e3e2e5",
+                        "text-muted": "#64748B",
+                        "on-secondary-fixed": "#002113",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#613f1c",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#ffdcbe",
+                        "on-primary-fixed": "#001c37",
+                        "background-slate": "#F8FAFC",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dbd9dc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "safe-area": "16px",
+                        "stack-sm": "8px",
+                        "gutter": "12px",
+                        "stack-md": "16px",
+                        "touch-target": "48px"
+                    },
+                    "fontFamily": {
+                        "metadata": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "data-tabular": ["JetBrains Mono"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-primary-container border-b border-border-gray dark:border-outline-variant flex justify-between items-center px-safe w-full h-touch-target fixed top-0 z-40 transition-colors duration-200">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">storefront</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">RetailMaster</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full cursor-pointer">search</span>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional high-definition headshot of a retail manager in a minimalist studio setting. The lighting is crisp and cool, reflecting a modern corporate atmosphere with soft blue and white tones. The subject is wearing a professional navy uniform, conveying authority and reliability in a high-intensity supermarket management environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqAIaMiU2prHCFqKdqP2DrF2FH5ujCNiSCG6gGddBYJcDRFxbfjaerDexl4C2onDqsE9aP4ByEZIjaWLisEciKh04LfH2aS5NzYUVnc72DVpw43kprAz7eoKbOV4pmyrE0EpdY7kUaDziQtNmnxY1SW-UeGK8OHeKTOV7SF5fujNW24eGfj6paUDJxpaCYLwHUMnwfEbpUscDc582KUhvE1iekOeubux6NZ6ICxRhf0Jk5ycVcYi4k3wENoyNK2mFA16FcYw_qgAYc"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<main class="flex-1 overflow-y-auto mt-[48px] pb-[90px] px-safe py-gutter custom-scrollbar">
+<!-- Screen Header -->
+<div class="mb-stack-md">
+<h2 class="font-headline-lg text-headline-lg text-primary">Báo cáo Ca làm việc</h2>
+<p class="font-body-md text-body-md text-text-muted mt-1">Tổng hợp báo cáo kết thúc ca gần nhất</p>
+</div>
+<!-- Summary Mini-Bento -->
+<div class="grid grid-cols-2 gap-gutter mb-stack-md">
+<div class="bg-surface-container-lowest border border-border-gray p-stack-md rounded-xl shadow-sm">
+<p class="font-metadata text-metadata text-text-muted uppercase tracking-wider">Tổng Doanh Thu</p>
+<p class="font-headline-md text-headline-md text-primary mt-1 font-data-tabular">42.850.000đ</p>
+<div class="flex items-center gap-1 mt-2 text-on-secondary-container">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="font-metadata text-metadata">+12% vs hôm qua</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-border-gray p-stack-md rounded-xl shadow-sm">
+<p class="font-metadata text-metadata text-text-muted uppercase tracking-wider">Chênh Lệch Quỹ</p>
+<p class="font-headline-md text-headline-md text-status-error mt-1 font-data-tabular">-120.000đ</p>
+<div class="flex items-center gap-1 mt-2 text-status-warning">
+<span class="material-symbols-outlined text-[16px]">report_problem</span>
+<span class="font-metadata text-metadata">3 ca thiếu hụt</span>
+</div>
+</div>
+</div>
+<!-- Shift Report List -->
+<div class="flex flex-col gap-gutter">
+<!-- Card 1: Shortage -->
+<div class="bg-white border border-border-gray rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-stack-sm">
+<div>
+<span class="font-metadata text-metadata bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full">Ca Chiều</span>
+<h3 class="font-body-lg text-body-lg font-bold text-primary mt-1">20/10/2023 • 14:00 - 22:00</h3>
+</div>
+<div class="flex items-center gap-1 text-error bg-error-container/30 px-3 py-1 rounded-full border border-error/10">
+<span class="material-symbols-outlined text-[18px]">trending_down</span>
+<span class="font-metadata text-metadata font-bold">Thiếu hụt</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-stack-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">person</span>
+<div>
+<p class="font-metadata text-metadata text-text-muted">Nhân viên</p>
+<p class="font-body-md text-body-md font-medium">Nguyễn Văn A</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">receipt_long</span>
+<div>
+<p class="font-metadata text-metadata text-text-muted">Giao dịch</p>
+<p class="font-body-md text-body-md font-medium">142 hóa đơn</p>
+</div>
+</div>
+</div>
+<div class="mt-stack-md pt-stack-md border-t border-border-gray/50 flex justify-between items-center">
+<div>
+<p class="font-metadata text-metadata text-text-muted">Doanh thu</p>
+<p class="font-headline-md text-headline-md text-primary font-data-tabular">18.240.000đ</p>
+</div>
+<div class="text-right">
+<p class="font-metadata text-metadata text-text-muted">Chênh lệch tiền mặt</p>
+<p class="font-body-lg text-body-lg font-bold text-error font-data-tabular">-85.000đ</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Balanced -->
+<div class="bg-white border border-border-gray rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-stack-sm">
+<div>
+<span class="font-metadata text-metadata bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full">Ca Sáng</span>
+<h3 class="font-body-lg text-body-lg font-bold text-primary mt-1">20/10/2023 • 06:00 - 14:00</h3>
+</div>
+<div class="flex items-center gap-1 text-on-secondary-container bg-secondary-container/30 px-3 py-1 rounded-full border border-secondary/10">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span class="font-metadata text-metadata font-bold">Khớp quỹ</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-stack-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">person</span>
+<div>
+<p class="font-metadata text-metadata text-text-muted">Nhân viên</p>
+<p class="font-body-md text-body-md font-medium">Lê Thị B</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">receipt_long</span>
+<div>
+<p class="font-metadata text-metadata text-text-muted">Giao dịch</p>
+<p class="font-body-md text-body-md font-medium">98 hóa đơn</p>
+</div>
+</div>
+</div>
+<div class="mt-stack-md pt-stack-md border-t border-border-gray/50 flex justify-between items-center">
+<div>
+<p class="font-metadata text-metadata text-text-muted">Doanh thu</p>
+<p class="font-headline-md text-headline-md text-primary font-data-tabular">12.560.000đ</p>
+</div>
+<div class="text-right">
+<p class="font-metadata text-metadata text-text-muted">Chênh lệch tiền mặt</p>
+<p class="font-body-lg text-body-lg font-bold text-secondary font-data-tabular">0đ</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3: Surplus -->
+<div class="bg-white border border-border-gray rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-stack-sm">
+<div>
+<span class="font-metadata text-metadata bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full">Ca Đêm</span>
+<h3 class="font-body-lg text-body-lg font-bold text-primary mt-1">19/10/2023 • 22:00 - 06:00</h3>
+</div>
+<div class="flex items-center gap-1 text-on-secondary-container bg-secondary-container/30 px-3 py-1 rounded-full border border-secondary/10">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span class="font-metadata text-metadata font-bold">Dư quỹ</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-stack-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">person</span>
+<div>
+<p class="font-metadata text-metadata text-text-muted">Nhân viên</p>
+<p class="font-body-md text-body-md font-medium">Trần Văn C</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">receipt_long</span>
+<div>
+<p class="font-metadata text-metadata text-text-muted">Giao dịch</p>
+<p class="font-body-md text-body-md font-medium">45 hóa đơn</p>
+</div>
+</div>
+</div>
+<div class="mt-stack-md pt-stack-md border-t border-border-gray/50 flex justify-between items-center">
+<div>
+<p class="font-metadata text-metadata text-text-muted">Doanh thu</p>
+<p class="font-headline-md text-headline-md text-primary font-data-tabular">6.420.000đ</p>
+</div>
+<div class="text-right">
+<p class="font-metadata text-metadata text-text-muted">Chênh lệch tiền mặt</p>
+<p class="font-body-lg text-body-lg font-bold text-secondary font-data-tabular">+25.000đ</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Empty State / Load More -->
+<button class="w-full py-stack-md border-2 border-dashed border-outline-variant text-outline-variant font-body-md hover:bg-surface-container-low transition-colors rounded-xl flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">expand_more</span>
+                Xem các ca cũ hơn
+            </button>
+</div>
+</main>
+<!-- FAB: Scanner/Action -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center z-50 hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[28px]">qr_code_scanner</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface dark:bg-primary-container border-t border-border-gray dark:border-outline-variant shadow-lg flex justify-around items-center h-[72px] px-safe pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 scale-95 transition-transform duration-100 hover:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-metadata text-metadata mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-3 py-1 scale-95 transition-transform duration-100" href="#">
+<span class="material-symbols-outlined active-icon">analytics</span>
+<span class="font-metadata text-metadata mt-1">Analytics</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 scale-95 transition-transform duration-100 hover:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-metadata text-metadata mt-1">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 scale-95 transition-transform duration-100 hover:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-metadata text-metadata mt-1">Staff</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for shift cards
+        document.querySelectorAll('.bg-white.border').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.transition = 'transform 0.1s ease';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Pull to refresh simulation (visual only)
+        let touchstartY = 0;
+        document.addEventListener('touchstart', e => {
+            touchstartY = e.touches[0].clientY;
+        });
+        document.addEventListener('touchend', e => {
+            const touchendY = e.changedTouches[0].clientY;
+            if (touchendY > touchstartY + 100 && window.scrollY === 0) {
+                // Potential Refresh Action
+                console.log('Refreshing content...');
+            }
+        });
+    </script>
+</body></html>

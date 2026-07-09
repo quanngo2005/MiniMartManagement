@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_dashboard_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/product_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_return_list_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_bottom_navigation_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_drawer.dart';
 
@@ -42,11 +45,13 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
   static const _destinationToIndex = {
     ManagerNavDestination.home: 0,
     ManagerNavDestination.shift: 1,
-    ManagerNavDestination.inventoryDocuments: 2,
-    ManagerNavDestination.inventoryTransactions: 3,
-    ManagerNavDestination.staff: 4,
-    ManagerNavDestination.customers: 5,
-    ManagerNavDestination.promotions: 6,
+    ManagerNavDestination.productPerformance: 2,
+    ManagerNavDestination.inventoryDocuments: 3,
+    ManagerNavDestination.inventoryTransactions: 4,
+    ManagerNavDestination.staff: 5,
+    ManagerNavDestination.customers: 6,
+    ManagerNavDestination.promotions: 7,
+    ManagerNavDestination.analyze: 8,
   };
 
   // Only 4 bottom-nav tabs map to destinations; others are drawer-only.
@@ -94,26 +99,32 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           ),
           // 1 — Shift
           ShiftManagementScreen(onMenuTap: _openDrawer),
-          // 2 — Inventory documents
+          // 2 — Product performance
+          ProductPerformanceScreen(onMenuTap: _openDrawer),
+          // 3 — Inventory documents
           InventoryDocumentsScreen(onMenuTap: _openDrawer),
-          // 3 — Inventory transactions
+          // 4 — Inventory transactions
           InventoryTransactionsScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
-          // 4 — Staff
+          // 5 — Staff
           EmployeeManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
-          // 5 — Customers
+          // 6 — Customers
           MemberManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
-          // 6 — Promotions
+          // 7 — Promotions
           PromotionManagementScreen(
             showBottomNavBar: false,
+            onMenuTap: _openDrawer,
+          ),
+          // 8 — Analyze
+          AnalyzeScreen(
             onMenuTap: _openDrawer,
           ),
         ],

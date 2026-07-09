@@ -7,10 +7,10 @@ namespace MiniMart.Migrations
     /// <inheritdoc />
     public partial class ResetTestAccountPasswords : Migration
     {
-        // Passwords reset to: Test@1234
+        // Passwords reset to: Manager@123
         // Hash: PBKDF2-SHA256, 100000 iterations, SHA256
         private const string AdminHash    = "PBKDF2-SHA256:100000:AAAAAAAAAAAAAAAAAAAAAA==:r0GIBpkS8e7GxDqGPi9RRGMTbz3e+lNuLZZL8JSwPCY=";
-        private const string ManagerHash  = "PBKDF2-SHA256:100000:AAAAAAAAAAAAAAAAAAAAAB==:fLt0cH9Q3iIYJa8l2GpBPY4cVbVPcE/xW7V4NpA7vUI=";
+        private const string ManagerHash  = "PBKDF2-SHA256:100000:4i06mXfdgXI4rFm+51SILA==:TSBEaTARkBveb/293mpk1+oJ98Ai3yoTyDllFlZIiO0=";
 
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,7 +22,7 @@ namespace MiniMart.Migrations
                 WHERE [Username] = N'admin.test';
 
                 UPDATE [dbo].[Employees]
-                SET [PasswordHash] = N'PBKDF2-SHA256:100000:AAAAAAAAAAAAAAAAAAAAAB==:fLt0cH9Q3iIYJa8l2GpBPY4cVbVPcE/xW7V4NpA7vUI='
+                SET [PasswordHash] = N'PBKDF2-SHA256:100000:4i06mXfdgXI4rFm+51SILA==:TSBEaTARkBveb/293mpk1+oJ98Ai3yoTyDllFlZIiO0='
                 WHERE [Username] = N'manager.test';
                 """);
         }
@@ -38,7 +38,7 @@ namespace MiniMart.Migrations
                 WHERE [Username] = N'admin.test';
 
                 UPDATE [dbo].[Employees]
-                SET [PasswordHash] = N'PBKDF2-SHA256:100000:CZNdjBIPynM3lzo4e7gK7A==:xiVhxkMlNdGago6CisgLJpYB9nXckw5sQW4HjrIVN1I='
+                SET [PasswordHash] = N'PBKDF2-SHA256:100000:4i06mXfdgXI4rFm+51SILA==:TSBEaTARkBveb/293mpk1+oJ98Ai3yoTyDllFlZIiO0='
                 WHERE [Username] = N'manager.test';
                 """);
         }
