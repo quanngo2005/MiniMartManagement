@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
+import 'package:mini_mart_management_mobile_app/models/checkout.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
 class OrderService {
@@ -10,7 +11,7 @@ class OrderService {
 
   final http.Client _client;
 
-  Future<Map<String, dynamic>> checkout(Map<String, dynamic> data) async {
+  Future<CheckoutResponse> checkout(CheckoutRequest request) async {
     final csrfToken = await _fetchCsrfToken();
     final headers = <String, String>{
       'Accept': 'application/json',
@@ -25,7 +26,7 @@ class OrderService {
     final response = await _client.post(
       ApiConfig.uri('/api/orders/checkout'),
       headers: headers,
-      body: jsonEncode(data),
+      body: jsonEncode(request.toJson()),
     );
 
     final responseJson = _decodeResponse(response);
@@ -33,7 +34,12 @@ class OrderService {
       throw ApiException(_readMessage(responseJson));
     }
 
-    return responseJson;
+    final data = responseJson['data'] ?? responseJson['Data'] ?? responseJson;
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException('Invalid checkout response');
+    }
+
+    return CheckoutResponse.fromJson(data);
   }
 
   Future<_CsrfToken> _fetchCsrfToken() async {

@@ -6,6 +6,14 @@ using MiniMart.Mapping;
 using MiniMart.Middleware;
 using MiniMart.Models;
 using MiniMart.Shared.Extensions;
+using MiniMart.Repositories.RepoInterface;
+using MiniMart.Repositories.RepoImplement;
+using MiniMart.Repositories.Implementations;
+using MiniMart.Repositories.Interfaces;
+using MiniMart.Services;
+using MiniMart.Services.Interfaces;
+using MiniMart.Services.Implementations;
+using MiniMart.Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
@@ -36,7 +44,11 @@ odataBuilder.EntitySet<Promotion>("Promotions");
 // ── Infrastructure ────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
+
+// ── Settings ────────────────────────────────────────────────────────
+builder.Services.Configure<TaxSettings>(builder.Configuration.GetSection("TaxSettings"));
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -56,6 +68,12 @@ builder.Services.AddScoped<IShiftService, ShiftService>();
 builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
 builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 builder.Services.AddAutoMapper(typeof(SupplierMappingProfile));
+builder.Services.AddAutoMapper(typeof(OrderReturnMappingProfile));
+builder.Services.AddScoped<IOrderReturnRepository, OrderReturnRepository>();
+builder.Services.AddScoped<IOrderReturnService, OrderReturnService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IPromotionService, PromotionService>();
+builder.Services.AddScoped<ITaxCalculationService, TaxCalculationService>();
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
