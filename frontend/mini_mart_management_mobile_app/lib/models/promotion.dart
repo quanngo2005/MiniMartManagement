@@ -41,18 +41,15 @@ class Promotion {
       type: (json['type'] ?? json['Type'] ?? 0) as int,
       discountPercent: (json['discountPercent'] ?? json['DiscountPercent'])
           ?.toDouble(),
-      discountAmount:
-          (json['discountAmount'] ?? json['DiscountAmount'])?.toDouble(),
-      buyQuantity:
-          (json['buyQuantity'] ?? json['BuyQuantity']) as int?,
-      giftQuantity:
-          (json['giftQuantity'] ?? json['GiftQuantity']) as int?,
-      giftProductId:
-          (json['giftProductId'] ?? json['GiftProductId']) as int?,
+      discountAmount: (json['discountAmount'] ?? json['DiscountAmount'])
+          ?.toDouble(),
+      buyQuantity: (json['buyQuantity'] ?? json['BuyQuantity']) as int?,
+      giftQuantity: (json['giftQuantity'] ?? json['GiftQuantity']) as int?,
+      giftProductId: (json['giftProductId'] ?? json['GiftProductId']) as int?,
       startDate: DateTime.parse(
-          (json['startDate'] ?? json['StartDate']) as String),
-      endDate:
-          DateTime.parse((json['endDate'] ?? json['EndDate']) as String),
+        (json['startDate'] ?? json['StartDate']) as String,
+      ),
+      endDate: DateTime.parse((json['endDate'] ?? json['EndDate']) as String),
       isActive: (json['isActive'] ?? json['IsActive'] ?? false) as bool,
       productIds: parsedIds,
     );
@@ -71,8 +68,7 @@ class Promotion {
     return 'Active';
   }
 
-  String get discountType =>
-      type == 0 ? 'Percentage' : 'BuyXGetYFree';
+  String get discountType => type == 0 ? 'Percentage' : 'BuyXGetYFree';
   double get discountValue => discountPercent ?? discountAmount ?? 0;
   int get minPurchaseAmount => 0;
 }

@@ -72,9 +72,9 @@ class TierOverviewCard extends StatelessWidget {
           Text(
             tier.name,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
           ),
           const SizedBox(height: 4),
           Text(

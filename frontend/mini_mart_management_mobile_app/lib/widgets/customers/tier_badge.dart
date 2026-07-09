@@ -9,7 +9,7 @@ class TierBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     Color bgColor;
     Color textColor;
-    
+
     switch (tier.toLowerCase()) {
       case 'gold':
         bgColor = AppColors.tierGoldBg;

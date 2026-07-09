@@ -90,7 +90,8 @@ class ReceiptService {
   }
 
   List<Map<String, dynamic>> _readItems(Map<String, dynamic> responseJson) {
-    final source = responseJson['value'] ??
+    final source =
+        responseJson['value'] ??
         responseJson['Value'] ??
         responseJson['data'] ??
         responseJson['Data'];
@@ -99,10 +100,12 @@ class ReceiptService {
       throw const ApiException('Không thể đọc danh sách chứng từ.');
     }
 
-    return source.map((item) {
-      if (item is Map<String, dynamic>) return item;
-      throw const ApiException('Không thể đọc chứng từ.');
-    }).toList(growable: false);
+    return source
+        .map((item) {
+          if (item is Map<String, dynamic>) return item;
+          throw const ApiException('Không thể đọc chứng từ.');
+        })
+        .toList(growable: false);
   }
 
   String _readMessage(Map<String, dynamic> responseJson) {

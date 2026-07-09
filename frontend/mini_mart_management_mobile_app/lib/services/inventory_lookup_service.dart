@@ -60,7 +60,8 @@ class InventoryLookupService {
   }
 
   List<Map<String, dynamic>> _readItems(Map<String, dynamic> responseJson) {
-    final source = responseJson['value'] ??
+    final source =
+        responseJson['value'] ??
         responseJson['Value'] ??
         responseJson['data'] ??
         responseJson['Data'];
@@ -69,10 +70,12 @@ class InventoryLookupService {
       throw const ApiException('Không thể đọc dữ liệu gợi ý.');
     }
 
-    return source.map((item) {
-      if (item is Map<String, dynamic>) return item;
-      throw const ApiException('Không thể đọc dữ liệu gợi ý.');
-    }).toList(growable: false);
+    return source
+        .map((item) {
+          if (item is Map<String, dynamic>) return item;
+          throw const ApiException('Không thể đọc dữ liệu gợi ý.');
+        })
+        .toList(growable: false);
   }
 
   String _readMessage(Map<String, dynamic> responseJson) {
