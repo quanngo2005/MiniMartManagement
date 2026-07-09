@@ -28,7 +28,7 @@ class CashierBottomNavigationBar extends StatelessWidget {
         // Navigator.of(context).pushReplacementNamed('/inventory');
         break;
       case 2:
-        // Navigator.of(context).pushReplacementNamed('/returns');
+        Navigator.of(context).pushReplacementNamed('/returns');
         break;
       case 3:
         Navigator.of(context).pushReplacement(

@@ -69,7 +69,7 @@ class CategoryManagementScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               sliver: SliverList.separated(
                 itemCount: _categories.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   return CategoryTreeCard(
                     category: _categories[index],
@@ -114,7 +114,7 @@ class CategoryManagementScreen extends StatelessWidget {
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.add_box_outlined),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
+      bottomNavigationBar: const AppBottomNavBar(selectedTab: AppNavTab.categories),
     );
   }
 
@@ -201,10 +201,6 @@ class CategoryManagementScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return const AppBottomNavBar(selectedTab: AppNavTab.categories);
   }
 
   void _showActionSnackBar(BuildContext context, String message) {

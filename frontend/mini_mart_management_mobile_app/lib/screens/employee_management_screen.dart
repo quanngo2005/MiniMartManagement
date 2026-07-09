@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee.dart';
 import 'package:mini_mart_management_mobile_app/models/role.dart';
 import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/supplier_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
@@ -513,6 +515,10 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    return const AppBottomNavBar(selectedTab: AppNavTab.staff);
   }
 
   void _showAddEmployeeDialog(BuildContext context) {
