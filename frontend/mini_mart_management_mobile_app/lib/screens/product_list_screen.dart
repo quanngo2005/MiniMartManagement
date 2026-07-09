@@ -99,7 +99,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
       child: TextField(
         controller: _searchCtrl,
         decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.search_rounded, color: AppColors.outlineVariant),
+          prefixIcon: const Icon(
+            Icons.search_rounded,
+            color: AppColors.outlineVariant,
+          ),
           hintText: 'Tìm theo tên, mã SKU, barcode...',
           filled: true,
           fillColor: AppColors.surfaceContainerLowest,
@@ -162,9 +165,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   void _openDetail(BuildContext context, Product product) {
     Navigator.push<void>(
       context,
-      MaterialPageRoute(
-        builder: (_) => ProductDetailScreen(product: product),
-      ),
+      MaterialPageRoute(builder: (_) => ProductDetailScreen(product: product)),
     );
   }
 
@@ -176,7 +177,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 }
 
-// ─── Product Tile ─────────────────────────────────────────────────────────────
+// ─── Product tile ─────────────────────────────────────────────────────────────
 
 class _ProductTile extends StatelessWidget {
   const _ProductTile({required this.product, required this.onTap});
@@ -187,7 +188,8 @@ class _ProductTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLowStock =
-        product.stockQuantity <= product.minimumStock && product.minimumStock > 0;
+        product.minimumStock > 0 &&
+        product.stockQuantity <= product.minimumStock;
 
     return GestureDetector(
       onTap: onTap,
@@ -262,7 +264,7 @@ class _ProductTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    _formatPrice(product.sellingPrice),
+                    _fmtPrice(product.sellingPrice),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w700,
@@ -304,7 +306,7 @@ class _ProductTile extends StatelessWidget {
     );
   }
 
-  String _formatPrice(double price) {
+  String _fmtPrice(double price) {
     final str = price.toInt().toString();
     final buf = StringBuffer();
     for (var i = 0; i < str.length; i++) {

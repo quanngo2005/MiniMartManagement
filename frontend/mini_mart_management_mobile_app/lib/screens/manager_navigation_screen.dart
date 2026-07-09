@@ -9,6 +9,7 @@ import 'package:mini_mart_management_mobile_app/screens/product_performance_scre
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_return_list_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_bottom_navigation_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_drawer.dart';
 
@@ -50,6 +51,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.staff: 5,
     ManagerNavDestination.customers: 6,
     ManagerNavDestination.promotions: 7,
+    ManagerNavDestination.analyze: 8,
   };
 
   // Only 4 bottom-nav tabs map to destinations; others are drawer-only.
@@ -119,6 +121,10 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           // 7 — Promotions
           PromotionManagementScreen(
             showBottomNavBar: false,
+            onMenuTap: _openDrawer,
+          ),
+          // 8 — Analyze
+          AnalyzeScreen(
             onMenuTap: _openDrawer,
           ),
         ],

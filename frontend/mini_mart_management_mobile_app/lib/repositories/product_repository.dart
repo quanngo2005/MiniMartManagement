@@ -17,16 +17,6 @@ class ProductRepository {
     }
   }
 
-  Future<Product> getById(int id) async {
-    try {
-      return await _service.getById(id);
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException('Không thể tải sản phẩm: $e');
-    }
-  }
-
   Future<Product> create(Map<String, dynamic> data) async {
     try {
       return await _service.create(data);

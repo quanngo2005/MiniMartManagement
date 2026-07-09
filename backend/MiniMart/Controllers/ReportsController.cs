@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MiniMart.Repositories.Interfaces;
+using MiniMart.Services.Interfaces;
 
 namespace MiniMart.Controllers
 {
@@ -9,31 +9,30 @@ namespace MiniMart.Controllers
     // [Authorize(Roles = "Manager")] 
     public class ReportsController : ControllerBase
     {
-        private readonly IReportRepository _reportRepository;
+        private readonly IReportService _reportService;
 
-        public ReportsController(IReportRepository reportRepository)
+        public ReportsController(IReportService reportService)
         {
-            _reportRepository = reportRepository;
+            _reportService = reportService;
         }
 
         [HttpGet("revenue")]
         public async Task<IActionResult> GetRevenueSummary([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
-            var result = await _reportRepository.GetRevenueSummaryAsync(startDate, endDate);
+            var result = await _reportService.GetRevenueSummaryAsync(startDate, endDate);
             return Ok(result);
         }
 
         [HttpGet("revenue/daily")]
         public async Task<IActionResult> GetDailyRevenue([FromQuery] int month, [FromQuery] int year)
         {
-            // Set default to current month/year if not provided
             if (month == 0) month = DateTime.Now.Month;
             if (year == 0) year = DateTime.Now.Year;
 
             if (month < 1 || month > 12 || year < 2000)
                 return BadRequest("Invalid month or year.");
 
-            var result = await _reportRepository.GetDailyRevenueAsync(month, year);
+            var result = await _reportService.GetDailyRevenueAsync(month, year);
             return Ok(result);
         }
 
@@ -45,21 +44,50 @@ namespace MiniMart.Controllers
             if (year < 2000)
                 return BadRequest("Invalid year.");
 
-            var result = await _reportRepository.GetMonthlyRevenueAsync(year);
+            var result = await _reportService.GetMonthlyRevenueAsync(year);
+            return Ok(result);
+        }
+
+        [HttpGet("financial/monthly")]
+        public async Task<IActionResult> GetMonthlyFinancialReport([FromQuery] int month, [FromQuery] int year)
+        {
+            if (month == 0) month = DateTime.Now.Month;
+            if (year == 0) year = DateTime.Now.Year;
+
+            if (month < 1 || month > 12 || year < 2000)
+                return BadRequest("Invalid month or year.");
+
+            var result = await _reportService.GetMonthlyFinancialReportAsync(month, year);
+            return Ok(result);
+        }
+
+        [HttpGet("revenue/hourly")]
+        public async Task<IActionResult> GetHourlyRevenue([FromQuery] DateTime date)
+        {
+            if (date == default) date = DateTime.Today;
+
+            var result = await _reportService.GetHourlyRevenueAsync(date);
             return Ok(result);
         }
 
         [HttpGet("cashier-performance")]
         public async Task<IActionResult> GetCashierPerformance([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
-            var result = await _reportRepository.GetCashierPerformanceAsync(startDate, endDate);
+            var result = await _reportService.GetCashierPerformanceAsync(startDate, endDate);
             return Ok(result);
         }
 
         [HttpGet("inventory")]
         public async Task<IActionResult> GetInventoryReport()
         {
-            var result = await _reportRepository.GetInventoryReportAsync();
+            var result = await _reportService.GetInventoryReportAsync();
+            return Ok(result);
+        }
+
+        [HttpGet("inventory/low-stock")]
+        public async Task<IActionResult> GetLowStockAlerts()
+        {
+            var result = await _reportService.GetLowStockAlertsAsync();
             return Ok(result);
         }
 
@@ -72,7 +100,14 @@ namespace MiniMart.Controllers
             if (top <= 0 || top > 100)
                 return BadRequest("top must be between 1 and 100.");
 
-            var result = await _reportRepository.GetTopProductsAsync(startDate, endDate, top);
+            var result = await _reportService.GetTopProductsAsync(startDate, endDate, top);
+            return Ok(result);
+        }
+
+        [HttpGet("supplier-debt")]
+        public async Task<IActionResult> GetSupplierDebt()
+        {
+            var result = await _reportService.GetSupplierDebtAsync();
             return Ok(result);
         }
     }

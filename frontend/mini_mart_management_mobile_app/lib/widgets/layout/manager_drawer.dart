@@ -11,6 +11,7 @@ enum ManagerNavDestination {
   staff,
   customers,
   promotions,
+  analyze,
 }
 
 class ManagerDrawer extends StatelessWidget {
@@ -47,6 +48,14 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.home,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.home),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.analytics_outlined,
+                    activeIcon: Icons.analytics_rounded,
+                    label: 'Báo Cáo Tài Chính',
+                    destination: ManagerNavDestination.analyze,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.analyze),
                   ),
                   _DrawerTile(
                     icon: Icons.schedule_outlined,

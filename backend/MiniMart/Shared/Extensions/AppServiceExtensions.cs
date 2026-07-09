@@ -18,6 +18,7 @@ namespace MiniMart.Shared.Extensions
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IPromotionService, PromotionService>();
             services.AddScoped<IPaymentGatewayService, VnPayService>();
+            services.AddScoped<IReportService, ReportService>();
             return services;
         }
     }

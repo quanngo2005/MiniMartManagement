@@ -5,8 +5,6 @@ import 'package:mini_mart_management_mobile_app/models/product.dart';
 import 'package:mini_mart_management_mobile_app/providers/product_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
-/// Pass [product] to view/edit an existing product.
-/// Pass nothing to create a new product.
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({this.product, super.key});
 
@@ -49,14 +47,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     text: widget.product?.supplierId?.toString() ?? '',
   );
 
-  late bool _status = widget.product?.status ?? true;
+  late bool _status;
+  bool _isEditing = false;
   bool _isSaving = false;
-  bool _isEditing = false; // set in initState
+
+  bool get _isNew => widget.product == null;
 
   @override
   void initState() {
     super.initState();
-    _isEditing = widget.product == null; // new product = always editing
+    _status = widget.product?.status ?? true;
+    _isEditing = _isNew;
   }
 
   @override
@@ -72,8 +73,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     _supplierCtrl.dispose();
     super.dispose();
   }
-
-  bool get _isNew => widget.product == null;
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
@@ -95,12 +94,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     };
 
     final provider = context.read<ProductProvider>();
-    bool ok;
-    if (_isNew) {
-      ok = await provider.create(data);
-    } else {
-      ok = await provider.update(widget.product!.productId, data);
-    }
+    final ok = _isNew
+        ? await provider.create(data)
+        : await provider.update(widget.product!.productId, data);
 
     if (!mounted) return;
     setState(() => _isSaving = false);
@@ -142,45 +138,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (widget.product != null) _buildStatusBadge(),
-                const SizedBox(height: 16),
+                if (!_isNew) _buildStatusBadge(),
+                if (!_isNew) const SizedBox(height: 16),
                 _buildSection('Thông tin cơ bản', [
-                  _buildField(
-                    _nameCtrl,
-                    'Tên sản phẩm *',
-                    enabled: _isEditing,
-                    validator: _required,
-                  ),
-                  _buildField(
-                    _codeCtrl,
-                    'Mã SKU *',
-                    enabled: _isEditing,
-                    validator: _required,
-                  ),
-                  _buildField(
-                    _barcodeCtrl,
-                    'Barcode *',
-                    enabled: _isEditing,
-                    validator: _required,
-                  ),
+                  _field(_nameCtrl, 'Tên sản phẩm *', validator: _req),
+                  _field(_codeCtrl, 'Mã SKU *', validator: _req),
+                  _field(_barcodeCtrl, 'Barcode *', validator: _req),
                 ]),
                 const SizedBox(height: 16),
                 _buildSection('Giá & Kho', [
-                  _buildField(
+                  _field(
                     _priceCtrl,
                     'Giá bán (VND) *',
-                    enabled: _isEditing,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: _required,
+                    validator: _req,
                   ),
                   Row(
                     children: [
                       Expanded(
-                        child: _buildField(
+                        child: _field(
                           _stockCtrl,
                           'Tồn kho',
-                          enabled: _isEditing,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
@@ -189,10 +168,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _buildField(
+                        child: _field(
                           _minStockCtrl,
                           'Tồn kho tối thiểu',
-                          enabled: _isEditing,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
@@ -203,32 +181,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection('Danh mục & Nhà cung cấp', [
-                  _buildField(
+                _buildSection('Danh mục & NCC', [
+                  _field(
                     _categoryCtrl,
                     'Category ID *',
-                    enabled: _isEditing,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: _required,
+                    validator: _req,
                   ),
-                  _buildField(
+                  _field(
                     _supplierCtrl,
                     'Supplier ID *',
-                    enabled: _isEditing,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: _required,
+                    validator: _req,
                   ),
                 ]),
                 const SizedBox(height: 16),
                 _buildSection('Mô tả', [
-                  _buildField(
-                    _descCtrl,
-                    'Mô tả sản phẩm',
-                    enabled: _isEditing,
-                    maxLines: 3,
-                  ),
+                  _field(_descCtrl, 'Mô tả sản phẩm', maxLines: 3),
                 ]),
                 if (_isEditing) ...[
                   const SizedBox(height: 16),
@@ -281,37 +252,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Widget _buildStatusBadge() {
     final active = widget.product!.status;
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: active
-                ? AppColors.secondaryFixed.withValues(alpha: 0.4)
-                : AppColors.errorContainer,
-            borderRadius: BorderRadius.circular(99),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: active
+            ? AppColors.secondaryFixed.withValues(alpha: 0.4)
+            : AppColors.errorContainer,
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            active ? Icons.check_circle_rounded : Icons.cancel_rounded,
+            size: 14,
+            color: active ? AppColors.secondary : AppColors.statusError,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                active ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                size: 14,
-                color: active ? AppColors.secondary : AppColors.statusError,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                active ? 'Đang kinh doanh' : 'Ngừng kinh doanh',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: active ? AppColors.secondary : AppColors.statusError,
-                ),
-              ),
-            ],
+          const SizedBox(width: 4),
+          Text(
+            active ? 'Đang kinh doanh' : 'Ngừng kinh doanh',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: active ? AppColors.secondary : AppColors.statusError,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -346,10 +313,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildField(
+  Widget _field(
     TextEditingController ctrl,
     String label, {
-    bool enabled = true,
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
@@ -357,7 +323,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }) {
     return TextFormField(
       controller: ctrl,
-      enabled: enabled,
+      enabled: _isEditing,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       maxLines: maxLines,
@@ -365,8 +331,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        filled: !enabled,
-        fillColor: enabled ? null : AppColors.surfaceContainerLow,
+        filled: !_isEditing,
+        fillColor: _isEditing ? null : AppColors.surfaceContainerLow,
       ),
     );
   }
@@ -388,7 +354,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
         subtitle: Text(
-          _status ? 'Sản phẩm hiển thị và có thể bán' : 'Sản phẩm ẩn khỏi bán hàng',
+          _status
+              ? 'Sản phẩm hiển thị và có thể bán'
+              : 'Sản phẩm ẩn khỏi bán hàng',
           style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
         ),
         value: _status,
@@ -419,12 +387,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.surfaceContainerLowest,
           minimumSize: const Size(0, 52),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ),
     );
   }
 
-  String? _required(String? v) =>
+  String? _req(String? v) =>
       (v == null || v.trim().isEmpty) ? 'Trường này không được trống' : null;
 }

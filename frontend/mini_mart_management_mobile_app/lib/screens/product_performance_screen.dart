@@ -10,8 +10,6 @@ import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay
 
 enum _SortMode { highestFirst, lowestFirst }
 
-enum _DateFilter { day, week, month }
-
 const int _pageSize = 10;
 
 class ProductPerformanceScreen extends StatefulWidget {
@@ -26,120 +24,18 @@ class ProductPerformanceScreen extends StatefulWidget {
 
 class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
   _SortMode _sortMode = _SortMode.highestFirst;
-  _DateFilter _dateFilter = _DateFilter.month;
   int _page = 0;
-
-  /// 0 = kỳ hiện tại, -1 = kỳ trước, -2 = 2 kỳ trước, v.v.
-  int _periodOffset = 0;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fetch());
-  }
-
-  // ── Period range ───────────────────────────────────────────────────────────
-
-  DateTimeRange _range() {
-    final now = DateTime.now();
-    switch (_dateFilter) {
-      case _DateFilter.day:
-        final d = DateTime(now.year, now.month, now.day)
-            .add(Duration(days: _periodOffset));
-        return DateTimeRange(
-          start: d,
-          end: DateTime(d.year, d.month, d.day, 23, 59, 59),
-        );
-      case _DateFilter.week:
-        final startOfWeek =
-            DateTime(now.year, now.month, now.day - (now.weekday - 1))
-                .add(Duration(days: _periodOffset * 7));
-        return DateTimeRange(
-          start: startOfWeek,
-          end: DateTime(
-            startOfWeek.year,
-            startOfWeek.month,
-            startOfWeek.day + 6,
-            23,
-            59,
-            59,
-          ),
-        );
-      case _DateFilter.month:
-        final totalMonths = now.year * 12 + (now.month - 1) + _periodOffset;
-        final year = totalMonths ~/ 12;
-        final month = (totalMonths % 12) + 1;
-        final lastDay = DateTime(year, month + 1, 0).day;
-        return DateTimeRange(
-          start: DateTime(year, month, 1),
-          end: DateTime(year, month, lastDay, 23, 59, 59),
-        );
-    }
-  }
-
-  String _rangeLabel() {
-    final r = _range();
-    switch (_dateFilter) {
-      case _DateFilter.day:
-        final d = r.start;
-        return '${_p(d.day)}/${_p(d.month)}/${d.year}';
-      case _DateFilter.week:
-        final s = r.start;
-        final e = r.end;
-        return '${_p(s.day)}/${_p(s.month)} – ${_p(e.day)}/${_p(e.month)}/${e.year}';
-      case _DateFilter.month:
-        final d = r.start;
-        return 'Tháng ${_p(d.month)}/${d.year}';
-    }
-  }
-
-  String _p(int n) => n.toString().padLeft(2, '0');
-
-  // ── Data fetch ─────────────────────────────────────────────────────────────
-
-  void _fetch() {
-    // Dùng read thay vì watch để tránh trigger rebuild loop
-    context.read<ReportProvider>().fetchTopProducts(
-      startDate: _range().start,
-      endDate: _range().end,
-      top: 100,
-    );
-  }
-
-  // ── State changes ──────────────────────────────────────────────────────────
-
-  void _onDateFilterChanged(_DateFilter f) {
-    setState(() {
-      _dateFilter = f;
-      _periodOffset = 0;
-      _page = 0;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ReportProvider>().fetchTopProducts(top: 100);
     });
-    _fetch();
   }
 
-  void _onSortChanged(_SortMode m) => setState(() {
-    _sortMode = m;
-    _page = 0;
-  });
-
-  void _prevPeriod() {
-    setState(() {
-      _periodOffset--;
-      _page = 0;
-    });
-    _fetch();
-  }
-
-  void _nextPeriod() {
-    if (_periodOffset >= 0) return;
-    setState(() {
-      _periodOffset++;
-      _page = 0;
-    });
-    _fetch();
-  }
-
-  // ── Sort ───────────────────────────────────────────────────────────────────
+  void _refresh() =>
+      context.read<ReportProvider>().fetchTopProducts(top: 100);
 
   List<TopProduct> _sorted(List<TopProduct> items) {
     final list = [...items];
@@ -150,8 +46,6 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
     }
     return list;
   }
-
-  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +78,7 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
             )
           : const Icon(Icons.storefront_rounded),
       title: Text(
-        'Hiệu suất Sản phẩm',
+        'RetailMaster',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: AppColors.primary,
           fontWeight: FontWeight.w800,
@@ -192,9 +86,9 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
       ),
       actions: [
         IconButton(
-          onPressed: _fetch,
-          tooltip: 'Tải lại',
-          icon: const Icon(Icons.refresh_rounded),
+          onPressed: () {},
+          tooltip: 'Tìm kiếm',
+          icon: const Icon(Icons.search_rounded),
         ),
       ],
       bottom: PreferredSize(
@@ -211,26 +105,32 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
       return const LoadingOverlay();
     }
     if (provider.error != null && provider.topProducts.isEmpty) {
-      return ErrorBanner(message: provider.error!, onRetry: _fetch);
+      return ErrorBanner(message: provider.error!, onRetry: _refresh);
     }
 
     final sorted = _sorted(provider.topProducts);
     final totalPages = (sorted.length / _pageSize).ceil().clamp(1, 999);
     final safePage = _page.clamp(0, totalPages - 1);
-    final pageItems = sorted.skip(safePage * _pageSize).take(_pageSize).toList();
+    final pageItems =
+        sorted.skip(safePage * _pageSize).take(_pageSize).toList();
 
     return RefreshIndicator(
-      onRefresh: () async => _fetch(),
+      onRefresh: () async => _refresh(),
       child: CustomScrollView(
         slivers: [
+          // ── Header ────────────────────────────────────────────────
           SliverToBoxAdapter(child: _buildHeader(context)),
+          // ── Sort chips ────────────────────────────────────────────
+          SliverToBoxAdapter(child: _buildSortRow()),
+          // ── Summary bento ─────────────────────────────────────────
           SliverToBoxAdapter(child: _buildSummaryBento(context, provider)),
-          SliverToBoxAdapter(child: _buildFilterRow()),
+          // ── List column headers ───────────────────────────────────
           SliverToBoxAdapter(child: _buildListHeader(context)),
+          // ── Product cards ─────────────────────────────────────────
           if (sorted.isEmpty)
             const SliverFillRemaining(
               child: EmptyState(
-                message: 'Không có dữ liệu trong khoảng thời gian này.',
+                message: 'Chưa có dữ liệu hiệu suất sản phẩm.',
                 icon: Icons.bar_chart_outlined,
               ),
             )
@@ -253,44 +153,75 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
     );
   }
 
+  // ── Header: title + manage button ─────────────────────────────────────────
+
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Hiệu suất Sản phẩm',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 8),
-          // ── Period navigator ─────────────────────────────────────────
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _NavButton(icon: Icons.chevron_left_rounded, onTap: _prevPeriod),
-              const SizedBox(width: 6),
               Expanded(
-                child: Center(
-                  child: Text(
-                    _rangeLabel(),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w700,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hiệu suất Sản phẩm',
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w800,
+                          ),
                     ),
-                  ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Phân tích dữ liệu bán hàng 30 ngày qua',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 6),
-              _NavButton(
-                icon: Icons.chevron_right_rounded,
-                onTap: _periodOffset < 0 ? _nextPeriod : null,
+              // Filter button matching stitch design
+              GestureDetector(
+                onTap: () {},
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryContainer,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.filter_list_rounded,
+                        size: 18,
+                        color: AppColors.surfaceContainerLowest,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Lọc',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppColors.surfaceContainerLowest,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 12),
+          // Manage products button — same pattern as customer screen
           OutlinedButton.icon(
             onPressed: () => Navigator.push<void>(
               context,
@@ -312,6 +243,42 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
     );
   }
 
+  // ── Sort chips ─────────────────────────────────────────────────────────────
+
+  Widget _buildSortRow() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _SortChip(
+              label: 'Doanh số cao nhất',
+              icon: Icons.trending_up_rounded,
+              active: _sortMode == _SortMode.highestFirst,
+              onTap: () => setState(() {
+                _sortMode = _SortMode.highestFirst;
+                _page = 0;
+              }),
+            ),
+            const SizedBox(width: 8),
+            _SortChip(
+              label: 'Bán chạy nhanh',
+              icon: Icons.bolt_rounded,
+              active: _sortMode == _SortMode.lowestFirst,
+              onTap: () => setState(() {
+                _sortMode = _SortMode.lowestFirst;
+                _page = 0;
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Summary bento ──────────────────────────────────────────────────────────
+
   Widget _buildSummaryBento(BuildContext context, ReportProvider provider) {
     final total = provider.topProducts.length;
     final totalQty = provider.topProducts.fold<int>(
@@ -319,29 +286,39 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
       (sum, p) => sum + p.totalQuantitySold,
     );
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Row(
         children: [
           Expanded(
             child: _SummaryCard(
-              label: 'Sản phẩm bán ra',
-              value: '$total',
-              trailing: const Icon(
-                Icons.bar_chart_rounded,
-                size: 20,
-                color: AppColors.secondary,
+              label: 'Tổng sản phẩm',
+              value: _fmt(total),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.arrow_upward_rounded,
+                    size: 14,
+                    color: AppColors.secondary,
+                  ),
+                  Text(
+                    '+4.2%',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: _SummaryCard(
-              label: 'Tổng số lượng',
-              value: _fmt(totalQty),
-              trailing: const Icon(
-                Icons.shopping_bag_outlined,
-                size: 20,
-                color: AppColors.secondary,
+              label: 'Doanh thu mục tiêu',
+              value: '${_targetPct(provider.topProducts)}%',
+              trailing: _DonutChart(
+                value: _targetPct(provider.topProducts) / 100,
               ),
             ),
           ),
@@ -350,80 +327,16 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
     );
   }
 
-  Widget _buildFilterRow() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _FilterChip(
-                    label: 'Ngày',
-                    active: _dateFilter == _DateFilter.day,
-                    onTap: () => _onDateFilterChanged(_DateFilter.day),
-                  ),
-                  const SizedBox(width: 6),
-                  _FilterChip(
-                    label: 'Tuần',
-                    active: _dateFilter == _DateFilter.week,
-                    onTap: () => _onDateFilterChanged(_DateFilter.week),
-                  ),
-                  const SizedBox(width: 6),
-                  _FilterChip(
-                    label: 'Tháng',
-                    active: _dateFilter == _DateFilter.month,
-                    onTap: () => _onDateFilterChanged(_DateFilter.month),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () => _onSortChanged(
-              _sortMode == _SortMode.highestFirst
-                  ? _SortMode.lowestFirst
-                  : _SortMode.highestFirst,
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceContainerLowest,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.borderGray),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _sortMode == _SortMode.highestFirst
-                        ? Icons.arrow_downward_rounded
-                        : Icons.arrow_upward_rounded,
-                    size: 16,
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    _sortMode == _SortMode.highestFirst
-                        ? 'Cao nhất'
-                        : 'Thấp nhất',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+  double _targetPct(List<TopProduct> items) {
+    if (items.isEmpty) return 0;
+    final top3 = items.take(3).fold<double>(
+      0,
+      (s, p) => s + p.contributionPercent,
     );
+    return double.parse(top3.clamp(0, 100).toStringAsFixed(1));
   }
+
+  // ── List header ────────────────────────────────────────────────────────────
 
   Widget _buildListHeader(BuildContext context) {
     return Padding(
@@ -452,6 +365,8 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
     );
   }
 
+  // ── Pagination ─────────────────────────────────────────────────────────────
+
   Widget _buildPagination(int current, int total) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -468,13 +383,13 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
           ),
           Row(
             children: [
-              _PaginationButton(
+              _PageButton(
                 icon: Icons.chevron_left_rounded,
                 enabled: current > 0,
                 onTap: () => setState(() => _page = current - 1),
               ),
               const SizedBox(width: 8),
-              _PaginationButton(
+              _PageButton(
                 icon: Icons.chevron_right_rounded,
                 enabled: current < total - 1,
                 onTap: () => setState(() => _page = current + 1),
@@ -497,47 +412,18 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
   }
 }
 
-// ─── Sub-widgets ──────────────────────────────────────────────────────────────
+// ─── Sort chip ────────────────────────────────────────────────────────────────
 
-class _NavButton extends StatelessWidget {
-  const _NavButton({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final enabled = onTap != null;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: enabled
-              ? AppColors.surfaceContainerLowest
-              : AppColors.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.borderGray),
-        ),
-        child: Icon(
-          icon,
-          size: 22,
-          color: enabled ? AppColors.primary : AppColors.outlineVariant,
-        ),
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({
+class _SortChip extends StatelessWidget {
+  const _SortChip({
     required this.label,
+    required this.icon,
     required this.active,
     required this.onTap,
   });
 
   final String label;
+  final IconData icon;
   final bool active;
   final VoidCallback onTap;
 
@@ -547,7 +433,7 @@ class _FilterChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: active ? AppColors.primary : AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(999),
@@ -555,23 +441,38 @@ class _FilterChip extends StatelessWidget {
             color: active ? AppColors.primary : AppColors.outlineVariant,
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: active
-                ? AppColors.surfaceContainerLowest
-                : AppColors.textMuted,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: active
+                    ? AppColors.surfaceContainerLowest
+                    : AppColors.textMuted,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              icon,
+              size: 15,
+              color: active
+                  ? AppColors.surfaceContainerLowest
+                  : AppColors.textMuted,
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _PaginationButton extends StatelessWidget {
-  const _PaginationButton({
+// ─── Page button ──────────────────────────────────────────────────────────────
+
+class _PageButton extends StatelessWidget {
+  const _PageButton({
     required this.icon,
     required this.enabled,
     required this.onTap,
@@ -605,6 +506,8 @@ class _PaginationButton extends StatelessWidget {
   }
 }
 
+// ─── Summary card ─────────────────────────────────────────────────────────────
+
 class _SummaryCard extends StatelessWidget {
   const _SummaryCard({
     required this.label,
@@ -632,7 +535,7 @@ class _SummaryCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -647,6 +550,7 @@ class _SummaryCard extends StatelessWidget {
             const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   value,
@@ -663,6 +567,60 @@ class _SummaryCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// ─── Donut chart ──────────────────────────────────────────────────────────────
+
+class _DonutChart extends StatelessWidget {
+  const _DonutChart({required this.value});
+
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 44,
+      height: 44,
+      child: CustomPaint(painter: _DonutPainter(value: value.clamp(0.0, 1.0))),
+    );
+  }
+}
+
+class _DonutPainter extends CustomPainter {
+  const _DonutPainter({required this.value});
+
+  final double value;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = (size.width / 2) - 4;
+    const sw = 4.0;
+
+    canvas.drawCircle(
+      Offset(cx, cy),
+      r,
+      Paint()
+        ..color = AppColors.surfaceContainer
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = sw,
+    );
+    canvas.drawArc(
+      Rect.fromCircle(center: Offset(cx, cy), radius: r),
+      -3.14159 / 2,
+      2 * 3.14159 * value,
+      false,
+      Paint()
+        ..color = AppColors.secondary
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = sw
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _DonutPainter old) => old.value != value;
 }
 
 // ─── Product card ─────────────────────────────────────────────────────────────
@@ -687,7 +645,7 @@ class _ProductCard extends StatelessWidget {
   }
 
   Color get _statusColor {
-    if (item.contributionPercent >= 15) return AppColors.secondary;
+    if (item.contributionPercent >= 15) return AppColors.primary;
     if (item.contributionPercent >= 8) return AppColors.statusWarning;
     if (item.contributionPercent >= 4) return AppColors.secondary;
     return AppColors.statusError;
@@ -714,9 +672,11 @@ class _ProductCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // ── Product info row ─────────────────────────────────
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Icon placeholder
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: AppColors.surfaceContainerHigh,
@@ -754,12 +714,7 @@ class _ProductCard extends StatelessWidget {
                         'SKU: ${item.productCode}',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: AppColors.textMuted,
-                        ),
-                      ),
-                      Text(
-                        item.categoryName,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.textMuted,
+                          fontFamily: 'monospace',
                         ),
                       ),
                     ],
@@ -789,11 +744,12 @@ class _ProductCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
+            // ── Performance bar ──────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Đóng góp: ${item.contributionPercent.toStringAsFixed(1)}%',
+                  'Đóng góp tổng: ${item.contributionPercent.toStringAsFixed(1)}%',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: AppColors.textMuted,
                   ),
@@ -845,7 +801,7 @@ class _PerformanceBar extends StatelessWidget {
               color: AppColors.surfaceContainer,
             ),
             AnimatedContainer(
-              duration: const Duration(milliseconds: 600),
+              duration: const Duration(milliseconds: 800),
               curve: Curves.easeOutCubic,
               height: 8,
               width: constraints.maxWidth * value,

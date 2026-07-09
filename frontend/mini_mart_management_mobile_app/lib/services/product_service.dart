@@ -12,31 +12,27 @@ class ProductService {
   final http.Client _client;
 
   Future<List<Product>> getAll() async {
-    final response = await _client.get(
+    final r = await _client.get(
       ApiConfig.uri('/api/products'),
       headers: const {'Accept': 'application/json'},
     );
-    final json = _decode(response);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_message(json));
+    if (r.body.isEmpty) return [];
+    final decoded = jsonDecode(r.body);
+    List<dynamic> list;
+    if (decoded is List) {
+      list = decoded;
+    } else if (decoded is Map<String, dynamic>) {
+      final v = decoded['value'] ?? decoded['Value'] ??
+                decoded['data'] ?? decoded['Data'];
+      list = v is List ? v : [];
+    } else {
+      return [];
     }
-    return _items(json).map(Product.fromJson).toList();
-  }
-
-  Future<Product> getById(int id) async {
-    final response = await _client.get(
-      ApiConfig.uri('/api/products/$id'),
-      headers: const {'Accept': 'application/json'},
-    );
-    final json = _decode(response);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_message(json));
-    }
-    return Product.fromJson(json);
+    return list.whereType<Map<String, dynamic>>().map(Product.fromJson).toList();
   }
 
   Future<Product> create(Map<String, dynamic> data) async {
-    final response = await _client.post(
+    final r = await _client.post(
       ApiConfig.uri('/api/products'),
       headers: const {
         'Accept': 'application/json',
@@ -44,15 +40,15 @@ class ProductService {
       },
       body: jsonEncode(data),
     );
-    final json = _decode(response);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_message(json));
+    final json = jsonDecode(r.body) as Map<String, dynamic>;
+    if (r.statusCode >= 400) {
+      throw ApiException(json['message'] ?? json['Message'] ?? 'Lỗi tạo sản phẩm.');
     }
     return Product.fromJson(json);
   }
 
   Future<Product> update(int id, Map<String, dynamic> data) async {
-    final response = await _client.put(
+    final r = await _client.put(
       ApiConfig.uri('/api/products/$id'),
       headers: const {
         'Accept': 'application/json',
@@ -60,42 +56,10 @@ class ProductService {
       },
       body: jsonEncode(data),
     );
-    final json = _decode(response);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(_message(json));
+    final json = jsonDecode(r.body) as Map<String, dynamic>;
+    if (r.statusCode >= 400) {
+      throw ApiException(json['message'] ?? json['Message'] ?? 'Lỗi cập nhật sản phẩm.');
     }
     return Product.fromJson(json);
-  }
-
-  // ── helpers ────────────────────────────────────────────────────────────────
-
-  Map<String, dynamic> _decode(http.Response r) {
-    if (r.body.isEmpty) return {};
-    try {
-      final d = jsonDecode(r.body);
-      if (d is Map<String, dynamic>) return d;
-      if (d is List) return {'value': d};
-    } on FormatException {
-      throw const ApiException('Server trả về dữ liệu không hợp lệ.');
-    }
-    throw const ApiException('Server trả về phản hồi không mong đợi.');
-  }
-
-  List<Map<String, dynamic>> _items(Map<String, dynamic> json) {
-    final src =
-        json['value'] ??
-        json['Value'] ??
-        json['data'] ??
-        json['Data'];
-    if (src is List) {
-      return src.whereType<Map<String, dynamic>>().toList();
-    }
-    // single object response
-    return [json];
-  }
-
-  String _message(Map<String, dynamic> json) {
-    final m = json['message'] ?? json['Message'];
-    return m is String && m.isNotEmpty ? m : 'Đã xảy ra lỗi.';
   }
 }
