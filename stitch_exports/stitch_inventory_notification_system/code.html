@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Supplier Profiles | Retail Manager</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter & JetBrains Mono -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-primary": "#b0c8eb",
+                    "border-gray": "#E2E8F0",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#f2f0f3",
+                    "secondary-container": "#6cf8bb",
+                    "primary-container": "#0a2540",
+                    "status-warning": "#F59E0B",
+                    "outline-variant": "#c4c6ce",
+                    "primary": "#000f22",
+                    "surface-container-highest": "#e3e2e5",
+                    "background-slate": "#F8FAFC",
+                    "tertiary-container": "#381d00",
+                    "surface-tint": "#49607e",
+                    "surface": "#faf9fb",
+                    "on-surface-variant": "#43474d",
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "background": "#faf9fb",
+                    "outline": "#74777e",
+                    "on-secondary-fixed": "#002113",
+                    "text-muted": "#64748B",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#ae835a",
+                    "on-background": "#1b1c1e",
+                    "secondary": "#006c49",
+                    "tertiary-fixed": "#ffdcbe",
+                    "tertiary": "#1a0b00",
+                    "on-primary-container": "#768dad",
+                    "surface-container": "#efedf0",
+                    "on-tertiary-fixed-variant": "#613f1c",
+                    "surface-bright": "#faf9fb",
+                    "on-tertiary-fixed": "#2d1600",
+                    "on-primary-fixed": "#001c37",
+                    "surface-dim": "#dbd9dc",
+                    "primary-fixed": "#d2e4ff",
+                    "on-primary-fixed-variant": "#314865",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f5f3f6",
+                    "inverse-surface": "#2f3033",
+                    "surface-container-high": "#e9e8ea",
+                    "on-secondary-container": "#00714d",
+                    "on-secondary-fixed-variant": "#005236",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#4edea3",
+                    "primary-fixed-dim": "#b0c8eb",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#1b1c1e",
+                    "status-error": "#EF4444",
+                    "surface-variant": "#e3e2e5",
+                    "tertiary-fixed-dim": "#eebd90",
+                    "text-dark": "#334155",
+                    "secondary-fixed": "#6ffbbe"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "safe-area": "16px",
+                    "stack-md": "16px",
+                    "gutter": "12px",
+                    "touch-target": "48px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "metadata": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "data-tabular": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-effect { backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.8); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-slate text-on-background min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-primary dark:bg-primary-container w-full top-0 sticky z-50 border-b border-outline-variant transition-colors duration-200">
+<div class="flex items-center justify-between px-safe-area h-touch-target w-full">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-primary dark:text-on-primary-container hover:bg-primary-fixed-dim/10 p-2 rounded-full transition-colors">
+                    menu
+                </button>
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-primary dark:text-on-primary-container">Retail Manager</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-on-primary dark:text-on-primary-container hover:bg-primary-fixed-dim/10 p-2 rounded-full transition-colors">
+                    search
+                </button>
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center">
+<span class="text-[10px] font-bold text-on-secondary-fixed">AD</span>
+</div>
+</div>
+</div>
+</header>
+<main class="px-safe-area pt-gutter">
+<!-- Search & Filter Bar -->
+<div class="mb-gutter">
+<div class="relative flex items-center bg-white border border-border-gray rounded-lg px-4 h-touch-target shadow-sm">
+<span class="material-symbols-outlined text-text-muted mr-3">search</span>
+<input class="w-full border-none focus:ring-0 bg-transparent font-body-md text-on-surface p-0 placeholder-text-muted" placeholder="Search suppliers, categories, or contacts..." type="text"/>
+<button class="material-symbols-outlined text-text-muted ml-3">tune</button>
+</div>
+</div>
+<!-- Page Context Header -->
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-headline-md text-headline-md text-primary">Suppliers <span class="text-text-muted text-body-md font-normal ml-2">(24 active)</span></h2>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-md font-bold flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                Add New
+            </button>
+</div>
+<!-- Supplier Grid (High Density) -->
+<div class="grid grid-cols-1 gap-gutter">
+<!-- Supplier Card 1 -->
+<div class="bg-white border border-border-gray rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="flex justify-between items-start mb-3">
+<div>
+<div class="text-metadata text-secondary font-bold uppercase tracking-wider mb-1">PROCESSED FOODS</div>
+<h3 class="font-headline-md text-headline-md text-on-background">Evergreen Logistics Co.</h3>
+</div>
+<div class="flex gap-2">
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-primary hover:text-white transition-colors" href="tel:+1234567890">
+<span class="material-symbols-outlined">call</span>
+</a>
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-primary hover:text-white transition-colors" href="mailto:contact@evergreen.com">
+<span class="material-symbols-outlined">mail</span>
+</a>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 border-t border-surface-container py-3">
+<div>
+<p class="text-metadata text-text-muted mb-0.5">Primary Contact</p>
+<p class="font-body-md text-on-surface font-medium">Sarah Jenkins</p>
+</div>
+<div>
+<p class="text-metadata text-text-muted mb-0.5">Phone Number</p>
+<p class="font-data-tabular text-on-surface">+1 (555) 012-4492</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 border-t border-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-warning text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-metadata font-bold text-on-surface">4.9</span>
+<span class="text-metadata text-text-muted">• 128 Shipments</span>
+</div>
+<button class="text-primary font-body-md font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        Details <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Supplier Card 2 -->
+<div class="bg-white border border-border-gray rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="flex justify-between items-start mb-3">
+<div>
+<div class="text-metadata text-secondary font-bold uppercase tracking-wider mb-1">DAIRY &amp; POULTRY</div>
+<h3 class="font-headline-md text-headline-md text-on-background">Northfield Farmstead</h3>
+</div>
+<div class="flex gap-2">
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">call</span>
+</a>
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">mail</span>
+</a>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 border-t border-surface-container py-3">
+<div>
+<p class="text-metadata text-text-muted mb-0.5">Primary Contact</p>
+<p class="font-body-md text-on-surface font-medium">Marcus Thorne</p>
+</div>
+<div>
+<p class="text-metadata text-text-muted mb-0.5">Phone Number</p>
+<p class="font-data-tabular text-on-surface">+1 (555) 019-3381</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 border-t border-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-warning text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-metadata font-bold text-on-surface">4.7</span>
+<span class="text-metadata text-text-muted">• 312 Shipments</span>
+</div>
+<button class="text-primary font-body-md font-bold flex items-center gap-1">
+                        Details <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Supplier Card 3 -->
+<div class="bg-white border border-border-gray rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="flex justify-between items-start mb-3">
+<div>
+<div class="text-metadata text-secondary font-bold uppercase tracking-wider mb-1">BEVERAGES</div>
+<h3 class="font-headline-md text-headline-md text-on-background">Summit Springs Distro</h3>
+</div>
+<div class="flex gap-2">
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">call</span>
+</a>
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">mail</span>
+</a>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 border-t border-surface-container py-3">
+<div>
+<p class="text-metadata text-text-muted mb-0.5">Primary Contact</p>
+<p class="font-body-md text-on-surface font-medium">Elena Rodriguez</p>
+</div>
+<div>
+<p class="text-metadata text-text-muted mb-0.5">Phone Number</p>
+<p class="font-data-tabular text-on-surface">+1 (555) 021-8812</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 border-t border-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-warning text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-metadata font-bold text-on-surface">4.8</span>
+<span class="text-metadata text-text-muted">• 89 Shipments</span>
+</div>
+<button class="text-primary font-body-md font-bold flex items-center gap-1">
+                        Details <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Supplier Card 4 -->
+<div class="bg-white border border-border-gray rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="flex justify-between items-start mb-3">
+<div>
+<div class="text-metadata text-secondary font-bold uppercase tracking-wider mb-1">ELECTRONICS &amp; MEDIA</div>
+<h3 class="font-headline-md text-headline-md text-on-background">Quantum Wholesale</h3>
+</div>
+<div class="flex gap-2">
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">call</span>
+</a>
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">mail</span>
+</a>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 border-t border-surface-container py-3">
+<div>
+<p class="text-metadata text-text-muted mb-0.5">Primary Contact</p>
+<p class="font-body-md text-on-surface font-medium">David Park</p>
+</div>
+<div>
+<p class="text-metadata text-text-muted mb-0.5">Phone Number</p>
+<p class="font-data-tabular text-on-surface">+1 (555) 044-1109</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 border-t border-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-warning text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-metadata font-bold text-on-surface">4.5</span>
+<span class="text-metadata text-text-muted">• 56 Shipments</span>
+</div>
+<button class="text-primary font-body-md font-bold flex items-center gap-1">
+                        Details <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Empty State Loader Skeleton (Simulated) -->
+<div class="bg-white/50 border border-border-gray border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center opacity-60">
+<div class="w-12 h-12 rounded-full bg-surface-container mb-3 flex items-center justify-center">
+<span class="material-symbols-outlined text-text-muted">local_shipping</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-text-muted">More suppliers loading...</h4>
+<p class="text-metadata text-text-muted mt-1">Syncing with warehouse database Sector A</p>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed right-safe-area bottom-20 w-14 h-14 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center active:scale-90 transition-transform z-40 border-4 border-white">
+<span class="material-symbols-outlined text-[32px]">barcode_scanner</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface border-t border-border-gray shadow-md transition-transform">
+<div class="flex justify-around items-center h-16 w-full px-safe-area pb-2">
+<!-- Catalog -->
+<a class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-high px-stack-md py-1 transition-colors" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-metadata text-metadata mt-1">Catalog</span>
+</a>
+<!-- Categories -->
+<a class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-high px-stack-md py-1 transition-colors" href="#">
+<span class="material-symbols-outlined">category</span>
+<span class="font-metadata text-metadata mt-1">Categories</span>
+</a>
+<!-- Suppliers (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-secondary-fixed rounded-xl px-stack-md py-1 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<span class="font-metadata text-metadata mt-1">Suppliers</span>
+</a>
+<!-- Finances -->
+<a class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-high px-stack-md py-1 transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-metadata text-metadata mt-1">Finances</span>
+</a>
+</div>
+</nav>
+<!-- Inline Script for micro-interactions -->
+<script>
+        // Simple search filter simulation
+        const searchInput = document.querySelector('input[type="text"]');
+        const cards = document.querySelectorAll('.grid-cols-1 > div:not(.bg-white\\/50)');
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(term)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Pull to refresh effect simulation
+        let touchStart = 0;
+        document.addEventListener('touchstart', e => touchStart = e.touches[0].pageY);
+        document.addEventListener('touchmove', e => {
+            const touchMove = e.touches[0].pageY;
+            if (window.scrollY === 0 && touchMove > touchStart + 50) {
+                // Potential Refresh UI trigger here
+            }
+        });
+    </script>
+</body></html>

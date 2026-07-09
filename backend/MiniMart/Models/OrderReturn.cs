@@ -29,6 +29,14 @@ namespace MiniMart.Models
 
         public OrderReturnStatus Status { get; set; }
 
+        public ReturnClassify Classify { get; set; }
+
+        public string? ImageEvidence { get; set; }
+
+        public int? ShiftId { get; set; }
+
+        public Shift? Shift { get; set; }
+
         public ICollection<OrderReturnDetail> OrderReturnDetails { get; set; }
             = new List<OrderReturnDetail>();
     }

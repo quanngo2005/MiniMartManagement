@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
-import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_dashboard_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/manager_return_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_bottom_navigation_bar.dart';
 
 class ManagerNavigationScreen extends StatefulWidget {
@@ -33,7 +33,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           // 1 — Analyze
           const ShiftManagementScreen(),
           // 2 — Return
-          const InventoryDocumentsScreen(),
+          const ManagerReturnListScreen(),
           // 3 — Inventory
           const InventoryTransactionsScreen(showBottomNavBar: false),
           // 4 — Staff

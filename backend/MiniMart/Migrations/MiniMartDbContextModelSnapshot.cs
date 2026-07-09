@@ -1994,11 +1994,17 @@ namespace MiniMart.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderReturnId"));
 
+                    b.Property<int>("Classify")
+                        .HasColumnType("int");
+
                     b.Property<int?>("EInvoiceId")
                         .HasColumnType("int");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImageEvidence")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("OriginalOrderId")
                         .HasColumnType("int");
@@ -2018,6 +2024,9 @@ namespace MiniMart.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ShiftId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -2029,11 +2038,13 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("OriginalOrderId");
 
+                    b.HasIndex("ShiftId");
+
                     b.ToTable("OrderReturns", t =>
                         {
                             t.HasCheckConstraint("CK_OrderReturns_RefundMethod", "[RefundMethod] IN (1,2,3,4,5,6)");
 
-                            t.HasCheckConstraint("CK_OrderReturns_Status", "[Status] IN (1,2,3)");
+                            t.HasCheckConstraint("CK_OrderReturns_Status", "[Status] IN (1,2,3,4)");
                         });
                 });
 
@@ -3690,11 +3701,17 @@ namespace MiniMart.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MiniMart.Models.Shift", "Shift")
+                        .WithMany()
+                        .HasForeignKey("ShiftId");
+
                     b.Navigation("EInvoice");
 
                     b.Navigation("Employee");
 
                     b.Navigation("OriginalOrder");
+
+                    b.Navigation("Shift");
                 });
 
             modelBuilder.Entity("MiniMart.Models.OrderReturnDetail", b =>
