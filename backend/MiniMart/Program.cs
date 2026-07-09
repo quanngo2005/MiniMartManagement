@@ -47,9 +47,6 @@ builder.Services.AddDbContext<MiniMartDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
-// ── Settings ────────────────────────────────────────────────────────
-builder.Services.Configure<TaxSettings>(builder.Configuration.GetSection("TaxSettings"));
-
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
