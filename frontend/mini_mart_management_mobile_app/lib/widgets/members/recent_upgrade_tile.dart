@@ -4,10 +4,7 @@ import 'package:mini_mart_management_mobile_app/models/customer_summary.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
 class RecentUpgradeTile extends StatelessWidget {
-  const RecentUpgradeTile({
-    super.key,
-    required this.customer,
-  });
+  const RecentUpgradeTile({super.key, required this.customer});
 
   final CustomerSummary customer;
 

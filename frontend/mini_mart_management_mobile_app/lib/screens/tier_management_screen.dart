@@ -38,10 +38,7 @@ class _TierManagementScreenState extends State<TierManagementScreen> {
             itemCount: provider.tiers.length,
             separatorBuilder: (_, _) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
-              return TierInfoCard(
-                tier: provider.tiers[index],
-                onEdit: () {},
-              );
+              return TierInfoCard(tier: provider.tiers[index], onEdit: () {});
             },
           );
         },

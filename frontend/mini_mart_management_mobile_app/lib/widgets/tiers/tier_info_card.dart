@@ -4,11 +4,7 @@ import '../../theme/app_colors.dart';
 import 'package:intl/intl.dart';
 
 class TierInfoCard extends StatelessWidget {
-  const TierInfoCard({
-    super.key,
-    required this.tier,
-    required this.onEdit,
-  });
+  const TierInfoCard({super.key, required this.tier, required this.onEdit});
 
   final MembershipTier tier;
   final VoidCallback onEdit;
@@ -36,7 +32,9 @@ class TierInfoCard extends StatelessWidget {
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: Color(int.parse(tier.colorCode.replaceFirst('#', '0xFF'))),
+                      color: Color(
+                        int.parse(tier.colorCode.replaceFirst('#', '0xFF')),
+                      ),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -51,7 +49,10 @@ class TierInfoCard extends StatelessWidget {
                 ],
               ),
               IconButton(
-                icon: const Icon(Icons.edit_outlined, color: AppColors.outlineVariant),
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.outlineVariant,
+                ),
                 onPressed: onEdit,
                 tooltip: 'Sửa',
               ),
@@ -68,21 +69,29 @@ class TierInfoCard extends StatelessWidget {
           const SizedBox(height: 8),
           const Divider(color: AppColors.borderGray),
           const SizedBox(height: 8),
-          ...tier.benefits.map((benefit) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle, size: 16, color: AppColors.secondary),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        benefit,
-                        style: textTheme.bodyMedium?.copyWith(color: AppColors.textDark),
+          ...tier.benefits.map(
+            (benefit) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.check_circle,
+                    size: 16,
+                    color: AppColors.secondary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      benefit,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textDark,
                       ),
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

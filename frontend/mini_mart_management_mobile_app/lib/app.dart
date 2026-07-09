@@ -5,6 +5,10 @@ import 'package:mini_mart_management_mobile_app/providers/customer_provider.dart
 import 'package:mini_mart_management_mobile_app/providers/inventory_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
+import 'package:mini_mart_management_mobile_app/repositories/order_return_repository.dart';
+import 'package:mini_mart_management_mobile_app/services/order_return_service.dart';
+import 'package:mini_mart_management_mobile_app/screens/cashier_return_screen.dart';
 import 'package:mini_mart_management_mobile_app/repositories/auth_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/inventory_lookup_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/inventory_repository.dart';
@@ -77,7 +81,12 @@ class MiniMartManagementApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         Provider<OrderRepository>(create: (_) => OrderRepository()),
         ChangeNotifierProvider(
-          create: (_) => SupplierProvider(SupplierRepository(SupplierService())),
+          create: (_) =>
+              SupplierProvider(SupplierRepository(SupplierService())),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              OrderReturnProvider(OrderReturnRepository(OrderReturnService())),
         ),
       ],
       child: MaterialApp(
@@ -89,6 +98,7 @@ class MiniMartManagementApp extends StatelessWidget {
           '/catalog': (_) => const InventoryTransactionsScreen(),
           '/members': (_) => const MemberManagementScreen(),
           '/promotions': (_) => const PromotionManagementScreen(),
+          '/returns': (_) => const CashierReturnScreen(),
         },
       ),
     );

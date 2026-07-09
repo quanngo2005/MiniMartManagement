@@ -24,7 +24,9 @@ class PromotionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isExpired ? AppColors.surfaceContainerLow : AppColors.surfaceContainerLowest,
+          color: isExpired
+              ? AppColors.surfaceContainerLow
+              : AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.borderGray),
           boxShadow: const [
@@ -46,20 +48,29 @@ class PromotionCard extends StatelessWidget {
                     promotion.title,
                     style: textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: isExpired ? AppColors.textMuted : AppColors.primary,
+                      color: isExpired
+                          ? AppColors.textMuted
+                          : AppColors.primary,
                     ),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: isExpired ? AppColors.surfaceContainerHigh : const Color(0xFFD2E4FF),
+                    color: isExpired
+                        ? AppColors.surfaceContainerHigh
+                        : const Color(0xFFD2E4FF),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     promotion.code,
                     style: TextStyle(
-                      color: isExpired ? AppColors.textMuted : const Color(0xFF001C37),
+                      color: isExpired
+                          ? AppColors.textMuted
+                          : const Color(0xFF001C37),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -71,18 +82,26 @@ class PromotionCard extends StatelessWidget {
             Text(
               '${promotion.discountType == 'Percentage' ? '${promotion.discountValue.toInt()}%' : '${NumberFormat('#,###').format(promotion.discountValue)}đ'} Off',
               style: textTheme.titleMedium?.copyWith(
-                color: isExpired ? AppColors.textMuted : AppColors.statusWarning,
+                color: isExpired
+                    ? AppColors.textMuted
+                    : AppColors.statusWarning,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 14, color: AppColors.textMuted),
+                const Icon(
+                  Icons.calendar_today,
+                  size: 14,
+                  color: AppColors.textMuted,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '${DateFormat('dd/MM').format(promotion.startDate)} - ${DateFormat('dd/MM/yyyy').format(promotion.endDate)}',
-                  style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: AppColors.textMuted,
+                  ),
                 ),
               ],
             ),

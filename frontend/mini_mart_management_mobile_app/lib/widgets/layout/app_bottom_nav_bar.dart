@@ -28,10 +28,7 @@ extension AppNavTabIndex on AppNavTab {
 }
 
 class AppBottomNavBar extends StatelessWidget {
-  const AppBottomNavBar({
-    super.key,
-    required this.selectedTab,
-  });
+  const AppBottomNavBar({super.key, required this.selectedTab});
 
   final AppNavTab selectedTab;
 

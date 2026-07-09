@@ -64,11 +64,22 @@ class ShiftProvider extends ChangeNotifier {
 
     try {
       final now = DateTime.now();
-      final dateStr = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
+      final dateStr =
+          '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
       final shiftCode = (isMorning ? 'SA-' : 'CH-') + dateStr;
       final shiftName = isMorning ? 'Ca sáng' : 'Ca chiều';
-      final startTimeStr = DateTime(now.year, now.month, now.day, isMorning ? 6 : 14).toIso8601String();
-      final endTimeStr = DateTime(now.year, now.month, now.day, isMorning ? 14 : 22).toIso8601String();
+      final startTimeStr = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        isMorning ? 6 : 14,
+      ).toIso8601String();
+      final endTimeStr = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        isMorning ? 14 : 22,
+      ).toIso8601String();
 
       final newShiftPayload = {
         'shiftCode': shiftCode,

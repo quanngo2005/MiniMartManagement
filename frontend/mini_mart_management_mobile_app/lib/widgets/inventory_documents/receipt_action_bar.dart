@@ -56,8 +56,8 @@ class ReceiptActionBar extends StatelessWidget {
                     isCompleting
                         ? 'Đang xử lý'
                         : onComplete == null
-                            ? 'Chia sẻ'
-                            : 'Hoàn thành',
+                        ? 'Chia sẻ'
+                        : 'Hoàn thành',
                   ),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,

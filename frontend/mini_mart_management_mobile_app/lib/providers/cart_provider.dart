@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:mini_mart_management_mobile_app/models/cart_item.dart';
 import 'package:mini_mart_management_mobile_app/models/product_lookup.dart';
 
-
 class CartProvider extends ChangeNotifier {
   final List<CartItem> _items = [];
   int? _selectedCustomerId;
@@ -58,7 +57,9 @@ class CartProvider extends ChangeNotifier {
   }
 
   void addItem(ProductLookup product) {
-    final index = _items.indexWhere((i) => i.product.productId == product.productId);
+    final index = _items.indexWhere(
+      (i) => i.product.productId == product.productId,
+    );
     if (index >= 0) {
       _items[index].quantity++;
     } else {

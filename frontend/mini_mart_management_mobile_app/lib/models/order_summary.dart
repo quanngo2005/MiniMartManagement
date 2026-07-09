@@ -19,18 +19,24 @@ class OrderSummary {
     return OrderSummary(
       orderId: (json['orderId'] ?? json['OrderId'] ?? 0) as int,
       orderCode: (json['orderCode'] ?? json['OrderCode'] ?? '') as String,
-      finalAmount: ((json['finalAmount'] ?? json['FinalAmount'] ?? 0) as num).toDouble(),
+      finalAmount: ((json['finalAmount'] ?? json['FinalAmount'] ?? 0) as num)
+          .toDouble(),
       status: (json['status'] ?? json['Status'] ?? 1) as int,
-      orderDate: DateTime.parse((json['orderDate'] ?? json['OrderDate']) as String),
+      orderDate: DateTime.parse(
+        (json['orderDate'] ?? json['OrderDate']) as String,
+      ),
       customerId: (json['customerId'] ?? json['CustomerId']) as int?,
     );
   }
 
   String get statusLabel {
     switch (status) {
-      case 2: return 'Hoàn thành';
-      case 3: return 'Đã hủy';
-      default: return 'Chờ xử lý';
+      case 2:
+        return 'Hoàn thành';
+      case 3:
+        return 'Đã hủy';
+      default:
+        return 'Chờ xử lý';
     }
   }
 

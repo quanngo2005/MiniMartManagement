@@ -41,6 +41,11 @@ class Supplier {
       bankName: _readNullableString(json, 'bankName', 'BankName'),
       description: _readNullableString(json, 'description', 'Description'),
       status: _readBool(json, 'status', 'Status'),
+      contactPerson: _readNullableString(
+        json,
+        'contactPerson',
+        'ContactPerson',
+      ),
     );
   }
 

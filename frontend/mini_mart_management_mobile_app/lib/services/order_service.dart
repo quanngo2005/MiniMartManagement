@@ -7,7 +7,7 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory.dar
 
 class OrderService {
   OrderService({http.Client? client})
-      : _client = client ?? createConfiguredClient();
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 

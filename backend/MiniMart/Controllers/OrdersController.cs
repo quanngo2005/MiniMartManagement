@@ -12,7 +12,7 @@ namespace MiniMart.Controllers
     [ApiController]
     [Route("api/orders")]
     [Route("odata/orders")]
-    public class OrdersController : ODataController
+    public class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
 

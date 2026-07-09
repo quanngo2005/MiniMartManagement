@@ -18,11 +18,15 @@ class CustomerPointTransaction {
   });
 
   factory CustomerPointTransaction.fromJson(Map<String, dynamic> json) {
-    final dateRaw = json['transactionDate'] ?? json['TransactionDate']
-        ?? json['createdAt'] ?? json['CreatedAt'];
+    final dateRaw =
+        json['transactionDate'] ??
+        json['TransactionDate'] ??
+        json['createdAt'] ??
+        json['CreatedAt'];
     return CustomerPointTransaction(
       pointTransactionId:
-          (json['pointTransactionId'] ?? json['PointTransactionId'] ?? 0) as int,
+          (json['pointTransactionId'] ?? json['PointTransactionId'] ?? 0)
+              as int,
       transactionType:
           (json['transactionType'] ?? json['TransactionType'] ?? 1) as int,
       delta: (json['delta'] ?? json['Delta'] ?? 0) as int,
