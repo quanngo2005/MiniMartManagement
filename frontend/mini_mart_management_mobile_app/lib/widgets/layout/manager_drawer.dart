@@ -5,6 +5,7 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 enum ManagerNavDestination {
   home,
   shift,
+  productPerformance,
   inventoryDocuments,
   inventoryTransactions,
   staff,
@@ -54,6 +55,17 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.shift,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.shift),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.bar_chart_outlined,
+                    activeIcon: Icons.bar_chart_rounded,
+                    label: 'Sản Phẩm',
+                    destination: ManagerNavDestination.productPerformance,
+                    selected: selected,
+                    onTap: _select(
+                      context,
+                      ManagerNavDestination.productPerformance,
+                    ),
                   ),
                   const _DrawerSectionLabel('Kho hàng'),
                   _DrawerTile(

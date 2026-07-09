@@ -9,5 +9,6 @@ namespace MiniMart.Repositories.Interfaces
         Task<IEnumerable<MonthlyRevenueDto>> GetMonthlyRevenueAsync(int year);
         Task<IEnumerable<CashierPerformanceDto>> GetCashierPerformanceAsync(DateTime? startDate, DateTime? endDate);
         Task<IEnumerable<InventoryStatusDto>> GetInventoryReportAsync();
+        Task<IEnumerable<TopProductDto>> GetTopProductsAsync(DateTime? startDate, DateTime? endDate, int top);
     }
 }

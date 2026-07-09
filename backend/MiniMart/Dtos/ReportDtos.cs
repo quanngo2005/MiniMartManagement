@@ -43,4 +43,15 @@ namespace MiniMart.DTOs
         public bool IsLowStock => CurrentStock <= MinimumStock;
         public string CategoryName { get; set; } = string.Empty;
     }
+
+    public class TopProductDto
+    {
+        public int ProductId { get; set; }
+        public string ProductCode { get; set; } = string.Empty;
+        public string ProductName { get; set; } = string.Empty;
+        public string CategoryName { get; set; } = string.Empty;
+        public int TotalQuantitySold { get; set; }
+        public decimal TotalRevenue { get; set; }
+        public decimal ContributionPercent { get; set; }
+    }
 }

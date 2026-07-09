@@ -117,5 +117,58 @@ namespace MiniMart.Repositories.Implementations
 
             return result;
         }
+
+        public async Task<IEnumerable<TopProductDto>> GetTopProductsAsync(DateTime? startDate, DateTime? endDate, int top)
+        {
+            if (top <= 0) top = 10;
+
+            var orderQuery = _context.Orders
+                .Where(o => o.Status == OrderStatus.Completed);
+
+            if (startDate.HasValue)
+                orderQuery = orderQuery.Where(o => o.OrderDate >= startDate.Value.Date);
+            if (endDate.HasValue)
+                orderQuery = orderQuery.Where(o => o.OrderDate <= endDate.Value.Date.AddDays(1).AddTicks(-1));
+
+            var orderIds = orderQuery.Select(o => o.OrderId);
+
+            var details = await _context.OrderDetails
+                .Where(od => !od.IsGift && orderIds.Contains(od.OrderId))
+                .GroupBy(od => new
+                {
+                    od.ProductId,
+                    od.Product.ProductCode,
+                    od.Product.ProductName,
+                    od.Product.Category.CategoryName
+                })
+                .Select(g => new
+                {
+                    g.Key.ProductId,
+                    g.Key.ProductCode,
+                    g.Key.ProductName,
+                    g.Key.CategoryName,
+                    TotalQuantitySold = g.Sum(od => od.Quantity),
+                    TotalRevenue = g.Sum(od => od.TotalPrice),
+                })
+                .OrderByDescending(r => r.TotalQuantitySold)
+                .Take(top)
+                .ToListAsync();
+
+            // Tính ContributionPercent trong C# sau khi fetch
+            var periodRevenue = details.Sum(d => d.TotalRevenue);
+
+            return details.Select(d => new TopProductDto
+            {
+                ProductId = d.ProductId,
+                ProductCode = d.ProductCode,
+                ProductName = d.ProductName,
+                CategoryName = d.CategoryName,
+                TotalQuantitySold = d.TotalQuantitySold,
+                TotalRevenue = d.TotalRevenue,
+                ContributionPercent = periodRevenue > 0
+                    ? Math.Round(d.TotalRevenue / periodRevenue * 100, 1)
+                    : 0
+            });
+        }
     }
 }

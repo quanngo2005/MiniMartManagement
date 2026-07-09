@@ -62,5 +62,18 @@ namespace MiniMart.Controllers
             var result = await _reportRepository.GetInventoryReportAsync();
             return Ok(result);
         }
+
+        [HttpGet("top-products")]
+        public async Task<IActionResult> GetTopProducts(
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate,
+            [FromQuery] int top = 10)
+        {
+            if (top <= 0 || top > 100)
+                return BadRequest("top must be between 1 and 100.");
+
+            var result = await _reportRepository.GetTopProductsAsync(startDate, endDate, top);
+            return Ok(result);
+        }
     }
 }
