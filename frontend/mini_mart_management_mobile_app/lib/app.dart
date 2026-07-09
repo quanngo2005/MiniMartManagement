@@ -62,7 +62,7 @@ class MiniMartManagementApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => ReceiptProvider(ReceiptRepository(ReceiptService())),
         ),
-        ChangeNotifierProvider(
+        ChangeNotifierProvider( 
           create: (_) =>
               EmployeeProvider(EmployeeRepository(EmployeeService())),
         ),

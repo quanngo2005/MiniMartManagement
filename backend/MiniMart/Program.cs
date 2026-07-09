@@ -13,6 +13,10 @@ using MiniMart.Repositories.Interfaces;
 using MiniMart.Services;
 using MiniMart.Services.Interfaces;
 using MiniMart.Services.Implementations;
+<<<<<<< HEAD
+using MiniMart.Shared.Settings;
+=======
+>>>>>>> 8c01141d39fec51ebd6adf827f53ccb0f0fd5e47
 
 var builder = WebApplication.CreateBuilder(args);
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
@@ -43,7 +47,8 @@ odataBuilder.EntitySet<Promotion>("Promotions");
 // ── Infrastructure ────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -68,6 +73,7 @@ builder.Services.AddScoped<IOrderReturnRepository, OrderReturnRepository>();
 builder.Services.AddScoped<IOrderReturnService, OrderReturnService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
+builder.Services.AddScoped<ITaxCalculationService, TaxCalculationService>();
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

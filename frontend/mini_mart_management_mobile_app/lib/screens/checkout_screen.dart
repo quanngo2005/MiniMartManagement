@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mini_mart_management_mobile_app/models/product_lookup.dart';
 import 'package:mini_mart_management_mobile_app/models/cart_item.dart';
+import 'package:mini_mart_management_mobile_app/models/checkout.dart';
 import 'package:mini_mart_management_mobile_app/providers/cart_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
@@ -229,37 +230,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       final orderRepo = context.read<OrderRepository>();
 
-      final items = cart.items
-          .map(
-            (i) => {'productId': i.product.productId, 'quantity': i.quantity},
-          )
-          .toList();
-
-      final givenStr = _customerGivenAmountController.text.replaceAll(
-        RegExp(r'[^0-9]'),
-        '',
-      );
-      final givenAmount = double.tryParse(givenStr) ?? cart.totalAmount;
-      if (cart.paymentMethod == 1 && givenAmount < cart.totalAmount) {
+      final givenStr = _customerGivenAmountController.text.replaceAll(RegExp(r'[^0-9]'), '');
+      final givenAmount = double.tryParse(givenStr) ?? cart.finalAmount;
+      if (cart.paymentMethod == 1 && givenAmount < cart.finalAmount) {
         _showError('Tiền khách đưa không đủ.');
         return;
       }
 
-      final response = await orderRepo.checkout(
+      final checkoutItems = cart.items.map((i) => CheckoutItem(
+        productId: i.product.productId,
+        quantity: i.quantity,
+      )).toList();
+
+      final checkoutRequest = CheckoutRequest(
         employeeId: currentUser.employeeId,
         shiftId: shiftProvider.currentShift!.shiftId,
         customerId: cart.selectedCustomerId,
         loyaltyPointsToUse: cart.pointsToUse,
-        paymentMethod: cart.paymentMethod,
+        paymentMethod: cart.paymentMethod == 1 ? PaymentMethod.cash : PaymentMethod.vnpay,
         paidAmount: cart.paymentMethod == 1 ? givenAmount : cart.finalAmount,
-        items: items,
+        items: checkoutItems,
       );
 
-      if (cart.paymentMethod == 5) {
-        final orderId = response['orderId'] ?? response['OrderId'];
-        if (orderId == null)
-          throw Exception('Không tìm thấy OrderId từ server.');
+      final response = await orderRepo.checkout(checkoutRequest);
 
+      if (cart.paymentMethod == 5) {
+        final orderId = response.orderId;
+        if (orderId == 0) throw Exception('Không tìm thấy OrderId từ server.');
+
+>>>>>>> 8c01141d39fec51ebd6adf827f53ccb0f0fd5e47
         final client = createConfiguredClient();
         final csrfRes = await client.get(
           ApiConfig.uri('/api/auth/csrf-token'),
@@ -1282,28 +1281,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                   const SizedBox(height: 16),
                 ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Tạm tính', style: TextStyle(fontSize: 16, color: AppColors.textMuted)),
+                    Text(currencyFormatter.format(cart.totalAmount), style: const TextStyle(fontSize: 16, color: AppColors.textDark)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Thuế VAT ${(cart.vatRateValue * 100).toInt()}%', style: const TextStyle(fontSize: 14, color: AppColors.textMuted)),
+                    Text(currencyFormatter.format(cart.vatAmount), style: const TextStyle(fontSize: 14, color: AppColors.textDark)),
+                  ],
+                ),
                 if (cart.pointsToUse > 0) ...[
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Tạm tính',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      Text(
-                        currencyFormatter.format(cart.totalAmount),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: AppColors.textDark,
-                        ),
-                      ),
+                      const Text('Giảm giá', style: TextStyle(fontSize: 14, color: AppColors.statusError)),
+                      Text('- ${currencyFormatter.format(cart.discountAmount)}', style: const TextStyle(fontSize: 14, color: AppColors.statusError)),
                     ],
                   ),
-                  const SizedBox(height: 8),
                 ],
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
