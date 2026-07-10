@@ -302,7 +302,6 @@ namespace MiniMart.Repositories.RepoImplement
                     }
                 }
 
-                // Tính toán điểm ngược lại từ DiscountAmount (1 điểm = 1000 VND)
                 int loyaltyPointsUsed = (int)(order.DiscountAmount / 1000m);
                 int pointsEarned = (int)(order.FinalAmount / 50000);
 
