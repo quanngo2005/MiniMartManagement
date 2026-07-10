@@ -9,7 +9,6 @@ class CartProvider extends ChangeNotifier {
   int? _selectedCustomerPoints;
   int _paymentMethod = 1; // 1 = Cash, 3 = EWallet (VNPAY)
   int _pointsToUse = 0;
-  static const double vatRate = 0.08;
 
   List<CartItem> get items => _items;
   int? get selectedCustomerId => _selectedCustomerId;
@@ -17,7 +16,6 @@ class CartProvider extends ChangeNotifier {
   int? get selectedCustomerPoints => _selectedCustomerPoints;
   int get paymentMethod => _paymentMethod;
   int get pointsToUse => _pointsToUse;
-  double get vatRateValue => vatRate;
 
   double get totalAmount {
     double total = 0;
@@ -27,26 +25,21 @@ class CartProvider extends ChangeNotifier {
     return total;
   }
 
-  double get vatAmount {
-    final raw = totalAmount * vatRate;
-    return (raw * 100).roundToDouble() / 100;
-  }
-
   double get discountAmount {
     return _pointsToUse * 1000.0;
   }
 
   double get finalAmount {
-    final raw = totalAmount + vatAmount - discountAmount;
-    final rounded = (raw * 100).roundToDouble() / 100;
-    return rounded < 0 ? 0 : rounded;
+    double finalAmt = totalAmount - discountAmount;
+    return finalAmt < 0 ? 0 : finalAmt;
   }
 
   int get maxPointsCanUse {
     if (_selectedCustomerPoints == null) return 0;
-    final amountBeforeDiscount = totalAmount + vatAmount;
-    int maxFromTotal = (amountBeforeDiscount / 1000).floor();
-    return _selectedCustomerPoints! < maxFromTotal ? _selectedCustomerPoints! : maxFromTotal;
+    int maxFromTotal = (totalAmount / 1000).floor();
+    return _selectedCustomerPoints! < maxFromTotal
+        ? _selectedCustomerPoints!
+        : maxFromTotal;
   }
 
   void setPointsToUse(int points) {

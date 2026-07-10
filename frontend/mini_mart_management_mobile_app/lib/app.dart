@@ -6,6 +6,7 @@ import 'package:mini_mart_management_mobile_app/providers/inventory_provider.dar
 import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/e_invoice_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/report_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/product_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/auth_repository.dart';
@@ -13,6 +14,7 @@ import 'package:mini_mart_management_mobile_app/repositories/product_repository.
 import 'package:mini_mart_management_mobile_app/repositories/inventory_lookup_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/inventory_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/order_return_repository.dart';
+import 'package:mini_mart_management_mobile_app/repositories/e_invoice_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/receipt_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/report_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/supplier_repository.dart';
@@ -23,6 +25,7 @@ import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_lookup_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_service.dart';
 import 'package:mini_mart_management_mobile_app/services/order_return_service.dart';
+import 'package:mini_mart_management_mobile_app/services/e_invoice_service.dart';
 import 'package:mini_mart_management_mobile_app/services/receipt_service.dart';
 import 'package:mini_mart_management_mobile_app/services/report_service.dart';
 import 'package:mini_mart_management_mobile_app/services/product_service.dart';
@@ -68,7 +71,7 @@ class MiniMartManagementApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => ReceiptProvider(ReceiptRepository(ReceiptService())),
         ),
-        ChangeNotifierProvider( 
+        ChangeNotifierProvider(
           create: (_) =>
               EmployeeProvider(EmployeeRepository(EmployeeService())),
         ),
@@ -84,12 +87,10 @@ class MiniMartManagementApp extends StatelessWidget {
               PromotionProvider(PromotionRepository(PromotionService())),
         ),
         ChangeNotifierProvider(
-          create: (_) =>
-              ReportProvider(ReportRepository(ReportService())),
+          create: (_) => ReportProvider(ReportRepository(ReportService())),
         ),
         ChangeNotifierProvider(
-          create: (_) =>
-              ProductProvider(ProductRepository(ProductService())),
+          create: (_) => ProductProvider(ProductRepository(ProductService())),
         ),
         ChangeNotifierProvider(create: (_) => TierProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
@@ -101,6 +102,10 @@ class MiniMartManagementApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) =>
               OrderReturnProvider(OrderReturnRepository(OrderReturnService())),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              EInvoiceProvider(EInvoiceRepository(service: EInvoiceService())),
         ),
       ],
       child: MaterialApp(

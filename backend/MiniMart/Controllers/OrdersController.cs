@@ -21,7 +21,6 @@ namespace MiniMart.Controllers
             OrderId = o.OrderId,
             OrderCode = o.OrderCode,
             SubTotal = o.SubTotal,
-            TaxAmount = o.TaxAmount,
             DiscountAmount = o.DiscountAmount,
             FinalAmount = o.FinalAmount,
             PaidAmount = o.PaidAmount,
