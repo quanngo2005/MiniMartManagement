@@ -16,7 +16,6 @@ class PromotionRuleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusKey = _statusKey(promotion.status);
-    final statusLabel = _statusLabel(promotion.status);
     final isEnded = statusKey == 'ended';
 
     return Container(
@@ -55,7 +54,8 @@ class PromotionRuleCard extends StatelessWidget {
                         children: [
                           Text(
                             promotion.name,
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: isEnded
                                       ? AppColors.textMuted
@@ -67,12 +67,12 @@ class PromotionRuleCard extends StatelessWidget {
                             children: [
                               const Icon(
                                 Icons.calendar_today_outlined,
-                                size: 14,
+                                size: 13,
                                 color: AppColors.textMuted,
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '${DateFormat('dd/MM/yyyy').format(promotion.startDate)} - ${DateFormat('dd/MM/yyyy').format(promotion.endDate)}',
+                                '${DateFormat('dd/MM/yyyy').format(promotion.startDate)} → ${DateFormat('dd/MM/yyyy').format(promotion.endDate)}',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textMuted,
@@ -83,10 +83,8 @@ class PromotionRuleCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    _StatusBadge(
-                      label: statusLabel,
-                      statusKey: statusKey,
-                    ),
+                    const SizedBox(width: 8),
+                    _StatusBadge(statusKey: statusKey),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -99,29 +97,21 @@ class PromotionRuleCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: Text(
-                          _ruleLabel(promotion),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ),
+                      _TypeChip(promotion: promotion),
+                      const Spacer(),
                       Text(
                         _discountLabel(promotion),
                         style: TextStyle(
-                          fontFamily: 'monospace',
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                           color: isEnded
                               ? AppColors.textMuted
                               : statusKey == 'active'
-                                  ? AppColors.secondary
-                                  : AppColors.primary,
+                              ? AppColors.secondary
+                              : AppColors.primary,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       GestureDetector(
                         onTap: onDelete,
                         child: const Icon(
@@ -152,58 +142,61 @@ class PromotionRuleCard extends StatelessWidget {
     }
   }
 
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'Active':
-        return 'Active';
-      case 'Upcoming':
-        return 'Scheduled';
-      case 'Expired':
-        return 'Ended';
-      default:
-        return 'Ended';
-    }
-  }
-
   Color _borderColor(String statusKey) {
     switch (statusKey) {
       case 'active':
         return AppColors.secondary;
       case 'scheduled':
-        return const Color(0xFF001C37);
+        return AppColors.primary;
       default:
-        return AppColors.textMuted;
+        return AppColors.outlineVariant;
     }
   }
 
-  String _ruleLabel(Promotion promotion) {
-    if (promotion.type == 1) {
-      return 'Rule: Buy X Get Y';
-    }
-    if (promotion.discountAmount != null) {
-      return 'Rule: Fixed Amount';
-    }
-    return 'Rule: Percentage Off';
+  String _discountLabel(Promotion p) {
+    if (p.type == 1) return 'M${p.buyQuantity ?? 2}T${p.giftQuantity ?? 1}';
+    if (p.discountAmount != null)
+      return '-${NumberFormat('#,###').format(p.discountAmount)}đ';
+    return '-${p.discountPercent?.toStringAsFixed(0) ?? '0'}%';
   }
+}
 
-  String _discountLabel(Promotion promotion) {
+class _TypeChip extends StatelessWidget {
+  const _TypeChip({required this.promotion});
+  final Promotion promotion;
+
+  @override
+  Widget build(BuildContext context) {
+    final String label;
+    final IconData icon;
+
     if (promotion.type == 1) {
-      return 'B${promotion.buyQuantity ?? 2}G${promotion.giftQuantity ?? 1}';
+      label = 'Mua X Tặng Y';
+      icon = Icons.card_giftcard_outlined;
+    } else if (promotion.discountAmount != null) {
+      label = 'Giảm tiền mặt';
+      icon = Icons.money_off_outlined;
+    } else {
+      label = 'Giảm theo %';
+      icon = Icons.percent_outlined;
     }
-    if (promotion.discountAmount != null) {
-      return '-${NumberFormat('#,###').format(promotion.discountAmount)}đ';
-    }
-    return '-${promotion.discountPercent?.toStringAsFixed(0) ?? '0'}%';
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: AppColors.textMuted),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+        ),
+      ],
+    );
   }
 }
 
 class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({
-    required this.label,
-    required this.statusKey,
-  });
-
-  final String label;
+  const _StatusBadge({required this.statusKey});
   final String statusKey;
 
   @override
@@ -211,20 +204,24 @@ class _StatusBadge extends StatelessWidget {
     final Color bg;
     final Color fg;
     final Color dot;
+    final String label;
 
     switch (statusKey) {
       case 'active':
         bg = AppColors.secondaryContainer;
         fg = const Color(0xFF00714D);
         dot = AppColors.secondary;
+        label = 'Đang chạy';
       case 'scheduled':
         bg = AppColors.primaryFixed;
         fg = const Color(0xFF314865);
         dot = AppColors.primary;
+        label = 'Sắp diễn ra';
       default:
         bg = AppColors.surfaceContainerHigh;
         fg = AppColors.textMuted;
         dot = AppColors.textMuted;
+        label = 'Đã kết thúc';
     }
 
     return Container(

@@ -58,6 +58,7 @@ namespace MiniMart.DTOs
         public int OrderId { get; set; }
         public string OrderCode { get; set; } = string.Empty;
         public decimal SubTotal { get; set; }
+        public decimal TaxAmount { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal FinalAmount { get; set; }
         public decimal PaidAmount { get; set; }
@@ -81,6 +82,7 @@ namespace MiniMart.DTOs
         public string? CustomerName { get; set; }
         public string? CustomerPhone { get; set; }
         public decimal SubTotal { get; set; }
+        public decimal TaxAmount { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal FinalAmount { get; set; }
         public decimal PaidAmount { get; set; }

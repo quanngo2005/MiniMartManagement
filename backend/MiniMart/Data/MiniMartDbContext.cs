@@ -296,7 +296,7 @@ namespace MiniMart.Data
             modelBuilder.Entity<OrderReturn>()
                 .ToTable(t =>
                 {
-                    t.HasCheckConstraint("CK_OrderReturns_Status", "[Status] IN (1,2,3)");
+                    t.HasCheckConstraint("CK_OrderReturns_Status", "[Status] IN (1,2,3,4)");
                     t.HasCheckConstraint("CK_OrderReturns_RefundMethod", "[RefundMethod] IN (1,2,3,4,5,6)");
                 });
 

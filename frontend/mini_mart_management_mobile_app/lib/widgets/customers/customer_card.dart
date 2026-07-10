@@ -4,11 +4,7 @@ import '../../models/customer_summary.dart';
 import '../../theme/app_colors.dart';
 
 class CustomerCard extends StatelessWidget {
-  const CustomerCard({
-    super.key,
-    required this.customer,
-    required this.onTap,
-  });
+  const CustomerCard({super.key, required this.customer, required this.onTap});
 
   final CustomerSummary customer;
   final VoidCallback onTap;
@@ -71,13 +67,18 @@ class CustomerCard extends StatelessWidget {
                   Text(
                     customer.phone,
                     style: const TextStyle(
-                        color: AppColors.textMuted, fontSize: 13),
+                      color: AppColors.textMuted,
+                      fontSize: 13,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(Icons.stars,
-                          size: 15, color: AppColors.secondary),
+                      const Icon(
+                        Icons.stars,
+                        size: 15,
+                        color: AppColors.secondary,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '${fmt.format(customer.points)} điểm',
@@ -97,8 +98,10 @@ class CustomerCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: customer.customerStatus
                         ? const Color(0xFFD1FAE5)
@@ -117,7 +120,10 @@ class CustomerCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Icon(Icons.chevron_right, color: AppColors.outlineVariant),
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.outlineVariant,
+                ),
               ],
             ),
           ],
@@ -163,7 +169,11 @@ class _TierChip extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-            color: fg, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+          color: fg,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }

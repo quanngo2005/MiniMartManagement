@@ -4,16 +4,19 @@ using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
+using MiniMart.Services.Interfaces;
 
 namespace MiniMart.Repositories.RepoImplement
 {
     public class OrderRepository : IOrderRepository
     {
         private readonly MiniMartDbContext _context;
+        private readonly ITaxCalculationService _taxCalculationService;
 
-        public OrderRepository(MiniMartDbContext context)
+        public OrderRepository(MiniMartDbContext context, ITaxCalculationService taxCalculationService)
         {
             _context = context;
+            _taxCalculationService = taxCalculationService;
         }
 
         // GET ALL (OData) 
@@ -60,6 +63,7 @@ namespace MiniMart.Repositories.RepoImplement
                 CustomerName = order.Customer?.FullName,
                 CustomerPhone = order.Customer?.PhoneNumber,
                 SubTotal = order.SubTotal,
+                TaxAmount = order.TaxAmount,
                 DiscountAmount = order.DiscountAmount,
                 FinalAmount = order.FinalAmount,
                 PaidAmount = order.PaidAmount,
@@ -77,11 +81,27 @@ namespace MiniMart.Repositories.RepoImplement
             };
         }
 
+        private async Task<string> GenerateNextOrderCodeAsync()
+        {
+            var codes = await _context.Orders
+                .Where(o => o.OrderCode.StartsWith("HD"))
+                .Select(o => o.OrderCode)
+                .ToListAsync();
+
+            var maxNum = codes
+                .Select(c => c.Substring(2))
+                .Select(s => int.TryParse(s, out int n) ? n : 0)
+                .DefaultIfEmpty(0)
+                .Max();
+
+            return $"HD{(maxNum + 1):D3}";
+        }
+
         // CREATE ORDER (Pending) 
         public async Task<Order> CreateOrderAsync(Order order)
         {
             order.Status = OrderStatus.Pending;
-            order.OrderCode = $"ORD-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
+            order.OrderCode = await GenerateNextOrderCodeAsync();
             order.OrderDate = DateTime.Now;
 
             await _context.Orders.AddAsync(order);
@@ -143,8 +163,8 @@ namespace MiniMart.Repositories.RepoImplement
             }
 
             decimal discountAmount = loyaltyDiscount;
-            decimal finalAmount = subTotal - discountAmount;
-            if (finalAmount < 0) finalAmount = 0;
+            var checkoutAmounts = _taxCalculationService.CalculateCheckoutAmounts(subTotal, discountAmount);
+            decimal finalAmount = checkoutAmounts.GrandTotal;
 
             decimal changeAmount = 0;
             if (request.PaymentMethod == PaymentMethod.Cash)
@@ -159,8 +179,9 @@ namespace MiniMart.Repositories.RepoImplement
             {
                 var order = new Order
                 {
-                    OrderCode = $"ORD-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}",
+                    OrderCode = await GenerateNextOrderCodeAsync(),
                     SubTotal = subTotal,
+                    TaxAmount = checkoutAmounts.TaxAmount,
                     DiscountAmount = discountAmount,
                     FinalAmount = finalAmount,
                     PaidAmount = request.PaidAmount,
@@ -222,6 +243,7 @@ namespace MiniMart.Repositories.RepoImplement
                     OrderId = order.OrderId,
                     OrderCode = order.OrderCode,
                     SubTotal = subTotal,
+                    TaxAmount = checkoutAmounts.TaxAmount,
                     DiscountAmount = discountAmount,
                     FinalAmount = finalAmount,
                     PaidAmount = request.PaidAmount,
@@ -231,6 +253,7 @@ namespace MiniMart.Repositories.RepoImplement
                     CustomerPointBalance = customer?.Point,
                     PaymentMethod = request.PaymentMethod,
                     Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
+                    OrderDate = order.OrderDate,
 
                     Items = orderDetails.Select(od => new OrderDetailDto
                     {

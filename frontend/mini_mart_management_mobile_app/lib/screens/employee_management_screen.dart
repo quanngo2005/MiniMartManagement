@@ -2,15 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee.dart';
 import 'package:mini_mart_management_mobile_app/models/role.dart';
 import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/supplier_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 class EmployeeManagementScreen extends StatefulWidget {
-  const EmployeeManagementScreen({this.showBottomNavBar = true, super.key});
+  const EmployeeManagementScreen({
+    this.showBottomNavBar = true,
+    this.onMenuTap,
+    super.key,
+  });
 
   final bool showBottomNavBar;
+  final VoidCallback? onMenuTap;
 
   @override
   State<EmployeeManagementScreen> createState() =>
@@ -205,7 +212,8 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () {
           ScaffoldMessenger.of(
             context,
@@ -225,12 +233,18 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
     return AppBar(
       backgroundColor: AppColors.surface,
       elevation: 0,
-      titleSpacing: 16,
-      leadingWidth: 40,
-      leading: const Padding(
-        padding: EdgeInsets.only(left: 16),
-        child: Icon(Icons.storefront_rounded, color: AppColors.primary),
-      ),
+      titleSpacing: widget.onMenuTap != null ? 0 : 16,
+      leadingWidth: widget.onMenuTap != null ? null : 40,
+      leading: widget.onMenuTap != null
+          ? IconButton(
+              icon: const Icon(Icons.menu_rounded),
+              onPressed: widget.onMenuTap,
+              color: AppColors.primary,
+            )
+          : const Padding(
+              padding: EdgeInsets.only(left: 16),
+              child: Icon(Icons.storefront_rounded, color: AppColors.primary),
+            ),
       title: Text(
         'Store #402 | North Branch',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -501,6 +515,10 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    return const AppBottomNavBar(selectedTab: AppNavTab.staff);
   }
 
   void _showAddEmployeeDialog(BuildContext context) {

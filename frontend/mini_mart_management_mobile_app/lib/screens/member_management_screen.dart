@@ -13,7 +13,14 @@ import 'package:mini_mart_management_mobile_app/widgets/members/tier_distributio
 import 'package:mini_mart_management_mobile_app/widgets/members/tier_overview_card.dart';
 
 class MemberManagementScreen extends StatefulWidget {
-  const MemberManagementScreen({super.key});
+  const MemberManagementScreen({
+    this.showBottomNavBar = true,
+    this.onMenuTap,
+    super.key,
+  });
+
+  final bool showBottomNavBar;
+  final VoidCallback? onMenuTap;
 
   @override
   State<MemberManagementScreen> createState() => _MemberManagementScreenState();
@@ -67,15 +74,16 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: _openCustomerList,
         backgroundColor: AppColors.primaryContainer,
         foregroundColor: Colors.white,
         child: const Icon(Icons.person_add_outlined),
       ),
-      bottomNavigationBar: const AppBottomNavBar(
-        selectedTab: AppNavTab.customers,
-      ),
+      bottomNavigationBar: widget.showBottomNavBar
+          ? const AppBottomNavBar(selectedTab: AppNavTab.customers)
+          : null,
     );
   }
 
@@ -87,14 +95,14 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
       leading: IconButton(
         icon: const Icon(Icons.menu),
         color: AppColors.primary,
-        onPressed: () {},
+        onPressed: widget.onMenuTap ?? () {},
       ),
       title: Text(
         'Quản lý thành viên',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       actions: [
         IconButton(
@@ -134,9 +142,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
             Text(
               'Phân hạng thành viên',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
             TextButton(onPressed: () {}, child: const Text('Chi tiết')),
           ],
@@ -189,9 +197,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                 Text(
                   'Nâng hạng gần đây',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
                 ),
                 const Icon(Icons.history, color: AppColors.textMuted),
               ],
@@ -251,13 +259,14 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
   }
 
   List<CustomerSummary> _recentUpgrades(List<CustomerSummary> customers) {
-    final eligible = customers
-        .where(
-          (customer) =>
-              MembershipTierUtils.previousTierName(customer.points) != null,
-        )
-        .toList()
-      ..sort((a, b) => b.points.compareTo(a.points));
+    final eligible =
+        customers
+            .where(
+              (customer) =>
+                  MembershipTierUtils.previousTierName(customer.points) != null,
+            )
+            .toList()
+          ..sort((a, b) => b.points.compareTo(a.points));
 
     return eligible.take(3).toList();
   }

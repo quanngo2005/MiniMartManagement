@@ -3,9 +3,10 @@ import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
 class ManagerDashboardScreen extends StatelessWidget {
-  const ManagerDashboardScreen({required this.user, super.key});
+  const ManagerDashboardScreen({required this.user, this.onMenuTap, super.key});
 
   final EmployeeUser user;
+  final VoidCallback? onMenuTap;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +70,8 @@ class ManagerDashboardScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _showActionSnackBar(context, 'Quét mã vạch'),
         tooltip: 'Quét mã vạch',
         backgroundColor: AppColors.primary,
@@ -84,7 +86,13 @@ class ManagerDashboardScreen extends StatelessWidget {
       backgroundColor: AppColors.surfaceBright,
       foregroundColor: AppColors.primary,
       titleSpacing: 0,
-      leading: const Icon(Icons.storefront_rounded),
+      leading: onMenuTap != null
+          ? IconButton(
+              icon: const Icon(Icons.menu_rounded),
+              onPressed: onMenuTap,
+              tooltip: 'Menu',
+            )
+          : const Icon(Icons.storefront_rounded),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

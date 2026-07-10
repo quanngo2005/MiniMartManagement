@@ -5,16 +5,18 @@ import 'package:mini_mart_management_mobile_app/models/receipt.dart';
 extension ReceiptInventoryDocumentMapper on Receipt {
   InventoryDocument toInventoryDocument() {
     final documentStatus = receiptStatus.toInventoryDocumentStatus();
-    final lines = batchLines.map((line) {
-      final unitPrice = line.importPrice.round();
-      return InventoryDocumentLine(
-        sku: line.productCode,
-        name: line.productName,
-        quantity: line.quantity,
-        unitPrice: unitPrice,
-        lineTotal: (line.importPrice * line.quantity).round(),
-      );
-    }).toList(growable: false);
+    final lines = batchLines
+        .map((line) {
+          final unitPrice = line.importPrice.round();
+          return InventoryDocumentLine(
+            sku: line.productCode,
+            name: line.productName,
+            quantity: line.quantity,
+            unitPrice: unitPrice,
+            lineTotal: (line.importPrice * line.quantity).round(),
+          );
+        })
+        .toList(growable: false);
 
     return InventoryDocument(
       id: receiptCode,
@@ -58,7 +60,8 @@ String _formatImportDate(DateTime value) {
   final localValue = value.toLocal();
   final today = DateTime(now.year, now.month, now.day);
   final date = DateTime(localValue.year, localValue.month, localValue.day);
-  final time = _twoDigits(localValue.hour) + ':' + _twoDigits(localValue.minute);
+  final time =
+      _twoDigits(localValue.hour) + ':' + _twoDigits(localValue.minute);
 
   if (date == today) return 'Hôm nay, $time';
   if (date == today.subtract(const Duration(days: 1))) {

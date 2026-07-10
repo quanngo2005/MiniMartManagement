@@ -5,14 +5,18 @@ using MiniMart.Data;
 using MiniMart.Mapping;
 using MiniMart.Middleware;
 using MiniMart.Models;
+using MiniMart.Shared.Extensions;
+using MiniMart.Repositories.RepoInterface;
+using MiniMart.Repositories.RepoImplement;
 using MiniMart.Repositories.Implementations;
 using MiniMart.Repositories.Interfaces;
-using MiniMart.Repositories.RepoImplement;
-using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services;
-using MiniMart.Services.Implementations;
 using MiniMart.Services.Interfaces;
-using MiniMart.Shared.Extensions;
+using MiniMart.Services.Implementations;
+<<<<<<< HEAD
+using MiniMart.Shared.Settings;
+=======
+>>>>>>> 8c01141d39fec51ebd6adf827f53ccb0f0fd5e47
 
 var builder = WebApplication.CreateBuilder(args);
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
@@ -40,10 +44,11 @@ odataBuilder.EntitySet<Shift>("Shifts");
 odataBuilder.EntitySet<InventoryTransaction>("InventoryTransactions");
 odataBuilder.EntitySet<Promotion>("Promotions");
 
-// ── Services ─────────────────────────────────────────────────────
+// ── Infrastructure ────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -61,16 +66,28 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IShiftService, ShiftService>();
 builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
+builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
+builder.Services.AddAutoMapper(typeof(SupplierMappingProfile));
+builder.Services.AddAutoMapper(typeof(OrderReturnMappingProfile));
+builder.Services.AddScoped<IOrderReturnRepository, OrderReturnRepository>();
+builder.Services.AddScoped<IOrderReturnService, OrderReturnService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IPromotionService, PromotionService>();
+builder.Services.AddScoped<ITaxCalculationService, TaxCalculationService>();
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<MiniMart.Services.Interfaces.IPaymentGatewayService, VnPayService>();
 
 builder.Services.AddControllers()
-
     .AddOData(options => options
         .Select()
         .Filter()

@@ -9,7 +9,7 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory.dar
 
 class CustomerService {
   CustomerService({http.Client? client})
-      : _client = client ?? createConfiguredClient();
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 
@@ -21,7 +21,9 @@ class CustomerService {
 
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException('[${response.statusCode}] ${_readMessage(responseJson)}');
+      throw ApiException(
+        '[${response.statusCode}] ${_readMessage(responseJson)}',
+      );
     }
 
     final data = responseJson['data'] ?? responseJson['Data'] ?? responseJson;
@@ -34,7 +36,9 @@ class CustomerService {
         return value.map((j) => CustomerSummary.fromJson(j)).toList();
       }
     }
-    throw ApiException('[${response.statusCode}] Không thể parse response: ${response.body.substring(0, response.body.length.clamp(0, 200))}');
+    throw ApiException(
+      '[${response.statusCode}] Không thể parse response: ${response.body.substring(0, response.body.length.clamp(0, 200))}',
+    );
   }
 
   Future<CustomerSummary> getCustomerById(int id) async {
@@ -75,7 +79,9 @@ class CustomerService {
   }
 
   Future<CustomerSummary> updateCustomer(
-      int id, Map<String, dynamic> data) async {
+    int id,
+    Map<String, dynamic> data,
+  ) async {
     final csrfToken = await _fetchCsrfToken();
     final headers = <String, String>{
       'Accept': 'application/json',
@@ -127,25 +133,33 @@ class CustomerService {
     );
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException('[${response.statusCode}] ${_readMessage(responseJson)}');
+      throw ApiException(
+        '[${response.statusCode}] ${_readMessage(responseJson)}',
+      );
     }
     final data = responseJson['data'] ?? responseJson['Data'] ?? responseJson;
     final list = data is List ? data : (data is Map ? data['value'] ?? [] : []);
     return (list as List).map((j) => CustomerOrder.fromJson(j)).toList();
   }
 
-  Future<List<CustomerPointTransaction>> getCustomerPointTransactions(int id) async {
+  Future<List<CustomerPointTransaction>> getCustomerPointTransactions(
+    int id,
+  ) async {
     final response = await _client.get(
       ApiConfig.uri('/api/customers/$id/point-transactions'),
       headers: const {'Accept': 'application/json'},
     );
     final responseJson = _decodeResponse(response);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException('[${response.statusCode}] ${_readMessage(responseJson)}');
+      throw ApiException(
+        '[${response.statusCode}] ${_readMessage(responseJson)}',
+      );
     }
     final data = responseJson['data'] ?? responseJson['Data'] ?? responseJson;
     final list = data is List ? data : (data is Map ? data['value'] ?? [] : []);
-    return (list as List).map((j) => CustomerPointTransaction.fromJson(j)).toList();
+    return (list as List)
+        .map((j) => CustomerPointTransaction.fromJson(j))
+        .toList();
   }
 
   Future<Map<String, dynamic>> getCustomerPoints(int id) async {
@@ -161,8 +175,7 @@ class CustomerService {
     return responseJson;
   }
 
-  Future<Map<String, dynamic>> updateCustomerPoints(
-      int id, int delta) async {
+  Future<Map<String, dynamic>> updateCustomerPoints(int id, int delta) async {
     final csrfToken = await _fetchCsrfToken();
     final headers = <String, String>{
       'Accept': 'application/json',
@@ -226,8 +239,8 @@ class CustomerService {
   }
 
   String _readMessage(Map<String, dynamic> json) {
-    final message = json['message'] ?? json['Message']
-        ?? json['title'] ?? json['Title'];
+    final message =
+        json['message'] ?? json['Message'] ?? json['title'] ?? json['Title'];
     return message is String && message.isNotEmpty
         ? message
         : 'Yêu cầu thất bại. Vui lòng thử lại.';
