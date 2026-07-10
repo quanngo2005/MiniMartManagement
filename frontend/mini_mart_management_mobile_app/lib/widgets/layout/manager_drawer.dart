@@ -12,6 +12,7 @@ enum ManagerNavDestination {
   customers,
   promotions,
   analyze,
+  invoices,
 }
 
 class ManagerDrawer extends StatelessWidget {
@@ -124,6 +125,14 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.promotions,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.promotions),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.receipt_long_outlined,
+                    activeIcon: Icons.receipt_long_rounded,
+                    label: 'Hóa đơn',
+                    destination: ManagerNavDestination.invoices,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.invoices),
                   ),
                 ],
               ),

@@ -64,8 +64,11 @@ builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
 builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 builder.Services.AddAutoMapper(typeof(SupplierMappingProfile));
 builder.Services.AddAutoMapper(typeof(OrderReturnMappingProfile));
+builder.Services.AddAutoMapper(typeof(EInvoiceMappingProfile));
 builder.Services.AddScoped<IOrderReturnRepository, OrderReturnRepository>();
 builder.Services.AddScoped<IOrderReturnService, OrderReturnService>();
+builder.Services.AddScoped<IEInvoiceRepository, EInvoiceRepository>();
+builder.Services.AddScoped<IEInvoiceService, EInvoiceService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 

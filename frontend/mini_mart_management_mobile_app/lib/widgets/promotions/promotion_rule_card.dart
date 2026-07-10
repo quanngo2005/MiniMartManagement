@@ -154,7 +154,16 @@ class PromotionRuleCard extends StatelessWidget {
   }
 
   String _discountLabel(Promotion p) {
-    if (p.type == 1) return 'M${p.buyQuantity ?? 2}T${p.giftQuantity ?? 1}';
+    if (p.type == 1) {
+      return 'M${p.buyQuantity ?? 2}T${p.giftQuantity ?? 1}';
+    }
+    if ((p.minimumOrderAmount ?? 0) > 0) {
+      final amount = NumberFormat('#,###').format(p.minimumOrderAmount);
+      if (p.discountAmount != null) {
+        return '-${NumberFormat('#,###').format(p.discountAmount)}đ / Từ $amount';
+      }
+      return '-${p.discountPercent?.toStringAsFixed(0) ?? '0'}% / Từ $amount';
+    }
     if (p.discountAmount != null)
       return '-${NumberFormat('#,###').format(p.discountAmount)}đ';
     return '-${p.discountPercent?.toStringAsFixed(0) ?? '0'}%';
@@ -173,6 +182,9 @@ class _TypeChip extends StatelessWidget {
     if (promotion.type == 1) {
       label = 'Mua X Tặng Y';
       icon = Icons.card_giftcard_outlined;
+    } else if ((promotion.minimumOrderAmount ?? 0) > 0) {
+      label = 'Đạt hóa đơn';
+      icon = Icons.point_of_sale_outlined;
     } else if (promotion.discountAmount != null) {
       label = 'Giảm tiền mặt';
       icon = Icons.money_off_outlined;

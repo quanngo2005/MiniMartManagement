@@ -333,6 +333,46 @@ namespace MiniMart.Models
             new OrderDetail { OrderDetailId = 58, OrderId = 22, ProductId = 43, Quantity = 1, UnitPrice = 72000, DiscountAmount = 0, TotalPrice = 72000, IsGift = false },
         };
 
+        // ========================= PROMOTIONS =========================
+        public static List<Promotion> GetPromotions() => new List<Promotion>
+        {
+            new Promotion
+            {
+                PromotionId = 1,
+                Name = "Snack mua 1 tặng 1",
+                Description = "Mua 1 tặng 1 cho nhóm snack chọn lọc.",
+                Type = PromotionType.BuyXGetYFree,
+                BuyQuantity = 1,
+                GiftQuantity = 1,
+                GiftProductId = 24,
+                StartDate = new DateTime(2026, 7, 1),
+                EndDate = new DateTime(2026, 7, 31),
+                IsActive = true,
+            },
+            new Promotion
+            {
+                PromotionId = 2,
+                Name = "Hóa đơn từ 150K",
+                Description = "Đơn hàng từ 150.000đ giảm 10.000đ.",
+                Type = PromotionType.PercentDiscount,
+                DiscountAmount = 10000,
+                MinimumOrderAmount = 150000,
+                StartDate = new DateTime(2026, 7, 1),
+                EndDate = new DateTime(2026, 8, 31),
+                IsActive = true,
+            },
+        };
+
+        public static List<PromotionProduct> GetPromotionProducts() => new List<PromotionProduct>
+        {
+            new PromotionProduct { PromotionId = 1, ProductId = 24 },
+            new PromotionProduct { PromotionId = 1, ProductId = 26 },
+            new PromotionProduct { PromotionId = 2, ProductId = 1 },
+            new PromotionProduct { PromotionId = 2, ProductId = 3 },
+            new PromotionProduct { PromotionId = 2, ProductId = 11 },
+            new PromotionProduct { PromotionId = 2, ProductId = 18 },
+        };
+
         // ========================= INVENTORY TRANSACTIONS =========================
         public static List<InventoryTransaction> GetInventoryTransactions() => new List<InventoryTransaction>
         {
