@@ -69,7 +69,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: _openCustomerList,
         backgroundColor: AppColors.primaryContainer,
         foregroundColor: Colors.white,
@@ -94,9 +95,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
       title: Text(
         'Quản lý thành viên',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       actions: [
         IconButton(
@@ -136,9 +137,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
             Text(
               'Phân hạng thành viên',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
             TextButton(onPressed: () {}, child: const Text('Chi tiết')),
           ],
@@ -191,9 +192,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                 Text(
                   'Nâng hạng gần đây',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
                 ),
                 const Icon(Icons.history, color: AppColors.textMuted),
               ],
@@ -253,13 +254,14 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
   }
 
   List<CustomerSummary> _recentUpgrades(List<CustomerSummary> customers) {
-    final eligible = customers
-        .where(
-          (customer) =>
-              MembershipTierUtils.previousTierName(customer.points) != null,
-        )
-        .toList()
-      ..sort((a, b) => b.points.compareTo(a.points));
+    final eligible =
+        customers
+            .where(
+              (customer) =>
+                  MembershipTierUtils.previousTierName(customer.points) != null,
+            )
+            .toList()
+          ..sort((a, b) => b.points.compareTo(a.points));
 
     return eligible.take(3).toList();
   }

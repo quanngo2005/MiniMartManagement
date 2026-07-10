@@ -64,7 +64,9 @@ class CustomerProvider with ChangeNotifier {
   Future<bool> updateCustomer(int id, Map<String, dynamic> data) async {
     try {
       final updated = await _customerRepository.updateCustomer(id, data);
-      _customers = _customers.map((c) => c.customerId == id ? updated : c).toList();
+      _customers = _customers
+          .map((c) => c.customerId == id ? updated : c)
+          .toList();
       notifyListeners();
       return true;
     } on ApiException catch (e) {
@@ -91,7 +93,10 @@ class CustomerProvider with ChangeNotifier {
 
   Future<bool> updateCustomerPoints(int customerId, int delta) async {
     try {
-      final newPoints = await _customerRepository.updateCustomerPoints(customerId, delta);
+      final newPoints = await _customerRepository.updateCustomerPoints(
+        customerId,
+        delta,
+      );
       _customers = _customers.map((c) {
         if (c.customerId == customerId) {
           return CustomerSummary(
@@ -129,7 +134,9 @@ class CustomerProvider with ChangeNotifier {
     }
   }
 
-  Future<List<CustomerPointTransaction>> fetchCustomerPointTransactions(int id) async {
+  Future<List<CustomerPointTransaction>> fetchCustomerPointTransactions(
+    int id,
+  ) async {
     if (_txnCache.containsKey(id)) return _txnCache[id]!;
     try {
       final txns = await _customerRepository.getCustomerPointTransactions(id);

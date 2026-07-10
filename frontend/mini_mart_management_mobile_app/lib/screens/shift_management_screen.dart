@@ -159,69 +159,70 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
         appBar: AppBar(
           automaticallyImplyLeading: activeShift != null,
           title: Row(
+            children: [
+              const Icon(Icons.storefront_rounded, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Store #402 | Quản lý ca',
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(color: AppColors.borderGray, height: 1),
+          ),
+        ),
+        body: Stack(
           children: [
-            const Icon(Icons.storefront_rounded, color: AppColors.primary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Store #402 | Quản lý ca',
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (activeShift != null) ...[
+                      _buildActiveShiftCard(
+                        activeShift,
+                        currentUser?.fullName ?? 'Nhân viên',
+                      ),
+                      const SizedBox(height: 16),
+                      _buildBentoMetrics(activeShift),
+                      const SizedBox(height: 16),
+                      _buildCashReconciliation(activeShift),
+                      const SizedBox(height: 16),
+                      _buildSparklineChart(),
+                      const SizedBox(height: 20),
+                      _buildCloseShiftButton(activeShift.shiftId),
+                    ] else ...[
+                      _buildNoActiveShiftCard(),
+                      const SizedBox(height: 16),
+                      _buildOpenShiftForm(currentUser?.employeeId ?? 1),
+                    ],
+                    const SizedBox(height: 80),
+                  ],
                 ),
               ),
             ),
+            if (shiftProvider.isLoading || _isProcessing)
+              Container(
+                color: Colors.black.withValues(alpha: 0.15),
+                child: const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              ),
           ],
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: AppColors.borderGray, height: 1),
-        ),
       ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (activeShift != null) ...[
-                    _buildActiveShiftCard(
-                      activeShift,
-                      currentUser?.fullName ?? 'Nhân viên',
-                    ),
-                    const SizedBox(height: 16),
-                    _buildBentoMetrics(activeShift),
-                    const SizedBox(height: 16),
-                    _buildCashReconciliation(activeShift),
-                    const SizedBox(height: 16),
-                    _buildSparklineChart(),
-                    const SizedBox(height: 20),
-                    _buildCloseShiftButton(activeShift.shiftId),
-                  ] else ...[
-                    _buildNoActiveShiftCard(),
-                    const SizedBox(height: 16),
-                    _buildOpenShiftForm(currentUser?.employeeId ?? 1),
-                  ],
-                  const SizedBox(height: 80),
-                ],
-              ),
-            ),
-          ),
-          if (shiftProvider.isLoading || _isProcessing)
-            Container(
-              color: Colors.black.withValues(alpha: 0.15),
-              child: const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              ),
-            ),
-        ],
-      ),
-    ));
+    );
   }
 
   Widget _buildActiveShiftCard(Shift shift, String staffName) {
@@ -913,5 +914,4 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
       ),
     );
   }
-
 }

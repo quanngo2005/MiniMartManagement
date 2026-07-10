@@ -24,13 +24,15 @@ class CustomerSummary {
   factory CustomerSummary.fromJson(Map<String, dynamic> json) {
     return CustomerSummary(
       customerId: (json['customerId'] ?? json['CustomerId'] ?? 0) as int,
-      customerCode: (json['customerCode'] ?? json['CustomerCode'] ?? '') as String,
+      customerCode:
+          (json['customerCode'] ?? json['CustomerCode'] ?? '') as String,
       name: (json['fullName'] ?? json['FullName'] ?? '') as String,
       phone: (json['phoneNumber'] ?? json['PhoneNumber'] ?? '') as String,
       email: json['email'] as String? ?? json['Email'] as String?,
       address: json['address'] as String? ?? json['Address'] as String?,
       points: (json['point'] ?? json['Point'] ?? 0) as int,
-      customerStatus: (json['customerStatus'] ?? json['CustomerStatus'] ?? false) as bool,
+      customerStatus:
+          (json['customerStatus'] ?? json['CustomerStatus'] ?? false) as bool,
     );
   }
 

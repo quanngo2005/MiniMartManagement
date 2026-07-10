@@ -13,6 +13,24 @@ class InventoryLookupService {
 
   final http.Client _client;
 
+  Future<ProductLookup?> fetchProductByBarcode(String barcode) async {
+    final uri = ApiConfig.uri(
+      '/api/products/barcode/${Uri.encodeComponent(barcode)}',
+    );
+    final response = await _client.get(
+      uri,
+      headers: const {'Accept': 'application/json'},
+    );
+
+    if (response.statusCode == 404) return null;
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final json = _decodeResponse(response);
+      throw ApiException(_readMessage(json));
+    }
+
+    return ProductLookup.fromJson(_decodeResponse(response));
+  }
+
   Future<List<ProductLookup>> fetchProducts() async {
     final response = await _client.get(
       ApiConfig.uri('/api/products'),
@@ -60,7 +78,8 @@ class InventoryLookupService {
   }
 
   List<Map<String, dynamic>> _readItems(Map<String, dynamic> responseJson) {
-    final source = responseJson['value'] ??
+    final source =
+        responseJson['value'] ??
         responseJson['Value'] ??
         responseJson['data'] ??
         responseJson['Data'];
@@ -69,10 +88,12 @@ class InventoryLookupService {
       throw const ApiException('Không thể đọc dữ liệu gợi ý.');
     }
 
-    return source.map((item) {
-      if (item is Map<String, dynamic>) return item;
-      throw const ApiException('Không thể đọc dữ liệu gợi ý.');
-    }).toList(growable: false);
+    return source
+        .map((item) {
+          if (item is Map<String, dynamic>) return item;
+          throw const ApiException('Không thể đọc dữ liệu gợi ý.');
+        })
+        .toList(growable: false);
   }
 
   String _readMessage(Map<String, dynamic> responseJson) {

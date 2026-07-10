@@ -207,7 +207,8 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () {
           ScaffoldMessenger.of(
             context,

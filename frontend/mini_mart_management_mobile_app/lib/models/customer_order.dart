@@ -20,9 +20,10 @@ class CustomerOrder {
       orderId: (json['orderId'] ?? json['OrderId'] ?? 0) as int,
       orderCode: (json['orderCode'] ?? json['OrderCode'] ?? '') as String,
       orderDate: DateTime.parse(
-          (json['orderDate'] ?? json['OrderDate']) as String),
-      finalAmount:
-          ((json['finalAmount'] ?? json['FinalAmount'] ?? 0) as num).toDouble(),
+        (json['orderDate'] ?? json['OrderDate']) as String,
+      ),
+      finalAmount: ((json['finalAmount'] ?? json['FinalAmount'] ?? 0) as num)
+          .toDouble(),
       status: (json['status'] ?? json['Status'] ?? 2) as int,
       itemCount: (json['itemCount'] ?? json['ItemCount'] ?? 0) as int,
     );

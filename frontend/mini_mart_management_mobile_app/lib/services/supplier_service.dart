@@ -7,7 +7,7 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory.dar
 
 class SupplierService {
   SupplierService({http.Client? client})
-      : _client = client ?? createConfiguredClient();
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 
@@ -121,7 +121,9 @@ class SupplierService {
 
   String _message(Map<String, dynamic> json) {
     final m = json['message'] ?? json['Message'];
-    return m is String && m.isNotEmpty ? m : 'Yêu cầu thất bại. Vui lòng thử lại.';
+    return m is String && m.isNotEmpty
+        ? m
+        : 'Yêu cầu thất bại. Vui lòng thử lại.';
   }
 
   String? _parseCookie(String? header) {

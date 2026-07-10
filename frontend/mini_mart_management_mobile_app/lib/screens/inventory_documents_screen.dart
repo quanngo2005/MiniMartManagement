@@ -96,7 +96,8 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _openCreateReceipt(context),
         tooltip: 'Tạo receipt nhập hàng',
         backgroundColor: AppColors.primary,
@@ -109,10 +110,12 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
   Widget _buildStats(List<Receipt> receipts) {
     final importedQuantity = receipts.fold<int>(
       0,
-      (total, receipt) => total + receipt.batchLines.fold<int>(
-        0,
-        (lineTotal, line) => lineTotal + line.quantity,
-      ),
+      (total, receipt) =>
+          total +
+          receipt.batchLines.fold<int>(
+            0,
+            (lineTotal, line) => lineTotal + line.quantity,
+          ),
     );
 
     return Padding(

@@ -37,9 +37,9 @@ class TierDistributionCard extends StatelessWidget {
           Text(
             'Phân bổ khách hàng',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
           ),
           const SizedBox(height: 16),
           _TierBar(

@@ -32,7 +32,11 @@ class Supplier {
       supplierId: _readInt(json, 'supplierId', 'SupplierId'),
       supplierCode: _readString(json, 'supplierCode', 'SupplierCode'),
       supplierName: _readString(json, 'supplierName', 'SupplierName'),
-      contactPerson: _readNullableString(json, 'contactPerson', 'ContactPerson'),
+      contactPerson: _readNullableString(
+        json,
+        'contactPerson',
+        'ContactPerson',
+      ),
       phoneNumber: _readString(json, 'phoneNumber', 'PhoneNumber'),
       email: _readNullableString(json, 'email', 'Email'),
       address: _readNullableString(json, 'address', 'Address'),
@@ -45,19 +49,19 @@ class Supplier {
   }
 
   Map<String, dynamic> toJson() => {
-        'supplierId': supplierId,
-        'supplierCode': supplierCode,
-        'supplierName': supplierName,
-        'contactPerson': contactPerson,
-        'phoneNumber': phoneNumber,
-        'email': email,
-        'address': address,
-        'taxCode': taxCode,
-        'bankAccount': bankAccount,
-        'bankName': bankName,
-        'description': description,
-        'status': status,
-      };
+    'supplierId': supplierId,
+    'supplierCode': supplierCode,
+    'supplierName': supplierName,
+    'contactPerson': contactPerson,
+    'phoneNumber': phoneNumber,
+    'email': email,
+    'address': address,
+    'taxCode': taxCode,
+    'bankAccount': bankAccount,
+    'bankName': bankName,
+    'description': description,
+    'status': status,
+  };
 
   static int _readInt(Map<String, dynamic> json, String c, String p) {
     final v = json[c] ?? json[p];
@@ -78,7 +82,11 @@ class Supplier {
     throw FormatException('Invalid $c.');
   }
 
-  static String? _readNullableString(Map<String, dynamic> json, String c, String p) {
+  static String? _readNullableString(
+    Map<String, dynamic> json,
+    String c,
+    String p,
+  ) {
     final v = json[c] ?? json[p];
     if (v == null || v is String) return v as String?;
     throw FormatException('Invalid $c.');

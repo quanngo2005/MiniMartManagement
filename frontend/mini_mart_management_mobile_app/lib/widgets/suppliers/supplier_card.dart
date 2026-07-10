@@ -45,7 +45,11 @@ class SupplierCard extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.1),
                 ),
                 child: const Center(
-                  child: Icon(Icons.business_rounded, color: AppColors.primary, size: 20),
+                  child: Icon(
+                    Icons.business_rounded,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -65,7 +69,9 @@ class SupplierCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       supplier.supplierCode,
-                      style: textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
+                      style: textTheme.labelSmall?.copyWith(
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ),
@@ -77,7 +83,10 @@ class SupplierCard extends StatelessWidget {
           const Divider(height: 1, color: Color(0xFFF1F5F9)),
           const SizedBox(height: 12),
           if (supplier.contactPerson != null) ...[
-            _InfoRow(icon: Icons.person_outline_rounded, text: supplier.contactPerson!),
+            _InfoRow(
+              icon: Icons.person_outline_rounded,
+              text: supplier.contactPerson!,
+            ),
             const SizedBox(height: 6),
           ],
           _InfoRow(icon: Icons.call_outlined, text: supplier.phoneNumber),
@@ -99,7 +108,10 @@ class SupplierCard extends StatelessWidget {
                 label: const Text('Sửa'),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                 ),
               ),
               TextButton.icon(
@@ -108,7 +120,10 @@ class SupplierCard extends StatelessWidget {
                 label: const Text('Xóa'),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.statusError,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                 ),
               ),
             ],

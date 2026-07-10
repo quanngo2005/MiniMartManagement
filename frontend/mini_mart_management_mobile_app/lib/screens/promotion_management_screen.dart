@@ -81,7 +81,8 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(heroTag: null,
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: _scrollToForm,
         backgroundColor: AppColors.secondary,
         foregroundColor: Colors.white,
@@ -107,9 +108,9 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
       title: Text(
         'Chương trình khuyến mãi',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       actions: [
         IconButton(
@@ -135,9 +136,9 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
             Text(
               'Danh sách chương trình',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -193,7 +194,11 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
       ),
       child: Column(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.statusError, size: 36),
+          const Icon(
+            Icons.error_outline,
+            color: AppColors.statusError,
+            size: 36,
+          ),
           const SizedBox(height: 8),
           Text(
             provider.error!,
@@ -221,7 +226,11 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
       ),
       child: const Column(
         children: [
-          Icon(Icons.local_offer_outlined, color: AppColors.textMuted, size: 32),
+          Icon(
+            Icons.local_offer_outlined,
+            color: AppColors.textMuted,
+            size: 32,
+          ),
           SizedBox(height: 8),
           Text(
             'Chưa có chương trình nào.',
@@ -244,10 +253,14 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
             child: const Text('Hủy'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.statusError),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.statusError,
+            ),
             onPressed: () async {
               Navigator.pop(ctx);
-              await context.read<PromotionProvider>().deletePromotion(p.promotionId);
+              await context.read<PromotionProvider>().deletePromotion(
+                p.promotionId,
+              );
             },
             child: const Text('Xóa'),
           ),
@@ -305,15 +318,18 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
           children: [
             Row(
               children: [
-                const Icon(Icons.add_moderator_outlined,
-                    color: AppColors.primary, size: 22),
+                const Icon(
+                  Icons.add_moderator_outlined,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Tạo chương trình mới',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
                 ),
               ],
             ),
@@ -327,18 +343,18 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
               validator: (v) => v == null || v.isEmpty ? 'Bắt buộc' : null,
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(child: _buildDiscountTypeDropdown()),
-              ],
-            ),
+            Row(children: [Expanded(child: _buildDiscountTypeDropdown())]),
             const SizedBox(height: 16),
             _fieldLabel('Giá trị giảm'),
             TextFormField(
               controller: _discountCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
-                suffixText: _discountType == 0 ? '%' : (_discountType == 1 ? 'đ' : ''),
+                suffixText: _discountType == 0
+                    ? '%'
+                    : (_discountType == 1 ? 'đ' : ''),
                 hintText: _discountType == 2 ? 'Không áp dụng' : null,
               ),
               enabled: _discountType != 2,
@@ -381,7 +397,10 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
                     ? const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
                       )
                     : const Icon(Icons.save_outlined),
                 label: const Text('Lưu chương trình'),
@@ -419,9 +438,18 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
           value: _discountType,
           decoration: const InputDecoration(),
           items: const [
-            DropdownMenuItem(value: 0, child: Text('Giảm theo % (PercentDiscount)')),
-            DropdownMenuItem(value: 1, child: Text('Giảm tiền mặt (FixedAmount)')),
-            DropdownMenuItem(value: 2, child: Text('Mua X Tặng Y (BuyXGetYFree)')),
+            DropdownMenuItem(
+              value: 0,
+              child: Text('Giảm theo % (PercentDiscount)'),
+            ),
+            DropdownMenuItem(
+              value: 1,
+              child: Text('Giảm tiền mặt (FixedAmount)'),
+            ),
+            DropdownMenuItem(
+              value: 2,
+              child: Text('Mua X Tặng Y (BuyXGetYFree)'),
+            ),
           ],
           onChanged: (v) => setState(() => _discountType = v ?? 0),
         ),
