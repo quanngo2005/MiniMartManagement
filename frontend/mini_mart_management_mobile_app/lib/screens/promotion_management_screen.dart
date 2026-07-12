@@ -8,9 +8,14 @@ import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_ba
 import 'package:mini_mart_management_mobile_app/widgets/promotions/promotion_rule_card.dart';
 
 class PromotionManagementScreen extends StatefulWidget {
-  const PromotionManagementScreen({this.showBottomNavBar = true, super.key});
+  const PromotionManagementScreen({
+    this.showBottomNavBar = true,
+    this.onMenuTap,
+    super.key,
+  });
 
   final bool showBottomNavBar;
+  final VoidCallback? onMenuTap;
 
   @override
   State<PromotionManagementScreen> createState() =>
@@ -103,7 +108,7 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
       leading: IconButton(
         icon: const Icon(Icons.menu),
         color: AppColors.primary,
-        onPressed: () {},
+        onPressed: widget.onMenuTap ?? () {},
       ),
       title: Text(
         'Chương trình khuyến mãi',

@@ -8,7 +8,9 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
 class ShiftManagementScreen extends StatefulWidget {
-  const ShiftManagementScreen({super.key});
+  const ShiftManagementScreen({this.onMenuTap, super.key});
+
+  final VoidCallback? onMenuTap;
 
   @override
   State<ShiftManagementScreen> createState() => _ShiftManagementScreenState();
@@ -158,10 +160,18 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: activeShift != null,
+          leading: widget.onMenuTap != null
+              ? IconButton(
+                  icon: const Icon(Icons.menu_rounded, color: AppColors.primary),
+                  onPressed: widget.onMenuTap,
+                )
+              : null,
           title: Row(
             children: [
-              const Icon(Icons.storefront_rounded, color: AppColors.primary),
-              const SizedBox(width: 8),
+              if (widget.onMenuTap == null) ...[
+                const Icon(Icons.storefront_rounded, color: AppColors.primary),
+                const SizedBox(width: 8),
+              ],
               Expanded(
                 child: Text(
                   'Store #402 | Quản lý ca',

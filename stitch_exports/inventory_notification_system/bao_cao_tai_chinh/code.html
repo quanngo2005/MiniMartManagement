@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Báo Cáo Tài Chính | RetailMaster</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#eebd90",
+                    "primary": "#000f22",
+                    "outline-variant": "#c4c6ce",
+                    "surface-variant": "#e3e2e5",
+                    "surface-container-high": "#e9e8ea",
+                    "on-background": "#1b1c1e",
+                    "on-error-container": "#93000a",
+                    "background": "#faf9fb",
+                    "status-warning": "#F59E0B",
+                    "tertiary-container": "#381d00",
+                    "text-dark": "#334155",
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#6cf8bb",
+                    "primary-fixed": "#d2e4ff",
+                    "primary-fixed-dim": "#b0c8eb",
+                    "on-tertiary-fixed": "#2d1600",
+                    "on-surface": "#1b1c1e",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-tertiary-container": "#ae835a",
+                    "inverse-surface": "#2f3033",
+                    "surface-tint": "#49607e",
+                    "surface-bright": "#faf9fb",
+                    "status-error": "#EF4444",
+                    "inverse-on-surface": "#f2f0f3",
+                    "outline": "#74777e",
+                    "on-primary-fixed-variant": "#314865",
+                    "tertiary": "#1a0b00",
+                    "on-secondary-container": "#00714d",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-primary-container": "#768dad",
+                    "inverse-primary": "#b0c8eb",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-surface-variant": "#43474d",
+                    "primary-container": "#0a2540",
+                    "surface-container": "#efedf0",
+                    "surface-container-low": "#f5f3f6",
+                    "error": "#ba1a1a",
+                    "secondary": "#006c49",
+                    "surface": "#faf9fb",
+                    "border-gray": "#E2E8F0",
+                    "surface-container-highest": "#e3e2e5",
+                    "text-muted": "#64748B",
+                    "on-secondary-fixed": "#002113",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#613f1c",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#ffdcbe",
+                    "on-primary-fixed": "#001c37",
+                    "background-slate": "#F8FAFC",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#dbd9dc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "safe-area": "16px",
+                    "stack-sm": "8px",
+                    "gutter": "12px",
+                    "stack-md": "16px",
+                    "touch-target": "48px"
+            },
+            "fontFamily": {
+                    "metadata": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "data-tabular": ["JetBrains Mono"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F8FAFC;
+            color: #1b1c1e;
+            -webkit-font-smoothing: antialiased;
+        }
+        .chart-grid {
+            background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .brutal-border {
+            border: 1px solid #000f22;
+            box-shadow: 4px 4px 0px 0px #000f22;
+        }
+        .brutal-card {
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 z-50 bg-surface dark:bg-primary-container border-b border-border-gray dark:border-outline-variant flex justify-between items-center px-safe w-full h-touch-target">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">storefront</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">RetailMaster</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim flex items-center justify-center text-on-primary-fixed overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a store manager in a clean retail environment, featuring high-contrast lighting and a minimalist aesthetic. The image uses a professional blue and gray palette to match the RetailMaster brand identity. Soft focus on the background showing organized shelves." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQ5HUXEPMjd0AQoZl9kdJJNKU81PCOqCplXlLOhVn1bmaxkCqDxjMnyVfsvRpFu4I5FL7kTUDJpayQY9a7akbw82uIP6r_Ab0OhNNd7rAWOY1USueCkUBBwwVmhjVIMq3uSWysX_AiJXJ7XAnR9yfZ4r_KzAwnG8oij63KAgRVLVIeJJcuN_2yyWqvTTxzVsiGzAb02bJHQe9T3_jUBRU2_N-mxzEPC9DbFDJWV12-MkDTId_yVvofhF6V-Nn8LkmSJbAetatZsZFj"/>
+</div>
+</nav>
+<main class="px-safe py-6 pb-24 space-y-6 max-w-lg mx-auto">
+<!-- Header & Filter Section -->
+<header class="space-y-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Báo Cáo Tài Chính</h2>
+<p class="text-on-surface-variant font-body-md">Theo dõi hiệu suất kinh doanh hàng ngày.</p>
+</div>
+<!-- Date Filter (Brutalism Style) -->
+<div class="flex items-center gap-2 p-1 bg-white border border-primary rounded-lg overflow-hidden">
+<button class="flex-1 py-2 text-center font-bold text-on-primary bg-primary rounded">Tháng này</button>
+<button class="flex-1 py-2 text-center font-medium text-primary hover:bg-surface-container-low transition-colors">Tháng trước</button>
+<button class="flex-1 py-2 text-center font-medium text-primary hover:bg-surface-container-low transition-colors">Tùy chọn</button>
+<div class="p-2">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+</div>
+</div>
+</header>
+<!-- Summary Cards (Bento Style) -->
+<section class="grid grid-cols-2 gap-3">
+<div class="col-span-2 brutal-card bg-white p-4 flex flex-col justify-between h-32 border-l-4 border-l-primary">
+<div class="flex justify-between items-start">
+<span class="text-metadata font-metadata uppercase tracking-wider text-muted">Tổng Doanh Thu</span>
+<span class="material-symbols-outlined text-primary">payments</span>
+</div>
+<div>
+<div class="text-headline-lg font-data-tabular">2.450.000.000<span class="text-body-md ml-1 font-bold">₫</span></div>
+<div class="flex items-center text-secondary font-bold text-metadata">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+12.5% so với tháng trước</span>
+</div>
+</div>
+</div>
+<div class="brutal-card bg-white p-4 flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-metadata font-metadata uppercase tracking-wider text-muted">Lợi Nhuận Ròng</span>
+<span class="material-symbols-outlined text-secondary">account_balance_wallet</span>
+</div>
+<div>
+<div class="text-headline-md font-data-tabular">842.000.000<span class="text-metadata ml-1 font-bold">₫</span></div>
+<div class="h-1 w-full bg-surface-container mt-2 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-3/4"></div>
+</div>
+</div>
+</div>
+<div class="brutal-card bg-white p-4 flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-metadata font-metadata uppercase tracking-wider text-muted">Tổng Chi Phí</span>
+<span class="material-symbols-outlined text-error">receipt_long</span>
+</div>
+<div>
+<div class="text-headline-md font-data-tabular">1.608.000.000<span class="text-metadata ml-1 font-bold">₫</span></div>
+<div class="flex items-center text-error font-bold text-metadata mt-1">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+4.2% chi vận hành</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Revenue Chart Section -->
+<section class="brutal-card bg-white p-4 space-y-4">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">show_chart</span>
+                    Biểu đồ Doanh thu &amp; Lợi nhuận
+                </h3>
+<div class="flex gap-2">
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-[10px] font-bold uppercase">DT</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-[10px] font-bold uppercase">LN</span>
+</div>
+</div>
+</div>
+<!-- Fake Line Chart using SVG for High Contrast -->
+<div class="w-full h-48 relative pt-4 overflow-hidden rounded border border-border-gray bg-background-slate chart-grid">
+<svg class="w-full h-full" viewbox="0 0 400 150">
+<!-- Revenue Line -->
+<path d="M0,120 L40,110 L80,130 L120,90 L160,100 L200,60 L240,75 L280,40 L320,55 L360,20 L400,30" fill="none" stroke="#000f22" stroke-linejoin="round" stroke-width="3"></path>
+<!-- Profit Line -->
+<path d="M0,140 L40,135 L80,145 L120,120 L160,130 L200,100 L240,115 L280,95 L320,105 L360,85 L400,90" fill="none" stroke="#006c49" stroke-dasharray="4" stroke-linejoin="round" stroke-width="2"></path>
+<!-- Area Fills -->
+<path d="M0,120 L40,110 L80,130 L120,90 L160,100 L200,60 L240,75 L280,40 L320,55 L360,20 L400,30 V150 H0 Z" fill="#000f22" fill-opacity="0.05"></path>
+</svg>
+<!-- X-Axis Labels -->
+<div class="absolute bottom-1 left-0 right-0 flex justify-between px-2 text-[10px] font-bold text-muted font-data-tabular">
+<span>01/10</span>
+<span>10/10</span>
+<span>20/10</span>
+<span>30/10</span>
+</div>
+</div>
+</section>
+<!-- Category Summaries -->
+<section class="space-y-3">
+<h3 class="font-bold text-primary flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-[20px]">category</span>
+                Tóm tắt theo Danh mục
+            </h3>
+<div class="space-y-2">
+<!-- Category 1 -->
+<div class="brutal-card bg-white p-3 flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">fastfood</span>
+</div>
+<div class="flex-1">
+<div class="font-bold text-body-md">Thực phẩm tươi sống</div>
+<div class="text-metadata text-muted">1.240 đơn hàng</div>
+</div>
+<div class="text-right">
+<div class="font-data-tabular font-bold">1.2B ₫</div>
+<div class="text-metadata text-secondary font-bold">+18%</div>
+</div>
+</div>
+<!-- Category 2 -->
+<div class="brutal-card bg-white p-3 flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">liquor</span>
+</div>
+<div class="flex-1">
+<div class="font-bold text-body-md">Đồ uống &amp; Rượu</div>
+<div class="text-metadata text-muted">850 đơn hàng</div>
+</div>
+<div class="text-right">
+<div class="font-data-tabular font-bold">450M ₫</div>
+<div class="text-metadata text-error font-bold">-5%</div>
+</div>
+</div>
+<!-- Category 3 -->
+<div class="brutal-card bg-white p-3 flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">cleaning_services</span>
+</div>
+<div class="flex-1">
+<div class="font-bold text-body-md">Hóa mỹ phẩm</div>
+<div class="text-metadata text-muted">620 đơn hàng</div>
+</div>
+<div class="text-right">
+<div class="font-data-tabular font-bold">320M ₫</div>
+<div class="text-metadata text-secondary font-bold">+12%</div>
+</div>
+</div>
+</div>
+<!-- Export Button -->
+<button class="w-full h-touch-target bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 mt-4 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">download</span>
+                Xuất báo cáo PDF/Excel
+            </button>
+</section>
+</main>
+<!-- Floating Action Button (Reserved for Barcode) -->
+<button class="fixed bottom-24 right-4 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center z-50 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[32px]">barcode_scanner</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<footer class="fixed bottom-0 w-full z-50 bg-surface dark:bg-primary-container border-t border-border-gray dark:border-outline-variant shadow-lg flex justify-around items-center h-[72px] px-safe pb-safe">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:bg-surface-container-low dark:hover:bg-primary transition-transform scale-95 duration-100">
+<span class="material-symbols-outlined">home</span>
+<span class="font-metadata text-metadata">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container dark:bg-secondary-fixed-dim dark:text-on-secondary-fixed rounded-xl px-3 py-1 transition-transform scale-95 duration-100">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-metadata text-metadata">Analytics</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:bg-surface-container-low dark:hover:bg-primary transition-transform scale-95 duration-100">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-metadata text-metadata">Inventory</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:bg-surface-container-low dark:hover:bg-primary transition-transform scale-95 duration-100">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-metadata text-metadata">Staff</span>
+</button>
+</footer>
+<script>
+        // Micro-interaction for summary cards
+        document.querySelectorAll('.brutal-card').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'translateY(2px)';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'translateY(0px)';
+            });
+        });
+
+        // Simple interactive date toggle
+        const dateButtons = document.querySelectorAll('header button');
+        dateButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                dateButtons.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary', 'font-bold');
+                    b.classList.add('text-primary', 'font-medium');
+                });
+                btn.classList.add('bg-primary', 'text-on-primary', 'font-bold');
+                btn.classList.remove('text-primary', 'font-medium');
+            });
+        });
+    </script>
+</body></html>

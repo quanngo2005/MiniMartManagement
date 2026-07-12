@@ -135,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       bottomNavigationBar: const CashierBottomNavigationBar(
-        selectedTab: CashierNavTab.profile,
+        selectedTab: CashierNavTab.settings,
       ),
     );
   }

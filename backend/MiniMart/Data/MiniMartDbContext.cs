@@ -431,6 +431,8 @@ namespace MiniMart.Data
             modelBuilder.Entity<Shift>().HasData(DataSource.GetShifts());
             modelBuilder.Entity<Order>().HasData(DataSource.GetOrders());
             modelBuilder.Entity<OrderDetail>().HasData(DataSource.GetOrderDetails());
+            modelBuilder.Entity<Promotion>().HasData(DataSource.GetPromotions());
+            modelBuilder.Entity<PromotionProduct>().HasData(DataSource.GetPromotionProducts());
             modelBuilder.Entity<InventoryTransaction>().HasData(DataSource.GetInventoryTransactions());
         }
 

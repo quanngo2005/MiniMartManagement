@@ -38,6 +38,8 @@ namespace MiniMart.Services.Implementations
             if (createDto.EndDate <= createDto.StartDate)
                 throw new DomainException("EndDate must be after StartDate.", StatusCodes.Status422UnprocessableEntity);
 
+            ValidatePromotionRule(createDto.Type, createDto.DiscountPercent, createDto.DiscountAmount, createDto.MinimumOrderAmount, createDto.BuyQuantity, createDto.GiftQuantity);
+
             foreach (var productId in createDto.ProductIds)
             {
                 if (!await _promotionRepository.ProductExistsAsync(productId))
@@ -59,6 +61,8 @@ namespace MiniMart.Services.Implementations
             if (updateDto.EndDate <= updateDto.StartDate)
                 throw new DomainException("EndDate must be after StartDate.", StatusCodes.Status422UnprocessableEntity);
 
+            ValidatePromotionRule(updateDto.Type, updateDto.DiscountPercent, updateDto.DiscountAmount, updateDto.MinimumOrderAmount, updateDto.BuyQuantity, updateDto.GiftQuantity);
+
             foreach (var productId in updateDto.ProductIds)
             {
                 if (!await _promotionRepository.ProductExistsAsync(productId))
@@ -78,6 +82,41 @@ namespace MiniMart.Services.Implementations
             var success = await _promotionRepository.DeletePromotionAsync(id);
             if (!success)
                 throw new DomainException($"Promotion with ID {id} not found.", StatusCodes.Status404NotFound);
+        }
+
+        private static void ValidatePromotionRule(
+            MiniMart.Models.Enums.PromotionType type,
+            decimal? discountPercent,
+            decimal? discountAmount,
+            decimal? minimumOrderAmount,
+            int? buyQuantity,
+            int? giftQuantity)
+        {
+            if (type == MiniMart.Models.Enums.PromotionType.BuyXGetYFree)
+            {
+                if (buyQuantity.GetValueOrDefault() <= 0 || giftQuantity.GetValueOrDefault() <= 0)
+                {
+                    throw new DomainException(
+                        "Buy X Get Y Free requires BuyQuantity and GiftQuantity to be greater than 0.",
+                        StatusCodes.Status422UnprocessableEntity);
+                }
+
+                return;
+            }
+
+            if (minimumOrderAmount.GetValueOrDefault() <= 0)
+            {
+                throw new DomainException(
+                    "Threshold promotions require MinimumOrderAmount to be greater than 0.",
+                    StatusCodes.Status422UnprocessableEntity);
+            }
+
+            if ((discountPercent ?? 0) <= 0 && (discountAmount ?? 0) <= 0)
+            {
+                throw new DomainException(
+                    "Threshold promotions require either DiscountPercent or DiscountAmount.",
+                    StatusCodes.Status422UnprocessableEntity);
+            }
         }
     }
 }

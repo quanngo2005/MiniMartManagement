@@ -13,9 +13,14 @@ import 'package:mini_mart_management_mobile_app/widgets/members/tier_distributio
 import 'package:mini_mart_management_mobile_app/widgets/members/tier_overview_card.dart';
 
 class MemberManagementScreen extends StatefulWidget {
-  const MemberManagementScreen({this.showBottomNavBar = true, super.key});
+  const MemberManagementScreen({
+    this.showBottomNavBar = true,
+    this.onMenuTap,
+    super.key,
+  });
 
   final bool showBottomNavBar;
+  final VoidCallback? onMenuTap;
 
   @override
   State<MemberManagementScreen> createState() => _MemberManagementScreenState();
@@ -90,7 +95,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
       leading: IconButton(
         icon: const Icon(Icons.menu),
         color: AppColors.primary,
-        onPressed: () {},
+        onPressed: widget.onMenuTap ?? () {},
       ),
       title: Text(
         'Quản lý thành viên',

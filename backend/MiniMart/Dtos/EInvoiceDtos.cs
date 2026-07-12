@@ -4,6 +4,7 @@ namespace MiniMart.DTOs
     {
         public int EInvoiceId { get; set; }
         public int OrderId { get; set; }
+        public string OrderCode { get; set; } = string.Empty;
         public string InvoiceSerial { get; set; } = string.Empty;
         public string InvoiceNumber { get; set; } = string.Empty;
         public string? BuyerTaxCode { get; set; }
@@ -16,6 +17,12 @@ namespace MiniMart.DTOs
         public string? XMLContent { get; set; }
         public DateTime? IssuedAt { get; set; }
         public bool Status { get; set; }
+    }
+
+    public class EInvoiceDetailResponseDto
+    {
+        public EInvoiceDto Invoice { get; set; } = new();
+        public List<EInvoiceDetailDto> Items { get; set; } = new();
     }
 
     public class EInvoiceDetailDto
