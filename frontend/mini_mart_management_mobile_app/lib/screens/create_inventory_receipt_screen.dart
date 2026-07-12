@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/models/product_lookup.dart';
 import 'package:mini_mart_management_mobile_app/models/receipt.dart';
+import 'package:mini_mart_management_mobile_app/models/scanned_product.dart';
 import 'package:mini_mart_management_mobile_app/models/supplier.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/inventory_lookup_provider.dart';
+import 'package:mini_mart_management_mobile_app/screens/barcode_scanner_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -190,10 +192,20 @@ class _CreateInventoryReceiptScreenState
     return _FormPanel(
       title: 'Danh sách sản phẩm',
       icon: Icons.inventory_2_outlined,
-      trailing: IconButton(
-        onPressed: () => _productSearchFocusNode.requestFocus(),
-        tooltip: 'Thêm sản phẩm',
-        icon: const Icon(Icons.add_circle_outline_rounded),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: () => _productSearchFocusNode.requestFocus(),
+            tooltip: 'Thêm sản phẩm',
+            icon: const Icon(Icons.add_circle_outline_rounded),
+          ),
+          IconButton(
+            onPressed: _openBarcodeScanner,
+            tooltip: 'Quét mã vạch',
+            icon: const Icon(Icons.qr_code_scanner_rounded),
+          ),
+        ],
       ),
       children: [
         TextFormField(
@@ -382,6 +394,26 @@ class _CreateInventoryReceiptScreenState
     setState(() {
       _lines.remove(line);
       line.dispose();
+    });
+  }
+
+  Future<void> _openBarcodeScanner() async {
+    final scannedList = await Navigator.of(context).push<List<ScannedProduct>>(
+      MaterialPageRoute(
+        builder: (_) => const BarcodeScannerScreen(),
+      ),
+    );
+    if (scannedList == null || scannedList.isEmpty) return;
+
+    setState(() {
+      for (final entry in scannedList) {
+        if (_lines.any((l) => l.product.productId == entry.product.productId)) {
+          continue;
+        }
+        final draft = _ReceiptProductDraft(entry.product);
+        draft.quantityController.text = entry.quantity.toString();
+        _lines.add(draft);
+      }
     });
   }
 
