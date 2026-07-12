@@ -13,11 +13,33 @@ class InventoryLookupProvider extends ChangeNotifier {
   List<Supplier> _suppliers = const [];
   String? _errorMessage;
   bool _isLoading = false;
+  bool _isScanning = false;
 
   List<ProductLookup> get products => _products;
   List<Supplier> get suppliers => _suppliers;
   String? get errorMessage => _errorMessage;
   bool get isLoading => _isLoading;
+  bool get isScanning => _isScanning;
+
+  Future<ProductLookup?> fetchProductByBarcode(String barcode) async {
+    _isScanning = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final product = await _lookupRepository.fetchProductByBarcode(barcode);
+      return product;
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+      return null;
+    } catch (_) {
+      _errorMessage = 'Không thể tìm kiếm sản phẩm.';
+      return null;
+    } finally {
+      _isScanning = false;
+      notifyListeners();
+    }
+  }
 
   Future<void> loadLookups() async {
     _isLoading = true;

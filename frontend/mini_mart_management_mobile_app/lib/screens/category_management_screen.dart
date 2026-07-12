@@ -114,7 +114,9 @@ class CategoryManagementScreen extends StatelessWidget {
         foregroundColor: AppColors.surfaceContainerLowest,
         child: const Icon(Icons.add_box_outlined),
       ),
-      bottomNavigationBar: const AppBottomNavBar(selectedTab: AppNavTab.categories),
+      bottomNavigationBar: const AppBottomNavBar(
+        selectedTab: AppNavTab.categories,
+      ),
     );
   }
 

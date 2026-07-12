@@ -13,6 +13,24 @@ class InventoryLookupService {
 
   final http.Client _client;
 
+  Future<ProductLookup?> fetchProductByBarcode(String barcode) async {
+    final uri = ApiConfig.uri(
+      '/api/products/barcode/${Uri.encodeComponent(barcode)}',
+    );
+    final response = await _client.get(
+      uri,
+      headers: const {'Accept': 'application/json'},
+    );
+
+    if (response.statusCode == 404) return null;
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final json = _decodeResponse(response);
+      throw ApiException(_readMessage(json));
+    }
+
+    return ProductLookup.fromJson(_decodeResponse(response));
+  }
+
   Future<List<ProductLookup>> fetchProducts() async {
     final response = await _client.get(
       ApiConfig.uri('/api/products'),
