@@ -99,7 +99,10 @@ class _ManagerReturnListScreenState extends State<ManagerReturnListScreen> {
               decoration: isSelected
                   ? const BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: AppColors.secondary, width: 3),
+                        bottom: BorderSide(
+                          color: AppColors.secondary,
+                          width: 3,
+                        ),
                       ),
                     )
                   : null,

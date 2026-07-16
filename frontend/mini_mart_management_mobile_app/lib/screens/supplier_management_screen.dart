@@ -11,7 +11,8 @@ class SupplierManagementScreen extends StatefulWidget {
   const SupplierManagementScreen({super.key});
 
   @override
-  State<SupplierManagementScreen> createState() => _SupplierManagementScreenState();
+  State<SupplierManagementScreen> createState() =>
+      _SupplierManagementScreenState();
 }
 
 class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
@@ -25,7 +26,9 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
       context.read<SupplierProvider>().fetchSuppliers();
     });
     _searchController.addListener(() {
-      setState(() => _searchQuery = _searchController.text.trim().toLowerCase());
+      setState(
+        () => _searchQuery = _searchController.text.trim().toLowerCase(),
+      );
     });
   }
 
@@ -55,7 +58,9 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
           children: [
             CustomScrollView(
               slivers: [
-                SliverToBoxAdapter(child: _buildHeader(context, totalCount, activeCount)),
+                SliverToBoxAdapter(
+                  child: _buildHeader(context, totalCount, activeCount),
+                ),
                 if (provider.error != null)
                   SliverFillRemaining(
                     hasScrollBody: false,
@@ -64,7 +69,9 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
                 else if (!provider.isLoading && filtered.isEmpty)
                   const SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(child: Text('Không tìm thấy nhà cung cấp nào.')),
+                    child: Center(
+                      child: Text('Không tìm thấy nhà cung cấp nào.'),
+                    ),
                   )
                 else
                   SliverPadding(
@@ -74,7 +81,8 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (_, i) => SupplierCard(
                         supplier: filtered[i],
-                        onEdit: () => _showFormSheet(context, supplier: filtered[i]),
+                        onEdit: () =>
+                            _showFormSheet(context, supplier: filtered[i]),
                         onDelete: () => _confirmDelete(context, filtered[i]),
                       ),
                     ),
@@ -109,9 +117,9 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
       title: Text(
         'Store #402 | North Branch',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w700,
-            ),
+          color: AppColors.primary,
+          fontWeight: FontWeight.w700,
+        ),
       ),
       actions: [
         Padding(
@@ -125,7 +133,11 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
               border: Border.all(color: AppColors.borderGray),
             ),
             child: const Center(
-              child: Icon(Icons.person_rounded, size: 20, color: AppColors.primary),
+              child: Icon(
+                Icons.person_rounded,
+                size: 20,
+                color: AppColors.primary,
+              ),
             ),
           ),
         ),
@@ -145,9 +157,9 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
               Text(
                 'Nhà cung cấp',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               FilledButton.icon(
                 onPressed: () => _showFormSheet(context),
@@ -156,7 +168,9 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.surfaceContainerLowest,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ],
@@ -172,9 +186,17 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _buildStatCard('Tổng số', '$total', AppColors.primary)),
+              Expanded(
+                child: _buildStatCard('Tổng số', '$total', AppColors.primary),
+              ),
               const SizedBox(width: 8),
-              Expanded(child: _buildStatCard('Hoạt động', '$active', AppColors.secondary)),
+              Expanded(
+                child: _buildStatCard(
+                  'Hoạt động',
+                  '$active',
+                  AppColors.secondary,
+                ),
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildStatCard(
@@ -198,17 +220,28 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.borderGray),
         boxShadow: const [
-          BoxShadow(color: Color(0x05000000), offset: Offset(0, 2), blurRadius: 4),
+          BoxShadow(
+            color: Color(0x05000000),
+            offset: Offset(0, 2),
+            blurRadius: 4,
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+          ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: color),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -222,12 +255,21 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, color: AppColors.statusError, size: 48),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: AppColors.statusError,
+              size: 48,
+            ),
             const SizedBox(height: 12),
-            Text(error, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.statusError)),
+            Text(
+              error,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.statusError),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => context.read<SupplierProvider>().fetchSuppliers(),
+              onPressed: () =>
+                  context.read<SupplierProvider>().fetchSuppliers(),
               child: const Text('Thử lại'),
             ),
           ],
@@ -253,9 +295,14 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
         onSave: (data) async {
           bool success;
           if (supplier == null) {
-            success = await context.read<SupplierProvider>().createSupplier(data);
+            success = await context.read<SupplierProvider>().createSupplier(
+              data,
+            );
           } else {
-            success = await context.read<SupplierProvider>().updateSupplier(supplier.supplierId, data);
+            success = await context.read<SupplierProvider>().updateSupplier(
+              supplier.supplierId,
+              data,
+            );
           }
           if (success && ctx.mounted) Navigator.pop(ctx);
         },
@@ -270,11 +317,16 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
         title: const Text('Xác nhận xóa'),
         content: Text('Xóa nhà cung cấp "${supplier.supplierName}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Hủy'),
+          ),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await context.read<SupplierProvider>().deleteSupplier(supplier.supplierId);
+              await context.read<SupplierProvider>().deleteSupplier(
+                supplier.supplierId,
+              );
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.statusError),
             child: const Text('Xóa'),
@@ -364,7 +416,8 @@ class _SupplierFormSheetState extends State<_SupplierFormSheet> {
                     child: TextFormField(
                       initialValue: _supplierCode,
                       decoration: const InputDecoration(labelText: 'Mã NCC *'),
-                      validator: (v) => v == null || v.isEmpty ? 'Nhập mã NCC' : null,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Nhập mã NCC' : null,
                       onSaved: (v) => _supplierCode = v!,
                     ),
                   ),
@@ -372,9 +425,12 @@ class _SupplierFormSheetState extends State<_SupplierFormSheet> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _phoneNumber,
-                      decoration: const InputDecoration(labelText: 'Số điện thoại *'),
+                      decoration: const InputDecoration(
+                        labelText: 'Số điện thoại *',
+                      ),
                       keyboardType: TextInputType.phone,
-                      validator: (v) => v == null || v.isEmpty ? 'Nhập số điện thoại' : null,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Nhập số điện thoại' : null,
                       onSaved: (v) => _phoneNumber = v!,
                     ),
                   ),
@@ -383,8 +439,11 @@ class _SupplierFormSheetState extends State<_SupplierFormSheet> {
               const SizedBox(height: 12),
               TextFormField(
                 initialValue: _supplierName,
-                decoration: const InputDecoration(labelText: 'Tên nhà cung cấp *'),
-                validator: (v) => v == null || v.isEmpty ? 'Nhập tên nhà cung cấp' : null,
+                decoration: const InputDecoration(
+                  labelText: 'Tên nhà cung cấp *',
+                ),
+                validator: (v) =>
+                    v == null || v.isEmpty ? 'Nhập tên nhà cung cấp' : null,
                 onSaved: (v) => _supplierName = v!,
               ),
               const SizedBox(height: 12),
@@ -412,7 +471,9 @@ class _SupplierFormSheetState extends State<_SupplierFormSheet> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _taxCode,
-                      decoration: const InputDecoration(labelText: 'Mã số thuế'),
+                      decoration: const InputDecoration(
+                        labelText: 'Mã số thuế',
+                      ),
                       onSaved: (v) => _taxCode = v,
                     ),
                   ),
@@ -422,10 +483,15 @@ class _SupplierFormSheetState extends State<_SupplierFormSheet> {
                       value: _status,
                       dropdownColor: Colors.white,
                       borderRadius: BorderRadius.circular(8),
-                      decoration: const InputDecoration(labelText: 'Trạng thái'),
+                      decoration: const InputDecoration(
+                        labelText: 'Trạng thái',
+                      ),
                       items: const [
                         DropdownMenuItem(value: true, child: Text('Hoạt động')),
-                        DropdownMenuItem(value: false, child: Text('Ngừng hợp tác')),
+                        DropdownMenuItem(
+                          value: false,
+                          child: Text('Ngừng hợp tác'),
+                        ),
                       ],
                       onChanged: (v) => setState(() => _status = v!),
                     ),
@@ -438,7 +504,9 @@ class _SupplierFormSheetState extends State<_SupplierFormSheet> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _bankAccount,
-                      decoration: const InputDecoration(labelText: 'Số tài khoản'),
+                      decoration: const InputDecoration(
+                        labelText: 'Số tài khoản',
+                      ),
                       onSaved: (v) => _bankAccount = v,
                     ),
                   ),
@@ -465,13 +533,18 @@ class _SupplierFormSheetState extends State<_SupplierFormSheet> {
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   minimumSize: const Size.fromHeight(48),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: _isSaving
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : Text(isEdit ? 'Cập nhật' : 'Thêm mới'),
               ),

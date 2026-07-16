@@ -44,16 +44,16 @@ class CartProvider extends ChangeNotifier {
   }
 
   double get finalAmount {
-    final raw = totalAmount + vatAmount - discountAmount;
-    final rounded = (raw * 100).roundToDouble() / 100;
-    return rounded < 0 ? 0 : rounded;
+    double finalAmt = totalAmount - discountAmount;
+    return finalAmt < 0 ? 0 : finalAmt;
   }
 
   int get maxPointsCanUse {
     if (_selectedCustomerPoints == null) return 0;
-    final amountBeforeDiscount = totalAmount + vatAmount;
-    int maxFromTotal = (amountBeforeDiscount / 1000).floor();
-    return _selectedCustomerPoints! < maxFromTotal ? _selectedCustomerPoints! : maxFromTotal;
+    int maxFromTotal = (totalAmount / 1000).floor();
+    return _selectedCustomerPoints! < maxFromTotal
+        ? _selectedCustomerPoints!
+        : maxFromTotal;
   }
 
   void setPointsToUse(int points) {

@@ -1439,7 +1439,7 @@ namespace MiniMart.Migrations
                             EmployeeId = 2,
                             FinalAmount = 66000m,
                             OrderCode = "HD001",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 1, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 70000m,
                             Status = 2,
                             SubTotal = 66000m,
@@ -1454,7 +1454,7 @@ namespace MiniMart.Migrations
                             EmployeeId = 2,
                             FinalAmount = 110000m,
                             OrderCode = "HD002",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 1, 14, 10, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 110000m,
                             Status = 2,
                             SubTotal = 110000m,
@@ -1469,7 +1469,7 @@ namespace MiniMart.Migrations
                             EmployeeId = 3,
                             FinalAmount = 50000m,
                             OrderCode = "HD003",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 2, 9, 15, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 50000m,
                             Status = 2,
                             SubTotal = 55000m,
@@ -1484,7 +1484,7 @@ namespace MiniMart.Migrations
                             EmployeeId = 3,
                             FinalAmount = 180000m,
                             OrderCode = "HD004",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 2, 16, 45, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 200000m,
                             Status = 2,
                             SubTotal = 180000m,
@@ -1499,7 +1499,7 @@ namespace MiniMart.Migrations
                             EmployeeId = 5,
                             FinalAmount = 92000m,
                             OrderCode = "HD005",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 5, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 100000m,
                             Status = 2,
                             SubTotal = 92000m,
@@ -1514,7 +1514,7 @@ namespace MiniMart.Migrations
                             EmployeeId = 6,
                             FinalAmount = 235000m,
                             OrderCode = "HD006",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 5, 15, 30, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 235000m,
                             Status = 2,
                             SubTotal = 245000m,
@@ -1528,7 +1528,7 @@ namespace MiniMart.Migrations
                             EmployeeId = 5,
                             FinalAmount = 38000m,
                             OrderCode = "HD007",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 10, 11, 20, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 40000m,
                             Status = 2,
                             SubTotal = 38000m,
@@ -1543,7 +1543,7 @@ namespace MiniMart.Migrations
                             EmployeeId = 10,
                             FinalAmount = 130000m,
                             OrderCode = "HD008",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 15, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 130000m,
                             Status = 2,
                             SubTotal = 130000m,
@@ -1558,7 +1558,7 @@ namespace MiniMart.Migrations
                             EmployeeId = 2,
                             FinalAmount = 75000m,
                             OrderCode = "HD009",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 20, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 80000m,
                             Status = 2,
                             SubTotal = 75000m,
@@ -1573,10 +1573,189 @@ namespace MiniMart.Migrations
                             EmployeeId = 12,
                             FinalAmount = 300000m,
                             OrderCode = "HD010",
-                            OrderDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            OrderDate = new DateTime(2026, 6, 25, 18, 30, 0, 0, DateTimeKind.Unspecified),
                             PaidAmount = 300000m,
                             Status = 2,
                             SubTotal = 320000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 11,
+                            ChangeAmount = 4000m,
+                            CustomerId = 5,
+                            DiscountAmount = 0m,
+                            EmployeeId = 2,
+                            FinalAmount = 76000m,
+                            OrderCode = "HD011",
+                            OrderDate = new DateTime(2026, 7, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 80000m,
+                            Status = 2,
+                            SubTotal = 76000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 12,
+                            ChangeAmount = 0m,
+                            CustomerId = 7,
+                            DiscountAmount = 5000m,
+                            EmployeeId = 3,
+                            FinalAmount = 150000m,
+                            OrderCode = "HD012",
+                            OrderDate = new DateTime(2026, 7, 1, 15, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 150000m,
+                            Status = 2,
+                            SubTotal = 155000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 13,
+                            ChangeAmount = 0m,
+                            CustomerId = 14,
+                            DiscountAmount = 10000m,
+                            EmployeeId = 5,
+                            FinalAmount = 200000m,
+                            OrderCode = "HD013",
+                            OrderDate = new DateTime(2026, 7, 2, 9, 30, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 200000m,
+                            Status = 2,
+                            SubTotal = 210000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 14,
+                            ChangeAmount = 2000m,
+                            DiscountAmount = 0m,
+                            EmployeeId = 6,
+                            FinalAmount = 48000m,
+                            OrderCode = "HD014",
+                            OrderDate = new DateTime(2026, 7, 2, 16, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 50000m,
+                            Status = 2,
+                            SubTotal = 48000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 15,
+                            ChangeAmount = 15000m,
+                            CustomerId = 16,
+                            DiscountAmount = 0m,
+                            EmployeeId = 10,
+                            FinalAmount = 185000m,
+                            OrderCode = "HD015",
+                            OrderDate = new DateTime(2026, 7, 3, 10, 45, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 200000m,
+                            Status = 2,
+                            SubTotal = 185000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 16,
+                            ChangeAmount = 5000m,
+                            CustomerId = 19,
+                            DiscountAmount = 0m,
+                            EmployeeId = 2,
+                            FinalAmount = 95000m,
+                            OrderCode = "HD016",
+                            OrderDate = new DateTime(2026, 7, 4, 8, 15, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 100000m,
+                            Status = 2,
+                            SubTotal = 95000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 17,
+                            ChangeAmount = 0m,
+                            CustomerId = 20,
+                            DiscountAmount = 10000m,
+                            EmployeeId = 3,
+                            FinalAmount = 250000m,
+                            OrderCode = "HD017",
+                            OrderDate = new DateTime(2026, 7, 4, 14, 30, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 250000m,
+                            Status = 2,
+                            SubTotal = 260000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 18,
+                            ChangeAmount = 8000m,
+                            CustomerId = 11,
+                            DiscountAmount = 0m,
+                            EmployeeId = 5,
+                            FinalAmount = 72000m,
+                            OrderCode = "HD018",
+                            OrderDate = new DateTime(2026, 7, 5, 9, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 80000m,
+                            Status = 2,
+                            SubTotal = 72000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 19,
+                            ChangeAmount = 0m,
+                            CustomerId = 15,
+                            DiscountAmount = 20000m,
+                            EmployeeId = 12,
+                            FinalAmount = 320000m,
+                            OrderCode = "HD019",
+                            OrderDate = new DateTime(2026, 7, 7, 11, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 320000m,
+                            Status = 2,
+                            SubTotal = 340000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 20,
+                            ChangeAmount = 5000m,
+                            CustomerId = 21,
+                            DiscountAmount = 0m,
+                            EmployeeId = 6,
+                            FinalAmount = 115000m,
+                            OrderCode = "HD020",
+                            OrderDate = new DateTime(2026, 7, 8, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 120000m,
+                            Status = 2,
+                            SubTotal = 115000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 21,
+                            ChangeAmount = 0m,
+                            CustomerId = 9,
+                            DiscountAmount = 5000m,
+                            EmployeeId = 2,
+                            FinalAmount = 160000m,
+                            OrderCode = "HD021",
+                            OrderDate = new DateTime(2026, 7, 9, 8, 30, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 160000m,
+                            Status = 2,
+                            SubTotal = 165000m,
+                            TaxAmount = 0m
+                        },
+                        new
+                        {
+                            OrderId = 22,
+                            ChangeAmount = 2000m,
+                            CustomerId = 13,
+                            DiscountAmount = 0m,
+                            EmployeeId = 3,
+                            FinalAmount = 88000m,
+                            OrderCode = "HD022",
+                            OrderDate = new DateTime(2026, 7, 9, 14, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaidAmount = 90000m,
+                            Status = 2,
+                            SubTotal = 88000m,
                             TaxAmount = 0m
                         });
                 });
@@ -1981,6 +2160,409 @@ namespace MiniMart.Migrations
                             Quantity = 2,
                             TotalPrice = 105000m,
                             UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 28,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 11,
+                            ProductId = 1,
+                            Quantity = 4,
+                            TotalPrice = 28000m,
+                            UnitPrice = 7000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 29,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 11,
+                            ProductId = 24,
+                            Quantity = 5,
+                            TotalPrice = 25000m,
+                            UnitPrice = 5000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 30,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 11,
+                            ProductId = 3,
+                            Quantity = 2,
+                            TotalPrice = 22000m,
+                            UnitPrice = 11000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 31,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 12,
+                            ProductId = 18,
+                            Quantity = 3,
+                            TotalPrice = 96000m,
+                            UnitPrice = 32000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 32,
+                            DiscountAmount = 2500m,
+                            IsGift = false,
+                            OrderId = 12,
+                            ProductId = 11,
+                            Quantity = 2,
+                            TotalPrice = 47500m,
+                            UnitPrice = 25000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 33,
+                            DiscountAmount = 2500m,
+                            IsGift = false,
+                            OrderId = 12,
+                            ProductId = 12,
+                            Quantity = 1,
+                            TotalPrice = 42500m,
+                            UnitPrice = 45000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 34,
+                            DiscountAmount = 5000m,
+                            IsGift = false,
+                            OrderId = 13,
+                            ProductId = 36,
+                            Quantity = 2,
+                            TotalPrice = 105000m,
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 35,
+                            DiscountAmount = 5000m,
+                            IsGift = false,
+                            OrderId = 13,
+                            ProductId = 38,
+                            Quantity = 2,
+                            TotalPrice = 99000m,
+                            UnitPrice = 52000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 36,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 13,
+                            ProductId = 41,
+                            Quantity = 2,
+                            TotalPrice = 110000m,
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 37,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 14,
+                            ProductId = 24,
+                            Quantity = 8,
+                            TotalPrice = 40000m,
+                            UnitPrice = 5000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 38,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 14,
+                            ProductId = 26,
+                            Quantity = 2,
+                            TotalPrice = 12000m,
+                            UnitPrice = 6000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 39,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 15,
+                            ProductId = 31,
+                            Quantity = 2,
+                            TotalPrice = 110000m,
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 40,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 15,
+                            ProductId = 29,
+                            Quantity = 2,
+                            TotalPrice = 56000m,
+                            UnitPrice = 28000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 41,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 15,
+                            ProductId = 33,
+                            Quantity = 1,
+                            TotalPrice = 28000m,
+                            UnitPrice = 28000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 42,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 16,
+                            ProductId = 8,
+                            Quantity = 3,
+                            TotalPrice = 54000m,
+                            UnitPrice = 18000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 43,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 16,
+                            ProductId = 15,
+                            Quantity = 3,
+                            TotalPrice = 45000m,
+                            UnitPrice = 15000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 44,
+                            DiscountAmount = 5000m,
+                            IsGift = false,
+                            OrderId = 17,
+                            ProductId = 36,
+                            Quantity = 3,
+                            TotalPrice = 160000m,
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 45,
+                            DiscountAmount = 5000m,
+                            IsGift = false,
+                            OrderId = 17,
+                            ProductId = 37,
+                            Quantity = 2,
+                            TotalPrice = 145000m,
+                            UnitPrice = 75000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 46,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 17,
+                            ProductId = 44,
+                            Quantity = 2,
+                            TotalPrice = 76000m,
+                            UnitPrice = 38000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 47,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 18,
+                            ProductId = 20,
+                            Quantity = 3,
+                            TotalPrice = 84000m,
+                            UnitPrice = 28000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 48,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 18,
+                            ProductId = 24,
+                            Quantity = 4,
+                            TotalPrice = 20000m,
+                            UnitPrice = 5000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 49,
+                            DiscountAmount = 10000m,
+                            IsGift = false,
+                            OrderId = 19,
+                            ProductId = 36,
+                            Quantity = 3,
+                            TotalPrice = 155000m,
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 50,
+                            DiscountAmount = 5000m,
+                            IsGift = false,
+                            OrderId = 19,
+                            ProductId = 41,
+                            Quantity = 3,
+                            TotalPrice = 160000m,
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 51,
+                            DiscountAmount = 5000m,
+                            IsGift = false,
+                            OrderId = 19,
+                            ProductId = 38,
+                            Quantity = 2,
+                            TotalPrice = 99000m,
+                            UnitPrice = 52000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 52,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 20,
+                            ProductId = 18,
+                            Quantity = 2,
+                            TotalPrice = 64000m,
+                            UnitPrice = 32000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 53,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 20,
+                            ProductId = 11,
+                            Quantity = 3,
+                            TotalPrice = 75000m,
+                            UnitPrice = 25000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 54,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 21,
+                            ProductId = 1,
+                            Quantity = 6,
+                            TotalPrice = 42000m,
+                            UnitPrice = 7000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 55,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 21,
+                            ProductId = 3,
+                            Quantity = 3,
+                            TotalPrice = 33000m,
+                            UnitPrice = 11000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 56,
+                            DiscountAmount = 5000m,
+                            IsGift = false,
+                            OrderId = 21,
+                            ProductId = 24,
+                            Quantity = 10,
+                            TotalPrice = 95000m,
+                            UnitPrice = 5000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 57,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 22,
+                            ProductId = 41,
+                            Quantity = 1,
+                            TotalPrice = 55000m,
+                            UnitPrice = 55000m,
+                            VatAmount = 0m,
+                            VatRate = 0m
+                        },
+                        new
+                        {
+                            OrderDetailId = 58,
+                            DiscountAmount = 0m,
+                            IsGift = false,
+                            OrderId = 22,
+                            ProductId = 43,
+                            Quantity = 1,
+                            TotalPrice = 72000m,
+                            UnitPrice = 72000m,
                             VatAmount = 0m,
                             VatRate = 0m
                         });
@@ -3266,65 +3848,65 @@ namespace MiniMart.Migrations
                         {
                             ShiftId = 1,
                             CashierId = 2,
-                            ClosedAt = new DateTime(2024, 6, 1, 14, 5, 0, 0, DateTimeKind.Unspecified),
+                            ClosedAt = new DateTime(2026, 7, 1, 14, 5, 0, 0, DateTimeKind.Unspecified),
                             EmployeeId = 1,
-                            EndCash = 3200000m,
-                            EndTime = new DateTime(2024, 6, 1, 14, 0, 0, 0, DateTimeKind.Unspecified),
-                            Revenue = 2700000m,
-                            ShiftCode = "SA-20240601",
+                            EndCash = 3800000m,
+                            EndTime = new DateTime(2026, 7, 1, 14, 0, 0, 0, DateTimeKind.Unspecified),
+                            Revenue = 3300000m,
+                            ShiftCode = "SA-20260701",
                             ShiftName = "Ca sáng",
                             StartCash = 500000m,
-                            StartTime = new DateTime(2024, 6, 1, 6, 0, 0, 0, DateTimeKind.Unspecified),
+                            StartTime = new DateTime(2026, 7, 1, 6, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 3,
-                            WorkDate = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            WorkDate = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             ShiftId = 2,
                             CashierId = 3,
-                            ClosedAt = new DateTime(2024, 6, 1, 22, 10, 0, 0, DateTimeKind.Unspecified),
+                            ClosedAt = new DateTime(2026, 7, 1, 22, 10, 0, 0, DateTimeKind.Unspecified),
                             EmployeeId = 1,
-                            EndCash = 4100000m,
-                            EndTime = new DateTime(2024, 6, 1, 22, 0, 0, 0, DateTimeKind.Unspecified),
-                            Revenue = 3600000m,
-                            ShiftCode = "CH-20240601",
+                            EndCash = 4200000m,
+                            EndTime = new DateTime(2026, 7, 1, 22, 0, 0, 0, DateTimeKind.Unspecified),
+                            Revenue = 3700000m,
+                            ShiftCode = "CH-20260701",
                             ShiftName = "Ca chiều",
                             StartCash = 500000m,
-                            StartTime = new DateTime(2024, 6, 1, 14, 0, 0, 0, DateTimeKind.Unspecified),
+                            StartTime = new DateTime(2026, 7, 1, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 3,
-                            WorkDate = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            WorkDate = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             ShiftId = 3,
                             CashierId = 5,
-                            ClosedAt = new DateTime(2024, 6, 2, 14, 2, 0, 0, DateTimeKind.Unspecified),
+                            ClosedAt = new DateTime(2026, 7, 8, 14, 2, 0, 0, DateTimeKind.Unspecified),
                             EmployeeId = 1,
-                            EndCash = 2800000m,
-                            EndTime = new DateTime(2024, 6, 2, 14, 0, 0, 0, DateTimeKind.Unspecified),
-                            Revenue = 2300000m,
-                            ShiftCode = "SA-20240602",
+                            EndCash = 3100000m,
+                            EndTime = new DateTime(2026, 7, 8, 14, 0, 0, 0, DateTimeKind.Unspecified),
+                            Revenue = 2600000m,
+                            ShiftCode = "SA-20260708",
                             ShiftName = "Ca sáng",
                             StartCash = 500000m,
-                            StartTime = new DateTime(2024, 6, 2, 6, 0, 0, 0, DateTimeKind.Unspecified),
+                            StartTime = new DateTime(2026, 7, 8, 6, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 3,
-                            WorkDate = new DateTime(2024, 6, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            WorkDate = new DateTime(2026, 7, 8, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             ShiftId = 4,
                             CashierId = 6,
-                            ClosedAt = new DateTime(2024, 6, 2, 22, 8, 0, 0, DateTimeKind.Unspecified),
+                            ClosedAt = new DateTime(2026, 7, 8, 22, 8, 0, 0, DateTimeKind.Unspecified),
                             EmployeeId = 1,
-                            EndCash = 5200000m,
-                            EndTime = new DateTime(2024, 6, 2, 22, 0, 0, 0, DateTimeKind.Unspecified),
-                            Revenue = 4700000m,
-                            ShiftCode = "CH-20240602",
+                            EndCash = 5500000m,
+                            EndTime = new DateTime(2026, 7, 8, 22, 0, 0, 0, DateTimeKind.Unspecified),
+                            Revenue = 5000000m,
+                            ShiftCode = "CH-20260708",
                             ShiftName = "Ca chiều",
                             StartCash = 500000m,
-                            StartTime = new DateTime(2024, 6, 2, 14, 0, 0, 0, DateTimeKind.Unspecified),
+                            StartTime = new DateTime(2026, 7, 8, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 3,
-                            WorkDate = new DateTime(2024, 6, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            WorkDate = new DateTime(2026, 7, 8, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -3332,14 +3914,14 @@ namespace MiniMart.Migrations
                             CashierId = 10,
                             EmployeeId = 1,
                             EndCash = 0m,
-                            EndTime = new DateTime(2024, 6, 3, 14, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2026, 7, 9, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             Revenue = 0m,
-                            ShiftCode = "SA-20240603",
+                            ShiftCode = "SA-20260709",
                             ShiftName = "Ca sáng",
                             StartCash = 500000m,
-                            StartTime = new DateTime(2024, 6, 3, 6, 0, 0, 0, DateTimeKind.Unspecified),
+                            StartTime = new DateTime(2026, 7, 9, 6, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 2,
-                            WorkDate = new DateTime(2024, 6, 3, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            WorkDate = new DateTime(2026, 7, 9, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 

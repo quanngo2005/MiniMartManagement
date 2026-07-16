@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mini_mart_management_mobile_app/models/product_lookup.dart';
 import 'package:mini_mart_management_mobile_app/models/cart_item.dart';
-import 'package:mini_mart_management_mobile_app/models/checkout.dart';
 import 'package:mini_mart_management_mobile_app/providers/cart_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
@@ -230,33 +229,36 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       final orderRepo = context.read<OrderRepository>();
 
-      final givenStr = _customerGivenAmountController.text.replaceAll(RegExp(r'[^0-9]'), '');
-      final givenAmount = double.tryParse(givenStr) ?? cart.finalAmount;
-      if (cart.paymentMethod == 1 && givenAmount < cart.finalAmount) {
+      final items = cart.items
+          .map(
+            (i) => {'productId': i.product.productId, 'quantity': i.quantity},
+          )
+          .toList();
+
+      final givenStr = _customerGivenAmountController.text.replaceAll(
+        RegExp(r'[^0-9]'),
+        '',
+      );
+      final givenAmount = double.tryParse(givenStr) ?? cart.totalAmount;
+      if (cart.paymentMethod == 1 && givenAmount < cart.totalAmount) {
         _showError('Tiền khách đưa không đủ.');
         return;
       }
 
-      final checkoutItems = cart.items.map((i) => CheckoutItem(
-        productId: i.product.productId,
-        quantity: i.quantity,
-      )).toList();
-
-      final checkoutRequest = CheckoutRequest(
+      final response = await orderRepo.checkout(
         employeeId: currentUser.employeeId,
         shiftId: shiftProvider.currentShift!.shiftId,
         customerId: cart.selectedCustomerId,
         loyaltyPointsToUse: cart.pointsToUse,
-        paymentMethod: cart.paymentMethod == 1 ? PaymentMethod.cash : PaymentMethod.vnpay,
+        paymentMethod: cart.paymentMethod,
         paidAmount: cart.paymentMethod == 1 ? givenAmount : cart.finalAmount,
-        items: checkoutItems,
+        items: items,
       );
 
-      final response = await orderRepo.checkout(checkoutRequest);
-
       if (cart.paymentMethod == 5) {
-        final orderId = response.orderId;
-        if (orderId == 0) throw Exception('Không tìm thấy OrderId từ server.');
+        final orderId = response['orderId'] ?? response['OrderId'];
+        if (orderId == null)
+          throw Exception('Không tìm thấy OrderId từ server.');
 
 
         final client = createConfiguredClient();

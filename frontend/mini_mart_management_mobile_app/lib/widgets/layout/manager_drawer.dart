@@ -5,11 +5,14 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 enum ManagerNavDestination {
   home,
   shift,
+  productPerformance,
   inventoryDocuments,
   inventoryTransactions,
   staff,
   customers,
   promotions,
+  analyze,
+  invoices,
 }
 
 class ManagerDrawer extends StatelessWidget {
@@ -48,12 +51,31 @@ class ManagerDrawer extends StatelessWidget {
                     onTap: _select(context, ManagerNavDestination.home),
                   ),
                   _DrawerTile(
+                    icon: Icons.analytics_outlined,
+                    activeIcon: Icons.analytics_rounded,
+                    label: 'Báo Cáo Tài Chính',
+                    destination: ManagerNavDestination.analyze,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.analyze),
+                  ),
+                  _DrawerTile(
                     icon: Icons.schedule_outlined,
                     activeIcon: Icons.schedule_rounded,
                     label: 'Quản lý ca',
                     destination: ManagerNavDestination.shift,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.shift),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.bar_chart_outlined,
+                    activeIcon: Icons.bar_chart_rounded,
+                    label: 'Sản Phẩm',
+                    destination: ManagerNavDestination.productPerformance,
+                    selected: selected,
+                    onTap: _select(
+                      context,
+                      ManagerNavDestination.productPerformance,
+                    ),
                   ),
                   const _DrawerSectionLabel('Kho hàng'),
                   _DrawerTile(
@@ -103,6 +125,14 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.promotions,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.promotions),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.receipt_long_outlined,
+                    activeIcon: Icons.receipt_long_rounded,
+                    label: 'Hóa đơn',
+                    destination: ManagerNavDestination.invoices,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.invoices),
                   ),
                 ],
               ),

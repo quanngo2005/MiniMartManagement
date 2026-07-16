@@ -13,6 +13,9 @@ public class Promotion
         // For fixed amount discount
         public decimal? DiscountAmount { get; set; }
 
+        // Minimum order total required to qualify for this promotion
+        public decimal? MinimumOrderAmount { get; set; }
+
         // For Buy X Get Y Free
         public int? BuyQuantity { get; set; }      // e.g. 1 or 2
         public int? GiftQuantity { get; set; }     // e.g. 1

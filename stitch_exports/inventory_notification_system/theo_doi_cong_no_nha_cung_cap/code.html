@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Supplier Debt Tracking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .debt-card {
+            transition: transform 0.1s ease-in-out;
+        }
+        .debt-card:active {
+            transform: scale(0.98);
+        }
+        .safe-area-pb {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-primary": "#b0c8eb",
+                    "border-gray": "#E2E8F0",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#f2f0f3",
+                    "secondary-container": "#6cf8bb",
+                    "primary-container": "#0a2540",
+                    "status-warning": "#F59E0B",
+                    "outline-variant": "#c4c6ce",
+                    "primary": "#000f22",
+                    "surface-container-highest": "#e3e2e5",
+                    "background-slate": "#F8FAFC",
+                    "tertiary-container": "#381d00",
+                    "surface-tint": "#49607e",
+                    "surface": "#faf9fb",
+                    "on-surface-variant": "#43474d",
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "background": "#faf9fb",
+                    "outline": "#74777e",
+                    "on-secondary-fixed": "#002113",
+                    "text-muted": "#64748B",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#ae835a",
+                    "on-background": "#1b1c1e",
+                    "secondary": "#006c49",
+                    "tertiary-fixed": "#ffdcbe",
+                    "tertiary": "#1a0b00",
+                    "on-primary-container": "#768dad",
+                    "surface-container": "#efedf0",
+                    "on-tertiary-fixed-variant": "#613f1c",
+                    "surface-bright": "#faf9fb",
+                    "on-tertiary-fixed": "#2d1600",
+                    "on-primary-fixed": "#001c37",
+                    "surface-dim": "#dbd9dc",
+                    "primary-fixed": "#d2e4ff",
+                    "on-primary-fixed-variant": "#314865",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f5f3f6",
+                    "inverse-surface": "#2f3033",
+                    "surface-container-high": "#e9e8ea",
+                    "on-secondary-container": "#00714d",
+                    "on-secondary-fixed-variant": "#005236",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#4edea3",
+                    "primary-fixed-dim": "#b0c8eb",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#1b1c1e",
+                    "status-error": "#EF4444",
+                    "surface-variant": "#e3e2e5",
+                    "tertiary-fixed-dim": "#eebd90",
+                    "text-dark": "#334155",
+                    "secondary-fixed": "#6ffbbe"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "safe-area": "16px",
+                    "stack-md": "16px",
+                    "gutter": "12px",
+                    "touch-target": "48px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "metadata": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "data-tabular": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-slate text-on-background font-body-md min-h-screen pb-32">
+<!-- Top AppBar - From Shared Component -->
+<header class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container w-full top-0 sticky z-50 border-b border-outline-variant flex items-center justify-between px-safe-area h-touch-target">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined cursor-pointer hover:bg-primary-fixed-dim/10 p-2 rounded-full transition-colors duration-200">menu</span>
+<h1 class="font-headline-lg text-headline-lg font-bold">Retail Manager</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined cursor-pointer hover:bg-primary-fixed-dim/10 p-2 rounded-full transition-colors duration-200">search</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="px-safe-area pt-6 max-w-md mx-auto">
+<!-- Header: Total Outstanding Debt -->
+<section class="mb-gutter">
+<div class="bg-primary-container p-stack-md rounded-xl shadow-sm border border-outline-variant">
+<p class="font-metadata text-metadata text-on-primary-container/70 mb-1 uppercase tracking-wider">Total Outstanding Debt</p>
+<div class="flex items-baseline justify-between">
+<span class="font-data-tabular text-3xl font-bold text-on-primary-container">$1,248,390.50</span>
+<span class="text-secondary-fixed font-bold text-sm">+2.4% vs LY</span>
+</div>
+<div class="mt-4 h-1 w-full bg-primary/20 rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed w-3/4"></div>
+</div>
+</div>
+</section>
+<!-- Quick Summary Mini-Dashboard -->
+<div class="grid grid-cols-2 gap-gutter mb-6">
+<div class="bg-surface-container-lowest p-stack-sm rounded-lg border border-border-gray shadow-sm">
+<p class="font-metadata text-metadata text-text-muted">Critical Accounts</p>
+<p class="font-headline-md text-headline-md text-status-error">12</p>
+</div>
+<div class="bg-surface-container-lowest p-stack-sm rounded-lg border border-border-gray shadow-sm">
+<p class="font-metadata text-metadata text-text-muted">Payments Pending</p>
+<p class="font-headline-md text-headline-md text-secondary">08</p>
+</div>
+</div>
+<!-- Supplier List Container -->
+<div class="flex flex-col gap-gutter">
+<h2 class="font-headline-md text-headline-md text-primary px-1">Active Debt Balances</h2>
+<!-- Supplier Card 1: Critical -->
+<div class="debt-card bg-surface-container-lowest rounded-xl border border-border-gray shadow-sm p-stack-md flex flex-col gap-stack-sm cursor-pointer hover:border-outline transition-colors">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Global Logistics Inc.</h3>
+<p class="font-metadata text-metadata text-text-muted">Code: GL-7882</p>
+</div>
+<span class="px-2 py-1 bg-error-container text-on-error-container text-[10px] font-bold rounded uppercase border border-error/20">Critical</span>
+</div>
+<div class="flex items-end justify-between mt-2">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-text-muted uppercase">Outstanding Balance</span>
+<span class="font-data-tabular text-xl font-bold text-primary">$412,900.00</span>
+</div>
+<div class="text-right">
+<span class="font-metadata text-metadata text-text-muted block">Last Receipt</span>
+<span class="font-data-tabular text-body-md text-on-surface">Oct 24, 2023</span>
+</div>
+</div>
+<div class="pt-2 border-t border-border-gray/50 mt-1 flex justify-between items-center">
+<span class="text-status-error font-bold text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">warning</span>
+                        Overdue 45d
+                    </span>
+<button class="text-primary font-bold text-xs hover:underline flex items-center">
+                        Details <span class="material-symbols-outlined text-sm ml-1">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Supplier Card 2: Warning -->
+<div class="debt-card bg-surface-container-lowest rounded-xl border border-border-gray shadow-sm p-stack-md flex flex-col gap-stack-sm cursor-pointer hover:border-outline transition-colors">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Fresh Produce Corp</h3>
+<p class="font-metadata text-metadata text-text-muted">Code: FP-0012</p>
+</div>
+<span class="px-2 py-1 bg-status-warning/10 text-status-warning text-[10px] font-bold rounded uppercase border border-status-warning/20">Overdue 15d</span>
+</div>
+<div class="flex items-end justify-between mt-2">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-text-muted uppercase">Outstanding Balance</span>
+<span class="font-data-tabular text-xl font-bold text-primary">$182,450.25</span>
+</div>
+<div class="text-right">
+<span class="font-metadata text-metadata text-text-muted block">Last Receipt</span>
+<span class="font-data-tabular text-body-md text-on-surface">Nov 02, 2023</span>
+</div>
+</div>
+<div class="pt-2 border-t border-border-gray/50 mt-1 flex justify-between items-center">
+<span class="text-status-warning font-bold text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                        Grace Period Ending
+                    </span>
+<button class="text-primary font-bold text-xs hover:underline flex items-center">
+                        Details <span class="material-symbols-outlined text-sm ml-1">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Supplier Card 3: Healthy -->
+<div class="debt-card bg-surface-container-lowest rounded-xl border border-border-gray shadow-sm p-stack-md flex flex-col gap-stack-sm cursor-pointer hover:border-outline transition-colors">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Apex Industrial Supply</h3>
+<p class="font-metadata text-metadata text-text-muted">Code: AX-9901</p>
+</div>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase border border-secondary/20">On Time</span>
+</div>
+<div class="flex items-end justify-between mt-2">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-text-muted uppercase">Outstanding Balance</span>
+<span class="font-data-tabular text-xl font-bold text-primary">$64,020.00</span>
+</div>
+<div class="text-right">
+<span class="font-metadata text-metadata text-text-muted block">Last Receipt</span>
+<span class="font-data-tabular text-body-md text-on-surface">Nov 10, 2023</span>
+</div>
+</div>
+<div class="pt-2 border-t border-border-gray/50 mt-1 flex justify-between items-center">
+<span class="text-secondary font-bold text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                        Verified
+                    </span>
+<button class="text-primary font-bold text-xs hover:underline flex items-center">
+                        Details <span class="material-symbols-outlined text-sm ml-1">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Supplier Card 4: Normal -->
+<div class="debt-card bg-surface-container-lowest rounded-xl border border-border-gray shadow-sm p-stack-md flex flex-col gap-stack-sm cursor-pointer hover:border-outline transition-colors">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Titan Beverages</h3>
+<p class="font-metadata text-metadata text-text-muted">Code: TB-5541</p>
+</div>
+<span class="px-2 py-1 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded uppercase border border-outline/20">Pending 3d</span>
+</div>
+<div class="flex items-end justify-between mt-2">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-text-muted uppercase">Outstanding Balance</span>
+<span class="font-data-tabular text-xl font-bold text-primary">$325,100.80</span>
+</div>
+<div class="text-right">
+<span class="font-metadata text-metadata text-text-muted block">Last Receipt</span>
+<span class="font-data-tabular text-body-md text-on-surface">Nov 08, 2023</span>
+</div>
+</div>
+<div class="pt-2 border-t border-border-gray/50 mt-1 flex justify-between items-center">
+<span class="text-text-muted font-bold text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">receipt_long</span>
+                        Awaiting Invoices
+                    </span>
+<button class="text-primary font-bold text-xs hover:underline flex items-center">
+                        Details <span class="material-symbols-outlined text-sm ml-1">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Pagination / Load More Utilitarian Footer -->
+<div class="mt-8 mb-12 flex justify-center">
+<button class="bg-primary text-on-primary px-8 h-touch-target rounded-lg font-bold shadow-md active:scale-95 transition-transform">
+                Load More Suppliers
+            </button>
+</div>
+</main>
+<!-- Bottom NavBar - From Shared Component -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface dark:bg-inverse-surface border-t border-border-gray shadow-md flex justify-around items-center h-16 px-safe-area pb-2">
+<div class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-high transition-colors p-2 rounded-lg cursor-pointer">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-metadata text-metadata">Catalog</span>
+</div>
+<div class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-high transition-colors p-2 rounded-lg cursor-pointer">
+<span class="material-symbols-outlined">category</span>
+<span class="font-metadata text-metadata">Categories</span>
+</div>
+<div class="flex flex-col items-center justify-center text-text-muted hover:bg-surface-container-high transition-colors p-2 rounded-lg cursor-pointer">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-metadata text-metadata">Suppliers</span>
+</div>
+<!-- ACTIVE TAB: Finances (Mapped via intent for Debt Tracking) -->
+<div class="flex flex-col items-center justify-center bg-primary-container text-secondary-fixed rounded-xl px-stack-md py-1 scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="font-metadata text-metadata">Finances</span>
+</div>
+</nav>
+<!-- FAB: Only for Create Document / Relevant Action -->
+<button class="fixed bottom-24 right-4 bg-primary text-on-primary w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:bg-on-primary-fixed-variant transition-colors z-40 active:scale-90">
+<span class="material-symbols-outlined text-3xl">add_card</span>
+</button>
+<script>
+        // Micro-interaction: Scroll shadow for TopAppBar
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 10) {
+                header.classList.add('shadow-md');
+                header.classList.remove('border-b');
+            } else {
+                header.classList.remove('shadow-md');
+                header.classList.add('border-b');
+            }
+        });
+
+        // Add ripple effect or simple tap interaction
+        document.querySelectorAll('.debt-card').forEach(card => {
+            card.addEventListener('click', () => {
+                console.log('Supplier selected for detail view');
+            });
+        });
+    </script>
+</body></html>

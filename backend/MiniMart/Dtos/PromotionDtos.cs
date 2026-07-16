@@ -10,6 +10,7 @@ namespace MiniMart.DTOs
         public PromotionType Type { get; set; }
         public decimal? DiscountPercent { get; set; }
         public decimal? DiscountAmount { get; set; }
+        public decimal? MinimumOrderAmount { get; set; }
         public int? BuyQuantity { get; set; }
         public int? GiftQuantity { get; set; }
         public int? GiftProductId { get; set; }
@@ -26,6 +27,7 @@ namespace MiniMart.DTOs
         public PromotionType Type { get; set; }
         public decimal? DiscountPercent { get; set; }
         public decimal? DiscountAmount { get; set; }
+        public decimal? MinimumOrderAmount { get; set; }
         public int? BuyQuantity { get; set; }
         public int? GiftQuantity { get; set; }
         public int? GiftProductId { get; set; }
@@ -42,6 +44,7 @@ namespace MiniMart.DTOs
         public PromotionType Type { get; set; }
         public decimal? DiscountPercent { get; set; }
         public decimal? DiscountAmount { get; set; }
+        public decimal? MinimumOrderAmount { get; set; }
         public int? BuyQuantity { get; set; }
         public int? GiftQuantity { get; set; }
         public int? GiftProductId { get; set; }

@@ -4,6 +4,7 @@ import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_navigation_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/mock_role_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/checkout_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/warehouse_navigation_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/dotted_background.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/login_card.dart';
@@ -51,6 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute<void>(
           builder: (_) {
             if (_isManager(user)) return ManagerNavigationScreen(user: user);
+            if (_isWarehouse(user)) return WarehouseNavigationScreen(user: user);
             if (_isCashier(user)) return const CheckoutScreen();
             return MockRoleScreen(user: user);
           },
@@ -64,6 +66,13 @@ class _LoginScreenState extends State<LoginScreen> {
         user.roleId == 5 ||
         user.roleName.toLowerCase() == 'manager' ||
         user.roleName.toLowerCase() == 'quản lý';
+  }
+
+  bool _isWarehouse(EmployeeUser user) {
+    return user.roleId == 3 ||
+        user.roleName.toLowerCase() == 'warehouse' ||
+        user.roleName.toLowerCase() == 'kho' ||
+        user.roleName.toLowerCase() == 'nhân viên kho';
   }
 
   bool _isCashier(EmployeeUser user) {

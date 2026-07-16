@@ -8,6 +8,16 @@ class InventoryLookupRepository {
 
   final InventoryLookupService _lookupService;
 
+  Future<ProductLookup?> fetchProductByBarcode(String barcode) async {
+    try {
+      return await _lookupService.fetchProductByBarcode(barcode);
+    } on ApiException {
+      rethrow;
+    } on FormatException {
+      throw const ApiException('Không thể đọc thông tin sản phẩm.');
+    }
+  }
+
   Future<List<ProductLookup>> fetchProducts() async {
     try {
       return await _lookupService.fetchProducts();
