@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
-import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/stock_count_history_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/warehouse_bottom_navigation_bar.dart';
 
@@ -15,8 +15,7 @@ class WarehouseNavigationScreen extends StatefulWidget {
       _WarehouseNavigationScreenState();
 }
 
-class _WarehouseNavigationScreenState
-    extends State<WarehouseNavigationScreen> {
+class _WarehouseNavigationScreenState extends State<WarehouseNavigationScreen> {
   int _selectedIndex = 0;
 
   @override
@@ -29,8 +28,8 @@ class _WarehouseNavigationScreenState
           _buildOverview(),
           // 1 — Kho
           const InventoryDocumentsScreen(),
-          // 2 — Tồn kho
-          const InventoryTransactionsScreen(showBottomNavBar: false),
+          // 2 — Tồn kho / kiểm kê
+          const StockCountHistoryScreen(),
           // 3 — Cá nhân
           _buildProfile(),
         ],

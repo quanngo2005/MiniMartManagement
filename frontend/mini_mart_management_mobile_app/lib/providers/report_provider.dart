@@ -70,7 +70,9 @@ class ReportProvider with ChangeNotifier {
         _fetchTopProducts(startDate: date, endDate: date, top: top),
       ]);
     } catch (e) {
-      _error = e is ApiException ? e.message : 'Đã xảy ra lỗi khi tải báo cáo tổng hợp.';
+      _error = e is ApiException
+          ? e.message
+          : 'Đã xảy ra lỗi khi tải báo cáo tổng hợp.';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -83,10 +85,8 @@ class ReportProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _monthlyFinancialReport = await _reportRepository.getMonthlyFinancialReport(
-        date.month,
-        date.year,
-      );
+      _monthlyFinancialReport = await _reportRepository
+          .getMonthlyFinancialReport(date.month, date.year);
     } on ApiException catch (e) {
       _error = e.message;
     } catch (_) {
@@ -113,7 +113,15 @@ class ReportProvider with ChangeNotifier {
     _supplierDebt = await _reportRepository.getSupplierDebt();
   }
 
-  Future<void> _fetchTopProducts({DateTime? startDate, DateTime? endDate, int top = 10}) async {
-    _topProducts = await _reportRepository.getTopProducts(startDate: startDate, endDate: endDate, top: top);
+  Future<void> _fetchTopProducts({
+    DateTime? startDate,
+    DateTime? endDate,
+    int top = 10,
+  }) async {
+    _topProducts = await _reportRepository.getTopProducts(
+      startDate: startDate,
+      endDate: endDate,
+      top: top,
+    );
   }
 }

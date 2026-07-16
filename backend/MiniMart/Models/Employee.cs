@@ -57,6 +57,12 @@ namespace MiniMart.Models
             = new List<OrderReturn>();
 
         public ICollection<RefreshToken> RefreshTokens { get; set; }
-            = new List<RefreshToken>();
+    = new List<RefreshToken>();
+
+        public ICollection<StockCount> CreatedStockCounts { get; set; }
+            = new List<StockCount>();
+
+        public ICollection<StockCount> ReviewedStockCounts { get; set; }
+            = new List<StockCount>();
     }
 }

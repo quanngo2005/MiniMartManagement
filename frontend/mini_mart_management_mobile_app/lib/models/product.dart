@@ -39,19 +39,16 @@ class Product {
       productCode: (j['productCode'] ?? j['ProductCode'] ?? '') as String,
       barcode: (j['barcode'] ?? j['Barcode'] ?? '') as String,
       productName: (j['productName'] ?? j['ProductName'] ?? '') as String,
-      sellingPrice:
-          ((j['sellingPrice'] ?? j['SellingPrice']) ?? 0).toDouble(),
+      sellingPrice: ((j['sellingPrice'] ?? j['SellingPrice']) ?? 0).toDouble(),
       stockQuantity: (j['stockQuantity'] ?? j['StockQuantity'] ?? 0) as int,
       minimumStock: (j['minimumStock'] ?? j['MinimumStock'] ?? 0) as int,
       status: (j['status'] ?? j['Status'] ?? true) as bool,
       description: j['description'] ?? j['Description'],
       imageUrl: j['imageUrl'] ?? j['ImageUrl'],
       categoryId: cat is Map ? (cat['id'] ?? cat['Id']) as int? : null,
-      categoryName:
-          cat is Map ? (cat['name'] ?? cat['Name']) as String? : null,
+      categoryName: cat is Map ? (cat['name'] ?? cat['Name']) as String? : null,
       supplierId: sup is Map ? (sup['id'] ?? sup['Id']) as int? : null,
-      supplierName:
-          sup is Map ? (sup['name'] ?? sup['Name']) as String? : null,
+      supplierName: sup is Map ? (sup['name'] ?? sup['Name']) as String? : null,
     );
   }
 }

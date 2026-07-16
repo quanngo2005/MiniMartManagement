@@ -20,6 +20,8 @@ namespace MiniMart.Models
 
         public int? ReferenceId { get; set; } // gắn với id của order, receipt, transfer, adjustment
 
+        public int? SubReferenceId { get; set; }
+
         public string? Note { get; set; }
 
         public int ProductId { get; set; }

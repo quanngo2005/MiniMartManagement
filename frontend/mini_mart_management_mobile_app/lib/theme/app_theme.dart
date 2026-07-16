@@ -13,6 +13,14 @@ abstract final class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.backgroundSlate,
       fontFamily: 'Roboto',
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.white,
+        foregroundColor: AppColors.primary,
+        surfaceTintColor: Colors.white,
+        centerTitle: true,
+        toolbarHeight: 68,
+        elevation: 0,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceBright,

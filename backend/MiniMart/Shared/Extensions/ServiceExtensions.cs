@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MiniMart.Services;
+using MiniMart.Services.Implementations;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Settings;
 
@@ -59,6 +60,12 @@ namespace MiniMart.Shared.Extensions
                 options.AddPolicy("AnyEmployee", policy => policy.RequireRole("Admin", "Manager", "Cashier", "Warehouse", "Staff"));
             });
 
+            return services;
+        }
+
+        public static IServiceCollection AddStockCountServices(this IServiceCollection services)
+        {
+            services.AddScoped<IStockCountService, StockCountService>();
             return services;
         }
     }

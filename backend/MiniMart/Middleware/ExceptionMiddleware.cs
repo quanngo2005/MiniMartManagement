@@ -41,7 +41,26 @@ namespace MiniMart.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = statusCode;
 
-            var response = ApiResponse<object>.Fail(exception.Message);
+            var response = new ApiResponse<object>
+            {
+                Success = false,
+                Message = exception.Message,
+                Data = exception switch
+                {
+                    StockCountLineConcurrencyException lineConflict => new { lineIds = lineConflict.LineIds },
+                    StockCountStockDriftException stockDrift => new
+                    {
+                        lines = stockDrift.Lines.Select(line => new
+                        {
+                            lineId = line.StockCountLineId,
+                            productId = line.ProductId,
+                            snapshotQuantity = line.SnapshotQuantity,
+                            currentQuantity = line.CurrentQuantity
+                        })
+                    },
+                    _ => null
+                }
+            };
             await context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
     }

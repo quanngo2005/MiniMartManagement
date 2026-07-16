@@ -30,5 +30,8 @@ namespace MiniMart.Models
 
         public ICollection<Product> Products { get; set; }
             = new List<Product>();
+
+        public ICollection<StockCountCategory> StockCountCategories { get; set; }
+            = new List<StockCountCategory>();
     }
 }

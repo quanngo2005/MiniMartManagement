@@ -7,6 +7,7 @@ import 'package:mini_mart_management_mobile_app/models/scanned_product.dart';
 import 'package:mini_mart_management_mobile_app/providers/inventory_lookup_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class BarcodeScannerScreen extends StatefulWidget {
@@ -112,7 +113,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     final hasItems = _scannedItems.isNotEmpty;
 
     return Scaffold(
-      appBar: _buildAppBar(hasItems),
+      appBar: _buildAppBar(),
       body: Stack(
         children: [
           Column(
@@ -127,30 +128,30 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
           if (provider.isScanning) const LoadingOverlay(),
         ],
       ),
+      bottomNavigationBar: hasItems
+          ? SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: SizedBox(
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: _onConfirm,
+                    icon: const Icon(Icons.check_circle_outline_rounded),
+                    label: Text('Xác nhận ($_totalQuantity)'),
+                  ),
+                ),
+              ),
+            )
+          : null,
     );
   }
 
-  PreferredSizeWidget _buildAppBar(bool hasItems) {
-    return AppBar(
-      title: const Text('Quét mã vạch'),
-      backgroundColor: Colors.black,
-      foregroundColor: Colors.white,
-      actions: [
-        IconButton(
-          onPressed: _toggleTorch,
-          icon: Icon(_torchOn ? Icons.flashlight_on : Icons.flashlight_off),
-          tooltip: 'Đèn flash',
-        ),
-        if (hasItems)
-          TextButton.icon(
-            onPressed: _onConfirm,
-            icon: const Icon(Icons.check_circle, color: Colors.white),
-            label: Text(
-              'Xác nhận ($_totalQuantity)',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-      ],
+  PreferredSizeWidget _buildAppBar() {
+    return MiniMartAppBar.scanner(
+      title: 'Quét mã vạch',
+      isTorchOn: _torchOn,
+      onToggleTorch: _toggleTorch,
     );
   }
 
