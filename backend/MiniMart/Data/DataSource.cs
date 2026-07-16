@@ -83,20 +83,21 @@ namespace MiniMart.Models
         public static List<Category> GetCategories() => new List<Category>
         {
             // Parent categories
-            new Category { CategoryId = 1,  CategoryCode = "TPHUC",  CategoryName = "Thực phẩm & Đồ uống",  Description = "Thực phẩm và đồ uống các loại",  Status = true, DisplayOrder = 1, ParentCategoryId = null, TaxRateId = 4 },
-            new Category { CategoryId = 2,  CategoryCode = "VSCS",   CategoryName = "Vệ sinh & Chăm sóc",   Description = "Sản phẩm vệ sinh và chăm sóc cá nhân", Status = true, DisplayOrder = 2, ParentCategoryId = null, TaxRateId = 4 },
-            new Category { CategoryId = 3,  CategoryCode = "GIADUNG", CategoryName = "Gia dụng",             Description = "Đồ dùng gia đình",               Status = true, DisplayOrder = 3, ParentCategoryId = null, TaxRateId = 4 },
+            // Parent categories - mỗi category có VAT khác nhau để test
+            new Category { CategoryId = 1,  CategoryCode = "TPHUC",  CategoryName = "Thực phẩm & Đồ uống",  Description = "Thực phẩm và đồ uống các loại",  Status = true, DisplayOrder = 1, ParentCategoryId = null, TaxRateId = 3 }, // 8%
+            new Category { CategoryId = 2,  CategoryCode = "VSCS",   CategoryName = "Vệ sinh & Chăm sóc",   Description = "Sản phẩm vệ sinh và chăm sóc cá nhân", Status = true, DisplayOrder = 2, ParentCategoryId = null, TaxRateId = 2 }, // 5%
+            new Category { CategoryId = 3,  CategoryCode = "GIADUNG", CategoryName = "Gia dụng",             Description = "Đồ dùng gia đình",               Status = true, DisplayOrder = 3, ParentCategoryId = null, TaxRateId = 1 }, // 0%
 
-            // Child of TPHUC (1)
-            new Category { CategoryId = 4,  CategoryCode = "NUOCUONG", CategoryName = "Nước uống & Đồ uống", Description = "Nước uống, nước ngọt, nước tăng lực", Status = true, DisplayOrder = 1, ParentCategoryId = 1, TaxRateId = 4 },
-            new Category { CategoryId = 5,  CategoryCode = "SNACK",   CategoryName = "Bánh kẹo & Snack",    Description = "Bánh kẹo, snack các loại",        Status = true, DisplayOrder = 2, ParentCategoryId = 1, TaxRateId = 4 },
-            new Category { CategoryId = 6,  CategoryCode = "SUADANH", CategoryName = "Sữa & Sản phẩm từ sữa", Description = "Sữa tươi, sữa hộp, sữa chua",  Status = true, DisplayOrder = 3, ParentCategoryId = 1, TaxRateId = 4 },
-            new Category { CategoryId = 7,  CategoryCode = "MITOMIM", CategoryName = "Mì & Thực phẩm khô",  Description = "Mì gói, bún khô, phở khô",       Status = true, DisplayOrder = 4, ParentCategoryId = 1, TaxRateId = 4 },
-            new Category { CategoryId = 8,  CategoryCode = "GIACVI",  CategoryName = "Gia vị & Dầu ăn",     Description = "Gia vị, dầu ăn, nước mắm, tương",Status = true, DisplayOrder = 5, ParentCategoryId = 1, TaxRateId = 4 },
+            // Child of TPHUC (1) - 8%
+            new Category { CategoryId = 4,  CategoryCode = "NUOCUONG", CategoryName = "Nước uống & Đồ uống", Description = "Nước uống, nước ngọt, nước tăng lực", Status = true, DisplayOrder = 1, ParentCategoryId = 1, TaxRateId = 3 },
+            new Category { CategoryId = 5,  CategoryCode = "SNACK",   CategoryName = "Bánh kẹo & Snack",    Description = "Bánh kẹo, snack các loại",        Status = true, DisplayOrder = 2, ParentCategoryId = 1, TaxRateId = 3 },
+            new Category { CategoryId = 6,  CategoryCode = "SUADANH", CategoryName = "Sữa & Sản phẩm từ sữa", Description = "Sữa tươi, sữa hộp, sữa chua",  Status = true, DisplayOrder = 3, ParentCategoryId = 1, TaxRateId = 3 },
+            new Category { CategoryId = 7,  CategoryCode = "MITOMIM", CategoryName = "Mì & Thực phẩm khô",  Description = "Mì gói, bún khô, phở khô",       Status = true, DisplayOrder = 4, ParentCategoryId = 1, TaxRateId = 3 },
+            new Category { CategoryId = 8,  CategoryCode = "GIACVI",  CategoryName = "Gia vị & Dầu ăn",     Description = "Gia vị, dầu ăn, nước mắm, tương",Status = true, DisplayOrder = 5, ParentCategoryId = 1, TaxRateId = 3 },
 
-            // Child of VSCS (2)
-            new Category { CategoryId = 9,  CategoryCode = "GIATRANG", CategoryName = "Giặt tẩy",           Description = "Bột giặt, nước giặt, nước xả",   Status = true, DisplayOrder = 1, ParentCategoryId = 2, TaxRateId = 4 },
-            new Category { CategoryId = 10, CategoryCode = "VSCT",    CategoryName = "Vệ sinh cá nhân",     Description = "Dầu gội, sữa tắm, kem đánh răng", Status = true, DisplayOrder = 2, ParentCategoryId = 2, TaxRateId = 4 },
+            // Child of VSCS (2) - 5%
+            new Category { CategoryId = 9,  CategoryCode = "GIATRANG", CategoryName = "Giặt tẩy",           Description = "Bột giặt, nước giặt, nước xả",   Status = true, DisplayOrder = 1, ParentCategoryId = 2, TaxRateId = 2 },
+            new Category { CategoryId = 10, CategoryCode = "VSCT",    CategoryName = "Vệ sinh cá nhân",     Description = "Dầu gội, sữa tắm, kem đánh răng", Status = true, DisplayOrder = 2, ParentCategoryId = 2, TaxRateId = 2 },
         };
 
         // ========================= PRODUCTS =========================

@@ -258,7 +258,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         final orderId = response.orderId;
         if (orderId == 0) throw Exception('Không tìm thấy OrderId từ server.');
 
->>>>>>> 8c01141d39fec51ebd6adf827f53ccb0f0fd5e47
+
         final client = createConfiguredClient();
         final csrfRes = await client.get(
           ApiConfig.uri('/api/auth/csrf-token'),
@@ -1292,7 +1292,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Thuế VAT ${(cart.vatRateValue * 100).toInt()}%', style: const TextStyle(fontSize: 14, color: AppColors.textMuted)),
+                    Text('Thuế VAT ${(cart.averageVatRate * 100).toInt()}%', style: const TextStyle(fontSize: 14, color: AppColors.textMuted)),
                     Text(currencyFormatter.format(cart.vatAmount), style: const TextStyle(fontSize: 14, color: AppColors.textDark)),
                   ],
                 ),

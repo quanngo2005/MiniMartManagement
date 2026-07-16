@@ -13,10 +13,7 @@ using MiniMart.Repositories.Interfaces;
 using MiniMart.Services;
 using MiniMart.Services.Interfaces;
 using MiniMart.Services.Implementations;
-<<<<<<< HEAD
 using MiniMart.Shared.Settings;
-=======
->>>>>>> 8c01141d39fec51ebd6adf827f53ccb0f0fd5e47
 
 var builder = WebApplication.CreateBuilder(args);
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";

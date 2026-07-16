@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_dashboard_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';

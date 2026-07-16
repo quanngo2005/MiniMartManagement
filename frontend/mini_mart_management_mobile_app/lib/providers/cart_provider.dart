@@ -9,7 +9,6 @@ class CartProvider extends ChangeNotifier {
   int? _selectedCustomerPoints;
   int _paymentMethod = 1; // 1 = Cash, 3 = EWallet (VNPAY)
   int _pointsToUse = 0;
-  static const double vatRate = 0.08;
 
   List<CartItem> get items => _items;
   int? get selectedCustomerId => _selectedCustomerId;
@@ -17,7 +16,6 @@ class CartProvider extends ChangeNotifier {
   int? get selectedCustomerPoints => _selectedCustomerPoints;
   int get paymentMethod => _paymentMethod;
   int get pointsToUse => _pointsToUse;
-  double get vatRateValue => vatRate;
 
   double get totalAmount {
     double total = 0;
@@ -28,8 +26,17 @@ class CartProvider extends ChangeNotifier {
   }
 
   double get vatAmount {
-    final raw = totalAmount * vatRate;
-    return (raw * 100).roundToDouble() / 100;
+    double totalVat = 0;
+    for (var item in _items) {
+      final itemVat = item.totalPrice * item.product.categoryTaxRate;
+      totalVat += itemVat;
+    }
+    return (totalVat * 100).roundToDouble() / 100;
+  }
+
+  double get averageVatRate {
+    if (totalAmount == 0) return 0.08;
+    return vatAmount / totalAmount;
   }
 
   double get discountAmount {
