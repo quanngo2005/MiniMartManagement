@@ -20,6 +20,7 @@ import 'package:mini_mart_management_mobile_app/repositories/report_repository.d
 import 'package:mini_mart_management_mobile_app/repositories/supplier_repository.dart';
 import 'package:mini_mart_management_mobile_app/screens/cashier_return_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_lookup_service.dart';
@@ -115,6 +116,7 @@ class MiniMartManagementApp extends StatelessWidget {
         home: const LoginScreen(),
         routes: {
           '/catalog': (_) => const InventoryTransactionsScreen(),
+          '/employee-performance': (_) => const EmployeePerformanceScreen(),
           '/members': (_) => const MemberManagementScreen(),
           '/promotions': (_) => const PromotionManagementScreen(),
           '/returns': (_) => const CashierReturnScreen(),

@@ -1,4 +1,5 @@
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
+import 'package:mini_mart_management_mobile_app/models/cashier_performance.dart';
 import 'package:mini_mart_management_mobile_app/models/daily_revenue.dart';
 import 'package:mini_mart_management_mobile_app/models/hourly_revenue.dart';
 import 'package:mini_mart_management_mobile_app/models/inventory_status.dart';
@@ -11,6 +12,22 @@ class ReportRepository {
   const ReportRepository(this._reportService);
 
   final ReportService _reportService;
+
+  Future<List<CashierPerformance>> getCashierPerformance({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      return await _reportService.getCashierPerformance(
+        startDate: startDate,
+        endDate: endDate,
+      );
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Khong the tai hieu suat nhan vien: $e');
+    }
+  }
 
   Future<List<TopProduct>> getTopProducts({
     DateTime? startDate,
@@ -92,10 +109,7 @@ class ReportRepository {
   ) async {
     try {
       final raw = await _reportService.getMonthlyFinancialReport(month, year);
-      if (raw is Map<String, dynamic>) {
-        return MonthlyFinancialReport.fromJson(raw);
-      }
-      throw const ApiException('Server tra ve du lieu khong hop le.');
+      return MonthlyFinancialReport.fromJson(raw);
     } on ApiException {
       rethrow;
     } catch (e) {

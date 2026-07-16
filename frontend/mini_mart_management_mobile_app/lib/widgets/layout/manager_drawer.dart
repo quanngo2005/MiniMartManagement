@@ -8,6 +8,7 @@ enum ManagerNavDestination {
   productPerformance,
   inventoryDocuments,
   inventoryTransactions,
+  staffPerformance,
   staff,
   customers,
   promotions,
@@ -101,6 +102,17 @@ class ManagerDrawer extends StatelessWidget {
                     ),
                   ),
                   const _DrawerSectionLabel('Nhân sự & Khách hàng'),
+                  _DrawerTile(
+                    icon: Icons.show_chart_outlined,
+                    activeIcon: Icons.trending_up_rounded,
+                    label: 'Hiệu suất nhân viên',
+                    destination: ManagerNavDestination.staffPerformance,
+                    selected: selected,
+                    onTap: _select(
+                      context,
+                      ManagerNavDestination.staffPerformance,
+                    ),
+                  ),
                   _DrawerTile(
                     icon: Icons.group_outlined,
                     activeIcon: Icons.group_rounded,
@@ -274,13 +286,12 @@ class _DrawerSectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
       child: Text(
-        label.toUpperCase(),
+        label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
           color: AppColors.textMuted,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
         ),
       ),
     );

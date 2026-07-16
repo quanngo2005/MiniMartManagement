@@ -281,10 +281,6 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
 
   Widget _buildSummaryBento(BuildContext context, ReportProvider provider) {
     final total = provider.topProducts.length;
-    final totalQty = provider.topProducts.fold<int>(
-      0,
-      (sum, p) => sum + p.totalQuantitySold,
-    );
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Row(

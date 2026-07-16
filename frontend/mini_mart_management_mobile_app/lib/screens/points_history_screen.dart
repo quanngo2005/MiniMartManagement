@@ -242,7 +242,7 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
             'END OF RECENT HISTORY',
             style: TextStyle(
               fontSize: 11,
-              color: AppColors.textMuted.withOpacity(0.7),
+              color: AppColors.textMuted.withValues(alpha: 0.7),
               letterSpacing: 0.5,
             ),
           ),

@@ -122,31 +122,36 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: GridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.48,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          _InventoryStatCard(
-            label: 'Tổng Nhập',
-            value: _formatNumber(importedQuantity),
-            trend: '${receipts.length} chứng từ',
-            trendIcon: Icons.receipt_long_rounded,
-            actionIcon: Icons.download_rounded,
-            accentColor: AppColors.secondary,
-          ),
-          const _InventoryStatCard(
-            label: 'Tổng Xuất',
-            value: '0',
-            trend: 'Từ receipt nhập',
-            trendIcon: Icons.trending_down_rounded,
-            actionIcon: Icons.upload_rounded,
-            accentColor: AppColors.onTertiaryContainer,
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final crossAxisCount = constraints.maxWidth >= 900 ? 4 : 2;
+          return GridView.count(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: constraints.maxWidth >= 900 ? 1.7 : 1.48,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _InventoryStatCard(
+                label: 'Tổng Nhập',
+                value: _formatNumber(importedQuantity),
+                trend: '${receipts.length} chứng từ',
+                trendIcon: Icons.receipt_long_rounded,
+                actionIcon: Icons.download_rounded,
+                accentColor: AppColors.secondary,
+              ),
+              const _InventoryStatCard(
+                label: 'Tổng Xuất',
+                value: '0',
+                trend: 'Từ receipt nhập',
+                trendIcon: Icons.trending_down_rounded,
+                actionIcon: Icons.upload_rounded,
+                accentColor: AppColors.onTertiaryContainer,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
