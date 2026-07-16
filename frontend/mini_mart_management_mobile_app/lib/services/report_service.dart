@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
+import 'package:mini_mart_management_mobile_app/models/cashier_performance.dart';
 import 'package:mini_mart_management_mobile_app/models/top_product.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
@@ -11,7 +12,32 @@ class ReportService {
 
   final http.Client _client;
 
-  // ── Top products ───────────────────────────────────────────────────────────
+  Future<List<CashierPerformance>> getCashierPerformance({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    final params = <String, String>{};
+    if (startDate != null) {
+      params['startDate'] = startDate.toIso8601String();
+    }
+    if (endDate != null) {
+      params['endDate'] = endDate.toIso8601String();
+    }
+
+    final response = await _client.get(
+      ApiConfig.uri(
+        '/api/reports/cashier-performance',
+      ).replace(queryParameters: params),
+      headers: const {'Accept': 'application/json'},
+    );
+
+    final json = _decode(response);
+    _checkStatus(response, json);
+    return _list(json)
+        .whereType<Map<String, dynamic>>()
+        .map(CashierPerformance.fromJson)
+        .toList();
+  }
 
   Future<List<TopProduct>> getTopProducts({
     DateTime? startDate,
@@ -29,7 +55,6 @@ class ReportService {
       headers: const {'Accept': 'application/json'},
     );
 
-    // Backend trả về plain array — decode trực tiếp
     if (response.body.isEmpty) return [];
     try {
       final decoded = jsonDecode(response.body);
@@ -61,8 +86,6 @@ class ReportService {
     return [];
   }
 
-  // ── Daily revenue ──────────────────────────────────────────────────────────
-
   Future<List<dynamic>> getDailyRevenue(int month, int year) async {
     final response = await _client.get(
       ApiConfig.uri('/api/reports/revenue/daily').replace(
@@ -75,8 +98,6 @@ class ReportService {
     _checkStatus(response, json);
     return _list(json);
   }
-
-  // ── Hourly revenue ─────────────────────────────────────────────────────────
 
   Future<List<dynamic>> getHourlyRevenue(DateTime date) async {
     final response = await _client.get(
@@ -91,8 +112,6 @@ class ReportService {
     return _list(json);
   }
 
-  // ── Low stock alerts ───────────────────────────────────────────────────────
-
   Future<List<dynamic>> getLowStockAlerts() async {
     final response = await _client.get(
       ApiConfig.uri('/api/reports/inventory'),
@@ -101,7 +120,6 @@ class ReportService {
 
     final json = _decode(response);
     _checkStatus(response, json);
-    // Filter only low-stock items client-side; backend returns all inventory
     final all = _list(json);
     return all.where((item) {
       if (item is Map<String, dynamic>) {
@@ -114,8 +132,6 @@ class ReportService {
       return false;
     }).toList();
   }
-
-  // ── Supplier debt ──────────────────────────────────────────────────────────
 
   Future<List<dynamic>> getSupplierDebt() async {
     final response = await _client.get(
@@ -143,8 +159,6 @@ class ReportService {
     _checkStatus(response, json);
     return json;
   }
-
-  // ── Helpers ────────────────────────────────────────────────────────────────
 
   Map<String, dynamic> _decode(http.Response r) {
     if (r.body.isEmpty) return {};

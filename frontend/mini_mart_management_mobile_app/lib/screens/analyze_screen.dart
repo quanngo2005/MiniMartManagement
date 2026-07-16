@@ -457,12 +457,17 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
             ],
           ),
           const SizedBox(height: 14),
-          SizedBox(
-            height: 230,
-            child: FinancialTrendChart(
-              points: points,
-              month: selectedMonth.month,
-            ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final chartHeight = constraints.maxWidth >= 900 ? 320.0 : 230.0;
+              return SizedBox(
+                height: chartHeight,
+                child: FinancialTrendChart(
+                  points: points,
+                  month: selectedMonth.month,
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -1039,7 +1044,7 @@ class _TrendLinesPainter extends CustomPainter {
         ..strokeJoin = StrokeJoin.round;
 
       final areaPaint = Paint()
-        ..color = color.withOpacity(0.08)
+        ..color = color.withValues(alpha: 0.08)
         ..style = PaintingStyle.fill;
 
       final points = <Offset>[];

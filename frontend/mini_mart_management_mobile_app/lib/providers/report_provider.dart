@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
-import 'package:mini_mart_management_mobile_app/models/top_product.dart';
+import 'package:mini_mart_management_mobile_app/models/cashier_performance.dart';
 import 'package:mini_mart_management_mobile_app/models/daily_revenue.dart';
 import 'package:mini_mart_management_mobile_app/models/hourly_revenue.dart';
+import 'package:mini_mart_management_mobile_app/models/inventory_status.dart';
 import 'package:mini_mart_management_mobile_app/models/monthly_financial_report.dart';
 import 'package:mini_mart_management_mobile_app/models/supplier_debt.dart';
-import 'package:mini_mart_management_mobile_app/models/inventory_status.dart';
+import 'package:mini_mart_management_mobile_app/models/top_product.dart';
 import 'package:mini_mart_management_mobile_app/repositories/report_repository.dart';
 
 class ReportProvider with ChangeNotifier {
@@ -13,6 +14,7 @@ class ReportProvider with ChangeNotifier {
 
   final ReportRepository _reportRepository;
 
+  List<CashierPerformance> _cashierPerformance = [];
   List<TopProduct> _topProducts = [];
   List<DailyRevenue> _dailyRevenue = [];
   List<HourlyRevenue> _hourlyRevenue = [];
@@ -23,6 +25,7 @@ class ReportProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
+  List<CashierPerformance> get cashierPerformance => _cashierPerformance;
   List<TopProduct> get topProducts => _topProducts;
   List<DailyRevenue> get dailyRevenue => _dailyRevenue;
   List<HourlyRevenue> get hourlyRevenue => _hourlyRevenue;
@@ -31,6 +34,28 @@ class ReportProvider with ChangeNotifier {
   MonthlyFinancialReport? get monthlyFinancialReport => _monthlyFinancialReport;
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  Future<void> fetchCashierPerformance({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      _cashierPerformance = await _reportRepository.getCashierPerformance(
+        startDate: startDate,
+        endDate: endDate,
+      );
+    } on ApiException catch (e) {
+      _error = e.message;
+    } catch (_) {
+      _error = 'Đã xảy ra lỗi khi tải hiệu suất nhân viên.';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   Future<void> fetchTopProducts({
     DateTime? startDate,
@@ -90,7 +115,7 @@ class ReportProvider with ChangeNotifier {
     } on ApiException catch (e) {
       _error = e.message;
     } catch (_) {
-      _error = 'Da xay ra loi khi tai bao cao tai chinh thang.';
+      _error = 'Đã xảy ra lỗi khi tải báo cáo tài chính tháng.';
     } finally {
       _isLoading = false;
       notifyListeners();

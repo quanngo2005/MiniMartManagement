@@ -1167,7 +1167,7 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
         fg = Colors.green.shade700;
         break;
       case 3: // Rejected
-        bg = AppColors.statusError.withOpacity(0.1);
+        bg = AppColors.statusError.withValues(alpha: 0.1);
         fg = AppColors.statusError;
         break;
       case 4: // Completed
@@ -1175,7 +1175,7 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
         fg = Colors.blue.shade700;
         break;
       default: // Pending
-        bg = AppColors.statusWarning.withOpacity(0.1);
+        bg = AppColors.statusWarning.withValues(alpha: 0.1);
         fg = AppColors.statusWarning;
     }
 

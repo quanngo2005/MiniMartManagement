@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
@@ -13,23 +14,6 @@ import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_bottom_navigation_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_drawer.dart';
 
-/// IndexedStack layout:
-///   0 → Home (dashboard)
-///   1 → Shift management
-///   2 → Product performance
-///   3 → Inventory documents
-///   4 → Inventory transactions
-///   5 → Staff
-///   6 → Customers
-///   7 → Promotions
-///   8 → Invoices
-///   9 → Analyze
-///
-/// Bottom nav (4 tabs):
-///   0 → Home         → stack index 0
-///   1 → Inventory    → stack index 3
-///   2 → Staff        → stack index 5
-///   3 → Customers    → stack index 6
 class ManagerNavigationScreen extends StatefulWidget {
   const ManagerNavigationScreen({required this.user, super.key});
 
@@ -51,11 +35,12 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.productPerformance: 2,
     ManagerNavDestination.inventoryDocuments: 3,
     ManagerNavDestination.inventoryTransactions: 4,
-    ManagerNavDestination.staff: 5,
-    ManagerNavDestination.customers: 6,
-    ManagerNavDestination.promotions: 7,
-    ManagerNavDestination.invoices: 8,
-    ManagerNavDestination.analyze: 9,
+    ManagerNavDestination.staffPerformance: 5,
+    ManagerNavDestination.staff: 6,
+    ManagerNavDestination.customers: 7,
+    ManagerNavDestination.promotions: 8,
+    ManagerNavDestination.invoices: 9,
+    ManagerNavDestination.analyze: 10,
   };
 
   static const _bottomNavDestinations = [
@@ -101,6 +86,12 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           InventoryTransactionsScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
+          ),
+          EmployeePerformanceScreen(
+            showBottomNavBar: false,
+            onMenuTap: _openDrawer,
+            onManageEmployees: () =>
+                _selectDestination(ManagerNavDestination.staff),
           ),
           EmployeeManagementScreen(
             showBottomNavBar: false,
