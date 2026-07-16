@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 
 class ManagerDashboardScreen extends StatelessWidget {
   const ManagerDashboardScreen({required this.user, this.onMenuTap, super.key});
@@ -82,64 +83,7 @@ class ManagerDashboardScreen extends StatelessWidget {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceBright,
-      foregroundColor: AppColors.primary,
-      titleSpacing: 0,
-      leading: onMenuTap != null
-          ? IconButton(
-              icon: const Icon(Icons.menu_rounded),
-              onPressed: onMenuTap,
-              tooltip: 'Menu',
-            )
-          : const Icon(Icons.storefront_rounded),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'RetailMaster',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const _LiveDot(),
-              const SizedBox(width: 6),
-              Text(
-                'Ca sáng: 08:00 - 16:00',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: Tooltip(
-            message: user.fullName,
-            child: CircleAvatar(
-              radius: 17,
-              backgroundColor: AppColors.surfaceContainerHigh,
-              foregroundColor: AppColors.primary,
-              child: Text(
-                user.fullName.isEmpty ? '?' : user.fullName[0].toUpperCase(),
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    return MiniMartAppBar.primary(title: 'Tổng quan', onBrandTap: onMenuTap);
   }
 
   Widget _buildSalesActivity(BuildContext context) {
@@ -510,23 +454,6 @@ class _NotificationTile extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LiveDot extends StatelessWidget {
-  const _LiveDot();
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox.square(
-      dimension: 8,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.secondaryFixed,
-          shape: BoxShape.circle,
         ),
       ),
     );

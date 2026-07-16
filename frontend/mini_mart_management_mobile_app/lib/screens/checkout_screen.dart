@@ -8,6 +8,7 @@ import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/order_repository.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_navigation_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
@@ -692,9 +693,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
-    final shiftProvider = context.watch<ShiftProvider>();
-    final isShiftActive = shiftProvider.currentShift != null;
-
     final givenStr = _customerGivenAmountController.text.replaceAll(
       RegExp(r'[^0-9]'),
       '',
@@ -706,39 +704,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const Icon(Icons.storefront_outlined),
-            const SizedBox(width: 8),
-            Text(
-              'Store | ${isShiftActive ? "Đang làm việc" : "Chưa mở ca"}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const ShiftManagementScreen(),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.primary,
-        elevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: AppColors.outlineVariant, height: 1),
-        ),
-      ),
+      appBar: const MiniMartAppBar.primary(title: 'Bán hàng'),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [

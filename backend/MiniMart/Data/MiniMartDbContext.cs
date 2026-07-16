@@ -54,6 +54,9 @@ namespace MiniMart.Data
         public DbSet<TaxRate> TaxRates { get; set; }
         public DbSet<EInvoice> EInvoices { get; set; }
         public DbSet<EInvoiceDetail> EInvoiceDetails { get; set; }
+        public DbSet<StockCount> StockCounts { get; set; }
+        public DbSet<StockCountLine> StockCountLines { get; set; }
+        public DbSet<StockCountCategory> StockCountCategories { get; set; }
 
         public override int SaveChanges()
         {
@@ -106,6 +109,19 @@ namespace MiniMart.Data
                 .WithMany(p => p.Batches)
                 .HasForeignKey(b => b.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Batch>()
+                .Property(b => b.Provenance)
+                .HasDefaultValue(BatchProvenance.Receipt)
+                .HasSentinel(BatchProvenance.Receipt);
+
+            modelBuilder.Entity<Batch>()
+                .Property(b => b.RowVersion)
+                .IsRowVersion();
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.RowVersion)
+                .IsRowVersion();
 
             // =========================
             // SHIFT
@@ -195,6 +211,53 @@ namespace MiniMart.Data
                 .HasOne(i => i.Batch)
                 .WithMany(b => b.InventoryTransactions)
                 .HasForeignKey(i => i.BatchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================
+            // STOCK COUNT
+            // =========================
+            modelBuilder.Entity<StockCount>()
+                .Property(sc => sc.RowVersion)
+                .IsRowVersion();
+
+            modelBuilder.Entity<StockCountLine>()
+                .Property(scl => scl.RowVersion)
+                .IsRowVersion();
+
+            modelBuilder.Entity<StockCount>()
+                .HasOne(sc => sc.CreatedByEmployee)
+                .WithMany(e => e.CreatedStockCounts)
+                .HasForeignKey(sc => sc.CreatedByEmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StockCount>()
+                .HasOne(sc => sc.ReviewedByEmployee)
+                .WithMany(e => e.ReviewedStockCounts)
+                .HasForeignKey(sc => sc.ReviewedByEmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StockCountLine>()
+                .HasOne(scl => scl.StockCount)
+                .WithMany(sc => sc.Lines)
+                .HasForeignKey(scl => scl.StockCountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<StockCountLine>()
+                .HasOne(scl => scl.Product)
+                .WithMany(p => p.StockCountLines)
+                .HasForeignKey(scl => scl.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StockCountCategory>()
+                .HasOne(scc => scc.StockCount)
+                .WithMany(sc => sc.Categories)
+                .HasForeignKey(scc => scc.StockCountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<StockCountCategory>()
+                .HasOne(scc => scc.Category)
+                .WithMany(c => c.StockCountCategories)
+                .HasForeignKey(scc => scc.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =========================
@@ -415,6 +478,10 @@ namespace MiniMart.Data
             modelBuilder.Entity<Customer>().HasIndex(c => c.PhoneNumber).IsUnique();
             modelBuilder.Entity<Supplier>().HasIndex(s => s.SupplierCode).IsUnique();
             modelBuilder.Entity<Category>().HasIndex(c => c.CategoryCode).IsUnique();
+            modelBuilder.Entity<StockCount>().HasIndex(sc => sc.StockCountCode).IsUnique();
+            modelBuilder.Entity<StockCountCategory>()
+                .HasIndex(scc => new { scc.StockCountId, scc.CategoryId })
+                .IsUnique();
 
             // =========================
             // SEED DATA
