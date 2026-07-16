@@ -4,6 +4,7 @@ import 'package:mini_mart_management_mobile_app/models/receipt_inventory_documen
 import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/create_inventory_receipt_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_document_receipt_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/stock_count_history_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
@@ -170,6 +171,15 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
         ),
       ),
       actions: [
+        IconButton(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const StockCountHistoryScreen(),
+            ),
+          ),
+          tooltip: 'Lịch sử kiểm kê',
+          icon: const Icon(Icons.history_rounded),
+        ),
         IconButton(
           onPressed: () => _showActionSnackBar(context, 'Tài khoản'),
           tooltip: 'Tài khoản',

@@ -7,5 +7,6 @@
         ReturnToSupplier = 3,
         Adjustment = 4,
         OrderReturn = 5,
+        StockCount = 6,
     }
 }

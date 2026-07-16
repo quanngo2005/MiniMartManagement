@@ -19,6 +19,8 @@ namespace MiniMart.Models
 
         public int MinimumStock { get; set; }
 
+        public byte[] RowVersion { get; set; }
+
         public string? Description { get; set; }
 
         public string? ImageUrl { get; set; }
@@ -46,5 +48,8 @@ namespace MiniMart.Models
 
         public ICollection<OrderReturnDetail> OrderReturnDetails { get; set; }
             = new List<OrderReturnDetail>();
+
+        public ICollection<StockCountLine> StockCountLines { get; set; }
+            = new List<StockCountLine>();
     }
 }

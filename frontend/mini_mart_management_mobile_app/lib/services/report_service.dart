@@ -23,7 +23,9 @@ class ReportService {
     if (endDate != null) params['endDate'] = endDate.toIso8601String();
 
     final response = await _client.get(
-      ApiConfig.uri('/api/reports/top-products').replace(queryParameters: params),
+      ApiConfig.uri(
+        '/api/reports/top-products',
+      ).replace(queryParameters: params),
       headers: const {'Accept': 'application/json'},
     );
 
@@ -39,8 +41,10 @@ class ReportService {
       }
       if (decoded is Map<String, dynamic>) {
         final raw =
-            decoded['data'] ?? decoded['Data'] ??
-            decoded['value'] ?? decoded['Value'];
+            decoded['data'] ??
+            decoded['Data'] ??
+            decoded['value'] ??
+            decoded['Value'];
         if (raw is List) {
           return raw
               .whereType<Map<String, dynamic>>()
@@ -61,8 +65,9 @@ class ReportService {
 
   Future<List<dynamic>> getDailyRevenue(int month, int year) async {
     final response = await _client.get(
-      ApiConfig.uri('/api/reports/revenue/daily')
-          .replace(queryParameters: {'month': month.toString(), 'year': year.toString()}),
+      ApiConfig.uri('/api/reports/revenue/daily').replace(
+        queryParameters: {'month': month.toString(), 'year': year.toString()},
+      ),
       headers: const {'Accept': 'application/json'},
     );
 
@@ -75,8 +80,9 @@ class ReportService {
 
   Future<List<dynamic>> getHourlyRevenue(DateTime date) async {
     final response = await _client.get(
-      ApiConfig.uri('/api/reports/revenue/hourly')
-          .replace(queryParameters: {'date': date.toIso8601String()}),
+      ApiConfig.uri(
+        '/api/reports/revenue/hourly',
+      ).replace(queryParameters: {'date': date.toIso8601String()}),
       headers: const {'Accept': 'application/json'},
     );
 
@@ -99,8 +105,10 @@ class ReportService {
     final all = _list(json);
     return all.where((item) {
       if (item is Map<String, dynamic>) {
-        final current = (item['currentStock'] ?? item['CurrentStock'] ?? 0) as num;
-        final minimum = (item['minimumStock'] ?? item['MinimumStock'] ?? 0) as num;
+        final current =
+            (item['currentStock'] ?? item['CurrentStock'] ?? 0) as num;
+        final minimum =
+            (item['minimumStock'] ?? item['MinimumStock'] ?? 0) as num;
         return current <= minimum;
       }
       return false;
@@ -120,7 +128,10 @@ class ReportService {
     return _list(json);
   }
 
-  Future<Map<String, dynamic>> getMonthlyFinancialReport(int month, int year) async {
+  Future<Map<String, dynamic>> getMonthlyFinancialReport(
+    int month,
+    int year,
+  ) async {
     final response = await _client.get(
       ApiConfig.uri('/api/reports/financial/monthly').replace(
         queryParameters: {'month': month.toString(), 'year': year.toString()},
