@@ -165,6 +165,10 @@ namespace MiniMart.Data
                 .Property(t => t.Description)
                 .HasMaxLength(100);
 
+            modelBuilder.Entity<TaxRate>()
+                .Property(t => t.CreatedAt)
+                .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
+
             // =========================
             // SEARCHABLE LABEL BOUNDS
             // =========================
@@ -229,6 +233,18 @@ namespace MiniMart.Data
                 .WithMany(e => e.CreatedStockCounts)
                 .HasForeignKey(sc => sc.CreatedByEmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Receipt>()
+                .Property(r => r.CreatedAt)
+                .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.CreatedAt)
+                .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
+
+            modelBuilder.Entity<OrderReturn>()
+                .Property(or => or.CreatedAt)
+                .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
 
             modelBuilder.Entity<StockCount>()
                 .HasOne(sc => sc.ReviewedByEmployee)

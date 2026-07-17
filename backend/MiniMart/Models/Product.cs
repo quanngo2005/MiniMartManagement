@@ -1,8 +1,7 @@
-﻿using MiniMart.Models.Base;
 
 namespace MiniMart.Models
 {
-    public class Product : BaseEntity
+    public class Product
     {
         public int ProductId { get; set; }
 

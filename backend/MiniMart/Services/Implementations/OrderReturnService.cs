@@ -125,11 +125,13 @@ namespace MiniMart.Services.Implementations
 
             // 5. Generate ReturnCode
             var count = await _orderReturnRepository.GetAllQueryable().CountAsync();
-            var returnCode = $"RET-{DateTime.Now:yyyyMMdd}-{count + 1:D4}";
+            var createdAt = DateTime.UtcNow.AddHours(7);
+            var returnCode = $"RET-{createdAt:yyyyMMdd}-{count + 1:D4}";
 
             var orderReturn = new OrderReturn
             {
                 ReturnCode = returnCode,
+                CreatedAt = createdAt,
                 OriginalOrderId = order.OrderId,
                 EmployeeId = employeeId,
                 Reason = dto.Reason,

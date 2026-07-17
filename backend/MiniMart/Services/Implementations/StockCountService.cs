@@ -65,7 +65,7 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException("The selected scope has no active products.", StatusCodes.Status400BadRequest);
             }
 
-            var createdAt = DateTime.Now;
+            var createdAt = DateTime.UtcNow.AddHours(7);
             for (var attempt = 0; attempt < 2; attempt++)
             {
                 var stockCount = _mapper.Map<StockCount>(createDto);

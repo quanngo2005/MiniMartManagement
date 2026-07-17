@@ -1,9 +1,8 @@
-﻿using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class Employee : BaseEntity
+    public class Employee
     {
         public int EmployeeId { get; set; }
 
