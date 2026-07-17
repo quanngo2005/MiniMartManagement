@@ -170,6 +170,7 @@ namespace MiniMart.Repositories.RepoImplement
                 changeAmount = request.PaidAmount - finalAmount;
             }
 
+            var createdAt = DateTime.UtcNow.AddHours(7);
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -182,7 +183,8 @@ namespace MiniMart.Repositories.RepoImplement
                     PaidAmount = request.PaidAmount,
                     ChangeAmount = changeAmount,
                     Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
-                    OrderDate = DateTime.Now,
+                    CreatedAt = createdAt,
+                    OrderDate = createdAt,
                     Note = request.Note,
                     EmployeeId = request.EmployeeId,
                     CustomerId = request.CustomerId,

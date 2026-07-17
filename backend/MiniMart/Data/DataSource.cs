@@ -78,7 +78,11 @@ namespace MiniMart.Models
             new TaxRate { TaxRateId = 2, Rate = 5.00m, Description = "Thue suat 5% - hang thiet yeu", EffectiveFrom = new DateOnly(2025, 7, 1), EffectiveTo = null, Status = true },
             new TaxRate { TaxRateId = 3, Rate = 8.00m, Description = "Thue suat giam theo chinh sach", EffectiveFrom = new DateOnly(2022, 2, 1), EffectiveTo = new DateOnly(2024, 6, 30), Status = false },
             new TaxRate { TaxRateId = 4, Rate = 10.00m, Description = "Thue suat 10% - hang hoa thong thuong", EffectiveFrom = new DateOnly(2025, 7, 1), EffectiveTo = null, Status = true },
-        };
+        }.Select(taxRate =>
+        {
+            taxRate.CreatedAt = taxRate.EffectiveFrom.ToDateTime(TimeOnly.MinValue);
+            return taxRate;
+        }).ToList();
 
         // ========================= CATEGORIES =========================
         public static List<Category> GetCategories() => new List<Category>
@@ -183,7 +187,11 @@ namespace MiniMart.Models
             new Receipt { ReceiptId = 3, ReceiptCode = "PN003", ImportDate = new DateTime(2024, 2, 5),  TotalAmount = 4200000, PaidAmount = 2000000, DebtAmount = 2200000, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 3, EmployeeId = 7 },
             new Receipt { ReceiptId = 4, ReceiptCode = "PN004", ImportDate = new DateTime(2024, 3, 1),  TotalAmount = 6800000, PaidAmount = 6800000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 4, EmployeeId = 9 },
             new Receipt { ReceiptId = 5, ReceiptCode = "PN005", ImportDate = new DateTime(2024, 4, 10), TotalAmount = 3500000, PaidAmount = 3500000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 5, EmployeeId = 4 },
-        };
+        }.Select(receipt =>
+        {
+            receipt.CreatedAt = receipt.ImportDate;
+            return receipt;
+        }).ToList();
 
         // ========================= BATCHES =========================
         // Mỗi batch gắn với 1 product và 1 receipt (merged from ReceiptDetails)
@@ -244,7 +252,11 @@ namespace MiniMart.Models
             new Order { OrderId = 20, OrderCode = "HD020", OrderDate = new DateTime(2026, 7, 8, 10, 0, 0),  SubTotal = 115000, TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 115000, PaidAmount = 120000, ChangeAmount = 5000,  Status = OrderStatus.Completed, EmployeeId = 6,  CustomerId = 21 },
             new Order { OrderId = 21, OrderCode = "HD021", OrderDate = new DateTime(2026, 7, 9, 8, 30, 0),  SubTotal = 165000, TaxAmount = 0, DiscountAmount = 5000,  FinalAmount = 160000, PaidAmount = 160000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 9 },
             new Order { OrderId = 22, OrderCode = "HD022", OrderDate = new DateTime(2026, 7, 9, 14, 0, 0),  SubTotal = 88000,  TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 88000,  PaidAmount = 90000,  ChangeAmount = 2000,  Status = OrderStatus.Completed, EmployeeId = 3,  CustomerId = 13 },
-        };
+        }.Select(order =>
+        {
+            order.CreatedAt = order.OrderDate;
+            return order;
+        }).ToList();
 
         // ========================= ORDER DETAILS =========================
         public static List<OrderDetail> GetOrderDetails() => new List<OrderDetail>

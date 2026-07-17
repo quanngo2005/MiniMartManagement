@@ -1,9 +1,8 @@
-using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class StockCount : BaseEntity
+    public class StockCount
     {
         public int StockCountId { get; set; }
         public string StockCountCode { get; set; }
