@@ -153,29 +153,17 @@ class _StockCountHistoryScreenState extends State<StockCountHistoryScreen> {
   }
 
   void _openStockCount(StockCount stockCount) {
-    if (stockCount.status != StockCountStatus.counting) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Chi tiết lịch sử sẽ được bổ sung cùng API chi tiết.'),
-        ),
-      );
-      return;
-    }
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => StockCountDetailScreen(
-          documentCode: stockCount.stockCountCode,
-          location: stockCount.scope.label,
-          staffName: stockCount.createdByEmployeeName,
-        ),
+        builder: (_) => StockCountDetailScreen(stockCountId: stockCount.stockCountId),
       ),
-    );
+    ).then((_) => context.read<StockCountProvider>().loadStockCounts());
   }
 
   void _createStockCount() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const StockCountDetailScreen()),
-    );
+    ).then((_) => context.read<StockCountProvider>().loadStockCounts());
   }
 }
 
