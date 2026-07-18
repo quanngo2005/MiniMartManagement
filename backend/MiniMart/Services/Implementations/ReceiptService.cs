@@ -56,6 +56,7 @@ namespace MiniMart.Services.Implementations
             var importDate = GetVietnamNow();
             var receipt = _mapper.Map<Receipt>(createDto);
             receipt.ReceiptCode = GenerateReceiptCode(importDate);
+            receipt.CreatedAt = importDate;
             receipt.ImportDate = importDate;
             receipt.EmployeeId = employeeId;
             receipt.ReceiptStatus = ReceiptStatus.Pending;

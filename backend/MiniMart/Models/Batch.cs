@@ -1,10 +1,9 @@
-﻿using MiniMart.Models.Base;
 
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class Batch : BaseEntity
+    public class Batch
     {
         public int BatchId { get; set; }
 

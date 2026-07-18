@@ -1,13 +1,14 @@
-using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class OrderReturn : BaseEntity
+    public class OrderReturn
     {
         public int OrderReturnId { get; set; }
 
         public string ReturnCode { get; set; }
+
+        public DateTime CreatedAt { get; set; }
 
         public int OriginalOrderId { get; set; }
 

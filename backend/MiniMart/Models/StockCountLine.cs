@@ -1,8 +1,7 @@
-using MiniMart.Models.Base;
 
 namespace MiniMart.Models
 {
-    public class StockCountLine : BaseEntity
+    public class StockCountLine
     {
         public int StockCountLineId { get; set; }
         public int StockCountId { get; set; }
