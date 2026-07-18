@@ -50,6 +50,7 @@ import 'package:mini_mart_management_mobile_app/services/employee_service.dart';
 import 'package:mini_mart_management_mobile_app/services/promotion_service.dart';
 import 'package:mini_mart_management_mobile_app/services/shift_service.dart';
 import 'package:mini_mart_management_mobile_app/providers/cart_provider.dart';
+import 'package:mini_mart_management_mobile_app/main.dart';
 import 'package:mini_mart_management_mobile_app/repositories/order_repository.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_theme.dart';
 import 'package:provider/provider.dart';
@@ -118,6 +119,7 @@ class MiniMartManagementApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        scaffoldMessengerKey: scaffoldMessengerKey,
         debugShowCheckedModeBanner: false,
         title: 'Quản lý Siêu thị',
         theme: AppTheme.light,

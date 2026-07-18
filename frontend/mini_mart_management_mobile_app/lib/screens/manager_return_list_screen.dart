@@ -4,10 +4,13 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/models/order_return.dart';
 import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_return_detail_screen.dart';
+import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
 import 'package:provider/provider.dart';
 
 class ManagerReturnListScreen extends StatefulWidget {
-  const ManagerReturnListScreen({super.key});
+  const ManagerReturnListScreen({this.onMenuTap, super.key});
+
+  final VoidCallback? onMenuTap;
 
   @override
   State<ManagerReturnListScreen> createState() =>
@@ -24,6 +27,19 @@ class _ManagerReturnListScreenState extends State<ManagerReturnListScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<OrderReturnProvider>().loadAllReturns();
     });
+    SignalrService.instance.addListener(_onNotificationReceived);
+  }
+
+  @override
+  void dispose() {
+    SignalrService.instance.removeListener(_onNotificationReceived);
+    super.dispose();
+  }
+
+  void _onNotificationReceived() {
+    if (mounted) {
+      context.read<OrderReturnProvider>().loadAllReturns();
+    }
   }
 
   List<OrderReturn> _getFilteredReturns(List<OrderReturn> returns) {
@@ -52,6 +68,12 @@ class _ManagerReturnListScreenState extends State<ManagerReturnListScreen> {
         title: const Text('Phê duyệt hoàn trả'),
         backgroundColor: AppColors.primaryContainer,
         foregroundColor: Colors.white,
+        leading: widget.onMenuTap != null
+            ? IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: widget.onMenuTap,
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
