@@ -1,9 +1,8 @@
-using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class Shift : BaseEntity
+    public class Shift
     {
         public int ShiftId { get; set; }
 

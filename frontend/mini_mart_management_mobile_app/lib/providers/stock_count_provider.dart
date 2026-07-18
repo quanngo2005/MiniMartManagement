@@ -31,4 +31,34 @@ class StockCountProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<StockCount> getDetail(int id) => _run(() => _repository.getDetail(id));
+
+  Future<StockCount> createAndStart() async {
+    final created = await _run(() => _repository.create(StockCountScope.global));
+    return _run(() => _repository.start(created));
+  }
+
+  Future<StockCount> saveLines(StockCount count, List<StockCountLine> lines) =>
+      _run(() => _repository.updateLines(count, lines));
+  Future<StockCount> submit(StockCount count) => _run(() => _repository.submit(count));
+  Future<StockCount> approve(StockCount count) => _run(() => _repository.approve(count));
+  Future<StockCount> reject(StockCount count, String reason) => _run(() => _repository.reject(count, reason));
+
+  Future<StockCount> _run(Future<StockCount> Function() action) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final result = await action();
+      await loadStockCounts();
+      return result;
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

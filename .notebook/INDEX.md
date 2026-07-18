@@ -3,6 +3,7 @@
 ## Entries
 
 - [Flutter stock count scanning](flutter-stock-count-scanning.md) - live count screen reuses barcode scan flow.
+- [Flutter stock-count API flow](flutter-stock-count-api-flow.md) - create, save, submit, approve/reject, and post-approval transaction refresh.
 
 - [Stock count domain foundation](stock-count-domain-foundation.md) - stock-count tables, row versions, and batch provenance.
 

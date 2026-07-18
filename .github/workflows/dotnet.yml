@@ -24,10 +24,10 @@ jobs:
       - name: Restore
         run: dotnet restore
 
-      - name: Verify audit fields are not used
+      - name: Verify BaseEntity is not used
         run: |
-          if grep -RInE '\b(CreatedAt|UpdatedAt)\b' --include='*.cs' --exclude-dir=Migrations .; then
-            echo "CreatedAt/UpdatedAt are no longer part of the active model. Remove these references."
+          if grep -RInE '\bBaseEntity\b' --include='*.cs' .; then
+            echo "BaseEntity is intentionally unused. Remove the inheritance or reference."
             exit 1
           fi
 

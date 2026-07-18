@@ -1,10 +1,9 @@
-﻿using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
     //quản lí đầu ra đầu vào sản phẩm
-    public class InventoryTransaction : BaseEntity
+    public class InventoryTransaction
     {
         public int InventoryTransactionId { get; set; }
 
