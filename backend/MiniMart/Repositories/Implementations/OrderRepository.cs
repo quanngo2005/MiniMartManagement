@@ -132,6 +132,7 @@ namespace MiniMart.Repositories.RepoImplement
             // BR-INV-01
             decimal subTotal = 0;
             var orderDetails = new List<OrderDetail>();
+            var taxDescriptionsByProductId = new Dictionary<int, string>();
 
             decimal totalTaxAmount = 0;
             foreach (var item in request.Items)
@@ -146,13 +147,28 @@ namespace MiniMart.Repositories.RepoImplement
                         $"Hiện có: {product.StockQuantity}, yêu cầu: {item.Quantity}.");
 
                 var lineTotal = product.SellingPrice * item.Quantity;
+<<<<<<< Updated upstream
                 
                 // Calculate VAT per item based on category tax rate
                 var vatRate = product.Category?.TaxRate?.Rate ?? 0;
                 var vatAmount = Math.Round(lineTotal * vatRate, 2);
                 totalTaxAmount += vatAmount;
                 
+=======
+                var taxRate = product.Category?.TaxRate
+                    ?? throw new InvalidOperationException($"Product '{product.ProductName}' does not have a category tax rate.");
+
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                if (!taxRate.Status || taxRate.EffectiveFrom > today ||
+                    (taxRate.EffectiveTo.HasValue && taxRate.EffectiveTo.Value < today))
+                {
+                    throw new InvalidOperationException($"Tax rate for category '{product.Category.CategoryName}' is not active.");
+                }
+
+                var vatAmount = Math.Round(lineTotal * taxRate.Rate / 100m, 2, MidpointRounding.AwayFromZero);
+>>>>>>> Stashed changes
                 subTotal += lineTotal;
+                taxDescriptionsByProductId[item.ProductId] = taxRate.Description;
 
                 orderDetails.Add(new OrderDetail
                 {
@@ -161,18 +177,27 @@ namespace MiniMart.Repositories.RepoImplement
                     UnitPrice = product.SellingPrice,
                     DiscountAmount = 0,
                     TotalPrice = lineTotal,
+<<<<<<< Updated upstream
                     VatRate = vatRate,
+=======
+                    VatRate = taxRate.Rate,
+>>>>>>> Stashed changes
                     VatAmount = vatAmount,
                     IsGift = false
                 });
             }
 
             decimal discountAmount = loyaltyDiscount;
+<<<<<<< Updated upstream
 <<<<<<< HEAD
             decimal finalAmount = subTotal + totalTaxAmount - discountAmount;
             finalAmount = Math.Round(finalAmount, 0);
 =======
             decimal finalAmount = subTotal - discountAmount;
+=======
+            decimal taxAmount = orderDetails.Sum(detail => detail.VatAmount);
+            decimal finalAmount = subTotal - discountAmount + taxAmount;
+>>>>>>> Stashed changes
             if (finalAmount < 0) finalAmount = 0;
 >>>>>>> c2da9605e5f3cc866420ee072326ac76dca571b1
 
@@ -191,10 +216,14 @@ namespace MiniMart.Repositories.RepoImplement
                 {
                     OrderCode = await GenerateNextOrderCodeAsync(),
                     SubTotal = subTotal,
+<<<<<<< Updated upstream
 <<<<<<< HEAD
                     TaxAmount = totalTaxAmount,
 =======
 >>>>>>> c2da9605e5f3cc866420ee072326ac76dca571b1
+=======
+                    TaxAmount = taxAmount,
+>>>>>>> Stashed changes
                     DiscountAmount = discountAmount,
                     FinalAmount = finalAmount,
                     PaidAmount = request.PaidAmount,
@@ -256,10 +285,14 @@ namespace MiniMart.Repositories.RepoImplement
                     OrderId = order.OrderId,
                     OrderCode = order.OrderCode,
                     SubTotal = subTotal,
+<<<<<<< Updated upstream
 <<<<<<< HEAD
                     TaxAmount = totalTaxAmount,
 =======
 >>>>>>> c2da9605e5f3cc866420ee072326ac76dca571b1
+=======
+                    TaxAmount = taxAmount,
+>>>>>>> Stashed changes
                     DiscountAmount = discountAmount,
                     FinalAmount = finalAmount,
                     PaidAmount = request.PaidAmount,
@@ -276,7 +309,10 @@ namespace MiniMart.Repositories.RepoImplement
                         Quantity = od.Quantity,
                         UnitPrice = od.UnitPrice,
                         DiscountAmount = od.DiscountAmount,
-                        TotalPrice = od.TotalPrice
+                        TotalPrice = od.TotalPrice,
+                        VatRate = od.VatRate,
+                        VatAmount = od.VatAmount,
+                        TaxDescription = taxDescriptionsByProductId[od.ProductId]
                     }).ToList()
                 };
             }
@@ -302,9 +338,15 @@ namespace MiniMart.Repositories.RepoImplement
         public async Task<Product?> GetProductByIdAsync(int productId)
         {
             return await _context.Products
+<<<<<<< Updated upstream
                 .Include(p => p.Category)
                     .ThenInclude(c => c.TaxRate)
                 .FirstOrDefaultAsync(p => p.ProductId == productId);
+=======
+                .Include(product => product.Category)
+                .ThenInclude(category => category.TaxRate)
+                .FirstOrDefaultAsync(product => product.ProductId == productId);
+>>>>>>> Stashed changes
         }
 
         public async Task ConfirmOrderCompletionAsync(int orderId)

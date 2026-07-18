@@ -139,7 +139,17 @@ namespace MiniMart.Data
 
             modelBuilder.Entity<Category>()
                 .Property(c => c.CategoryName)
-                .HasMaxLength(255);
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<Category>()
+                .Property(c => c.CategoryCode)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            modelBuilder.Entity<Category>()
+                .Property(c => c.Description)
+                .HasMaxLength(500);
 
             modelBuilder.Entity<TaxRate>()
                 .Property(t => t.Rate)
