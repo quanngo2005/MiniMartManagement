@@ -29,7 +29,9 @@ class MonthlyFinancialReport {
 
   factory MonthlyFinancialReport.fromJson(Map<String, dynamic> json) {
     final totalIncome = _asDouble(json['totalIncome'] ?? json['TotalIncome']);
-    final totalExpenses = _asDouble(json['totalExpenses'] ?? json['TotalExpenses']);
+    final totalExpenses = _asDouble(
+      json['totalExpenses'] ?? json['TotalExpenses'],
+    );
 
     return MonthlyFinancialReport(
       month: _asInt(json['month'] ?? json['Month']),
@@ -48,15 +50,18 @@ class MonthlyFinancialReport {
       profitGrowthPercent: _asDouble(
         json['profitGrowthPercent'] ?? json['ProfitGrowthPercent'],
       ),
-      supplierInvoiceCount:
-          _asInt(json['supplierInvoiceCount'] ?? json['SupplierInvoiceCount']),
+      supplierInvoiceCount: _asInt(
+        json['supplierInvoiceCount'] ?? json['SupplierInvoiceCount'],
+      ),
       supplierDebt: _asDouble(json['supplierDebt'] ?? json['SupplierDebt']),
       dailyPoints: _parseDailyPoints(json),
       supplierSummaries: _parseSupplierSummaries(json),
     );
   }
 
-  static List<MonthlyFinancialPoint> _parseDailyPoints(Map<String, dynamic> json) {
+  static List<MonthlyFinancialPoint> _parseDailyPoints(
+    Map<String, dynamic> json,
+  ) {
     final raw = json['dailyPoints'] ?? json['DailyPoints'];
     if (raw is List) {
       return raw

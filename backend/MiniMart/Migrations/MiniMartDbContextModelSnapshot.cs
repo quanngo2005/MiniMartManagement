@@ -50,6 +50,11 @@ namespace MiniMart.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Provenance")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -59,8 +64,14 @@ namespace MiniMart.Migrations
                     b.Property<int>("QuantityRemaining")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReceiptId")
+                    b.Property<int?>("ReceiptId")
                         .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
@@ -89,6 +100,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2023, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 18,
+                            Provenance = 1,
                             Quantity = 200,
                             QuantityImported = 200,
                             QuantityRemaining = 150,
@@ -105,6 +117,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2023, 12, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 19,
+                            Provenance = 1,
                             Quantity = 160,
                             QuantityImported = 160,
                             QuantityRemaining = 120,
@@ -121,6 +134,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 20,
+                            Provenance = 1,
                             Quantity = 200,
                             QuantityImported = 200,
                             QuantityRemaining = 160,
@@ -137,6 +151,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 24,
+                            Provenance = 1,
                             Quantity = 500,
                             QuantityImported = 500,
                             QuantityRemaining = 400,
@@ -153,6 +168,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 25,
+                            Provenance = 1,
                             Quantity = 400,
                             QuantityImported = 400,
                             QuantityRemaining = 350,
@@ -169,6 +185,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2023, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 1,
+                            Provenance = 1,
                             Quantity = 300,
                             QuantityImported = 300,
                             QuantityRemaining = 250,
@@ -185,6 +202,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2023, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 3,
+                            Provenance = 1,
                             Quantity = 300,
                             QuantityImported = 300,
                             QuantityRemaining = 280,
@@ -201,6 +219,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2023, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 11,
+                            Provenance = 1,
                             Quantity = 150,
                             QuantityImported = 150,
                             QuantityRemaining = 100,
@@ -217,6 +236,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2023, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 12,
+                            Provenance = 1,
                             Quantity = 100,
                             QuantityImported = 100,
                             QuantityRemaining = 80,
@@ -233,6 +253,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 36,
+                            Provenance = 1,
                             Quantity = 100,
                             QuantityImported = 100,
                             QuantityRemaining = 90,
@@ -249,6 +270,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 37,
+                            Provenance = 1,
                             Quantity = 80,
                             QuantityImported = 80,
                             QuantityRemaining = 70,
@@ -265,6 +287,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 38,
+                            Provenance = 1,
                             Quantity = 90,
                             QuantityImported = 90,
                             QuantityRemaining = 80,
@@ -281,6 +304,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 41,
+                            Provenance = 1,
                             Quantity = 100,
                             QuantityImported = 100,
                             QuantityRemaining = 90,
@@ -297,6 +321,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 42,
+                            Provenance = 1,
                             Quantity = 90,
                             QuantityImported = 90,
                             QuantityRemaining = 80,
@@ -313,6 +338,7 @@ namespace MiniMart.Migrations
                             IsDeleted = false,
                             ManufactureDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ProductId = 43,
+                            Provenance = 1,
                             Quantity = 110,
                             QuantityImported = 110,
                             QuantityRemaining = 100,
@@ -1167,7 +1193,7 @@ namespace MiniMart.Migrations
                             FullName = "Manager Test",
                             Gender = true,
                             HireDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PasswordHash = "PBKDF2-SHA256:100000:CZNdjBIPynM3lzo4e7gK7A==:xiVhxkMlNdGago6CisgLJpYB9nXckw5sQW4HjrIVN1I=",
+                            PasswordHash = "PBKDF2-SHA256:100000:4i06mXfdgXI4rFm+51SILA==:TSBEaTARkBveb/293mpk1+oJ98Ai3yoTyDllFlZIiO0=",
                             PhoneNumber = "0901000014",
                             RoleId = 1,
                             Salary = 13000000m,
@@ -1209,6 +1235,9 @@ namespace MiniMart.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("ReferenceType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubReferenceId")
                         .HasColumnType("int");
 
                     b.Property<int>("TransactionType")
@@ -1379,6 +1408,11 @@ namespace MiniMart.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
+
                     b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
@@ -1436,6 +1470,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 1,
                             ChangeAmount = 4000m,
+                            CreatedAt = new DateTime(2026, 6, 1, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 1,
                             DiscountAmount = 0m,
                             EmployeeId = 2,
@@ -1451,6 +1486,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 2,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 6, 1, 14, 10, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 4,
                             DiscountAmount = 0m,
                             EmployeeId = 2,
@@ -1466,6 +1502,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 3,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 6, 2, 9, 15, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 2,
                             DiscountAmount = 5000m,
                             EmployeeId = 3,
@@ -1481,6 +1518,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 4,
                             ChangeAmount = 20000m,
+                            CreatedAt = new DateTime(2026, 6, 2, 16, 45, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 8,
                             DiscountAmount = 0m,
                             EmployeeId = 3,
@@ -1496,6 +1534,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 5,
                             ChangeAmount = 8000m,
+                            CreatedAt = new DateTime(2026, 6, 5, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 3,
                             DiscountAmount = 0m,
                             EmployeeId = 5,
@@ -1511,6 +1550,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 6,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 6, 5, 15, 30, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 12,
                             DiscountAmount = 10000m,
                             EmployeeId = 6,
@@ -1526,6 +1566,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 7,
                             ChangeAmount = 2000m,
+                            CreatedAt = new DateTime(2026, 6, 10, 11, 20, 0, 0, DateTimeKind.Unspecified),
                             DiscountAmount = 0m,
                             EmployeeId = 5,
                             FinalAmount = 38000m,
@@ -1540,6 +1581,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 8,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 6, 15, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 6,
                             DiscountAmount = 0m,
                             EmployeeId = 10,
@@ -1555,6 +1597,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 9,
                             ChangeAmount = 5000m,
+                            CreatedAt = new DateTime(2026, 6, 20, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 10,
                             DiscountAmount = 0m,
                             EmployeeId = 2,
@@ -1570,6 +1613,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 10,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 6, 25, 18, 30, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 22,
                             DiscountAmount = 20000m,
                             EmployeeId = 12,
@@ -1585,6 +1629,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 11,
                             ChangeAmount = 4000m,
+                            CreatedAt = new DateTime(2026, 7, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 5,
                             DiscountAmount = 0m,
                             EmployeeId = 2,
@@ -1600,6 +1645,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 12,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 7, 1, 15, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 7,
                             DiscountAmount = 5000m,
                             EmployeeId = 3,
@@ -1615,6 +1661,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 13,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 7, 2, 9, 30, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 14,
                             DiscountAmount = 10000m,
                             EmployeeId = 5,
@@ -1630,6 +1677,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 14,
                             ChangeAmount = 2000m,
+                            CreatedAt = new DateTime(2026, 7, 2, 16, 0, 0, 0, DateTimeKind.Unspecified),
                             DiscountAmount = 0m,
                             EmployeeId = 6,
                             FinalAmount = 48000m,
@@ -1644,6 +1692,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 15,
                             ChangeAmount = 15000m,
+                            CreatedAt = new DateTime(2026, 7, 3, 10, 45, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 16,
                             DiscountAmount = 0m,
                             EmployeeId = 10,
@@ -1659,6 +1708,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 16,
                             ChangeAmount = 5000m,
+                            CreatedAt = new DateTime(2026, 7, 4, 8, 15, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 19,
                             DiscountAmount = 0m,
                             EmployeeId = 2,
@@ -1674,6 +1724,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 17,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 7, 4, 14, 30, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 20,
                             DiscountAmount = 10000m,
                             EmployeeId = 3,
@@ -1689,6 +1740,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 18,
                             ChangeAmount = 8000m,
+                            CreatedAt = new DateTime(2026, 7, 5, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 11,
                             DiscountAmount = 0m,
                             EmployeeId = 5,
@@ -1704,6 +1756,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 19,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 7, 7, 11, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 15,
                             DiscountAmount = 20000m,
                             EmployeeId = 12,
@@ -1719,6 +1772,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 20,
                             ChangeAmount = 5000m,
+                            CreatedAt = new DateTime(2026, 7, 8, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 21,
                             DiscountAmount = 0m,
                             EmployeeId = 6,
@@ -1734,6 +1788,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 21,
                             ChangeAmount = 0m,
+                            CreatedAt = new DateTime(2026, 7, 9, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 9,
                             DiscountAmount = 5000m,
                             EmployeeId = 2,
@@ -1749,6 +1804,7 @@ namespace MiniMart.Migrations
                         {
                             OrderId = 22,
                             ChangeAmount = 2000m,
+                            CreatedAt = new DateTime(2026, 7, 9, 14, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomerId = 13,
                             DiscountAmount = 0m,
                             EmployeeId = 3,
@@ -2581,6 +2637,11 @@ namespace MiniMart.Migrations
                     b.Property<int>("Classify")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
+
                     b.Property<int?>("EInvoiceId")
                         .HasColumnType("int");
 
@@ -2773,6 +2834,12 @@ namespace MiniMart.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<decimal>("SellingPrice")
                         .HasPrecision(18, 2)
@@ -3542,6 +3609,10 @@ namespace MiniMart.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal?>("MinimumOrderAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -3553,6 +3624,10 @@ namespace MiniMart.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<decimal?>("MinimumOrderAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -3570,6 +3645,33 @@ namespace MiniMart.Migrations
                     b.HasIndex("GiftProductId");
 
                     b.ToTable("Promotions");
+
+                    b.HasData(
+                        new
+                        {
+                            PromotionId = 1,
+                            BuyQuantity = 1,
+                            Description = "Mua 1 tặng 1 cho nhóm snack chọn lọc.",
+                            EndDate = new DateTime(2026, 7, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GiftProductId = 24,
+                            GiftQuantity = 1,
+                            IsActive = true,
+                            Name = "Snack mua 1 tặng 1",
+                            StartDate = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = 1
+                        },
+                        new
+                        {
+                            PromotionId = 2,
+                            Description = "Đơn hàng từ 150.000đ giảm 10.000đ.",
+                            DiscountAmount = 10000m,
+                            EndDate = new DateTime(2026, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActive = true,
+                            MinimumOrderAmount = 150000m,
+                            Name = "Hóa đơn từ 150K",
+                            StartDate = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = 0
+                        });
                 });
 
             modelBuilder.Entity("MiniMart.Models.PromotionProduct", b =>
@@ -3585,6 +3687,38 @@ namespace MiniMart.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("PromotionProducts");
+
+                    b.HasData(
+                        new
+                        {
+                            PromotionId = 1,
+                            ProductId = 24
+                        },
+                        new
+                        {
+                            PromotionId = 1,
+                            ProductId = 26
+                        },
+                        new
+                        {
+                            PromotionId = 2,
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            PromotionId = 2,
+                            ProductId = 3
+                        },
+                        new
+                        {
+                            PromotionId = 2,
+                            ProductId = 11
+                        },
+                        new
+                        {
+                            PromotionId = 2,
+                            ProductId = 18
+                        });
                 });
 
             modelBuilder.Entity("MiniMart.Models.Receipt", b =>
@@ -3594,6 +3728,11 @@ namespace MiniMart.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
 
                     b.Property<decimal>("DebtAmount")
                         .HasPrecision(18, 2)
@@ -3638,6 +3777,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 1,
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 0m,
                             EmployeeId = 4,
                             ImportDate = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3650,6 +3790,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 2,
+                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 0m,
                             EmployeeId = 4,
                             ImportDate = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3662,6 +3803,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 3,
+                            CreatedAt = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 2200000m,
                             EmployeeId = 7,
                             ImportDate = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3674,6 +3816,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 4,
+                            CreatedAt = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 0m,
                             EmployeeId = 9,
                             ImportDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3686,6 +3829,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             ReceiptId = 5,
+                            CreatedAt = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DebtAmount = 0m,
                             EmployeeId = 4,
                             ImportDate = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3927,6 +4071,125 @@ namespace MiniMart.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MiniMart.Models.StockCount", b =>
+                {
+                    b.Property<int>("StockCountId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockCountId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByEmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReviewedByEmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("Scope")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StockCountCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("StockCountId");
+
+                    b.HasIndex("CreatedByEmployeeId");
+
+                    b.HasIndex("ReviewedByEmployeeId");
+
+                    b.HasIndex("StockCountCode")
+                        .IsUnique();
+
+                    b.ToTable("StockCounts");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.StockCountCategory", b =>
+                {
+                    b.Property<int>("StockCountCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockCountCategoryId"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StockCountId")
+                        .HasColumnType("int");
+
+                    b.HasKey("StockCountCategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("StockCountId", "CategoryId")
+                        .IsUnique();
+
+                    b.ToTable("StockCountCategories");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.StockCountLine", b =>
+                {
+                    b.Property<int>("StockCountLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockCountLineId"));
+
+                    b.Property<int?>("ActualQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("SnapshotQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StockCountId")
+                        .HasColumnType("int");
+
+                    b.HasKey("StockCountLineId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("StockCountId");
+
+                    b.ToTable("StockCountLines");
+                });
+
             modelBuilder.Entity("MiniMart.Models.Supplier", b =>
                 {
                     b.Property<int>("SupplierId")
@@ -4061,6 +4324,11 @@ namespace MiniMart.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaxRateId"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -4087,6 +4355,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             TaxRateId = 1,
+                            CreatedAt = new DateTime(2025, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Mien thue GTGT",
                             EffectiveFrom = new DateOnly(2025, 7, 1),
                             Rate = 0.00m,
@@ -4095,6 +4364,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             TaxRateId = 2,
+                            CreatedAt = new DateTime(2025, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Thue suat 5% - hang thiet yeu",
                             EffectiveFrom = new DateOnly(2025, 7, 1),
                             Rate = 5.00m,
@@ -4103,6 +4373,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             TaxRateId = 3,
+                            CreatedAt = new DateTime(2022, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Thue suat giam theo chinh sach",
                             EffectiveFrom = new DateOnly(2022, 2, 1),
                             EffectiveTo = new DateOnly(2024, 6, 30),
@@ -4112,6 +4383,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             TaxRateId = 4,
+                            CreatedAt = new DateTime(2025, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Thue suat 10% - hang hoa thong thuong",
                             EffectiveFrom = new DateOnly(2025, 7, 1),
                             Rate = 10.00m,
@@ -4130,8 +4402,7 @@ namespace MiniMart.Migrations
                     b.HasOne("MiniMart.Models.Receipt", "Receipt")
                         .WithMany("Batches")
                         .HasForeignKey("ReceiptId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Product");
 
@@ -4441,6 +4712,62 @@ namespace MiniMart.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("MiniMart.Models.StockCount", b =>
+                {
+                    b.HasOne("MiniMart.Models.Employee", "CreatedByEmployee")
+                        .WithMany("CreatedStockCounts")
+                        .HasForeignKey("CreatedByEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniMart.Models.Employee", "ReviewedByEmployee")
+                        .WithMany("ReviewedStockCounts")
+                        .HasForeignKey("ReviewedByEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByEmployee");
+
+                    b.Navigation("ReviewedByEmployee");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.StockCountCategory", b =>
+                {
+                    b.HasOne("MiniMart.Models.Category", "Category")
+                        .WithMany("StockCountCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniMart.Models.StockCount", "StockCount")
+                        .WithMany("Categories")
+                        .HasForeignKey("StockCountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("StockCount");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.StockCountLine", b =>
+                {
+                    b.HasOne("MiniMart.Models.Product", "Product")
+                        .WithMany("StockCountLines")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniMart.Models.StockCount", "StockCount")
+                        .WithMany("Lines")
+                        .HasForeignKey("StockCountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("StockCount");
+                });
+
             modelBuilder.Entity("MiniMart.Models.Batch", b =>
                 {
                     b.Navigation("InventoryTransactions");
@@ -4451,6 +4778,8 @@ namespace MiniMart.Migrations
                     b.Navigation("ChildCategories");
 
                     b.Navigation("Products");
+
+                    b.Navigation("StockCountCategories");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Customer", b =>
@@ -4471,6 +4800,8 @@ namespace MiniMart.Migrations
                 {
                     b.Navigation("CashierShifts");
 
+                    b.Navigation("CreatedStockCounts");
+
                     b.Navigation("InventoryTransactions");
 
                     b.Navigation("ManagedShifts");
@@ -4482,6 +4813,8 @@ namespace MiniMart.Migrations
                     b.Navigation("Receipts");
 
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("ReviewedStockCounts");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Order", b =>
@@ -4518,6 +4851,8 @@ namespace MiniMart.Migrations
                     b.Navigation("OrderReturnDetails");
 
                     b.Navigation("PromotionProducts");
+
+                    b.Navigation("StockCountLines");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Promotion", b =>
@@ -4538,6 +4873,13 @@ namespace MiniMart.Migrations
             modelBuilder.Entity("MiniMart.Models.Shift", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("MiniMart.Models.StockCount", b =>
+                {
+                    b.Navigation("Categories");
+
+                    b.Navigation("Lines");
                 });
 
             modelBuilder.Entity("MiniMart.Models.Supplier", b =>

@@ -27,13 +27,19 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        context.read<ReportProvider>().fetchMonthlyFinancialReport(_selectedMonth);
+        context.read<ReportProvider>().fetchMonthlyFinancialReport(
+          _selectedMonth,
+        );
       }
     });
   }
 
   void _shiftMonth(int delta) {
-    final nextMonth = DateTime(_selectedMonth.year, _selectedMonth.month + delta, 1);
+    final nextMonth = DateTime(
+      _selectedMonth.year,
+      _selectedMonth.month + delta,
+      1,
+    );
     setState(() => _selectedMonth = nextMonth);
     context.read<ReportProvider>().fetchMonthlyFinancialReport(nextMonth);
   }
@@ -58,61 +64,61 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
         child: provider.isLoading && report == null
             ? const LoadingOverlay()
             : provider.error != null && report == null
-                ? Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: ErrorBanner(message: provider.error!),
-                  )
-                : RefreshIndicator(
-                    onRefresh: () => context
-                        .read<ReportProvider>()
-                        .fetchMonthlyFinancialReport(_selectedMonth),
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 120),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildTopBar(context, avatarText),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                            child: _buildHeader(context),
-                          ),
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: _buildPresetTabs(context),
-                          ),
-                          const SizedBox(height: 16),
-                          if (report != null) ...[
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: _buildHeroCard(report),
-                            ),
-                            const SizedBox(height: 12),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: _buildMetricGrid(report),
-                            ),
-                            const SizedBox(height: 20),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: _buildChartSection(report, _selectedMonth),
-                            ),
-                            const SizedBox(height: 20),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: _buildSupplierSection(report),
-                            ),
-                            const SizedBox(height: 16),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: _buildExportButton(context),
-                            ),
-                          ],
-                        ],
+            ? Padding(
+                padding: const EdgeInsets.all(16),
+                child: ErrorBanner(message: provider.error!),
+              )
+            : RefreshIndicator(
+                onRefresh: () => context
+                    .read<ReportProvider>()
+                    .fetchMonthlyFinancialReport(_selectedMonth),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 120),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildTopBar(context, avatarText),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                        child: _buildHeader(context),
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _buildPresetTabs(context),
+                      ),
+                      const SizedBox(height: 16),
+                      if (report != null) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _buildHeroCard(report),
+                        ),
+                        const SizedBox(height: 12),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _buildMetricGrid(report),
+                        ),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _buildChartSection(report, _selectedMonth),
+                        ),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _buildSupplierSection(report),
+                        ),
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _buildExportButton(context),
+                        ),
+                      ],
+                    ],
                   ),
+                ),
+              ),
       ),
       floatingActionButton: _buildScannerButton(),
     );
@@ -130,7 +136,10 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
           IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints.tightFor(width: 40, height: 40),
-            icon: const Icon(Icons.storefront_outlined, color: AppColors.primary),
+            icon: const Icon(
+              Icons.storefront_outlined,
+              color: AppColors.primary,
+            ),
             onPressed: widget.onMenuTap,
           ),
           const SizedBox(width: 4),
@@ -210,10 +219,12 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text('Chuyển tháng bằng mũi tên trái/phải',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: AppColors.textMuted,
-                          )),
+                  Text(
+                    'Chuyển tháng bằng mũi tên trái/phải',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppColors.textMuted,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -233,7 +244,9 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
         icon: Icon(icon, color: AppColors.primary),
         style: IconButton.styleFrom(
           backgroundColor: AppColors.surfaceContainerLow,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
@@ -241,11 +254,17 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
 
   Widget _buildPresetTabs(BuildContext context) {
     final currentMonth = DateTime(_selectedMonth.year, _selectedMonth.month, 1);
-    final previousMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1, 1);
+    final previousMonth = DateTime(
+      _selectedMonth.year,
+      _selectedMonth.month - 1,
+      1,
+    );
     final isCurrentMonth =
-        currentMonth.year == DateTime.now().year && currentMonth.month == DateTime.now().month;
+        currentMonth.year == DateTime.now().year &&
+        currentMonth.month == DateTime.now().month;
     final isPreviousMonth =
-        previousMonth.year == DateTime.now().year && previousMonth.month == DateTime.now().month;
+        previousMonth.year == DateTime.now().year &&
+        previousMonth.month == DateTime.now().month;
 
     return Container(
       padding: const EdgeInsets.all(4),
@@ -260,14 +279,18 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
             child: _PresetTab(
               label: 'Tháng này',
               selected: isCurrentMonth,
-              onTap: () => _selectPreset(DateTime(DateTime.now().year, DateTime.now().month, 1)),
+              onTap: () => _selectPreset(
+                DateTime(DateTime.now().year, DateTime.now().month, 1),
+              ),
             ),
           ),
           Expanded(
             child: _PresetTab(
               label: 'Tháng trước',
               selected: isPreviousMonth,
-              onTap: () => _selectPreset(DateTime(DateTime.now().year, DateTime.now().month - 1, 1)),
+              onTap: () => _selectPreset(
+                DateTime(DateTime.now().year, DateTime.now().month - 1, 1),
+              ),
             ),
           ),
           Expanded(
@@ -285,7 +308,10 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
               color: AppColors.surfaceContainerLow,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.calendar_month_outlined, color: AppColors.primary),
+            child: const Icon(
+              Icons.calendar_month_outlined,
+              color: AppColors.primary,
+            ),
           ),
         ],
       ),
@@ -293,8 +319,12 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
   }
 
   Widget _buildHeroCard(MonthlyFinancialReport report) {
-    final growth = report.incomeGrowthPercent >= 0 ? '+${report.incomeGrowthPercent.toStringAsFixed(1)}%' : '${report.incomeGrowthPercent.toStringAsFixed(1)}%';
-    final growthColor = report.incomeGrowthPercent >= 0 ? AppColors.secondary : AppColors.statusError;
+    final growth = report.incomeGrowthPercent >= 0
+        ? '+${report.incomeGrowthPercent.toStringAsFixed(1)}%'
+        : '${report.incomeGrowthPercent.toStringAsFixed(1)}%';
+    final growthColor = report.incomeGrowthPercent >= 0
+        ? AppColors.secondary
+        : AppColors.statusError;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -303,7 +333,11 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border(left: BorderSide(color: AppColors.primary, width: 5)),
         boxShadow: const [
-          BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.06), offset: Offset(0, 1), blurRadius: 2),
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.06),
+            offset: Offset(0, 1),
+            blurRadius: 2,
+          ),
         ],
       ),
       child: Column(
@@ -358,7 +392,8 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
             icon: Icons.account_balance_wallet_outlined,
             iconColor: AppColors.secondary,
             accentColor: AppColors.secondary,
-            subtitle: '${_signedPercent(report.profitGrowthPercent)} so với tháng trước',
+            subtitle:
+                '${_signedPercent(report.profitGrowthPercent)} so với tháng trước',
           ),
         ),
         const SizedBox(width: 12),
@@ -369,14 +404,18 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
             icon: Icons.receipt_long_outlined,
             iconColor: AppColors.statusError,
             accentColor: AppColors.statusError,
-            subtitle: '${_signedPercent(report.expenseGrowthPercent)} chi vận hành',
+            subtitle:
+                '${_signedPercent(report.expenseGrowthPercent)} chi vận hành',
           ),
         ),
       ],
     );
   }
 
-  Widget _buildChartSection(MonthlyFinancialReport report, DateTime selectedMonth) {
+  Widget _buildChartSection(
+    MonthlyFinancialReport report,
+    DateTime selectedMonth,
+  ) {
     final points = report.dailyPoints;
     return Container(
       padding: const EdgeInsets.all(16),
@@ -385,7 +424,11 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
         border: Border.all(color: AppColors.borderGray),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.04), offset: Offset(0, 1), blurRadius: 2),
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.04),
+            offset: Offset(0, 1),
+            blurRadius: 2,
+          ),
         ],
       ),
       child: Column(
@@ -414,9 +457,17 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
             ],
           ),
           const SizedBox(height: 14),
-          SizedBox(
-            height: 230,
-            child: FinancialTrendChart(points: points, month: selectedMonth.month),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final chartHeight = constraints.maxWidth >= 900 ? 320.0 : 230.0;
+              return SizedBox(
+                height: chartHeight,
+                child: FinancialTrendChart(
+                  points: points,
+                  month: selectedMonth.month,
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -476,7 +527,9 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.surfaceContainerLowest,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
         ),
       ),
     );
@@ -488,7 +541,7 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
       backgroundColor: AppColors.primary,
       foregroundColor: AppColors.surfaceContainerLowest,
       shape: const CircleBorder(),
-          child: const Icon(Icons.document_scanner_outlined, size: 30),
+      child: const Icon(Icons.document_scanner_outlined, size: 30),
     );
   }
 
@@ -552,7 +605,9 @@ class _PresetTab extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                color: selected ? AppColors.surfaceContainerLowest : AppColors.primary,
+                color: selected
+                    ? AppColors.surfaceContainerLowest
+                    : AppColors.primary,
                 fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
               ),
             ),
@@ -590,7 +645,11 @@ class _MetricCard extends StatelessWidget {
         border: Border.all(color: AppColors.borderGray),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.05), offset: Offset(0, 1), blurRadius: 2),
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.05),
+            offset: Offset(0, 1),
+            blurRadius: 2,
+          ),
         ],
       ),
       child: Column(
@@ -664,7 +723,11 @@ class _LegendDot extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: 6),
         Text(
           label,
@@ -694,7 +757,9 @@ class _SupplierTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final debtColor = totalDebt > 0 ? AppColors.statusError : AppColors.secondary;
+    final debtColor = totalDebt > 0
+        ? AppColors.statusError
+        : AppColors.secondary;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -704,7 +769,11 @@ class _SupplierTile extends StatelessWidget {
         border: Border.all(color: AppColors.borderGray),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.04), offset: Offset(0, 1), blurRadius: 2),
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.04),
+            offset: Offset(0, 1),
+            blurRadius: 2,
+          ),
         ],
       ),
       child: Row(
@@ -716,7 +785,10 @@ class _SupplierTile extends StatelessWidget {
               color: AppColors.surfaceContainer,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.local_shipping_outlined, color: AppColors.primary),
+            child: const Icon(
+              Icons.local_shipping_outlined,
+              color: AppColors.primary,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -725,12 +797,18 @@ class _SupplierTile extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '$invoiceCount hóa đơn',
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                  style: const TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -740,12 +818,19 @@ class _SupplierTile extends StatelessWidget {
             children: [
               Text(
                 _formatMoney(totalExpense),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const SizedBox(height: 2),
               Text(
                 _formatMoney(totalDebt),
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: debtColor),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: debtColor,
+                ),
               ),
             ],
           ),
@@ -808,12 +893,20 @@ class _MiniMetric extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w700),
+            style: const TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(color: AppColors.primary, fontSize: 16, fontWeight: FontWeight.w800),
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),
@@ -822,7 +915,11 @@ class _MiniMetric extends StatelessWidget {
 }
 
 class FinancialTrendChart extends StatelessWidget {
-  const FinancialTrendChart({required this.points, required this.month, super.key});
+  const FinancialTrendChart({
+    required this.points,
+    required this.month,
+    super.key,
+  });
 
   final List<MonthlyFinancialPoint> points;
   final int month;
@@ -841,17 +938,10 @@ class FinancialTrendChart extends StatelessWidget {
       ),
       child: Stack(
         children: [
+          Positioned.fill(child: CustomPaint(painter: _TrendGridPainter())),
           Positioned.fill(
             child: CustomPaint(
-              painter: _TrendGridPainter(),
-            ),
-          ),
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _TrendLinesPainter(
-                income: income,
-                profit: profit,
-              ),
+              painter: _TrendLinesPainter(income: income, profit: profit),
             ),
           ),
           Positioned(
@@ -890,7 +980,11 @@ class FinancialTrendChart extends StatelessWidget {
         .map(
           (day) => Text(
             '${day.toString().padLeft(2, '0')}/${month.toString().padLeft(2, '0')}',
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.primary),
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
           ),
         )
         .toList();
@@ -950,12 +1044,14 @@ class _TrendLinesPainter extends CustomPainter {
         ..strokeJoin = StrokeJoin.round;
 
       final areaPaint = Paint()
-        ..color = color.withOpacity(0.08)
+        ..color = color.withValues(alpha: 0.08)
         ..style = PaintingStyle.fill;
 
       final points = <Offset>[];
       for (var i = 0; i < values.length; i++) {
-        final x = leftPadding + chartWidth * (values.length == 1 ? 0 : i / (values.length - 1));
+        final x =
+            leftPadding +
+            chartWidth * (values.length == 1 ? 0 : i / (values.length - 1));
         final normalized = maxValue == 0 ? 0.0 : values[i] / maxValue;
         final y = topPadding + (chartHeight * (1 - normalized));
         points.add(Offset(x, y));
@@ -1001,7 +1097,8 @@ class _TrendLinesPainter extends CustomPainter {
     var progress = 0.0;
     while (progress < distance) {
       final segmentStart = start + direction * progress;
-      final segmentEnd = start + direction * math.min(progress + dashWidth, distance);
+      final segmentEnd =
+          start + direction * math.min(progress + dashWidth, distance);
       canvas.drawLine(segmentStart, segmentEnd, paint);
       progress += dashWidth + dashSpace;
     }

@@ -1,8 +1,9 @@
-﻿using MiniMart.Models.Base;
+
+using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class Batch : BaseEntity
+    public class Batch
     {
         public int BatchId { get; set; }
 
@@ -27,13 +28,17 @@ namespace MiniMart.Models
 
         public bool Status { get; set; } // true: còn, false: hết
 
+        public BatchProvenance Provenance { get; set; } = BatchProvenance.Receipt;
+
+        public byte[] RowVersion { get; set; }
+
         public int ProductId { get; set; }
 
         public Product Product { get; set; }
 
-        public int ReceiptId { get; set; }
+        public int? ReceiptId { get; set; }
 
-        public Receipt Receipt { get; set; }
+        public Receipt? Receipt { get; set; }
         public ICollection<InventoryTransaction> InventoryTransactions { get; set; }
             = new List<InventoryTransaction>();
 

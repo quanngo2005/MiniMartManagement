@@ -1,9 +1,8 @@
-﻿using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class Employee : BaseEntity
+    public class Employee
     {
         public int EmployeeId { get; set; }
 
@@ -57,6 +56,12 @@ namespace MiniMart.Models
             = new List<OrderReturn>();
 
         public ICollection<RefreshToken> RefreshTokens { get; set; }
-            = new List<RefreshToken>();
+    = new List<RefreshToken>();
+
+        public ICollection<StockCount> CreatedStockCounts { get; set; }
+            = new List<StockCount>();
+
+        public ICollection<StockCount> ReviewedStockCounts { get; set; }
+            = new List<StockCount>();
     }
 }

@@ -162,7 +162,10 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
           automaticallyImplyLeading: activeShift != null,
           leading: widget.onMenuTap != null
               ? IconButton(
-                  icon: const Icon(Icons.menu_rounded, color: AppColors.primary),
+                  icon: const Icon(
+                    Icons.menu_rounded,
+                    color: AppColors.primary,
+                  ),
                   onPressed: widget.onMenuTap,
                 )
               : null,

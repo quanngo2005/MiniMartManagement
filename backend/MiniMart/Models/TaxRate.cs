@@ -1,12 +1,13 @@
-using MiniMart.Models.Base;
 
 namespace MiniMart.Models
 {
-    public class TaxRate : BaseEntity
+    public class TaxRate
     {
         public int TaxRateId { get; set; }
 
         public decimal Rate { get; set; }
+
+        public DateTime CreatedAt { get; set; }
 
         public string Description { get; set; }
 

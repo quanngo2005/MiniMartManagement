@@ -399,9 +399,7 @@ class _CreateInventoryReceiptScreenState
 
   Future<void> _openBarcodeScanner() async {
     final scannedList = await Navigator.of(context).push<List<ScannedProduct>>(
-      MaterialPageRoute(
-        builder: (_) => const BarcodeScannerScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const BarcodeScannerScreen()),
     );
     if (scannedList == null || scannedList.isEmpty) return;
 
