@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
-import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_navigation_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -82,15 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceContainerLow,
-      appBar: AppBar(
-        title: const Text(
-          'Cài đặt',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: const MiniMartAppBar.secondary(title: 'Hồ sơ & Cài đặt'),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

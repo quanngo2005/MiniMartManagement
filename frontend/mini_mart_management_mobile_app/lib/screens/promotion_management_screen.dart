@@ -71,13 +71,19 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
                   child: _PromotionCreateForm(
                     onSave: (data) async {
                       final ok = await provider.createPromotion(data);
-                      if (ok && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Tạo khuyến mãi thành công!'),
+                      if (!context.mounted) return ok;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            ok
+                                ? 'Tạo khuyến mãi thành công!'
+                                : provider.error ?? 'Không thể tạo khuyến mãi.',
                           ),
-                        );
-                      }
+                        ),
+                      );
+
+                      return ok;
                     },
                   ),
                 ),
@@ -278,7 +284,7 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
 class _PromotionCreateForm extends StatefulWidget {
   const _PromotionCreateForm({required this.onSave});
 
-  final Future<void> Function(Map<String, dynamic> data) onSave;
+  final Future<bool> Function(Map<String, dynamic> data) onSave;
 
   @override
   State<_PromotionCreateForm> createState() => _PromotionCreateFormState();
@@ -287,16 +293,24 @@ class _PromotionCreateForm extends StatefulWidget {
 class _PromotionCreateFormState extends State<_PromotionCreateForm> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
-  final _discountCtrl = TextEditingController(text: '0.00');
+  final _discountCtrl = TextEditingController(text: '10');
+  final _minimumOrderCtrl = TextEditingController(text: '150000');
+  final _buyQuantityCtrl = TextEditingController(text: '1');
+  final _giftQuantityCtrl = TextEditingController(text: '1');
+  final _productIdsCtrl = TextEditingController();
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(const Duration(days: 30));
-  int _discountType = 0;
+  int _promotionRule = 0;
   bool _isSaving = false;
 
   @override
   void dispose() {
     _nameCtrl.dispose();
     _discountCtrl.dispose();
+    _minimumOrderCtrl.dispose();
+    _buyQuantityCtrl.dispose();
+    _giftQuantityCtrl.dispose();
+    _productIdsCtrl.dispose();
     super.dispose();
   }
 
@@ -343,32 +357,76 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
             TextFormField(
               controller: _nameCtrl,
               decoration: const InputDecoration(
-                hintText: 'Ví dụ: Giảm 10% cuối tuần...',
+                hintText: 'Ví dụ: Hóa đơn từ 150K giảm 10K',
               ),
-              validator: (v) => v == null || v.isEmpty ? 'Bắt buộc' : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Bắt buộc' : null,
             ),
             const SizedBox(height: 16),
-            Row(children: [Expanded(child: _buildDiscountTypeDropdown())]),
+            _buildPromotionRuleDropdown(),
             const SizedBox(height: 16),
-            _fieldLabel('Giá trị giảm'),
+            if (_promotionRule == 2) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildPositiveIntField(
+                      label: 'Số lượng mua',
+                      controller: _buyQuantityCtrl,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildPositiveIntField(
+                      label: 'Số lượng tặng',
+                      controller: _giftQuantityCtrl,
+                    ),
+                  ),
+                ],
+              ),
+            ] else ...[
+              _fieldLabel('Ngưỡng hóa đơn'),
+              TextFormField(
+                controller: _minimumOrderCtrl,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  suffixText: 'đ',
+                  hintText: 'Ví dụ: 150000',
+                ),
+                validator: _validatePositiveNumber,
+              ),
+              const SizedBox(height: 16),
+              _fieldLabel('Giá trị giảm'),
+              TextFormField(
+                controller: _discountCtrl,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: InputDecoration(
+                  suffixText: _promotionRule == 0 ? '%' : 'đ',
+                  hintText: _promotionRule == 0 ? 'Ví dụ: 10' : 'Ví dụ: 10000',
+                ),
+                validator: (v) {
+                  final error = _validatePositiveNumber(v);
+                  if (error != null) return error;
+                  final value = double.parse(v!.trim());
+                  if (_promotionRule == 0 && value > 100) {
+                    return 'Phần trăm không được vượt 100';
+                  }
+                  return null;
+                },
+              ),
+            ],
+            const SizedBox(height: 16),
+            _fieldLabel('Sản phẩm áp dụng'),
             TextFormField(
-              controller: _discountCtrl,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
+              controller: _productIdsCtrl,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                hintText: 'Ví dụ: 1, 3, 11 - để trống nếu áp dụng toàn bộ',
               ),
-              decoration: InputDecoration(
-                suffixText: _discountType == 0
-                    ? '%'
-                    : (_discountType == 1 ? 'đ' : ''),
-                hintText: _discountType == 2 ? 'Không áp dụng' : null,
-              ),
-              enabled: _discountType != 2,
-              validator: (v) {
-                if (_discountType == 2) return null;
-                if (v == null || v.isEmpty) return 'Bắt buộc';
-                if (double.tryParse(v) == null) return 'Số không hợp lệ';
-                return null;
-              },
+              validator: _validateProductIds,
             ),
             const SizedBox(height: 16),
             Row(
@@ -434,29 +492,51 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
     );
   }
 
-  Widget _buildDiscountTypeDropdown() {
+  Widget _buildPromotionRuleDropdown() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _fieldLabel('Loại khuyến mãi'),
         DropdownButtonFormField<int>(
-          value: _discountType,
+          initialValue: _promotionRule,
           decoration: const InputDecoration(),
           items: const [
             DropdownMenuItem(
               value: 0,
-              child: Text('Giảm theo % (PercentDiscount)'),
+              child: Text('Đạt hóa đơn - giảm theo %'),
             ),
             DropdownMenuItem(
               value: 1,
-              child: Text('Giảm tiền mặt (FixedAmount)'),
+              child: Text('Đạt hóa đơn - giảm tiền mặt'),
             ),
-            DropdownMenuItem(
-              value: 2,
-              child: Text('Mua X Tặng Y (BuyXGetYFree)'),
-            ),
+            DropdownMenuItem(value: 2, child: Text('Mua X tặng Y')),
           ],
-          onChanged: (v) => setState(() => _discountType = v ?? 0),
+          onChanged: (v) => setState(() => _promotionRule = v ?? 0),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPositiveIntField({
+    required String label,
+    required TextEditingController controller,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _fieldLabel(label),
+        TextFormField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(hintText: 'Ví dụ: 1'),
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return 'Bắt buộc';
+            final value = int.tryParse(v.trim());
+            if (value == null || value <= 0) {
+              return 'Số nguyên phải lớn hơn 0';
+            }
+            return null;
+          },
         ),
       ],
     );
@@ -501,6 +581,9 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
     setState(() {
       if (isStart) {
         _startDate = picked;
+        if (_endDate.isBefore(_startDate)) {
+          _endDate = _startDate.add(const Duration(days: 1));
+        }
       } else {
         _endDate = picked;
       }
@@ -509,7 +592,7 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_endDate.isBefore(_startDate)) {
+    if (!_endDate.isAfter(_startDate)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ngày kết thúc phải sau ngày bắt đầu.')),
       );
@@ -517,28 +600,85 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
     }
 
     setState(() => _isSaving = true);
-    final discount = double.tryParse(_discountCtrl.text) ?? 0;
-    // type 0 = PercentDiscount, type 1 = BuyXGetYFree
-    final promotionType = _discountType == 2 ? 1 : 0;
+    final discount = double.tryParse(_discountCtrl.text.trim()) ?? 0;
+    final minimumOrder = double.tryParse(_minimumOrderCtrl.text.trim()) ?? 0;
+    final buyQuantity = int.tryParse(_buyQuantityCtrl.text.trim()) ?? 0;
+    final giftQuantity = int.tryParse(_giftQuantityCtrl.text.trim()) ?? 0;
+    final productIds = _parseProductIds();
+    final promotionType = _promotionRule == 2 ? 1 : 0;
 
-    await widget.onSave({
-      'name': _nameCtrl.text.trim(),
-      'description': '',
-      'type': promotionType,
-      'discountPercent': _discountType == 0 ? discount : null,
-      'discountAmount': _discountType == 1 ? discount : null,
-      'buyQuantity': _discountType == 2 ? 2 : null,
-      'giftQuantity': _discountType == 2 ? 1 : null,
-      'startDate': _startDate.toIso8601String(),
-      'endDate': _endDate.toIso8601String(),
-      'isActive': true,
-      'productIds': <int>[],
-    });
+    try {
+      final ok = await widget.onSave({
+        'name': _nameCtrl.text.trim(),
+        'description': _buildDescription(),
+        'type': promotionType,
+        'discountPercent': _promotionRule == 0 ? discount : null,
+        'discountAmount': _promotionRule == 1 ? discount : null,
+        'minimumOrderAmount': _promotionRule == 2 ? null : minimumOrder,
+        'buyQuantity': _promotionRule == 2 ? buyQuantity : null,
+        'giftQuantity': _promotionRule == 2 ? giftQuantity : null,
+        'giftProductId': null,
+        'startDate': _startDate.toIso8601String(),
+        'endDate': _endDate.toIso8601String(),
+        'isActive': true,
+        'productIds': productIds,
+      });
 
-    if (mounted) {
-      setState(() => _isSaving = false);
-      _nameCtrl.clear();
-      _discountCtrl.text = '0.00';
+      if (ok && mounted) {
+        _resetForm();
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
+  }
+
+  String? _validatePositiveNumber(String? value) {
+    if (value == null || value.trim().isEmpty) return 'Bắt buộc';
+    final parsed = double.tryParse(value.trim());
+    if (parsed == null || parsed <= 0) return 'Số phải lớn hơn 0';
+    return null;
+  }
+
+  String? _validateProductIds(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    final ids = value.split(',');
+    for (final id in ids) {
+      final parsed = int.tryParse(id.trim());
+      if (parsed == null || parsed <= 0) {
+        return 'Danh sách ID sản phẩm không hợp lệ';
+      }
+    }
+    return null;
+  }
+
+  List<int> _parseProductIds() {
+    final text = _productIdsCtrl.text.trim();
+    if (text.isEmpty) return <int>[];
+    return text.split(',').map((id) => int.parse(id.trim())).toList();
+  }
+
+  String _buildDescription() {
+    if (_promotionRule == 2) {
+      return 'Mua ${_buyQuantityCtrl.text.trim()} tặng ${_giftQuantityCtrl.text.trim()}';
+    }
+
+    final suffix = _promotionRule == 0 ? '%' : 'đ';
+    return 'Hóa đơn từ ${_minimumOrderCtrl.text.trim()}đ giảm ${_discountCtrl.text.trim()}$suffix';
+  }
+
+  void _resetForm() {
+    setState(() {
+      _nameCtrl.clear();
+      _discountCtrl.text = '10';
+      _minimumOrderCtrl.text = '150000';
+      _buyQuantityCtrl.text = '1';
+      _giftQuantityCtrl.text = '1';
+      _productIdsCtrl.clear();
+      _promotionRule = 0;
+      _startDate = DateTime.now();
+      _endDate = DateTime.now().add(const Duration(days: 30));
+    });
   }
 }

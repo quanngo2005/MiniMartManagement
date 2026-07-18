@@ -27,8 +27,8 @@ class TopProduct {
           (json['categoryName'] ?? json['CategoryName'] ?? '') as String,
       totalQuantitySold:
           (json['totalQuantitySold'] ?? json['TotalQuantitySold'] ?? 0) as int,
-      totalRevenue:
-          ((json['totalRevenue'] ?? json['TotalRevenue']) ?? 0).toDouble(),
+      totalRevenue: ((json['totalRevenue'] ?? json['TotalRevenue']) ?? 0)
+          .toDouble(),
       contributionPercent:
           ((json['contributionPercent'] ?? json['ContributionPercent']) ?? 0.0)
               .toDouble(),

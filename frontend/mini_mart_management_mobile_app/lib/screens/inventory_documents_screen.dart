@@ -4,6 +4,7 @@ import 'package:mini_mart_management_mobile_app/models/receipt_inventory_documen
 import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/create_inventory_receipt_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_document_receipt_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/stock_count_history_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
@@ -122,31 +123,36 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: GridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.48,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          _InventoryStatCard(
-            label: 'Tổng Nhập',
-            value: _formatNumber(importedQuantity),
-            trend: '${receipts.length} chứng từ',
-            trendIcon: Icons.receipt_long_rounded,
-            actionIcon: Icons.download_rounded,
-            accentColor: AppColors.secondary,
-          ),
-          const _InventoryStatCard(
-            label: 'Tổng Xuất',
-            value: '0',
-            trend: 'Từ receipt nhập',
-            trendIcon: Icons.trending_down_rounded,
-            actionIcon: Icons.upload_rounded,
-            accentColor: AppColors.onTertiaryContainer,
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final crossAxisCount = constraints.maxWidth >= 900 ? 4 : 2;
+          return GridView.count(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: constraints.maxWidth >= 900 ? 1.7 : 1.48,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _InventoryStatCard(
+                label: 'Tổng Nhập',
+                value: _formatNumber(importedQuantity),
+                trend: '${receipts.length} chứng từ',
+                trendIcon: Icons.receipt_long_rounded,
+                actionIcon: Icons.download_rounded,
+                accentColor: AppColors.secondary,
+              ),
+              const _InventoryStatCard(
+                label: 'Tổng Xuất',
+                value: '0',
+                trend: 'Từ receipt nhập',
+                trendIcon: Icons.trending_down_rounded,
+                actionIcon: Icons.upload_rounded,
+                accentColor: AppColors.onTertiaryContainer,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -170,6 +176,15 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
         ),
       ),
       actions: [
+        IconButton(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const StockCountHistoryScreen(),
+            ),
+          ),
+          tooltip: 'Lịch sử kiểm kê',
+          icon: const Icon(Icons.history_rounded),
+        ),
         IconButton(
           onPressed: () => _showActionSnackBar(context, 'Tài khoản'),
           tooltip: 'Tài khoản',

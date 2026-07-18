@@ -34,8 +34,7 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
     });
   }
 
-  void _refresh() =>
-      context.read<ReportProvider>().fetchTopProducts(top: 100);
+  void _refresh() => context.read<ReportProvider>().fetchTopProducts(top: 100);
 
   List<TopProduct> _sorted(List<TopProduct> items) {
     final list = [...items];
@@ -111,8 +110,10 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
     final sorted = _sorted(provider.topProducts);
     final totalPages = (sorted.length / _pageSize).ceil().clamp(1, 999);
     final safePage = _page.clamp(0, totalPages - 1);
-    final pageItems =
-        sorted.skip(safePage * _pageSize).take(_pageSize).toList();
+    final pageItems = sorted
+        .skip(safePage * _pageSize)
+        .take(_pageSize)
+        .toList();
 
     return RefreshIndicator(
       onRefresh: () async => _refresh(),
@@ -143,9 +144,7 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
                 itemBuilder: (_, i) => _ProductCard(item: pageItems[i]),
               ),
             ),
-            SliverToBoxAdapter(
-              child: _buildPagination(safePage, totalPages),
-            ),
+            SliverToBoxAdapter(child: _buildPagination(safePage, totalPages)),
           ],
           const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
@@ -281,10 +280,6 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
 
   Widget _buildSummaryBento(BuildContext context, ReportProvider provider) {
     final total = provider.topProducts.length;
-    final totalQty = provider.topProducts.fold<int>(
-      0,
-      (sum, p) => sum + p.totalQuantitySold,
-    );
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Row(
@@ -329,10 +324,9 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
 
   double _targetPct(List<TopProduct> items) {
     if (items.isEmpty) return 0;
-    final top3 = items.take(3).fold<double>(
-      0,
-      (s, p) => s + p.contributionPercent,
-    );
+    final top3 = items
+        .take(3)
+        .fold<double>(0, (s, p) => s + p.contributionPercent);
     return double.parse(top3.clamp(0, 100).toStringAsFixed(1));
   }
 
@@ -750,9 +744,9 @@ class _ProductCard extends StatelessWidget {
               children: [
                 Text(
                   'Đóng góp tổng: ${item.contributionPercent.toStringAsFixed(1)}%',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: AppColors.textMuted,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
                 ),
                 Text(
                   _statusLabel,

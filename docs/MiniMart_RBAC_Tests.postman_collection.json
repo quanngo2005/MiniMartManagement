@@ -94,6 +94,26 @@
       "key": "import_batch_code_2",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "stock_count_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stock_count_row_version",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stock_count_line_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stock_count_line_row_version",
+      "value": "",
+      "type": "string"
     }
   ],
   "auth": {
@@ -1941,6 +1961,109 @@
                 "{{test_import_receipt_id}}"
               ]
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stock Counts",
+      "item": [
+        {
+          "name": "Create Global Stock Count - Warehouse (201)",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [
+              "const token = pm.collectionVariables.get('warehouse_token');",
+              "pm.request.headers.remove('Authorization');",
+              "if (token) pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });"
+            ], "type": "text/javascript" } },
+            { "listen": "test", "script": { "exec": [
+              "pm.test('Warehouse creates Draft count', () => { pm.response.to.have.status(201); });",
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set('stock_count_id', body.stockCountId);",
+              "pm.collectionVariables.set('stock_count_row_version', body.rowVersion);",
+              "pm.expect(body.status).to.eql(1);",
+              "pm.expect(body.lines).to.be.an('array').that.is.not.empty;"
+            ], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"scope\": 1,\n  \"categoryIds\": []\n}" },
+            "url": { "raw": "{{base_url}}/api/stock-counts", "host": ["{{base_url}}"], "path": ["api", "stock-counts"] }
+          }
+        },
+        {
+          "name": "Start Stock Count - Warehouse (200)",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [
+              "const token = pm.collectionVariables.get('warehouse_token'); pm.request.headers.remove('Authorization');",
+              "if (token) pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });"
+            ], "type": "text/javascript" } },
+            { "listen": "test", "script": { "exec": [
+              "pm.test('Draft count starts', () => { pm.response.to.have.status(200); });",
+              "const body = pm.response.json(); pm.collectionVariables.set('stock_count_row_version', body.rowVersion);",
+              "const line = body.lines[0]; pm.collectionVariables.set('stock_count_line_id', line.stockCountLineId); pm.collectionVariables.set('stock_count_line_row_version', line.rowVersion);",
+              "pm.expect(body.status).to.eql(2);"
+            ], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"rowVersion\": \"{{stock_count_row_version}}\" }" },
+            "url": { "raw": "{{base_url}}/api/stock-counts/{{stock_count_id}}/start", "host": ["{{base_url}}"], "path": ["api", "stock-counts", "{{stock_count_id}}", "start"] }
+          }
+        },
+        {
+          "name": "Save One Count Line as Zero - Warehouse (200)",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [
+              "const token = pm.collectionVariables.get('warehouse_token'); pm.request.headers.remove('Authorization');",
+              "if (token) pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });"
+            ], "type": "text/javascript" } },
+            { "listen": "test", "script": { "exec": [
+              "pm.test('Explicit zero is accepted', () => { pm.response.to.have.status(200); });",
+              "const body = pm.response.json(); pm.collectionVariables.set('stock_count_row_version', body.rowVersion);",
+              "const line = body.lines.find(item => item.stockCountLineId === Number(pm.collectionVariables.get('stock_count_line_id')));",
+              "pm.collectionVariables.set('stock_count_line_row_version', line.rowVersion); pm.expect(line.actualQuantity).to.eql(0);"
+            ], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"stockCountRowVersion\": \"{{stock_count_row_version}}\",\n  \"lines\": [{ \"stockCountLineId\": {{stock_count_line_id}}, \"actualQuantity\": 0, \"note\": \"Postman zero-count check\", \"rowVersion\": \"{{stock_count_line_row_version}}\" }]\n}" },
+            "url": { "raw": "{{base_url}}/api/stock-counts/{{stock_count_id}}/lines", "host": ["{{base_url}}"], "path": ["api", "stock-counts", "{{stock_count_id}}", "lines"] }
+          }
+        },
+        {
+          "name": "Approve Stock Count - Warehouse (expect 403)",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [
+              "const token = pm.collectionVariables.get('warehouse_token'); pm.request.headers.remove('Authorization');",
+              "if (token) pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });"
+            ], "type": "text/javascript" } },
+            { "listen": "test", "script": { "exec": ["pm.test('Warehouse cannot approve', () => { pm.response.to.have.status(403); });"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"rowVersion\": \"{{stock_count_row_version}}\" }" },
+            "url": { "raw": "{{base_url}}/api/stock-counts/{{stock_count_id}}/approve", "host": ["{{base_url}}"], "path": ["api", "stock-counts", "{{stock_count_id}}", "approve"] }
+          }
+        },
+        {
+          "name": "Approve Incomplete Stock Count - Admin (expect 400)",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [
+              "const token = pm.collectionVariables.get('admin_token'); pm.request.headers.remove('Authorization');",
+              "if (token) pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });"
+            ], "type": "text/javascript" } },
+            { "listen": "test", "script": { "exec": [
+              "pm.test('Manager-level caller reaches approval validation', () => { pm.response.to.have.status(409); });"
+            ], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"rowVersion\": \"{{stock_count_row_version}}\" }" },
+            "url": { "raw": "{{base_url}}/api/stock-counts/{{stock_count_id}}/approve", "host": ["{{base_url}}"], "path": ["api", "stock-counts", "{{stock_count_id}}", "approve"] }
           }
         }
       ]

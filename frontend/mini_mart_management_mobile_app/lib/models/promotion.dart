@@ -46,7 +46,8 @@ class Promotion {
       discountAmount: (json['discountAmount'] ?? json['DiscountAmount'])
           ?.toDouble(),
       minimumOrderAmount:
-          (json['minimumOrderAmount'] ?? json['MinimumOrderAmount'])?.toDouble(),
+          (json['minimumOrderAmount'] ?? json['MinimumOrderAmount'])
+              ?.toDouble(),
       buyQuantity: (json['buyQuantity'] ?? json['BuyQuantity']) as int?,
       giftQuantity: (json['giftQuantity'] ?? json['GiftQuantity']) as int?,
       giftProductId: (json['giftProductId'] ?? json['GiftProductId']) as int?,

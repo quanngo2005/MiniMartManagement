@@ -1,9 +1,8 @@
-using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class Payment : BaseEntity
+    public class Payment
     {
         public int PaymentId { get; set; }
 

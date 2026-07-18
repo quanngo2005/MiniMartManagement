@@ -22,6 +22,13 @@ namespace MiniMart.Shared.Extensions
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
+            services.AddScoped<IStockCountRepository, StockCountRepository>();
+            return services;
+        }
+
+        public static IServiceCollection AddStockCountRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IStockCountRepository, StockCountRepository>();
             return services;
         }
     }

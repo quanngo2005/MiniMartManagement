@@ -1,13 +1,14 @@
-﻿using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class Receipt : BaseEntity
+    public class Receipt
     {
         public int ReceiptId { get; set; }
 
         public string ReceiptCode { get; set; }
+
+        public DateTime CreatedAt { get; set; }
 
         public DateTime ImportDate { get; set; }
 

@@ -14,7 +14,9 @@ class HourlyRevenue {
   factory HourlyRevenue.fromJson(Map<String, dynamic> json) {
     return HourlyRevenue(
       hour: json['hour'] ?? json['Hour'] ?? 0,
-      date: DateTime.parse(json['date'] ?? json['Date'] ?? DateTime.now().toIso8601String()),
+      date: DateTime.parse(
+        json['date'] ?? json['Date'] ?? DateTime.now().toIso8601String(),
+      ),
       revenue: (json['revenue'] ?? json['Revenue'] ?? 0.0).toDouble(),
       orderCount: json['orderCount'] ?? json['OrderCount'] ?? 0,
     );

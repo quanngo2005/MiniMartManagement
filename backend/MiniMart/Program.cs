@@ -39,6 +39,7 @@ odataBuilder.EntitySet<Receipt>("Receipts");
 odataBuilder.EntitySet<Shift>("Shifts");
 odataBuilder.EntitySet<InventoryTransaction>("InventoryTransactions");
 odataBuilder.EntitySet<Promotion>("Promotions");
+odataBuilder.EntitySet<StockCount>("StockCounts");
 
 // ── Infrastructure ────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
@@ -65,12 +66,15 @@ builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 builder.Services.AddAutoMapper(typeof(SupplierMappingProfile));
 builder.Services.AddAutoMapper(typeof(OrderReturnMappingProfile));
 builder.Services.AddAutoMapper(typeof(EInvoiceMappingProfile));
+builder.Services.AddAutoMapper(typeof(StockCountMappingProfile));
 builder.Services.AddScoped<IOrderReturnRepository, OrderReturnRepository>();
 builder.Services.AddScoped<IOrderReturnService, OrderReturnService>();
 builder.Services.AddScoped<IEInvoiceRepository, EInvoiceRepository>();
 builder.Services.AddScoped<IEInvoiceService, EInvoiceService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
+builder.Services.AddStockCountRepository();
+builder.Services.AddStockCountServices();
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
