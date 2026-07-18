@@ -62,7 +62,9 @@ class ManagerDashboardScreen extends StatelessWidget {
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              sliver: SliverToBoxAdapter(child: _buildSalesActivity(context)),
+              sliver: SliverToBoxAdapter(
+                child: _buildSalesActivity(context, chartHeight: 168),
+              ),
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 88),
@@ -86,7 +88,10 @@ class ManagerDashboardScreen extends StatelessWidget {
     return MiniMartAppBar.primary(title: 'Tổng quan', onBrandTap: onMenuTap);
   }
 
-  Widget _buildSalesActivity(BuildContext context) {
+  Widget _buildSalesActivity(
+    BuildContext context, {
+    required double chartHeight,
+  }) {
     return _DashboardPanel(
       title: 'Hoạt động bán hàng thời gian thực',
       trailing: DecoratedBox(
@@ -105,7 +110,7 @@ class ManagerDashboardScreen extends StatelessWidget {
           ),
         ),
       ),
-      child: const SizedBox(height: 168, child: _SalesChart()),
+      child: SizedBox(height: chartHeight, child: const _SalesChart()),
     );
   }
 
@@ -459,3 +464,4 @@ class _NotificationTile extends StatelessWidget {
     );
   }
 }
+
