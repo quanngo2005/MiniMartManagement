@@ -5,3 +5,5 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory_stu
 http.Client createConfiguredClient() => createHttpClient();
 
 void clearClientCookies() => clearCookieStore();
+
+String? getClientCookieHeader() => getCookieHeader();

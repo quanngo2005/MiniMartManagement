@@ -33,6 +33,13 @@ namespace MiniMart.Middleware
                 await _next(context);
                 return;
             }
+
+            // --- SignalR Hub ---------------------------
+            if (context.Request.Path.StartsWithSegments("/hubs/notifications"))
+            {
+                await _next(context);
+                return;
+            }
             // -------------------------------------------
 
             if (!SafeMethods.Contains(context.Request.Method))
