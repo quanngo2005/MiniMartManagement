@@ -8,6 +8,7 @@ import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/order_repository.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_navigation_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_drawer.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -710,7 +711,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: const MiniMartAppBar.primary(title: 'Bán hàng'),
+      drawer: const CashierDrawer(selectedTab: CashierNavTab.checkout),
+      appBar: const MiniMartAppBar.primary(title: 'Bán hàng', showMenu: true),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
