@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_mart_management_mobile_app/models/promotion.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
@@ -7,123 +7,144 @@ class PromotionRuleCard extends StatelessWidget {
   const PromotionRuleCard({
     super.key,
     required this.promotion,
+    this.onTap,
+    this.onEdit,
     required this.onDelete,
+    this.showActionButtons = true,
   });
 
   final Promotion promotion;
+  final VoidCallback? onTap;
+  final VoidCallback? onEdit;
   final VoidCallback onDelete;
+  final bool showActionButtons;
 
   @override
   Widget build(BuildContext context) {
     final statusKey = _statusKey(promotion.status);
     final isEnded = statusKey == 'ended';
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.borderGray),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: DecoratedBox(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
         decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(8),
-          border: Border(
-            left: BorderSide(color: _borderColor(statusKey), width: 4),
-          ),
+          border: Border.all(color: AppColors.borderGray),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0A000000),
+              blurRadius: 2,
+              offset: Offset(0, 1),
+            ),
+          ],
         ),
-        child: Opacity(
-          opacity: isEnded ? 0.75 : 1,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            promotion.name,
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isEnded
-                                      ? AppColors.textMuted
-                                      : AppColors.primary,
-                                ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.calendar_today_outlined,
-                                size: 13,
-                                color: AppColors.textMuted,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${DateFormat('dd/MM/yyyy').format(promotion.startDate)} → ${DateFormat('dd/MM/yyyy').format(promotion.endDate)}',
-                                style: const TextStyle(
-                                  fontSize: 12,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border(
+              left: BorderSide(color: _borderColor(statusKey), width: 4),
+            ),
+          ),
+          child: Opacity(
+            opacity: isEnded ? 0.75 : 1,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              promotion.name,
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isEnded
+                                        ? AppColors.textMuted
+                                        : AppColors.primary,
+                                  ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.calendar_today_outlined,
+                                  size: 13,
                                   color: AppColors.textMuted,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    _StatusBadge(statusKey: statusKey),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.only(top: 8),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: AppColors.borderGray),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      _TypeChip(promotion: promotion),
-                      const Spacer(),
-                      Text(
-                        _discountLabel(promotion),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: isEnded
-                              ? AppColors.textMuted
-                              : statusKey == 'active'
-                              ? AppColors.secondary
-                              : AppColors.primary,
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${DateFormat('dd/MM/yyyy').format(promotion.startDate)} → ${DateFormat('dd/MM/yyyy').format(promotion.endDate)}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      GestureDetector(
-                        onTap: onDelete,
-                        child: const Icon(
-                          Icons.delete_outline,
-                          size: 18,
-                          color: AppColors.statusError,
-                        ),
-                      ),
+                      const SizedBox(width: 8),
+                      _StatusBadge(statusKey: statusKey),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.only(top: 8),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: AppColors.borderGray),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        _TypeChip(promotion: promotion),
+                        const Spacer(),
+                        Text(
+                          _discountLabel(promotion),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: isEnded
+                                ? AppColors.textMuted
+                                : statusKey == 'active'
+                                    ? AppColors.secondary
+                                    : AppColors.primary,
+                          ),
+                        ),
+                        if (showActionButtons) ...[
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: onEdit,
+                            child: const Icon(
+                              Icons.edit_outlined,
+                              size: 18,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: onDelete,
+                            child: const Icon(
+                              Icons.delete_outline,
+                              size: 18,
+                              color: AppColors.statusError,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -155,17 +176,24 @@ class PromotionRuleCard extends StatelessWidget {
 
   String _discountLabel(Promotion p) {
     if (p.type == 1) {
-      return 'M${p.buyQuantity ?? 2}T${p.giftQuantity ?? 1}';
+      return 'M${p.buyQuantity ?? 1}T${p.giftQuantity ?? 1}';
     }
+
     if ((p.minimumOrderAmount ?? 0) > 0) {
       final amount = NumberFormat('#,###').format(p.minimumOrderAmount);
-      if (p.discountAmount != null) {
-        return '-${NumberFormat('#,###').format(p.discountAmount)}đ / Từ $amount';
-      }
       return '-${p.discountPercent?.toStringAsFixed(0) ?? '0'}% / Từ $amount';
     }
-    if (p.discountAmount != null)
+
+    if (p.type == 2) {
+      if (p.discountAmount != null) {
+        return '-${NumberFormat('#,###').format(p.discountAmount)}đ / SP';
+      }
+      return '-${p.discountPercent?.toStringAsFixed(0) ?? '0'}% / SP';
+    }
+
+    if (p.discountAmount != null) {
       return '-${NumberFormat('#,###').format(p.discountAmount)}đ';
+    }
     return '-${p.discountPercent?.toStringAsFixed(0) ?? '0'}%';
   }
 }
@@ -180,11 +208,14 @@ class _TypeChip extends StatelessWidget {
     final IconData icon;
 
     if (promotion.type == 1) {
-      label = 'Mua X Tặng Y';
+      label = 'Mua X tặng Y';
       icon = Icons.card_giftcard_outlined;
     } else if ((promotion.minimumOrderAmount ?? 0) > 0) {
       label = 'Đạt hóa đơn';
       icon = Icons.point_of_sale_outlined;
+    } else if (promotion.type == 2) {
+      label = 'Giảm sản phẩm';
+      icon = Icons.sell_outlined;
     } else if (promotion.discountAmount != null) {
       label = 'Giảm tiền mặt';
       icon = Icons.money_off_outlined;

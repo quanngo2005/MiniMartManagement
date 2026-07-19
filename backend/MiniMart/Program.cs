@@ -13,6 +13,7 @@ using MiniMart.Repositories.Interfaces;
 using MiniMart.Services;
 using MiniMart.Services.Interfaces;
 using MiniMart.Services.Implementations;
+using MiniMart.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
@@ -67,6 +68,8 @@ builder.Services.AddAutoMapper(typeof(SupplierMappingProfile));
 builder.Services.AddAutoMapper(typeof(OrderReturnMappingProfile));
 builder.Services.AddAutoMapper(typeof(EInvoiceMappingProfile));
 builder.Services.AddAutoMapper(typeof(StockCountMappingProfile));
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IOrderReturnRepository, OrderReturnRepository>();
 builder.Services.AddScoped<IOrderReturnService, OrderReturnService>();
 builder.Services.AddScoped<IEInvoiceRepository, EInvoiceRepository>();
@@ -144,5 +147,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();

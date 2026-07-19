@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
+import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
+import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
+import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_dashboard_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/manager_return_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/product_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
@@ -13,23 +18,6 @@ import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_bottom_navigation_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_drawer.dart';
 
-/// IndexedStack layout:
-///   0 → Home (dashboard)
-///   1 → Shift management
-///   2 → Product performance
-///   3 → Inventory documents
-///   4 → Inventory transactions
-///   5 → Staff
-///   6 → Customers
-///   7 → Promotions
-///   8 → Invoices
-///   9 → Analyze
-///
-/// Bottom nav (4 tabs):
-///   0 → Home         → stack index 0
-///   1 → Inventory    → stack index 3
-///   2 → Staff        → stack index 5
-///   3 → Customers    → stack index 6
 class ManagerNavigationScreen extends StatefulWidget {
   const ManagerNavigationScreen({required this.user, super.key});
 
@@ -45,17 +33,40 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
 
   ManagerNavDestination _destination = ManagerNavDestination.home;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<OrderReturnProvider>().loadAllReturns();
+    });
+    SignalrService.instance.addListener(_onNotificationReceived);
+  }
+
+  @override
+  void dispose() {
+    SignalrService.instance.removeListener(_onNotificationReceived);
+    super.dispose();
+  }
+
+  void _onNotificationReceived() {
+    if (mounted) {
+      context.read<OrderReturnProvider>().loadAllReturns();
+    }
+  }
+
   static const _destinationToIndex = {
     ManagerNavDestination.home: 0,
     ManagerNavDestination.shift: 1,
     ManagerNavDestination.productPerformance: 2,
     ManagerNavDestination.inventoryDocuments: 3,
     ManagerNavDestination.inventoryTransactions: 4,
-    ManagerNavDestination.staff: 5,
-    ManagerNavDestination.customers: 6,
-    ManagerNavDestination.promotions: 7,
-    ManagerNavDestination.invoices: 8,
-    ManagerNavDestination.analyze: 9,
+    ManagerNavDestination.staffPerformance: 5,
+    ManagerNavDestination.staff: 6,
+    ManagerNavDestination.customers: 7,
+    ManagerNavDestination.promotions: 8,
+    ManagerNavDestination.invoices: 9,
+    ManagerNavDestination.analyze: 10,
+    ManagerNavDestination.returns: 11,
   };
 
   static const _bottomNavDestinations = [
@@ -102,6 +113,12 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
+          EmployeePerformanceScreen(
+            showBottomNavBar: false,
+            onMenuTap: _openDrawer,
+            onManageEmployees: () =>
+                _selectDestination(ManagerNavDestination.staff),
+          ),
           EmployeeManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
@@ -116,6 +133,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           ),
           const InvoiceListScreen(),
           AnalyzeScreen(onMenuTap: _openDrawer),
+          ManagerReturnListScreen(onMenuTap: _openDrawer),
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(

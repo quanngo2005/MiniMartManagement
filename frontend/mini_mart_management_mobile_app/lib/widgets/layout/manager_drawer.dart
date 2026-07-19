@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
+import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
+import 'package:provider/provider.dart';
 
 enum ManagerNavDestination {
   home,
@@ -8,11 +10,13 @@ enum ManagerNavDestination {
   productPerformance,
   inventoryDocuments,
   inventoryTransactions,
+  staffPerformance,
   staff,
   customers,
   promotions,
   analyze,
   invoices,
+  returns,
 }
 
 class ManagerDrawer extends StatelessWidget {
@@ -29,6 +33,10 @@ class ManagerDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pendingCount = context.select<OrderReturnProvider, int>(
+      (provider) => provider.allReturns.where((r) => r.status == 1).length,
+    );
+
     return Drawer(
       backgroundColor: AppColors.surfaceContainerLowest,
       child: SafeArea(
@@ -102,6 +110,17 @@ class ManagerDrawer extends StatelessWidget {
                   ),
                   const _DrawerSectionLabel('Nhân sự & Khách hàng'),
                   _DrawerTile(
+                    icon: Icons.show_chart_outlined,
+                    activeIcon: Icons.trending_up_rounded,
+                    label: 'Hiệu suất nhân viên',
+                    destination: ManagerNavDestination.staffPerformance,
+                    selected: selected,
+                    onTap: _select(
+                      context,
+                      ManagerNavDestination.staffPerformance,
+                    ),
+                  ),
+                  _DrawerTile(
                     icon: Icons.group_outlined,
                     activeIcon: Icons.group_rounded,
                     label: 'Nhân viên',
@@ -133,6 +152,34 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.invoices,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.invoices),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.assignment_return_outlined,
+                    activeIcon: Icons.assignment_return_rounded,
+                    label: 'Phê duyệt trả hàng',
+                    destination: ManagerNavDestination.returns,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.returns),
+                    trailing: pendingCount > 0
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.statusError,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '$pendingCount',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                        : null,
                   ),
                 ],
               ),
@@ -230,6 +277,7 @@ class _DrawerTile extends StatelessWidget {
     required this.destination,
     required this.selected,
     required this.onTap,
+    this.trailing,
   });
 
   final IconData icon;
@@ -238,6 +286,7 @@ class _DrawerTile extends StatelessWidget {
   final ManagerNavDestination destination;
   final ManagerNavDestination selected;
   final VoidCallback onTap;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -260,6 +309,7 @@ class _DrawerTile extends StatelessWidget {
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
+        trailing: trailing,
         onTap: onTap,
       ),
     );
@@ -274,13 +324,12 @@ class _DrawerSectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
       child: Text(
-        label.toUpperCase(),
+        label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
           color: AppColors.textMuted,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
         ),
       ),
     );
