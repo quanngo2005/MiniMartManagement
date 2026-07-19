@@ -219,11 +219,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 const SizedBox(height: 16),
                 _buildSection('Mô tả', [
                   _field(_descCtrl, 'Mô tả sản phẩm', maxLines: 3),
-                  _field(
-                    _imageUrlCtrl,
-                    'Image URL',
-                    validator: null,
-                  ),
+                  _field(_imageUrlCtrl, 'Image URL', validator: null),
                   if (_imageUrlCtrl.text.trim().isNotEmpty)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
@@ -232,7 +228,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
+                        errorBuilder: (_, _, _) => Container(
                           height: 160,
                           width: double.infinity,
                           color: AppColors.surfaceContainerHigh,
@@ -446,9 +442,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         child: Text(
           text,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: AppColors.textMuted,
-                fontStyle: FontStyle.italic,
-              ),
+            color: AppColors.textMuted,
+            fontStyle: FontStyle.italic,
+          ),
         ),
       ),
     );
