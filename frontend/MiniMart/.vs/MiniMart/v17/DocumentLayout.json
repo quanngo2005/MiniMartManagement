@@ -56,7 +56,7 @@
               "RelativeDocumentMoniker": "MiniMart\\ViewModels\\MainViewModel.cs",
               "ToolTip": "T:\\PRN232Project\\MiniMartManagement\\frontend\\MiniMart\\MiniMart\\ViewModels\\MainViewModel.cs",
               "RelativeToolTip": "MiniMart\\ViewModels\\MainViewModel.cs",
-              "ViewState": "AgIAAAQAAAAAAAAAAAAuwC0AAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAGwAAAAAAAAAAAAmwEIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-09T15:09:02.931Z",
               "EditorCaption": ""
@@ -70,8 +70,7 @@
               "ToolTip": "T:\\PRN232Project\\MiniMartManagement\\frontend\\MiniMart\\MiniMart\\MainWindow.xaml",
               "RelativeToolTip": "MiniMart\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-07-09T15:04:27.357Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-09T15:04:27.357Z"
             },
             {
               "$type": "Document",
@@ -83,8 +82,7 @@
               "RelativeToolTip": "MiniMart\\MainWindow.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-09T15:04:26.922Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-09T15:04:26.922Z"
             },
             {
               "$type": "Document",
@@ -96,8 +94,7 @@
               "RelativeToolTip": "MiniMart\\Models\\CartItem.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-09T17:07:42.215Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-09T17:07:42.215Z"
             }
           ]
         }

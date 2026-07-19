@@ -28,38 +28,97 @@
         <!-- ================= HEADER: TASKBAR ================= -->
         <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="20,0">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <!-- Tab Active -->
-                <Border Background="#EEF2FF" BorderBrush="#4F46E5" BorderThickness="0,0,0,2" Padding="15,10" Margin="0,0,10,0" CornerRadius="4,4,0,0">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Order 1" FontWeight="Bold" Foreground="#4F46E5" Margin="0,0,10,0"/>
-                        <TextBlock Text="✕" Foreground="#4F46E5" Cursor="Hand"/>
-                    </StackPanel>
-                </Border>
-                <!-- Tab Inactive -->
-                <Border Padding="15,10" Margin="0,0,10,0" Cursor="Hand">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Order 2" Foreground="#64748B" Margin="0,0,10,0"/>
-                        <TextBlock Text="✕" Foreground="#64748B"/>
-                    </StackPanel>
-                </Border>
-                <Button Content="+" Width="35" Height="35" Background="Transparent" BorderThickness="0" FontSize="20" Foreground="#64748B" Cursor="Hand"/>
+                
+                <!-- Ca làm Tab -->
+                <Button Command="{Binding ShowShiftTabCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,10,0">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Name="TabBorder" Padding="15,10" CornerRadius="4,4,0,0" BorderThickness="0,0,0,2">
+                                <TextBlock Name="TabText" Text="Ca làm" FontWeight="Bold"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsShiftTabActive}" Value="True">
+                                    <Setter TargetName="TabBorder" Property="Background" Value="#EEF2FF"/>
+                                    <Setter TargetName="TabBorder" Property="BorderBrush" Value="#4F46E5"/>
+                                    <Setter TargetName="TabText" Property="Foreground" Value="#4F46E5"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsShiftTabActive}" Value="False">
+                                    <Setter TargetName="TabBorder" Property="Background" Value="Transparent"/>
+                                    <Setter TargetName="TabBorder" Property="BorderBrush" Value="Transparent"/>
+                                    <Setter TargetName="TabText" Property="Foreground" Value="#64748B"/>
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <!-- List of Order Tabs -->
+                <ItemsControl ItemsSource="{Binding OrderTabs}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.ShowOrderTabCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,10,0">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Name="TabBorder" Padding="15,10" CornerRadius="4,4,0,0" BorderThickness="0,0,0,2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Name="TabText" Text="{Binding TabName}" FontWeight="Bold" Margin="0,0,10,0"/>
+                                                <Button Content="✕" 
+                                                        Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                        CommandParameter="{Binding}"
+                                                        Background="Transparent" BorderThickness="0" Foreground="#64748B" Cursor="Hand"
+                                                        FontWeight="Bold"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                <Setter TargetName="TabBorder" Property="Background" Value="#EEF2FF"/>
+                                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#4F46E5"/>
+                                                <Setter TargetName="TabText" Property="Foreground" Value="#4F46E5"/>
+                                            </DataTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Add New Tab Button -->
+                <Button Command="{Binding AddNewTabCommand}" Content="+" Width="35" Height="35" Background="Transparent" BorderThickness="0" FontSize="20" Foreground="#64748B" Cursor="Hand"/>
             </StackPanel>
         </Border>
 
-        <!-- ================= MAIN BODY (8:2) ================= -->
+        <!-- ================= MAIN BODY ================= -->
         <Grid Grid.Row="1" Margin="20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="7.5*"/>
-                <!-- Cột bên trái -->
-                <ColumnDefinition Width="2.5*"/>
-                <!-- Cột bên phải -->
-            </Grid.ColumnDefinitions>
+            <!-- Order Grid -->
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsShiftTabActive}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="7.5*"/>
+                    <!-- Cột bên trái -->
+                    <ColumnDefinition Width="2.5*"/>
+                    <!-- Cột bên phải -->
+                </Grid.ColumnDefinitions>
 
-            <!-- CỘT TRÁI: TÌM KIẾM & DANH SÁCH SẢN PHẨM -->
-            <Border Grid.Column="0" Background="White" CornerRadius="12" Margin="0,0,20,0" Padding="0">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="10" ShadowDepth="1" Color="#D1D5DB" Opacity="0.5"/>
-                </Border.Effect>
+                <!-- CỘT TRÁI: TÌM KIẾM & DANH SÁCH SẢN PHẨM -->
+                <Border Grid.Column="0" Background="White" CornerRadius="12" Margin="0,0,20,0" Padding="0">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" ShadowDepth="1" Color="#D1D5DB" Opacity="0.5"/>
+                    </Border.Effect>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="70"/>
@@ -69,14 +128,58 @@
                     <!-- Search Bar -->
                     <Border Grid.Row="0" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="20">
                         <Grid>
-                            <TextBox FontSize="16" Foreground="#334155" BorderThickness="0" VerticalAlignment="Center" Text="Search products..."/>
+                            <TextBox FontSize="16" Foreground="#334155" BorderThickness="0" VerticalAlignment="Center" 
+                                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="Search products..." Foreground="#94A3B8" FontSize="16" VerticalAlignment="Center" IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SearchQuery}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Grid>
                     </Border>
+                    
+                    <!-- Search Results Popup (Overlay over DataGrid) -->
+                    <ListBox Grid.Row="1" ItemsSource="{Binding SearchResults}" Panel.ZIndex="100"
+                             BorderBrush="#E2E8F0" BorderThickness="1" Background="White"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <!-- BoolToVis converter doesn't work for int directly, so we can use a Style trigger instead for better accuracy -->
+                        <ListBox.Style>
+                            <Style TargetType="ListBox">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SearchResults.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.Style>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding ProductName}" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding SellingPrice, StringFormat={}{0:N0}}" FontSize="16" Foreground="#4F46E5" FontWeight="Bold" Margin="10,0" VerticalAlignment="Center"/>
+                                    <Button Grid.Column="2" Content="Add" Command="{Binding DataContext.AddProductToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Background="#4F46E5" Foreground="White" Padding="15,5" BorderThickness="0" Cursor="Hand"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
 
                     <!-- DataGrid Món hàng -->
                     <DataGrid Grid.Row="1" Margin="20" AutoGenerateColumns="False" HeadersVisibility="Column" 
           Background="White" BorderThickness="0" RowHeight="60" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
-          ItemsSource="{Binding CartItems}">
+          ItemsSource="{Binding ActiveTab.CartItems}">
 
                         <DataGrid.Columns>
                             <!-- Tên món -->
@@ -109,26 +212,22 @@
                 </Grid>
             </Border>
 
-            <!-- CỘT PHẢI: KHÁCH HÀNG & THANH TOÁN -->
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <!-- Tìm KH -->
-                    <RowDefinition Height="Auto"/>
-                    <!-- Info KH -->
-                    <RowDefinition Height="*"/>
-                    <!-- Khoảng trống -->
-                    <RowDefinition Height="Auto"/>
-                    <!-- Thanh toán -->
-                </Grid.RowDefinitions>
+                <!-- CỘT PHẢI: KHÁCH HÀNG & THANH TOÁN -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                <!-- Search Khách hàng -->
-                <Border Grid.Row="0" Background="White" CornerRadius="8" Padding="15" Margin="0,0,0,15">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="10" ShadowDepth="1" Color="#D1D5DB" Opacity="0.5"/>
-                    </Border.Effect>
-                    <TextBox FontSize="14" BorderThickness="0" Text="Find customer..."/>
-                </Border>
+                    <!-- Search Khách hàng -->
+                    <Border Grid.Row="0" Background="White" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10" ShadowDepth="1" Color="#D1D5DB" Opacity="0.5"/>
+                        </Border.Effect>
+                        <TextBox FontSize="14" BorderThickness="0" Text="Find customer..."/>
+                    </Border>
 
                 <!-- Panel Customer Info -->
                 <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="20">
@@ -145,13 +244,13 @@
                         </Grid>
 
                         <!-- Thông tin -->
-                        <TextBlock Text="{Binding CustomerName, StringFormat=Name: {0}}" FontSize="15" Foreground="#334155" Margin="0,0,0,8"/>
-                        <TextBlock Text="{Binding CustomerPhone, StringFormat=Phone: {0}}" FontSize="15" Foreground="#334155" Margin="0,0,0,8"/>
-                        <TextBlock Text="{Binding CustomerPoints, StringFormat=Points: {0:N0}}" FontSize="15" Foreground="#334155" FontWeight="Bold" Margin="0,0,0,15"/>
+                        <TextBlock Text="{Binding ActiveTab.CustomerName, StringFormat=Name: {0}}" FontSize="15" Foreground="#334155" Margin="0,0,0,8"/>
+                        <TextBlock Text="{Binding ActiveTab.CustomerPhone, StringFormat=Phone: {0}}" FontSize="15" Foreground="#334155" Margin="0,0,0,8"/>
+                        <TextBlock Text="{Binding ActiveTab.CustomerPoints, StringFormat=Points: {0:N0}}" FontSize="15" Foreground="#334155" FontWeight="Bold" Margin="0,0,0,15"/>
 
                         <!-- Input dùng điểm -->
                         <TextBlock Text="Loyalty points to use:" FontSize="13" Foreground="#64748B" Margin="0,0,0,5"/>
-                        <TextBox Height="40" Padding="10,0" VerticalContentAlignment="Center" BorderBrush="#E2E8F0" BorderThickness="1" Text="{Binding LoyaltyPointsToUse, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Height="40" Padding="10,0" VerticalContentAlignment="Center" BorderBrush="#E2E8F0" BorderThickness="1" Text="{Binding ActiveTab.LoyaltyPointsToUse, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </Border>
 
@@ -164,24 +263,24 @@
                         <!-- Tài chính -->
                         <Grid Margin="0,0,0,10">
                             <TextBlock Text="SubTotal" FontSize="16" Foreground="#64748B"/>
-                            <TextBlock Text="{Binding SubTotal, StringFormat={}{0:N0} VND}" FontSize="16" Foreground="#1E293B" FontWeight="Medium" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding ActiveTab.SubTotal, StringFormat={}{0:N0} VND}" FontSize="16" Foreground="#1E293B" FontWeight="Medium" HorizontalAlignment="Right"/>
                         </Grid>
                         <Grid Margin="0,0,0,15">
                             <TextBlock Text="Discount" FontSize="16" Foreground="#64748B"/>
                             <!-- Hiện dấu trừ trước số tiền -->
-                            <TextBlock Text="{Binding Discount, StringFormat=- {0:N0} VND}" FontSize="16" Foreground="#EF4444" FontWeight="Medium" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding ActiveTab.Discount, StringFormat=- {0:N0} VND}" FontSize="16" Foreground="#EF4444" FontWeight="Medium" HorizontalAlignment="Right"/>
                         </Grid>
                         <Separator Background="#E2E8F0" Margin="0,0,0,15"/>
                         <Grid Margin="0,0,0,20">
                             <TextBlock Text="Final Amount" FontSize="20" FontWeight="Bold" Foreground="#1E293B"/>
-                            <TextBlock Text="{Binding FinalAmount, StringFormat={}{0:N0} VND}" FontSize="24" FontWeight="Black" Foreground="#4F46E5" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding ActiveTab.FinalAmount, StringFormat={}{0:N0} VND}" FontSize="24" FontWeight="Black" Foreground="#4F46E5" HorizontalAlignment="Right"/>
                         </Grid>
 
                         <!-- Payment Dropdown -->
+                        <!-- Ẩn VNPay theo yêu cầu -->
                         <TextBlock Text="Payment Method" FontSize="13" Foreground="#64748B" Margin="0,0,0,5"/>
                         <ComboBox Height="45" Margin="0,0,0,15" SelectedIndex="0" VerticalContentAlignment="Center" FontSize="16" Padding="10,0">
                             <ComboBoxItem Content="Cash"/>
-                            <ComboBoxItem Content="VNPay"/>
                         </ComboBox>
 
                         <!-- Nút Checkout -->
@@ -195,7 +294,79 @@
                         </Button>
                     </StackPanel>
                 </Border>
-            </Grid>
+            </Grid> <!-- End Right Column -->
+        </Grid> <!-- End Order Grid -->
+
+            <!-- Shift Info Grid -->
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsShiftTabActive}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                
+                <Border Background="White" CornerRadius="12" Padding="40" HorizontalAlignment="Center" VerticalAlignment="Center" Width="600">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" ShadowDepth="1" Color="#D1D5DB" Opacity="0.5"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="Thông tin Ca Làm Việc" FontSize="24" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+                        
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Tên ca:" FontSize="16" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CurrentShift.ShiftName}" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Ngày làm việc:" FontSize="16" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CurrentShift.StartTime, StringFormat='dd/MM/yyyy'}" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="#E2E8F0" Margin="0,10,0,20"/>
+
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Số tiền đầu ca (Start Cash):" FontSize="16" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CurrentShift.StartCash, StringFormat={}{0:N0} VND}" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Số đơn hàng hiện tại:" FontSize="16" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="1" Text="{Binding TotalOrders}" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Số tiền hiện tại (Ước tính):" FontSize="16" Foreground="#4F46E5" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CurrentCash, StringFormat={}{0:N0} VND}" FontSize="20" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                    </StackPanel>
+                </Border>
+            </Grid> <!-- End Shift Info Grid -->
         </Grid>
 
         <!-- ================= LỚP PHỦ POPUP THANH TOÁN QR CODE ================= -->

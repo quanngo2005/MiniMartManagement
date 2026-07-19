@@ -1,0 +1,43 @@
+<Window x:Class="MiniMart.Views.CloseShiftWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewmodels="clr-namespace:MiniMart.ViewModels"
+        Title="Đóng Ca Bán Hàng" Height="500" Width="600"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#F5F7FA" FontFamily="Segoe UI">
+
+    <Window.DataContext>
+        <viewmodels:CloseShiftViewModel />
+    </Window.DataContext>
+
+    <Border Background="White" CornerRadius="16" Margin="30" Padding="30">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="15" ShadowDepth="2" Color="#D1D5DB" Opacity="0.5"/>
+        </Border.Effect>
+
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="ĐÓNG CA BÁN HÀNG" FontSize="24" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+            
+            <TextBlock Text="{Binding ShiftName, StringFormat='Ca hiện tại: {0}'}" FontSize="16" FontWeight="Medium" Foreground="#334155" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+            <TextBlock Text="{Binding ShiftDate, StringFormat='Ngày: {0}'}" FontSize="14" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+            <TextBlock Text="Ca làm việc đã kết thúc. Vui lòng kiểm đếm và nhập số tiền mặt có trong két để đóng ca." 
+                       FontSize="14" Foreground="#64748B" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,30"/>
+
+            <TextBlock Text="Tiền cuối ca (End Cash):" FontSize="14" Foreground="#64748B" Margin="0,0,0,5"/>
+            <TextBox Text="{Binding EndCashString, UpdateSourceTrigger=PropertyChanged}" 
+                     Height="45" Padding="15,0" VerticalContentAlignment="Center" FontSize="16" BorderBrush="#E2E8F0" BorderThickness="1" Margin="0,0,0,10"/>
+
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#EF4444" FontSize="13" TextWrapping="Wrap" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+
+            <Button Content="Đóng ca" Command="{Binding CloseShiftCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" 
+                    Height="50" Background="#DC2626" Foreground="White" FontSize="16" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="8"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+    </Border>
+</Window>

@@ -1,82 +1,144 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MiniMart.Models;
+using MiniMart.Models.DTOs;
+using MiniMart.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MiniMart.ViewModels
 {
-    //Ke thua ObservableObject la dk bat buoc de UI tu dong cap nhat khi du lieu thay doi
     public partial class MainViewModel : ObservableObject
     {
-        //Thuộc tính [ObservableProperty] tu dong sinh ra bien public 'title' co kha nang tbao cho giao dien
         [ObservableProperty]
-        private ObservableCollection<CartItem> _cartItems;
+        private ObservableCollection<OrderTabViewModel> _orderTabs = new();
 
-        //Biến tiền
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(FinalAmount))]
-        private decimal _subTotal;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(FinalAmount))]
-        private decimal _discount;
-
-        private int _loyaltyPointsToUse;
-        public int LoyaltyPointsToUse
+        private OrderTabViewModel? _activeTab;
+        public OrderTabViewModel? ActiveTab
         {
-            get => _loyaltyPointsToUse;
+            get => _activeTab;
             set
             {
-                if(value < 0) value = 0;
-
-                if (value > 500) value = 500;
-
-                if(SetProperty(ref _loyaltyPointsToUse, value))
+                if (SetProperty(ref _activeTab, value))
                 {
-                    Discount = _loyaltyPointsToUse * 1000;
+                    foreach (var tab in OrderTabs)
+                    {
+                        tab.IsActive = (tab == value);
+                    }
                 }
             }
         }
 
-        // --- THÔNG TIN KHÁCH HÀNG ---
-        [ObservableProperty]
-        private string _customerName = "Jane Doe";
+        private int _nextTabId = 1;
 
         [ObservableProperty]
-        private string _customerPhone = "0123 456 789";
+        private bool _isShiftTabActive = false;
 
         [ObservableProperty]
-        private int _customerPoints = 1500;
+        [NotifyPropertyChangedFor(nameof(CurrentCash))]
+        private ShiftDto? _currentShift;
 
         [ObservableProperty]
-        private string _tempCustomerName;
+        private int _totalOrders = 0;
+
+        public decimal CurrentCash => (CurrentShift?.StartCash ?? 0) + (CurrentShift?.Revenue ?? 0);
 
         [ObservableProperty]
-        private string _tempCustomerPhone;
+        private bool _isCheckoutPopupOpen;
 
         [ObservableProperty]
         private bool _isEditCustomerPopupOpen;
 
+        [ObservableProperty]
+        private string _tempCustomerName = string.Empty;
+
+        [ObservableProperty]
+        private string _tempCustomerPhone = string.Empty;
+
+        [ObservableProperty]
+        private string _searchQuery = string.Empty;
+
+        [ObservableProperty]
+        private ObservableCollection<ProductDto> _searchResults = new();
+
+        // For tracking the delay in debounce
+        private string _lastSearchQuery = string.Empty;
+
+        public MainViewModel()
+        {
+            AddNewTab();
+        }
+
+        [RelayCommand]
+        private void AddNewTab()
+        {
+            var tab = new OrderTabViewModel
+            {
+                Id = _nextTabId,
+                TabName = $"Order {_nextTabId}"
+            };
+            OrderTabs.Add(tab);
+            ActiveTab = tab;
+            IsShiftTabActive = false;
+            _nextTabId++;
+        }
+
+        [RelayCommand]
+        private void CloseTab(OrderTabViewModel tab)
+        {
+            if (tab != null && OrderTabs.Contains(tab))
+            {
+                OrderTabs.Remove(tab);
+                if (OrderTabs.Count == 0)
+                {
+                    _nextTabId = 1;
+                    AddNewTab();
+                }
+                else
+                {
+                    ActiveTab = OrderTabs.Last();
+                }
+            }
+        }
+
+        [RelayCommand]
+        private void ShowShiftTab()
+        {
+            IsShiftTabActive = true;
+            ActiveTab = null;
+        }
+
+        [RelayCommand]
+        private void ShowOrderTab(OrderTabViewModel tab)
+        {
+            IsShiftTabActive = false;
+            ActiveTab = tab;
+        }
+
         [RelayCommand]
         private void OpenEditCustomer()
         {
-            TempCustomerName = CustomerName;
-            TempCustomerPhone = CustomerPhone;
-            IsEditCustomerPopupOpen = true;
+            if (ActiveTab != null)
+            {
+                TempCustomerName = ActiveTab.CustomerName;
+                TempCustomerPhone = ActiveTab.CustomerPhone;
+                IsEditCustomerPopupOpen = true;
+            }
         }
 
         [RelayCommand]
         private void SaveEditCustomer()
         {
-            CustomerName = TempCustomerName;
-            CustomerPhone = TempCustomerPhone;
+            if (ActiveTab != null)
+            {
+                ActiveTab.CustomerName = TempCustomerName;
+                ActiveTab.CustomerPhone = TempCustomerPhone;
+                // Also search customer by phone
+                _ = SearchCustomerAsync(TempCustomerPhone);
+            }
             IsEditCustomerPopupOpen = false;
         }
 
@@ -86,14 +148,64 @@ namespace MiniMart.ViewModels
             IsEditCustomerPopupOpen = false;
         }
 
-        [ObservableProperty]
-        private bool _isCheckoutPopupOpen;
+        private async Task SearchCustomerAsync(string phone)
+        {
+            var customer = await ApiService.Instance.GetCustomerByPhoneAsync(phone);
+            if (customer != null && ActiveTab != null)
+            {
+                ActiveTab.CustomerName = customer.FullName;
+                ActiveTab.CustomerPoints = customer.Point;
+                ActiveTab.CustomerId = customer.CustomerId;
+            }
+        }
 
+        async partial void OnSearchQueryChanged(string value)
+        {
+            _lastSearchQuery = value;
+            await Task.Delay(300); // debounce 300ms
+            if (_lastSearchQuery != value) return; // Only execute if it's the latest
 
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SearchResults.Clear();
+                });
+                return;
+            }
+            
+            var results = await ApiService.Instance.SearchProductsAsync(value);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                SearchResults.Clear();
+                foreach (var item in results)
+                {
+                    SearchResults.Add(item);
+                }
+            });
+        }
+
+        [RelayCommand]
+        private void AddProductToCart(ProductDto product)
+        {
+            if (ActiveTab == null) return;
+
+            var existingItem = ActiveTab.CartItems.FirstOrDefault(x => x.ProductId == product.ProductId);
+            if (existingItem != null)
+            {
+                existingItem.Quantity++;
+            }
+            else
+            {
+                ActiveTab.AddItem(new CartItem(product.ProductId, product.ProductName, product.SellingPrice, 1));
+            }
+            SearchQuery = string.Empty;
+        }
 
         [RelayCommand]
         private void Checkout()
         {
+            if (ActiveTab == null || ActiveTab.CartItems.Count == 0) return;
             IsCheckoutPopupOpen = true;
         }
 
@@ -101,40 +213,6 @@ namespace MiniMart.ViewModels
         private void ClosePopup()
         {
             IsCheckoutPopupOpen = false;
-        }
-
-        public decimal FinalAmount => SubTotal - Discount;
-        public MainViewModel()
-        {
-            //
-            CartItems = new ObservableCollection<CartItem>
-            {
-                new CartItem("Nước giải khát Coca Cola 330ml", 10000, 2),
-                new CartItem("Mì tôm Hảo Hảo chua cay", 3500, 5),
-                new CartItem("Bánh mì que Pate cay", 15000, 1),
-                new CartItem("Sữa tươi Vinamilk có đường 180ml", 8000, 3)
-            };
-
-            foreach(var item in CartItems)
-            {
-                item.PropertyChanged += Item_PropertyChanged;
-            }
-
-            CalculateTotal();
-        }
-
-        //Ham tu dong chay moi khi 1 CartItem bi thay doi du lieu
-        private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(CartItem.Total)) 
-            {
-                CalculateTotal();
-            }
-        }
-
-        private void CalculateTotal()
-        {
-            SubTotal = CartItems.Sum(item => item.Total);
         }
     }
 }

@@ -13,12 +13,10 @@ using MiniMart.Repositories.Interfaces;
 using MiniMart.Services;
 using MiniMart.Services.Interfaces;
 using MiniMart.Services.Implementations;
-<<<<<<< HEAD
 using MiniMart.Shared.Settings;
-=======
->>>>>>> 8c01141d39fec51ebd6adf827f53ccb0f0fd5e47
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<TaxSettings>(builder.Configuration.GetSection("TaxSettings"));
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
 
 // ── OData EDM Model ──────────────────────────────────────────────
@@ -47,8 +45,7 @@ odataBuilder.EntitySet<Promotion>("Promotions");
 // ── Infrastructure ────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

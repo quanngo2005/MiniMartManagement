@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,9 +34,13 @@ namespace MiniMart.Models
             }
         }
 
+        [ObservableProperty]
+        private int _productId;
+
         public decimal Total => Price * Quantity;
-        public CartItem(string name, decimal price, int quantity)
+        public CartItem(int productId, string name, decimal price, int quantity)
         {
+            ProductId = productId;
             Name = name;
             Price = price;
             Quantity = quantity;

@@ -105,7 +105,7 @@ class CheckoutResponse {
       loyaltyPointsEarned: json['loyaltyPointsEarned'] ?? 0,
       customerPointBalance: json['customerPointBalance'],
       paymentMethod: _parsePaymentMethod(json['paymentMethod']),
-      status: json['status'] ?? '',
+      status: json['status']?.toString() ?? '',
       orderDate: DateTime.tryParse(json['orderDate'] ?? '') ?? DateTime.now(),
       items: (json['items'] as List<dynamic>?)
               ?.map((i) => CheckoutItemResponse.fromJson(i))

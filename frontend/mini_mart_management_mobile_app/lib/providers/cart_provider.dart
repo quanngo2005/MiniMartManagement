@@ -9,7 +9,7 @@ class CartProvider extends ChangeNotifier {
   int? _selectedCustomerPoints;
   int _paymentMethod = 1; // 1 = Cash, 3 = EWallet (VNPAY)
   int _pointsToUse = 0;
-  static const double vatRate = 0.08;
+  static const double vatRate = 0.0;
 
   List<CartItem> get items => _items;
   int? get selectedCustomerId => _selectedCustomerId;

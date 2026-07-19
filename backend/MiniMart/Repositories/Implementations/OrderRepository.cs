@@ -117,6 +117,9 @@ namespace MiniMart.Repositories.RepoImplement
             if (shift == null)
                 throw new InvalidOperationException("Ca làm việc không tồn tại hoặc đã đóng.");
 
+            if (DateTime.Now > shift.EndTime)
+                throw new InvalidOperationException("Ca làm việc đã kết thúc. Vui lòng đóng ca trước khi thao tác tiếp.");
+
             
             Customer? customer = null;
             int loyaltyPointsUsed = 0;
