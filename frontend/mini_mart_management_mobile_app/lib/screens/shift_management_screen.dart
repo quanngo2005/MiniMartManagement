@@ -42,7 +42,17 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ShiftProvider>().fetchCurrentShift();
+      final currentUser = context.read<AuthProvider>().currentUser;
+      final isManager =
+          currentUser?.roleName == 'Manager' ||
+          currentUser?.roleName == 'Admin';
+      final shiftProvider = context.read<ShiftProvider>();
+
+      if (isManager) {
+        shiftProvider.fetchShifts();
+      } else {
+        shiftProvider.fetchCurrentShift();
+      }
     });
 
     _pulseController = AnimationController(
