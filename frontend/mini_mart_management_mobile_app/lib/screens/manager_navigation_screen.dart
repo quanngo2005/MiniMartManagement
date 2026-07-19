@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
+import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
+import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
+import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
@@ -8,6 +11,7 @@ import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart
 import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_dashboard_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/manager_return_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/product_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
@@ -30,6 +34,27 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
 
   ManagerNavDestination _destination = ManagerNavDestination.home;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<OrderReturnProvider>().loadAllReturns();
+    });
+    SignalrService.instance.addListener(_onNotificationReceived);
+  }
+
+  @override
+  void dispose() {
+    SignalrService.instance.removeListener(_onNotificationReceived);
+    super.dispose();
+  }
+
+  void _onNotificationReceived() {
+    if (mounted) {
+      context.read<OrderReturnProvider>().loadAllReturns();
+    }
+  }
+
   static const _destinationToIndex = {
     ManagerNavDestination.home: 0,
     ManagerNavDestination.shift: 1,
@@ -42,7 +67,11 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.promotions: 8,
     ManagerNavDestination.invoices: 9,
     ManagerNavDestination.analyze: 10,
+<<<<<<< HEAD
     ManagerNavDestination.categories: 11,
+=======
+    ManagerNavDestination.returns: 11,
+>>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
   };
 
   static const _bottomNavDestinations = [
@@ -109,7 +138,11 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           ),
           const InvoiceListScreen(),
           AnalyzeScreen(onMenuTap: _openDrawer),
+<<<<<<< HEAD
           CategoryManagementScreen.withProvider(onMenuTap: _openDrawer),
+=======
+          ManagerReturnListScreen(onMenuTap: _openDrawer),
+>>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(

@@ -52,8 +52,9 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute<void>(
           builder: (_) {
             if (_isManager(user)) return ManagerNavigationScreen(user: user);
-            if (_isWarehouse(user))
+            if (_isWarehouse(user)) {
               return WarehouseNavigationScreen(user: user);
+            }
             if (_isCashier(user)) return const CheckoutScreen();
             return MockRoleScreen(user: user);
           },

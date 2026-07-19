@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using MiniMart.Data;
+using MiniMart.DTOs;
 using MiniMart.Models;
+using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 
 namespace MiniMart.Repositories.RepoImplement
@@ -68,6 +70,76 @@ namespace MiniMart.Repositories.RepoImplement
             return excludeId.HasValue
                 ? await _context.Suppliers.AnyAsync(s => s.SupplierCode == supplierCode && s.SupplierId != excludeId.Value)
                 : await _context.Suppliers.AnyAsync(s => s.SupplierCode == supplierCode);
+        }
+
+        public async Task<IReadOnlyList<SupplierDebtSummaryDto>> GetDebtSummariesAsync()
+        {
+            return await _context.Receipts
+                .AsNoTracking()
+                .Where(r => r.ReceiptStatus == ReceiptStatus.Completed && r.DebtAmount > 0)
+                .GroupBy(r => new
+                {
+                    r.SupplierId,
+                    r.Supplier.SupplierCode,
+                    r.Supplier.SupplierName
+                })
+                .Select(g => new SupplierDebtSummaryDto
+                {
+                    SupplierId = g.Key.SupplierId,
+                    SupplierCode = g.Key.SupplierCode,
+                    SupplierName = g.Key.SupplierName,
+                    TotalDebt = g.Sum(r => r.DebtAmount),
+                    UnpaidReceiptCount = g.Count(),
+                    LatestReceiptDate = g.Max(r => r.ImportDate)
+                })
+                .OrderByDescending(summary => summary.TotalDebt)
+                .ThenBy(summary => summary.SupplierName)
+                .ToListAsync();
+        }
+
+        public async Task<SupplierDebtDetailDto?> GetDebtDetailAsync(int supplierId)
+        {
+            var supplier = await _context.Suppliers
+                .AsNoTracking()
+                .Where(s => s.SupplierId == supplierId)
+                .Select(s => new
+                {
+                    s.SupplierId,
+                    s.SupplierCode,
+                    s.SupplierName
+                })
+                .FirstOrDefaultAsync();
+
+            if (supplier == null)
+                return null;
+
+            var receipts = await _context.Receipts
+                .AsNoTracking()
+                .Where(r => r.SupplierId == supplierId &&
+                            r.ReceiptStatus == ReceiptStatus.Completed &&
+                            r.DebtAmount > 0)
+                .OrderByDescending(r => r.ImportDate)
+                .ThenByDescending(r => r.ReceiptId)
+                .Select(r => new SupplierDebtReceiptDto
+                {
+                    ReceiptId = r.ReceiptId,
+                    ReceiptCode = r.ReceiptCode,
+                    ImportDate = r.ImportDate,
+                    TotalAmount = r.TotalAmount,
+                    PaidAmount = r.PaidAmount,
+                    DebtAmount = r.DebtAmount,
+                    Note = r.Note
+                })
+                .ToListAsync();
+
+            return new SupplierDebtDetailDto
+            {
+                SupplierId = supplier.SupplierId,
+                SupplierCode = supplier.SupplierCode,
+                SupplierName = supplier.SupplierName,
+                TotalDebt = receipts.Sum(r => r.DebtAmount),
+                Receipts = receipts
+            };
         }
     }
 }

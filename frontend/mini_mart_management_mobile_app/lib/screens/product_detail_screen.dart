@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/product.dart';
+import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/product_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
@@ -40,6 +41,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late final _descCtrl = TextEditingController(
     text: widget.product?.description ?? '',
   );
+  late final _imageUrlCtrl = TextEditingController(
+    text: widget.product?.imageUrl ?? '',
+  );
   late final _categoryCtrl = TextEditingController(
     text: widget.product?.categoryId?.toString() ?? '',
   );
@@ -58,6 +62,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     super.initState();
     _status = widget.product?.status ?? true;
     _isEditing = _isNew;
+    _imageUrlCtrl.addListener(() {
+      if (mounted) setState(() {});
+    });
+    _categoryCtrl.addListener(() {
+      if (mounted) setState(() {});
+    });
+    _supplierCtrl.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -69,6 +82,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     _stockCtrl.dispose();
     _minStockCtrl.dispose();
     _descCtrl.dispose();
+    _imageUrlCtrl.dispose();
     _categoryCtrl.dispose();
     _supplierCtrl.dispose();
     super.dispose();
@@ -88,6 +102,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       'description': _descCtrl.text.trim().isEmpty
           ? null
           : _descCtrl.text.trim(),
+      'imageUrl': _imageUrlCtrl.text.trim().isEmpty
+          ? null
+          : _imageUrlCtrl.text.trim(),
       'status': _status,
       'categoryId': int.tryParse(_categoryCtrl.text) ?? 0,
       'supplierId': int.tryParse(_supplierCtrl.text) ?? 0,
@@ -189,6 +206,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     validator: _req,
                   ),
+                  _lookupText(_categoryCtrl, _categoryLabel(context)),
                   _field(
                     _supplierCtrl,
                     'Supplier ID *',
@@ -196,10 +214,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     validator: _req,
                   ),
+                  _lookupText(_supplierCtrl, _supplierLabel(context)),
                 ]),
                 const SizedBox(height: 16),
                 _buildSection('Mô tả', [
                   _field(_descCtrl, 'Mô tả sản phẩm', maxLines: 3),
+                  _field(
+                    _imageUrlCtrl,
+                    'Image URL',
+                    validator: null,
+                  ),
+                  if (_imageUrlCtrl.text.trim().isNotEmpty)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        _imageUrlCtrl.text.trim(),
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          height: 160,
+                          width: double.infinity,
+                          color: AppColors.surfaceContainerHigh,
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.broken_image_outlined),
+                        ),
+                      ),
+                    ),
                 ]),
                 if (_isEditing) ...[
                   const SizedBox(height: 16),
@@ -359,7 +400,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         value: _status,
         onChanged: (v) => setState(() => _status = v),
-        activeColor: AppColors.secondary,
+        activeThumbColor: AppColors.secondary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -395,4 +436,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   String? _req(String? v) =>
       (v == null || v.trim().isEmpty) ? 'Trường này không được trống' : null;
+
+  Widget _lookupText(TextEditingController controller, String? text) {
+    if (text == null || text.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: AppColors.textMuted,
+                fontStyle: FontStyle.italic,
+              ),
+        ),
+      ),
+    );
+  }
+
+  String? _categoryLabel(BuildContext context) {
+    final id = int.tryParse(_categoryCtrl.text.trim());
+    if (id == null) return null;
+    final categories = context.watch<CategoryProvider>().categories;
+    for (final category in categories) {
+      if (category.categoryId == id) {
+        return 'Danh mục: ${category.categoryName}';
+      }
+    }
+    return 'Danh mục chưa tìm thấy';
+  }
+
+  String? _supplierLabel(BuildContext context) {
+    return null;
+  }
 }

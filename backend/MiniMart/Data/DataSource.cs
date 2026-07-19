@@ -178,7 +178,12 @@ namespace MiniMart.Models
             new Product { ProductId = 53, ProductCode = "SP053", Barcode = "8934588011053", ProductName = "Khăn giấy lau bếp 2 cuộn",           SellingPrice = 22000,  StockQuantity = 150, Status = true, CategoryId = 3,  SupplierId = 5 },
             new Product { ProductId = 54, ProductCode = "SP054", Barcode = "8934588011054", ProductName = "Bọc thực phẩm màng bọc 30m",        SellingPrice = 28000,  StockQuantity = 100, Status = true, CategoryId = 3,  SupplierId = 5 },
             new Product { ProductId = 55, ProductCode = "SP055", Barcode = "8934588011055", ProductName = "Nến thơm cốc nhỏ 100g",             SellingPrice = 45000,  StockQuantity = 60,  Status = true, CategoryId = 3,  SupplierId = 5 },
-        };
+        }
+        .Select(product =>
+        {
+            product.ImageUrl = GetProductImageUrl(product.ProductCode);
+            return product;
+        }).ToList();
 
         // ========================= RECEIPTS =========================
         public static List<Receipt> GetReceipts() => new List<Receipt>
@@ -366,12 +371,23 @@ namespace MiniMart.Models
             {
                 PromotionId = 2,
                 Name = "Hóa đơn từ 150K",
-                Description = "Đơn hàng từ 150.000đ giảm 10.000đ.",
+                Description = "Đơn hàng từ 150.000đ giảm 10%.",
                 Type = PromotionType.PercentDiscount,
-                DiscountAmount = 10000,
+                DiscountPercent = 10,
                 MinimumOrderAmount = 150000,
                 StartDate = new DateTime(2026, 7, 1),
                 EndDate = new DateTime(2026, 8, 31),
+                IsActive = true,
+            },
+            new Promotion
+            {
+                PromotionId = 3,
+                Name = "Giảm giá bánh Oreo",
+                Description = "Bánh Oreo giảm 15% trong tháng 7.",
+                Type = PromotionType.ProductDiscount,
+                DiscountPercent = 15,
+                StartDate = new DateTime(2026, 7, 1),
+                EndDate = new DateTime(2026, 7, 31),
                 IsActive = true,
             },
         };
@@ -380,10 +396,7 @@ namespace MiniMart.Models
         {
             new PromotionProduct { PromotionId = 1, ProductId = 24 },
             new PromotionProduct { PromotionId = 1, ProductId = 26 },
-            new PromotionProduct { PromotionId = 2, ProductId = 1 },
-            new PromotionProduct { PromotionId = 2, ProductId = 3 },
-            new PromotionProduct { PromotionId = 2, ProductId = 11 },
-            new PromotionProduct { PromotionId = 2, ProductId = 18 },
+            new PromotionProduct { PromotionId = 3, ProductId = 11 },
         };
 
         // ========================= INVENTORY TRANSACTIONS =========================
@@ -402,6 +415,24 @@ namespace MiniMart.Models
             // Bán hàng từ order 4
             new InventoryTransaction { InventoryTransactionId = 9,  TransactionType = InventoryTransactionType.Sale,   Quantity = 2,   PreviousStock = 100, CurrentStock = 98,  ReferenceType = ReferenceType.Order,   ReferenceId = 4, ProductId = 36, BatchId = 10, EmployeeId = 3, Note = "Bán hàng đơn HD004" },
             new InventoryTransaction { InventoryTransactionId = 10, TransactionType = InventoryTransactionType.Sale,   Quantity = 2,   PreviousStock = 90,  CurrentStock = 88,  ReferenceType = ReferenceType.Order,   ReferenceId = 4, ProductId = 38, BatchId = 12, EmployeeId = 3, Note = "Bán hàng đơn HD004" },
+        };
+
+        private static string GetProductImageUrl(string productCode) => productCode switch
+        {
+            "SP001" => "https://storage.googleapis.com/tm-zopsmart-uploads/1/images/640/20250417/3296881-20250417-161955.webp",
+            "SP002" => "https://upload.wikimedia.org/wikipedia/commons/2/29/La_Vie_bottle.jpg",
+            "SP003" => "https://tiimg.tistatic.com/fp/1/006/506/pepsi-cola-canned-soda-330ml-539.jpg",
+            "SP004" => "https://tiimg.tistatic.com/fp/1/006/506/coca-cola-soft-drink-330ml-can-539.jpg",
+            "SP011" => "https://www.crackerjack.co.nz/cdn/shop/products/oreo-original-sandwich-chocolate-1196g-fs1675.jpg",
+            "SP012" => "https://www.pns.hk/cdn/shop/products/448372_1_1024x1024.jpg",
+            "SP014" => "https://www.worldwideholland.com/cdn/shop/products/haribo-gold-bears-250-gr-1_1024x1024.jpg",
+            "SP015" => "https://cdn.shopify.com/s/files/1/0550/6322/3094/products/LaysOriginal50g_1024x1024.jpg",
+            "SP018" => "https://www.avakids.com/images/products/2024/03/07/large/sua-tuoi-vinamilk-it-duong-1-lit-1-hop_1712572233.jpg",
+            "SP020" => "https://www.sieuthianhduong.com/upload/product/sua-milo-180ml-4-hop_1620202344.jpg",
+            "SP024" => "https://osifood.vn/cdn/shop/products/mi-hao-hao-tom-chua-cay-goi-75g_1024x1024.jpg",
+            "SP029" => "https://www.chin-su.com.vn/uploads/products/nuoc-mam-ca-hoi-500ml.jpg",
+            "SP030" => "https://www.chin-su.com.vn/uploads/products/tuong-ot-chin-su-250g.jpg",
+            _ => $"https://placehold.co/320x320/png?text={productCode}",
         };
     }
 }

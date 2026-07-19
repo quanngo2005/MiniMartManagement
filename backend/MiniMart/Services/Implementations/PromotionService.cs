@@ -38,7 +38,30 @@ namespace MiniMart.Services.Implementations
             if (createDto.EndDate <= createDto.StartDate)
                 throw new DomainException("EndDate must be after StartDate.", StatusCodes.Status422UnprocessableEntity);
 
-            ValidatePromotionRule(createDto.Type, createDto.DiscountPercent, createDto.DiscountAmount, createDto.MinimumOrderAmount, createDto.BuyQuantity, createDto.GiftQuantity);
+            ValidatePromotionRule(
+                createDto.Type,
+                createDto.DiscountPercent,
+                createDto.DiscountAmount,
+                createDto.MinimumOrderAmount,
+                createDto.BuyQuantity,
+                createDto.GiftQuantity,
+                createDto.GiftProductId);
+
+            if (createDto.Type == MiniMart.Models.Enums.PromotionType.BuyXGetYFree && createDto.GiftProductId.GetValueOrDefault() <= 0)
+            {
+                throw new DomainException(
+                    "Buy X Get Y Free requires a gift product.",
+                    StatusCodes.Status422UnprocessableEntity);
+            }
+
+            if ((createDto.Type == MiniMart.Models.Enums.PromotionType.ProductDiscount
+                || createDto.Type == MiniMart.Models.Enums.PromotionType.BuyXGetYFree)
+                && !createDto.ProductIds.Any())
+            {
+                throw new DomainException(
+                    "Promotion requires at least one product.",
+                    StatusCodes.Status422UnprocessableEntity);
+            }
 
             foreach (var productId in createDto.ProductIds)
             {
@@ -61,7 +84,30 @@ namespace MiniMart.Services.Implementations
             if (updateDto.EndDate <= updateDto.StartDate)
                 throw new DomainException("EndDate must be after StartDate.", StatusCodes.Status422UnprocessableEntity);
 
-            ValidatePromotionRule(updateDto.Type, updateDto.DiscountPercent, updateDto.DiscountAmount, updateDto.MinimumOrderAmount, updateDto.BuyQuantity, updateDto.GiftQuantity);
+            ValidatePromotionRule(
+                updateDto.Type,
+                updateDto.DiscountPercent,
+                updateDto.DiscountAmount,
+                updateDto.MinimumOrderAmount,
+                updateDto.BuyQuantity,
+                updateDto.GiftQuantity,
+                updateDto.GiftProductId);
+
+            if (updateDto.Type == MiniMart.Models.Enums.PromotionType.BuyXGetYFree && updateDto.GiftProductId.GetValueOrDefault() <= 0)
+            {
+                throw new DomainException(
+                    "Buy X Get Y Free requires a gift product.",
+                    StatusCodes.Status422UnprocessableEntity);
+            }
+
+            if ((updateDto.Type == MiniMart.Models.Enums.PromotionType.ProductDiscount
+                || updateDto.Type == MiniMart.Models.Enums.PromotionType.BuyXGetYFree)
+                && !updateDto.ProductIds.Any())
+            {
+                throw new DomainException(
+                    "Promotion requires at least one product.",
+                    StatusCodes.Status422UnprocessableEntity);
+            }
 
             foreach (var productId in updateDto.ProductIds)
             {
@@ -90,7 +136,8 @@ namespace MiniMart.Services.Implementations
             decimal? discountAmount,
             decimal? minimumOrderAmount,
             int? buyQuantity,
-            int? giftQuantity)
+            int? giftQuantity,
+            int? giftProductId)
         {
             if (type == MiniMart.Models.Enums.PromotionType.BuyXGetYFree)
             {
@@ -101,22 +148,50 @@ namespace MiniMart.Services.Implementations
                         StatusCodes.Status422UnprocessableEntity);
                 }
 
+                if (giftProductId.GetValueOrDefault() <= 0)
+                {
+                    throw new DomainException(
+                        "Buy X Get Y Free requires a gift product.",
+                        StatusCodes.Status422UnprocessableEntity);
+                }
+
                 return;
             }
 
-            if (minimumOrderAmount.GetValueOrDefault() <= 0)
+            if (type == MiniMart.Models.Enums.PromotionType.ProductDiscount)
             {
-                throw new DomainException(
-                    "Threshold promotions require MinimumOrderAmount to be greater than 0.",
-                    StatusCodes.Status422UnprocessableEntity);
+                if ((discountPercent ?? 0) <= 0 && (discountAmount ?? 0) <= 0)
+                {
+                    throw new DomainException(
+                        "Product promotions require either DiscountPercent or DiscountAmount.",
+                        StatusCodes.Status422UnprocessableEntity);
+                }
+
+                return;
             }
 
-            if ((discountPercent ?? 0) <= 0 && (discountAmount ?? 0) <= 0)
+            if (type == MiniMart.Models.Enums.PromotionType.PercentDiscount)
             {
-                throw new DomainException(
-                    "Threshold promotions require either DiscountPercent or DiscountAmount.",
-                    StatusCodes.Status422UnprocessableEntity);
+                if (minimumOrderAmount.GetValueOrDefault() <= 0)
+                {
+                    throw new DomainException(
+                        "Threshold promotions require MinimumOrderAmount to be greater than 0.",
+                        StatusCodes.Status422UnprocessableEntity);
+                }
+
+                if ((discountPercent ?? 0) <= 0)
+                {
+                    throw new DomainException(
+                        "Threshold promotions require DiscountPercent to be greater than 0.",
+                        StatusCodes.Status422UnprocessableEntity);
+                }
+
+                return;
             }
+
+            throw new DomainException(
+                "Unsupported promotion type.",
+                StatusCodes.Status422UnprocessableEntity);
         }
     }
 }

@@ -1,28 +1,40 @@
 class Category {
   const Category({
-    required this.id,
-    required this.name,
+    required this.categoryId,
+    required this.categoryCode,
+    required this.categoryName,
     this.description,
+    required this.status,
+    required this.displayOrder,
+    this.parentCategoryId,
+    this.parentCategoryName,
     required this.taxRateId,
-    required this.taxRate,
-    required this.taxDescription,
   });
 
-  final int id;
-  final String name;
+  final int categoryId;
+  final String categoryCode;
+  final String categoryName;
   final String? description;
+  final bool status;
+  final int displayOrder;
+  final int? parentCategoryId;
+  final String? parentCategoryName;
   final int taxRateId;
-  final double taxRate;
-  final String taxDescription;
 
   factory Category.fromJson(Map<String, dynamic> json) {
+    final parent = json['parentCategory'] ?? json['ParentCategory'];
     return Category(
-      id: (json['id'] ?? json['Id'] ?? 0) as int,
-      name: (json['name'] ?? json['Name'] ?? '') as String,
-      description: json['description'] as String? ?? json['Description'] as String?,
+      categoryId: (json['categoryId'] ?? json['CategoryId'] ?? 0) as int,
+      categoryCode: (json['categoryCode'] ?? json['CategoryCode'] ?? '') as String,
+      categoryName: (json['categoryName'] ?? json['CategoryName'] ?? '') as String,
+      description: json['description'] ?? json['Description'],
+      status: (json['status'] ?? json['Status'] ?? true) as bool,
+      displayOrder: (json['displayOrder'] ?? json['DisplayOrder'] ?? 0) as int,
+      parentCategoryId: (json['parentCategoryId'] ?? json['ParentCategoryId']) as int?,
+      parentCategoryName: parent is Map<String, dynamic>
+          ? (parent['categoryName'] ?? parent['CategoryName']) as String?
+          : null,
       taxRateId: (json['taxRateId'] ?? json['TaxRateId'] ?? 0) as int,
-      taxRate: ((json['taxRate'] ?? json['TaxRate'] ?? 0) as num).toDouble(),
-      taxDescription: (json['taxDescription'] ?? json['TaxDescription'] ?? '') as String,
     );
   }
 }

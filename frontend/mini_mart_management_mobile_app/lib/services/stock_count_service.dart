@@ -6,18 +6,181 @@ import 'package:mini_mart_management_mobile_app/models/stock_count.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
 class StockCountService {
-  StockCountService({http.Client? client}) : _client = client ?? createConfiguredClient();
+  StockCountService({http.Client? client})
+    : _client = client ?? createConfiguredClient();
   final http.Client _client;
-  Future<List<StockCount>> fetchStockCounts() async { final json = await _request('GET', '/api/stock-counts'); final items = json['value'] ?? json['Value'] ?? json['data'] ?? json['Data']; if (items is! List) throw const ApiException('Không thể đọc lịch sử kiểm kê.'); return items.whereType<Map<String, dynamic>>().map(StockCount.fromJson).toList(growable: false); }
-  Future<StockCount> getDetail(int id) async => StockCount.fromJson(await _request('GET', '/api/stock-counts/$id'));
-  Future<StockCount> create(StockCountScope scope) async => StockCount.fromJson(await _request('POST', '/api/stock-counts', body: {'scope': scope.apiValue, 'categoryIds': const <int>[] }));
-  Future<StockCount> start(StockCount count) async => _transition('PUT', '/api/stock-counts/${count.stockCountId}/start', count.rowVersion);
-  Future<StockCount> submit(StockCount count) async => _transition('PUT', '/api/stock-counts/${count.stockCountId}/submit', count.rowVersion);
-  Future<StockCount> approve(StockCount count) async => _transition('POST', '/api/stock-counts/${count.stockCountId}/approve', count.rowVersion);
-  Future<StockCount> reject(StockCount count, String reason) async => StockCount.fromJson(await _request('POST', '/api/stock-counts/${count.stockCountId}/reject', body: {'rowVersion': count.rowVersion, 'reason': reason}));
-  Future<StockCount> updateLines(StockCount count, List<StockCountLine> lines) async => StockCount.fromJson(await _request('PUT', '/api/stock-counts/${count.stockCountId}/lines', body: {'stockCountRowVersion': count.rowVersion, 'lines': lines.map((line) => {'stockCountLineId': line.stockCountLineId, 'actualQuantity': line.actualQuantity, 'note': line.note, 'rowVersion': line.rowVersion}).toList()}));
-  Future<StockCount> _transition(String method, String path, String rowVersion) async => StockCount.fromJson(await _request(method, path, body: {'rowVersion': rowVersion}));
-  Future<Map<String, dynamic>> _request(String method, String path, {Object? body}) async { final headers = {'Accept': 'application/json', if (body != null) 'Content-Type': 'application/json'}; final uri = ApiConfig.uri(path); final response = switch (method) { 'GET' => await _client.get(uri, headers: headers), 'POST' => await _client.post(uri, headers: headers, body: body == null ? null : jsonEncode(body)), 'PUT' => await _client.put(uri, headers: headers, body: body == null ? null : jsonEncode(body)), _ => throw UnsupportedError(method) }; final json = _decode(response); if (response.statusCode < 200 || response.statusCode >= 300) throw ApiException(_message(json)); return json; }
-  Map<String, dynamic> _decode(http.Response response) { if (response.body.isEmpty) return {}; final decoded = jsonDecode(response.body); if (decoded is Map<String, dynamic>) return decoded; if (decoded is List) return {'data': decoded}; throw const ApiException('Server returned an unexpected response.'); }
-  String _message(Map<String, dynamic> json) { final message = json['message'] ?? json['Message']; return message is String && message.isNotEmpty ? message : 'Không thể xử lý phiếu kiểm kê.'; }
+  Future<List<StockCount>> fetchStockCounts() async {
+    final json = await _request('GET', '/api/stock-counts');
+    final items =
+        json['value'] ?? json['Value'] ?? json['data'] ?? json['Data'];
+    if (items is! List) {
+      throw const ApiException('Không thể đọc lịch sử kiểm kê.');
+    }
+    return items
+        .whereType<Map<String, dynamic>>()
+        .map(StockCount.fromJson)
+        .toList(growable: false);
+  }
+
+  Future<StockCount> getDetail(int id) async =>
+      StockCount.fromJson(await _request('GET', '/api/stock-counts/$id'));
+  Future<StockCount> create(
+    StockCountScope scope, {
+    List<int> categoryIds = const [],
+  }) async => StockCount.fromJson(
+    await _request(
+      'POST',
+      '/api/stock-counts',
+      body: {'scope': scope.apiValue, 'categoryIds': categoryIds},
+    ),
+  );
+  Future<StockCount> start(StockCount count) async => _transition(
+    'PUT',
+    '/api/stock-counts/${count.stockCountId}/start',
+    count.rowVersion,
+  );
+  Future<StockCount> cancelDraft(StockCount count) async => StockCount.fromJson(
+    await _request(
+      'DELETE',
+      '/api/stock-counts/${count.stockCountId}',
+      body: {'rowVersion': count.rowVersion},
+    ),
+  );
+  Future<StockCount> addLines(StockCount count, List<int> productIds) async =>
+      StockCount.fromJson(
+        await _request(
+          'POST',
+          '/api/stock-counts/${count.stockCountId}/lines',
+          body: {
+            'stockCountRowVersion': count.rowVersion,
+            'productIds': productIds,
+          },
+        ),
+      );
+  Future<StockCount> submit(StockCount count) async => _transition(
+    'PUT',
+    '/api/stock-counts/${count.stockCountId}/submit',
+    count.rowVersion,
+  );
+  Future<StockCount> approve(StockCount count) async => _transition(
+    'POST',
+    '/api/stock-counts/${count.stockCountId}/approve',
+    count.rowVersion,
+  );
+  Future<StockCount> reject(StockCount count, String reason) async =>
+      StockCount.fromJson(
+        await _request(
+          'POST',
+          '/api/stock-counts/${count.stockCountId}/reject',
+          body: {'rowVersion': count.rowVersion, 'reason': reason},
+        ),
+      );
+  Future<StockCount> updateLines(
+    StockCount count,
+    List<StockCountLine> lines,
+  ) async => StockCount.fromJson(
+    await _request(
+      'PUT',
+      '/api/stock-counts/${count.stockCountId}/lines',
+      body: {
+        'stockCountRowVersion': count.rowVersion,
+        'lines': lines
+            .map(
+              (line) => {
+                'stockCountLineId': line.stockCountLineId,
+                'actualQuantity': line.actualQuantity,
+                'note': line.note,
+                'rowVersion': line.rowVersion,
+              },
+            )
+            .toList(),
+      },
+    ),
+  );
+  Future<StockCount> _transition(
+    String method,
+    String path,
+    String rowVersion,
+  ) async => StockCount.fromJson(
+    await _request(method, path, body: {'rowVersion': rowVersion}),
+  );
+  Future<Map<String, dynamic>> _request(
+    String method,
+    String path, {
+    Object? body,
+  }) async {
+    final isMutation = {'POST', 'PUT', 'PATCH', 'DELETE'}.contains(method);
+    final headers = <String, String>{
+      'Accept': 'application/json',
+      if (body != null) 'Content-Type': 'application/json',
+    };
+    if (isMutation) headers.addAll(await _mutationHeaders());
+
+    final uri = ApiConfig.uri(path);
+    final encodedBody = body == null ? null : jsonEncode(body);
+    final response = switch (method) {
+      'GET' => await _client.get(uri, headers: headers),
+      'POST' => await _client.post(uri, headers: headers, body: encodedBody),
+      'PUT' => await _client.put(uri, headers: headers, body: encodedBody),
+      'PATCH' => await _client.patch(uri, headers: headers, body: encodedBody),
+      'DELETE' => await _client.delete(
+        uri,
+        headers: headers,
+        body: encodedBody,
+      ),
+      _ => throw UnsupportedError(method),
+    };
+    final json = _decode(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(_message(json));
+    }
+    return json;
+  }
+
+  Future<Map<String, String>> _mutationHeaders() async {
+    final response = await _client.get(
+      ApiConfig.uri('/api/auth/csrf-token'),
+      headers: const {'Accept': 'application/json'},
+    );
+    final json = _decode(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(_message(json));
+    }
+
+    final data = json['data'] ?? json['Data'];
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException('CSRF response is missing token data.');
+    }
+    final token = data['csrfToken'] ?? data['CsrfToken'];
+    if (token is! String || token.isEmpty) {
+      throw const ApiException('CSRF token is missing.');
+    }
+
+    final headers = <String, String>{'X-XSRF-TOKEN': token};
+    final cookieToken = _readCookieToken(response.headers['set-cookie']);
+    if (cookieToken != null) headers['Cookie'] = 'XSRF-TOKEN=$cookieToken';
+    return headers;
+  }
+
+  String? _readCookieToken(String? setCookieHeader) {
+    if (setCookieHeader == null || setCookieHeader.isEmpty) return null;
+    return RegExp(
+      r'XSRF-TOKEN=([^;,\s]+)',
+    ).firstMatch(setCookieHeader)?.group(1);
+  }
+
+  Map<String, dynamic> _decode(http.Response response) {
+    if (response.body.isEmpty) return {};
+    final decoded = jsonDecode(response.body);
+    if (decoded is Map<String, dynamic>) return decoded;
+    if (decoded is List) return {'data': decoded};
+    throw const ApiException('Server returned an unexpected response.');
+  }
+
+  String _message(Map<String, dynamic> json) {
+    final message = json['message'] ?? json['Message'];
+    return message is String && message.isNotEmpty
+        ? message
+        : 'Không thể xử lý phiếu kiểm kê.';
+  }
 }

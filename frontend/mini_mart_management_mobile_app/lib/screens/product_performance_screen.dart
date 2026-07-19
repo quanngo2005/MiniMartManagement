@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/top_product.dart';
 import 'package:mini_mart_management_mobile_app/providers/report_provider.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/product_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
@@ -140,7 +141,7 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               sliver: SliverList.separated(
                 itemCount: pageItems.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (_, i) => _ProductCard(item: pageItems[i]),
               ),
             ),
@@ -228,6 +229,25 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
             ),
             icon: const Icon(Icons.inventory_2_outlined),
             label: const Text('Quản lý Sản Phẩm'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              side: const BorderSide(color: AppColors.primary),
+              minimumSize: const Size(double.infinity, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => Navigator.push<void>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CategoryManagementScreen(),
+              ),
+            ),
+            icon: const Icon(Icons.category_outlined),
+            label: const Text('Quản lý Danh Mục'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
               side: const BorderSide(color: AppColors.primary),

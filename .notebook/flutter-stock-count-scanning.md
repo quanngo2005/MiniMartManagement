@@ -3,9 +3,9 @@
 
 Entry: `frontend/mini_mart_management_mobile_app/lib/screens/stock_count_detail_screen.dart:StockCountDetailScreen`
 
-Scan flow: `StockCountDetailScreen._openBarcodeScanner()` → `screens/barcode_scanner_screen.dart:BarcodeScannerScreen` → `List<ScannedProduct>` → local count lines.
+Scan flow: `StockCountDetailScreen._openBarcodeScanner()` → `screens/barcode_scanner_screen.dart:BarcodeScannerScreen` → `List<ScannedProduct>` → selected-count lines. Missing scanned products are created through `POST /api/stock-counts/{id}/lines`; scan quantities are then held locally until Save/Submit.
 
-Count state: screen-local until a frontend StockCount model/service/provider exists; product expected quantity comes from `models/product_lookup.dart:ProductLookup.stockQuantity`.
+Selected counts start empty. `StockCountDetailScreen._productPicker()` reuses `InventoryLookupProvider` and filters active products by name, product code, or barcode. Adding a product creates a server line with a snapshot quantity and leaves actual quantity blank.
 
 Entry point: `screens/inventory_documents_screen.dart:_InventoryDocumentsScreenState._buildAppBar()` → stock-count action.
 
@@ -13,4 +13,4 @@ History flow: `screens/stock_count_history_screen.dart:StockCountHistoryScreen` 
 
 Mapping: `backend/MiniMart/Dtos/StockCountDtos.cs:StockCountListDto` → `models/stock_count.dart:StockCount`; enum JSON accepts the API's numeric and string forms. Detail/line persistence is not yet wired to the frontend.
 
-Updated: 2026-07-16
+Updated: 2026-07-18

@@ -40,6 +40,11 @@ namespace MiniMart.Repositories.Implementations
             StockCountScope scope,
             IReadOnlyCollection<int> categoryIds)
         {
+            if (scope == StockCountScope.Selected)
+            {
+                return Array.Empty<Product>();
+            }
+
             var products = _context.Products
                 .Where(p => p.Status);
 
@@ -53,6 +58,14 @@ namespace MiniMart.Repositories.Implementations
                 .ToListAsync();
         }
 
+        public async Task<IReadOnlyList<Product>> GetActiveProductsByIdsAsync(IReadOnlyCollection<int> productIds)
+        {
+            return await _context.Products
+                .Where(product => productIds.Contains(product.ProductId) && product.Status)
+                .OrderBy(product => product.ProductId)
+                .ToListAsync();
+        }
+
         public Task<bool> CategoryExistsAsync(int categoryId)
         {
             return _context.Categories.AnyAsync(c => c.CategoryId == categoryId);
@@ -61,6 +74,11 @@ namespace MiniMart.Repositories.Implementations
         public Task<bool> EmployeeExistsAsync(int employeeId)
         {
             return _context.Employees.AnyAsync(e => e.EmployeeId == employeeId);
+        }
+
+        public Task<bool> HasCountingStockCountAsync()
+        {
+            return _context.StockCounts.AnyAsync(stockCount => stockCount.Status == StockCountStatus.Counting);
         }
 
         public async Task<string> GenerateStockCountCodeAsync(DateTime createdAt)

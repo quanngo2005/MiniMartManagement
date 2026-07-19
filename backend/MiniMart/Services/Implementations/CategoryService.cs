@@ -37,7 +37,6 @@ namespace MiniMart.Services.Implementations
                 TaxRateId = request.TaxRateId,
                 Status = true
             };
-
             return MapToDto(await _categoryRepository.CreateAsync(category));
         }
 
@@ -63,7 +62,6 @@ namespace MiniMart.Services.Implementations
             if (await _categoryRepository.GetByIdAsync(id) is null)
                 throw new DomainException($"Category with ID {id} not found.", StatusCodes.Status404NotFound);
 
-            // BR-PRO-01: category deletion is forbidden while any product references it.
             if (await _categoryRepository.HasProductsAsync(id))
                 throw new DomainException("Cannot delete category because it currently contains products.");
 

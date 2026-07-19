@@ -13,10 +13,10 @@ namespace MiniMart.Controllers
 
         public CategoriesController(ICategoryService categoryService) => _categoryService = categoryService;
 
-        // All authenticated staff roles may view categories.
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IReadOnlyList<CategoryDto>>> GetAll() => Ok(await _categoryService.GetAllAsync());
+        public async Task<ActionResult<IReadOnlyList<CategoryDto>>> GetAll() =>
+            Ok(await _categoryService.GetAllAsync());
 
         [HttpGet("{id:int}")]
         [Authorize]
@@ -26,9 +26,8 @@ namespace MiniMart.Controllers
             return category is null ? NotFound(new { message = $"Category with ID {id} not found." }) : Ok(category);
         }
 
-        // Category administration is limited to the Manager JWT role.
         [HttpPost]
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager,Admin")]
         public async Task<ActionResult<CategoryDto>> Create(CreateCategoryRequest request)
         {
             var created = await _categoryService.CreateAsync(request);
@@ -36,12 +35,12 @@ namespace MiniMart.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager,Admin")]
         public async Task<ActionResult<CategoryDto>> Update(int id, UpdateCategoryRequest request) =>
             Ok(await _categoryService.UpdateAsync(id, request));
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             await _categoryService.DeleteAsync(id);

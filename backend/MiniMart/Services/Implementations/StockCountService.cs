@@ -41,6 +41,13 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException("Current employee does not exist.", StatusCodes.Status422UnprocessableEntity);
             }
 
+            if (await _stockCountRepository.HasCountingStockCountAsync())
+            {
+                throw new DomainException(
+                    "A stock count is already in progress. Complete or submit it before creating another.",
+                    StatusCodes.Status409Conflict);
+            }
+
             var categoryIds = await ValidateCreateScopeAsync(createDto.Scope, createDto.CategoryIds);
             if (createDto.Scope == StockCountScope.Category)
             {
@@ -60,7 +67,7 @@ namespace MiniMart.Services.Implementations
             }
 
             var products = await _stockCountRepository.GetActiveProductsForScopeAsync(createDto.Scope, categoryIds);
-            if (products.Count == 0)
+            if (createDto.Scope != StockCountScope.Selected && products.Count == 0)
             {
                 throw new DomainException("The selected scope has no active products.", StatusCodes.Status400BadRequest);
             }
@@ -124,6 +131,100 @@ namespace MiniMart.Services.Implementations
                 await _stockCountRepository.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
+            {
+                throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
+            }
+
+            return (await GetDetailByIdAsync(id))!;
+        }
+
+        public async Task<StockCountDetailDto> CancelDraftAsync(int id, byte[] rowVersion)
+        {
+            if (rowVersion.Length == 0)
+            {
+                throw new DomainException("A stock-count row version is required.", StatusCodes.Status400BadRequest);
+            }
+
+            var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
+                ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
+
+            EnsureStatus(stockCount, StockCountStatus.Draft);
+            _stockCountRepository.ApplyOriginalRowVersion(stockCount, rowVersion);
+            stockCount.Status = StockCountStatus.Cancelled;
+
+            try
+            {
+                await _stockCountRepository.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
+            }
+
+            return (await GetDetailByIdAsync(id))!;
+        }
+
+        public async Task<StockCountDetailDto> AddLinesAsync(int id, AddStockCountLinesDto addDto)
+        {
+            if (addDto.StockCountRowVersion.Length == 0)
+            {
+                throw new DomainException("A stock-count row version is required.", StatusCodes.Status400BadRequest);
+            }
+
+            var productIds = addDto.ProductIds.Distinct().ToList();
+            if (productIds.Count == 0)
+            {
+                throw new DomainException("At least one product is required.", StatusCodes.Status400BadRequest);
+            }
+
+            var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
+                ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
+
+            EnsureStatus(stockCount, StockCountStatus.Counting);
+            if (stockCount.Scope != StockCountScope.Selected)
+            {
+                throw new DomainException(
+                    "Products can be added only to selected-product stock counts.",
+                    StatusCodes.Status409Conflict);
+            }
+            var existingProductIds = stockCount.Lines
+                .Select(line => line.ProductId)
+                .ToHashSet();
+            var missingProductIds = productIds
+                .Where(productId => !existingProductIds.Contains(productId))
+                .ToList();
+
+            if (missingProductIds.Count == 0)
+            {
+                return (await GetDetailByIdAsync(id))!;
+            }
+
+            var products = await _stockCountRepository.GetActiveProductsByIdsAsync(missingProductIds);
+            if (products.Count != missingProductIds.Count)
+            {
+                throw new DomainException("One or more products do not exist or are inactive.", StatusCodes.Status422UnprocessableEntity);
+            }
+
+            _stockCountRepository.ApplyOriginalRowVersion(stockCount, addDto.StockCountRowVersion);
+            _stockCountRepository.TouchForLineEdit(stockCount);
+            foreach (var product in products)
+            {
+                stockCount.Lines.Add(new StockCountLine
+                {
+                    ProductId = product.ProductId,
+                    SnapshotQuantity = product.StockQuantity
+                });
+            }
+
+            try
+            {
+                await _stockCountRepository.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
+            }
+            catch (DbUpdateException)
             {
                 throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
             }
@@ -200,6 +301,10 @@ namespace MiniMart.Services.Implementations
                 ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
 
             ValidateTransition(stockCount, StockCountStatus.PendingApproval);
+            if (stockCount.Lines.Count == 0)
+            {
+                throw new DomainException("At least one product must be added before submission.", StatusCodes.Status400BadRequest);
+            }
             var uncountedLineIds = stockCount.Lines
                 .Where(line => line.ActualQuantity is null)
                 .Select(line => line.StockCountLineId)
@@ -414,6 +519,16 @@ namespace MiniMart.Services.Implementations
                 if (distinctCategoryIds.Count != 0)
                 {
                     throw new DomainException("Global stock counts must not include category IDs.", StatusCodes.Status400BadRequest);
+                }
+
+                return distinctCategoryIds;
+            }
+
+            if (scope == StockCountScope.Selected)
+            {
+                if (distinctCategoryIds.Count != 0)
+                {
+                    throw new DomainException("Selected-product stock counts must not include category IDs.", StatusCodes.Status400BadRequest);
                 }
 
                 return distinctCategoryIds;

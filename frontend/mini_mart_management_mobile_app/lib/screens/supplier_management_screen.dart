@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/supplier.dart';
 import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart';
+import 'package:mini_mart_management_mobile_app/screens/supplier_debt_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
@@ -152,15 +153,33 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Nhà cung cấp',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w800,
+              Expanded(
+                child: Text(
+                  'Nhà cung cấp',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const SupplierDebtScreen(),
+                  ),
+                ),
+                icon: const Icon(
+                  Icons.account_balance_wallet_outlined,
+                  size: 18,
+                ),
+                label: const Text('Công nợ'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.borderGray),
+                ),
+              ),
+              const SizedBox(width: 8),
               FilledButton.icon(
                 onPressed: () => _showFormSheet(context),
                 icon: const Icon(Icons.add_rounded, size: 20),
@@ -480,7 +499,7 @@ class _SupplierFormSheetState extends State<_SupplierFormSheet> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<bool>(
-                      value: _status,
+                      initialValue: _status,
                       dropdownColor: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                       decoration: const InputDecoration(

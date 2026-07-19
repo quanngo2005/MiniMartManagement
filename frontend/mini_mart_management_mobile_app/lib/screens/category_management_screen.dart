@@ -34,9 +34,9 @@ class CategoryManagementScreen extends StatelessWidget {
         title: Text(
           'Danh mục sản phẩm',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: AppColors.surfaceContainerLowest,
-            fontWeight: FontWeight.w700,
-          ),
+                color: AppColors.surfaceContainerLowest,
+                fontWeight: FontWeight.w700,
+              ),
         ),
       ),
       body: const _CategoryBody(),
@@ -101,15 +101,15 @@ class _CategoryBodyState extends State<_CategoryBody> {
           child: filtered.isEmpty
               ? const Center(child: Text('Không có danh mục nào.'))
               : ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: filtered.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (ctx, i) => _CategoryTile(
-              category: filtered[i],
-              onEdit: () => _showForm(ctx, provider, category: filtered[i]),
-              onDelete: () => _confirmDelete(ctx, provider, filtered[i]),
-            ),
-          ),
+                  padding: const EdgeInsets.all(16),
+                  itemCount: filtered.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (ctx, i) => _CategoryTile(
+                    category: filtered[i],
+                    onEdit: () => _showForm(ctx, provider, category: filtered[i]),
+                    onDelete: () => _confirmDelete(ctx, provider, filtered[i]),
+                  ),
+                ),
         ),
       ],
     );
@@ -305,7 +305,7 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
                   controller: _codeCtrl,
                   decoration: const InputDecoration(labelText: 'Mã danh mục *'),
                   validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Nhập mã danh mục' : null,
+                      (v == null || v.trim().isEmpty) ? 'Nhập mã danh mục' : null,
                 ),
                 const SizedBox(height: 12),
               ],
@@ -313,7 +313,7 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
                 controller: _nameCtrl,
                 decoration: const InputDecoration(labelText: 'Tên danh mục *'),
                 validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Nhập tên danh mục' : null,
+                    (v == null || v.trim().isEmpty) ? 'Nhập tên danh mục' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -325,7 +325,8 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
               DropdownButtonFormField<int>(
                 value: _selectedTaxRateId,
                 decoration: const InputDecoration(labelText: 'Thuế suất *'),
-                items: taxRates
+                items: {for (final t in taxRates) t.taxRateId: t}
+                    .values
                     .map((t) => DropdownMenuItem(value: t.taxRateId, child: Text(t.label)))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedTaxRateId = v),
@@ -348,9 +349,9 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
           onPressed: _saving ? null : () => _submit(context),
           child: _saving
               ? const SizedBox(
-            width: 16, height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-          )
+                  width: 16, height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
               : Text(_isEdit ? 'Lưu' : 'Tạo'),
         ),
       ],

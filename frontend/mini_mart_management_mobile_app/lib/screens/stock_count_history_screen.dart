@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_mart_management_mobile_app/models/stock_count.dart';
+import 'package:mini_mart_management_mobile_app/models/product_lookup.dart';
+import 'package:mini_mart_management_mobile_app/providers/inventory_lookup_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/stock_count_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/stock_count_detail_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
-import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class StockCountHistoryScreen extends StatefulWidget {
@@ -36,7 +37,7 @@ class _StockCountHistoryScreenState extends State<StockCountHistoryScreen> {
     final stockCounts = _filter(provider.stockCounts);
 
     return Scaffold(
-      appBar: MiniMartAppBar.secondary(title: 'Lịch sử kiểm kê'),
+      appBar: _buildAppBar(context),
       backgroundColor: AppColors.backgroundSlate,
       body: RefreshIndicator(
         onRefresh: provider.loadStockCounts,
@@ -52,6 +53,29 @@ class _StockCountHistoryScreenState extends State<StockCountHistoryScreen> {
       ),
     );
   }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) => AppBar(
+    backgroundColor: AppColors.surfaceBright,
+    foregroundColor: AppColors.primary,
+    titleSpacing: 0,
+    leading: const Icon(Icons.storefront_rounded),
+    title: Text(
+      'Cửa hàng #402 | Nhập/Xuất',
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+        color: AppColors.primary,
+        fontWeight: FontWeight.w800,
+      ),
+    ),
+    actions: [
+      IconButton(
+        onPressed: () => ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Tài khoản'))),
+        tooltip: 'Tài khoản',
+        icon: const Icon(Icons.account_circle_outlined),
+      ),
+    ],
+  );
 
   Widget _buildBody(StockCountProvider provider, List<StockCount> stockCounts) {
     if (provider.isLoading && provider.stockCounts.isEmpty) {
@@ -152,19 +176,160 @@ class _StockCountHistoryScreenState extends State<StockCountHistoryScreen> {
         .toList(growable: false);
   }
 
-  void _openStockCount(StockCount stockCount) {
-    Navigator.of(context).push(
+  Future<void> _openStockCount(StockCount stockCount) async {
+    await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => StockCountDetailScreen(stockCountId: stockCount.stockCountId),
+        builder: (_) =>
+            StockCountDetailScreen(stockCountId: stockCount.stockCountId),
       ),
-    ).then((_) => context.read<StockCountProvider>().loadStockCounts());
+    );
+    if (!mounted) return;
+    await context.read<StockCountProvider>().loadStockCounts();
   }
 
-  void _createStockCount() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const StockCountDetailScreen()),
-    ).then((_) => context.read<StockCountProvider>().loadStockCounts());
+  Future<void> _createStockCount() async {
+    final lookupProvider = context.read<InventoryLookupProvider>();
+    await lookupProvider.loadLookups();
+    if (!mounted) return;
+
+    final options = await showModalBottomSheet<_StockCountCreationOptions>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => _StockCountScopeSheet(
+        categories: _categoriesFrom(lookupProvider.products),
+      ),
+    );
+    if (!mounted || options == null) return;
+
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => StockCountDetailScreen(
+          createScope: options.scope,
+          categoryIds: options.categoryIds,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    await context.read<StockCountProvider>().loadStockCounts();
   }
+
+  List<ProductLookupCategory> _categoriesFrom(List<ProductLookup> products) {
+    final categories = <int, ProductLookupCategory>{
+      for (final product in products)
+        if (product.category != null) product.category!.id: product.category!,
+    };
+    return categories.values.toList()
+      ..sort((left, right) => left.name.compareTo(right.name));
+  }
+}
+
+class _StockCountCreationOptions {
+  const _StockCountCreationOptions({
+    required this.scope,
+    this.categoryIds = const [],
+  });
+
+  final StockCountScope scope;
+  final List<int> categoryIds;
+}
+
+class _StockCountScopeSheet extends StatefulWidget {
+  const _StockCountScopeSheet({required this.categories});
+
+  final List<ProductLookupCategory> categories;
+
+  @override
+  State<_StockCountScopeSheet> createState() => _StockCountScopeSheetState();
+}
+
+class _StockCountScopeSheetState extends State<_StockCountScopeSheet> {
+  StockCountScope _scope = StockCountScope.global;
+  final Set<int> _selectedCategoryIds = <int>{};
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Tạo phiếu kiểm kê',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 12),
+          RadioGroup<StockCountScope>(
+            groupValue: _scope,
+            onChanged: (value) => setState(() => _scope = value!),
+            child: Column(
+              children: StockCountScope.values
+                  .map(
+                    (scope) => RadioListTile<StockCountScope>(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(scope.label),
+                      value: scope,
+                    ),
+                  )
+                  .toList(growable: false),
+            ),
+          ),
+          if (_scope == StockCountScope.category) ...[
+            const Divider(),
+            Text(
+              'Chọn danh mục',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            if (widget.categories.isEmpty)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text('Chưa có danh mục nào có sản phẩm đang hoạt động.'),
+              )
+            else
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 260),
+                child: ListView(
+                  shrinkWrap: true,
+                  children: widget.categories
+                      .map(
+                        (category) => CheckboxListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(category.name),
+                          value: _selectedCategoryIds.contains(category.id),
+                          onChanged: (selected) => setState(() {
+                            if (selected ?? false) {
+                              _selectedCategoryIds.add(category.id);
+                            } else {
+                              _selectedCategoryIds.remove(category.id);
+                            }
+                          }),
+                        ),
+                      )
+                      .toList(growable: false),
+                ),
+              ),
+          ],
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed:
+                  _scope != StockCountScope.category ||
+                      _selectedCategoryIds.isNotEmpty
+                  ? () => Navigator.of(context).pop(
+                      _StockCountCreationOptions(
+                        scope: _scope,
+                        categoryIds: _selectedCategoryIds.toList(),
+                      ),
+                    )
+                  : null,
+              child: const Text('Bắt đầu kiểm kê'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _StatusFilterChip extends StatelessWidget {
@@ -317,6 +482,10 @@ class _StockCountHistoryCard extends StatelessWidget {
     StockCountStatus.closed => const _StatusColors(
       AppColors.secondaryFixed,
       AppColors.secondary,
+    ),
+    StockCountStatus.cancelled => const _StatusColors(
+      AppColors.errorContainer,
+      AppColors.statusError,
     ),
   };
 }

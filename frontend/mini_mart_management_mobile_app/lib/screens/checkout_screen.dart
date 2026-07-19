@@ -120,18 +120,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             final pointRaw = (customer['point'] ?? customer['Point']);
 
             int parsedId = 0;
-            if (customerId is int)
+            if (customerId is int) {
               parsedId = customerId;
-            else if (customerId is String)
+            } else if (customerId is String) {
               parsedId = int.tryParse(customerId) ?? 0;
+            }
 
             int parsedPoint = 0;
-            if (pointRaw is int)
+            if (pointRaw is int) {
               parsedPoint = pointRaw;
-            else if (pointRaw is double)
+            } else if (pointRaw is double) {
               parsedPoint = pointRaw.toInt();
-            else if (pointRaw is String)
+            } else if (pointRaw is String) {
               parsedPoint = int.tryParse(pointRaw) ?? 0;
+            }
 
             context.read<CartProvider>().setCustomer(
               parsedId,
@@ -258,8 +260,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       if (cart.paymentMethod == 5) {
         final orderId = response['orderId'] ?? response['OrderId'];
-        if (orderId == null)
+        if (orderId == null) {
           throw Exception('Không tìm thấy OrderId từ server.');
+        }
 
 
         final client = createConfiguredClient();
@@ -350,13 +353,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 final res = await client.get(
                   ApiConfig.uri('/api/payments/$transactionRef/status'),
                 );
+                if (!ctx.mounted) return;
                 if (res.statusCode == 200) {
                   final data = jsonDecode(res.body);
                   final status = data['status'] ?? data['Status'];
                   if (status == 2) {
                     timer.cancel();
                     isPaid = true;
-                    if (mounted) Navigator.pop(ctx);
+                    Navigator.pop(ctx);
                   }
                 }
               } catch (_) {}
@@ -436,9 +440,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   '/api/payments/$transactionRef/mock-success',
                                 ),
                               );
+                              if (!ctx.mounted) return;
                             } catch (_) {}
                             isPaid = true;
-                            if (mounted) Navigator.pop(ctx);
+                            Navigator.pop(ctx);
                           },
                           child: const Text(
                             'Giao dịch thành công',
@@ -576,33 +581,33 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   created['customerId'] ??
                                   created['CustomerId'] ??
                                   0;
-                              if (mounted) {
-                                context.read<CartProvider>().setCustomer(
+                              if (!context.mounted) return;
+                              context.read<CartProvider>().setCustomer(
                                   customerId,
                                   name,
                                   0,
                                 );
-                                setState(() {
-                                  _showCreateCustomerButton = false;
-                                });
-                                final messenger = ScaffoldMessenger.of(context);
-                                Navigator.pop(context);
-                                messenger.showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Tạo khách hàng thành công!',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    backgroundColor: AppColors.secondary,
+                              setState(() {
+                                _showCreateCustomerButton = false;
+                              });
+                              final messenger = ScaffoldMessenger.of(context);
+                              Navigator.pop(context);
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Tạo khách hàng thành công!',
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                );
-                              }
+                                  backgroundColor: AppColors.secondary,
+                                ),
+                              );
                             } else {
                               final error = jsonDecode(response.body);
                               final errorMsg =
                                   error['message'] ??
                                   error['title'] ??
                                   response.body;
+                              if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -614,6 +619,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               );
                             }
                           } catch (e) {
+                            if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -717,8 +723,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 TextField(
                   controller: _customerPhoneController,
                   onChanged: (val) {
-                    if (_showCreateCustomerButton)
+                    if (_showCreateCustomerButton) {
                       setState(() => _showCreateCustomerButton = false);
+                    }
                   },
                   decoration: InputDecoration(
                     hintText: 'Nhập số điện thoại khách hàng...',
@@ -939,7 +946,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: cart.items.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        separatorBuilder: (_, _) => const Divider(height: 1),
                         itemBuilder: (context, index) {
                           final item = cart.items[index];
                           return Padding(

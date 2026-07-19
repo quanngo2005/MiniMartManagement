@@ -303,7 +303,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
               physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: _orders.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (_, i) => _buildOrderCard(context, _orders[i]),
             ),
           const SizedBox(height: 24),
@@ -501,12 +501,14 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                           'customerStatus': c.customerStatus,
                         });
                     if (ctx.mounted) Navigator.pop(ctx);
-                    if (success && mounted) {
+                    if (!mounted) return;
+                    if (success) {
                       // Refresh
                       final updated = await context
                           .read<CustomerProvider>()
                           .getCustomerById(id);
-                      if (mounted) setState(() => _customer = updated);
+                      if (!mounted) return;
+                      setState(() => _customer = updated);
                     }
                   },
                   style: FilledButton.styleFrom(
@@ -561,10 +563,12 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                     'point': c.points,
                     'customerStatus': !isActive,
                   });
-              if (success && mounted) {
+              if (!mounted) return;
+              if (success) {
                 final updated = await context
                     .read<CustomerProvider>()
                     .getCustomerById(id);
+                if (!mounted) return;
                 setState(() => _customer = updated);
               }
             },

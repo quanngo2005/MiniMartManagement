@@ -1,11 +1,13 @@
-﻿namespace MiniMart.Repositories.RepoInterface
+using MiniMart.Models;
+
+namespace MiniMart.Repositories.RepoInterface
 {
     public interface ICategoryRepository
     {
-        IQueryable<Models.Category> GetAllQueryable();
-        Task<Models.Category?> GetByIdAsync(int id);
-        Task<Models.Category> CreateAsync(Models.Category category);
-        Task<Models.Category?> UpdateAsync(Models.Category category);
+        IQueryable<Category> GetAllQueryable();
+        Task<Category?> GetByIdAsync(int id);
+        Task<Category> CreateAsync(Category category);
+        Task<Category?> UpdateAsync(Category category);
         Task<bool> DeleteAsync(int id);
         Task<bool> HasProductsAsync(int categoryId);
         Task<bool> CategoryCodeExistsAsync(string categoryCode, int? excludeId = null);
