@@ -4,6 +4,7 @@ import 'package:mini_mart_management_mobile_app/models/daily_revenue.dart';
 import 'package:mini_mart_management_mobile_app/models/hourly_revenue.dart';
 import 'package:mini_mart_management_mobile_app/models/inventory_status.dart';
 import 'package:mini_mart_management_mobile_app/models/monthly_financial_report.dart';
+import 'package:mini_mart_management_mobile_app/models/revenue_summary.dart';
 import 'package:mini_mart_management_mobile_app/models/supplier_debt.dart';
 import 'package:mini_mart_management_mobile_app/models/top_product.dart';
 import 'package:mini_mart_management_mobile_app/services/report_service.dart';
@@ -26,6 +27,22 @@ class ReportRepository {
       rethrow;
     } catch (e) {
       throw ApiException('Khong the tai hieu suat nhan vien: $e');
+    }
+  }
+
+  Future<RevenueSummary> getRevenueSummary({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      return await _reportService.getRevenueSummary(
+        startDate: startDate,
+        endDate: endDate,
+      );
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Khong the tai tong quan doanh thu: $e');
     }
   }
 

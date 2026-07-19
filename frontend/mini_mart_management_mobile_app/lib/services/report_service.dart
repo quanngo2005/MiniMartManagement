@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/cashier_performance.dart';
+import 'package:mini_mart_management_mobile_app/models/revenue_summary.dart';
 import 'package:mini_mart_management_mobile_app/models/top_product.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
@@ -37,6 +38,27 @@ class ReportService {
         .whereType<Map<String, dynamic>>()
         .map(CashierPerformance.fromJson)
         .toList();
+  }
+
+  Future<RevenueSummary> getRevenueSummary({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    final params = <String, String>{};
+    if (startDate != null) params['startDate'] = startDate.toIso8601String();
+    if (endDate != null) params['endDate'] = endDate.toIso8601String();
+
+    final response = await _client.get(
+      ApiConfig.uri('/api/reports/revenue').replace(queryParameters: params),
+      headers: const {'Accept': 'application/json'},
+    );
+    final json = _decode(response);
+    _checkStatus(response, json);
+    final data = _list(json).isNotEmpty ? _list(json).first : json['data'] ?? json['Data'] ?? json;
+    if (data is Map<String, dynamic>) {
+      return RevenueSummary.fromJson(data);
+    }
+    throw const ApiException('Không thể đọc dữ liệu doanh thu.');
   }
 
   Future<List<TopProduct>> getTopProducts({

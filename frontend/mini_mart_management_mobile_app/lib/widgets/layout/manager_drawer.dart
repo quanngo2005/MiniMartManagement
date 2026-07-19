@@ -12,6 +12,7 @@ enum ManagerNavDestination {
   inventoryTransactions,
   staffPerformance,
   staff,
+  suppliers,
   customers,
   promotions,
   analyze,
@@ -127,6 +128,14 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.staff,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.staff),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.local_shipping_outlined,
+                    activeIcon: Icons.local_shipping_rounded,
+                    label: 'Nhà cung cấp',
+                    destination: ManagerNavDestination.suppliers,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.suppliers),
                   ),
                   _DrawerTile(
                     icon: Icons.people_alt_outlined,
