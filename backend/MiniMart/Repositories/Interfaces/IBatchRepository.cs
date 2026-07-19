@@ -10,5 +10,6 @@ namespace MiniMart.Repositories.RepoInterface
         Task<bool> ProductExistsAsync(int productId);
         Task<bool> ReceiptExistsAsync(int receiptId);
         Task AdjustBatchRemainingQuantityAsync(int batchId, int quantityDelta);
+        Task ExecuteInTransactionAsync(Func<Task> operation);
     }
 }

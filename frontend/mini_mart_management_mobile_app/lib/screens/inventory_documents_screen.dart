@@ -4,6 +4,7 @@ import 'package:mini_mart_management_mobile_app/models/receipt_editor_result.dar
 import 'package:mini_mart_management_mobile_app/models/receipt_inventory_document_mapper.dart';
 import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/create_inventory_receipt_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/batch_status_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_document_receipt_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/stock_count_history_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
@@ -182,6 +183,13 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
         ),
       ),
       actions: [
+        IconButton(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const BatchStatusScreen()),
+          ),
+          tooltip: 'Trạng thái lô hàng',
+          icon: const Icon(Icons.inventory_2_outlined),
+        ),
         IconButton(
           onPressed:
               widget.onOpenStockCountHistory ??

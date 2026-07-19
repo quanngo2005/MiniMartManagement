@@ -54,5 +54,27 @@ namespace MiniMart.Repositories.RepoImplement
             batch.QuantityRemaining += quantityDelta;
             batch.Status = batch.QuantityRemaining > 0;
         }
+
+        public async Task ExecuteInTransactionAsync(Func<Task> operation)
+        {
+            if (!_context.Database.IsRelational())
+            {
+                await operation();
+                return;
+            }
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                await operation();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                _context.ChangeTracker.Clear();
+                throw;
+            }
+        }
     }
 }
