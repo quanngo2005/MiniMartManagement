@@ -63,5 +63,15 @@ namespace MiniMart.Services.Implementations
             if (!success)
                 throw new DomainException($"Supplier with ID {id} not found.", StatusCodes.Status404NotFound);
         }
+
+        public Task<IReadOnlyList<SupplierDebtSummaryDto>> GetDebtSummariesAsync()
+        {
+            return _supplierRepository.GetDebtSummariesAsync();
+        }
+
+        public Task<SupplierDebtDetailDto?> GetDebtDetailAsync(int supplierId)
+        {
+            return _supplierRepository.GetDebtDetailAsync(supplierId);
+        }
     }
 }

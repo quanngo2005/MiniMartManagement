@@ -56,6 +56,28 @@ class ReceiptProvider extends ChangeNotifier {
     return _save(() => _receiptRepository.completeReceipt(id));
   }
 
+  Future<bool> deleteReceipt(int id) async {
+    _isSaving = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      await _receiptRepository.deleteReceipt(id);
+      _receipts = _receipts
+          .where((receipt) => receipt.receiptId != id)
+          .toList();
+      return true;
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+      return false;
+    } catch (_) {
+      _errorMessage = 'Không thể hủy chứng từ. Vui lòng thử lại.';
+      return false;
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> _save(Future<Receipt> Function() action) async {
     _isSaving = true;
     _errorMessage = null;

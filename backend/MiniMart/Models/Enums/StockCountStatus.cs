@@ -5,6 +5,7 @@ namespace MiniMart.Models.Enums
         Draft = 1,
         Counting = 2,
         PendingApproval = 3,
-        Closed = 4
+        Closed = 4,
+        Cancelled = 5
     }
 }

@@ -58,6 +58,12 @@ namespace MiniMart.DTOs
         public List<UpdateStockCountLineDto> Lines { get; set; } = new();
     }
 
+    public class AddStockCountLinesDto
+    {
+        public byte[] StockCountRowVersion { get; set; } = Array.Empty<byte>();
+        public List<int> ProductIds { get; set; } = new();
+    }
+
     public class UpdateStockCountLineDto
     {
         public int StockCountLineId { get; set; }

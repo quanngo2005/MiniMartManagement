@@ -1,4 +1,5 @@
 using MiniMart.Models;
+using MiniMart.DTOs;
 
 namespace MiniMart.Repositories.RepoInterface
 {
@@ -10,5 +11,7 @@ namespace MiniMart.Repositories.RepoInterface
         Task<Supplier?> UpdateAsync(Supplier supplier);
         Task<bool> DeleteAsync(int id);
         Task<bool> SupplierCodeExistsAsync(string supplierCode, int? excludeId = null);
+        Task<IReadOnlyList<SupplierDebtSummaryDto>> GetDebtSummariesAsync();
+        Task<SupplierDebtDetailDto?> GetDebtDetailAsync(int supplierId);
     }
 }

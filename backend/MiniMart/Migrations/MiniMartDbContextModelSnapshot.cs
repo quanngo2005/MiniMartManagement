@@ -4185,6 +4185,9 @@ namespace MiniMart.Migrations
 
                     b.HasIndex("StockCountId");
 
+                    b.HasIndex("StockCountId", "ProductId")
+                        .IsUnique();
+
                     b.ToTable("StockCountLines");
                 });
 

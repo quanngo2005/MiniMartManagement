@@ -38,34 +38,5 @@ namespace MiniMart.Controllers
             return Ok(batch);
         }
 
-        [Authorize(Policy = "ManagerUp")]
-        [HttpPost]
-        public async Task<ActionResult<BatchDto>> Create([FromBody] CreateBatchDto createDto)
-        {
-            if (createDto == null) return BadRequest(new { message = "Invalid batch data." });
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var created = await _batchService.CreateBatchAsync(createDto);
-            return CreatedAtAction(nameof(GetById), new { id = created.BatchId }, created);
-        }
-
-        [Authorize(Policy = "ManagerUp")]
-        [HttpPut("{id}")]
-        public async Task<ActionResult<BatchDto>> Update(int id, [FromBody] UpdateBatchDto updateDto)
-        {
-            if (updateDto == null) return BadRequest(new { message = "Invalid update data." });
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var updated = await _batchService.UpdateBatchAsync(id, updateDto);
-            return Ok(updated);
-        }
-
-        [Authorize(Policy = "ManagerUp")]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            await _batchService.DeleteBatchAsync(id);
-            return NoContent();
-        }
     }
 }

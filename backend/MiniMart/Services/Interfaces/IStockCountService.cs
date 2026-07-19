@@ -10,6 +10,8 @@ namespace MiniMart.Services.Interfaces
         Task<StockCountDetailDto?> GetDetailByIdAsync(int id);
         Task<StockCountDetailDto> CreateAsync(CreateStockCountDto createDto, int employeeId);
         Task<StockCountDetailDto> StartAsync(int id, byte[] rowVersion);
+        Task<StockCountDetailDto> CancelDraftAsync(int id, byte[] rowVersion);
+        Task<StockCountDetailDto> AddLinesAsync(int id, AddStockCountLinesDto addDto);
         Task<StockCountDetailDto> UpdateLinesAsync(int id, UpdateStockCountLinesDto updateDto);
         Task<StockCountDetailDto> SubmitAsync(int id, byte[] rowVersion);
         Task<StockCountDetailDto> ApproveAsync(int id, byte[] rowVersion, int reviewerEmployeeId);
