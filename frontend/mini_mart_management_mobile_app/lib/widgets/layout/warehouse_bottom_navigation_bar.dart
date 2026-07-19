@@ -35,9 +35,9 @@ class WarehouseBottomNavigationBar extends StatelessWidget {
           label: 'Tồn kho',
         ),
         NavigationDestination(
-          selectedIcon: Icon(Icons.person_rounded),
-          icon: Icon(Icons.person_outlined),
-          label: 'Cá nhân',
+          selectedIcon: Icon(Icons.inventory_rounded),
+          icon: Icon(Icons.inventory_2_outlined),
+          label: 'Quản lý lô hàng',
         ),
       ],
     );

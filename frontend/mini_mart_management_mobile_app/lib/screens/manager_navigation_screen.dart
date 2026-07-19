@@ -62,14 +62,15 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.productPerformance: 2,
     ManagerNavDestination.inventoryDocuments: 3,
     ManagerNavDestination.inventoryTransactions: 4,
-    ManagerNavDestination.staffPerformance: 5,
-    ManagerNavDestination.staff: 6,
-    ManagerNavDestination.suppliers: 7,
-    ManagerNavDestination.customers: 8,
-    ManagerNavDestination.promotions: 9,
-    ManagerNavDestination.invoices: 10,
-    ManagerNavDestination.analyze: 11,
-    ManagerNavDestination.categories: 12,
+    ManagerNavDestination.batches: 5,
+    ManagerNavDestination.staffPerformance: 6,
+    ManagerNavDestination.staff: 7,
+    ManagerNavDestination.suppliers: 8,
+    ManagerNavDestination.customers: 9,
+    ManagerNavDestination.promotions: 10,
+    ManagerNavDestination.invoices: 11,
+    ManagerNavDestination.analyze: 12,
+    ManagerNavDestination.categories: 13,
   };
 
   static const _bottomNavDestinations = [
