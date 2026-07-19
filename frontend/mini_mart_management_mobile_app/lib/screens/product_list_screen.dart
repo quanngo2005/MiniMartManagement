@@ -153,7 +153,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
         itemCount: filtered.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, _) => const SizedBox(height: 10),
         itemBuilder: (_, i) => _ProductTile(
           product: filtered[i],
           onTap: () => _openDetail(context, filtered[i]),
@@ -313,6 +313,6 @@ class _ProductTile extends StatelessWidget {
       if (i > 0 && (str.length - i) % 3 == 0) buf.write('.');
       buf.write(str[i]);
     }
-    return '${buf}đ';
+    return '$bufđ';
   }
 }

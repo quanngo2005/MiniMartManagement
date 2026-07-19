@@ -140,7 +140,7 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               sliver: SliverList.separated(
                 itemCount: pageItems.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (_, i) => _ProductCard(item: pageItems[i]),
               ),
             ),

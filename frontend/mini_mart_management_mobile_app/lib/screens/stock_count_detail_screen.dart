@@ -50,7 +50,8 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
               categoryIds: widget.categoryIds,
             )
           : await provider.getDetail(widget.stockCountId!);
-      if (mounted) _setCount(count);
+      if (!mounted) return;
+      _setCount(count);
       if (count.scope == StockCountScope.selected) {
         await context.read<InventoryLookupProvider>().loadLookups();
       }
@@ -215,11 +216,12 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
 
   Future<void> _submit() async {
     try {
-      final saved = await context.read<StockCountProvider>().saveLines(
+      final provider = context.read<StockCountProvider>();
+      final saved = await provider.saveLines(
         _count!,
         _updatedLines,
       );
-      _setCount(await context.read<StockCountProvider>().submit(saved));
+      _setCount(await provider.submit(saved));
       _message('Đã gửi phiếu chờ duyệt.');
     } on ApiException catch (error) {
       _message(error.message);
@@ -228,8 +230,10 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
 
   Future<void> _approve() async {
     try {
-      _setCount(await context.read<StockCountProvider>().approve(_count!));
-      await context.read<InventoryProvider>().loadTransactions();
+      final stockCountProvider = context.read<StockCountProvider>();
+      final inventoryProvider = context.read<InventoryProvider>();
+      _setCount(await stockCountProvider.approve(_count!));
+      await inventoryProvider.loadTransactions();
       if (mounted) _message('Đã duyệt và tạo giao dịch điều chỉnh kho.');
     } on ApiException catch (error) {
       _message(error.message);
@@ -293,8 +297,10 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
     controller.dispose();
     if (reason == null || reason.isEmpty) return;
     try {
+      if (!mounted) return;
+      final provider = context.read<StockCountProvider>();
       _setCount(
-        await context.read<StockCountProvider>().reject(_count!, reason),
+        await provider.reject(_count!, reason),
       );
       _message('Đã trả phiếu để kiểm kê lại.');
     } on ApiException catch (error) {
@@ -310,11 +316,12 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
   Widget build(BuildContext context) {
     if (_initializing) return const Scaffold(body: LoadingOverlay());
     final count = _count;
-    if (count == null)
+    if (count == null) {
       return Scaffold(
         appBar: MiniMartAppBar.secondary(title: 'Kiểm kê kho hàng'),
         body: const Center(child: Text('Không thể mở phiếu kiểm kê.')),
       );
+    }
     final checked = _actualQuantities.values.whereType<int>().length;
     final variances = count.lines.where((line) {
       final actual = _actualQuantities[line.stockCountLineId];

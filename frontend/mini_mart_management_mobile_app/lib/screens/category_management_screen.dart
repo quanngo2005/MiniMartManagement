@@ -69,7 +69,7 @@ class CategoryManagementScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               sliver: SliverList.separated(
                 itemCount: _categories.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   return CategoryTreeCard(
                     category: _categories[index],

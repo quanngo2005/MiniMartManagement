@@ -10,7 +10,7 @@ class ReceiptPdfService {
     final font = await PdfGoogleFonts.notoSansRegular();
     final boldFont = await PdfGoogleFonts.notoSansBold();
     final document = pw.Document();
-    final currency = (double value) => '${value.toStringAsFixed(0)} đ';
+    String currency(double value) => '${value.toStringAsFixed(0)} đ';
 
     document.addPage(
       pw.MultiPage(

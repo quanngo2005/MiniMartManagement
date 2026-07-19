@@ -607,7 +607,7 @@ class _FormPanel extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (trailing != null) trailing!,
+                if (trailing case final Widget trailing) trailing,
               ],
             ),
             const SizedBox(height: 12),
