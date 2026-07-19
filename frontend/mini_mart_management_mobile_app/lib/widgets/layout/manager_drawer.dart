@@ -17,11 +17,7 @@ enum ManagerNavDestination {
   promotions,
   analyze,
   invoices,
-<<<<<<< HEAD
   categories,
-=======
-  returns,
->>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
 }
 
 class ManagerDrawer extends StatelessWidget {
@@ -158,7 +154,6 @@ class ManagerDrawer extends StatelessWidget {
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.invoices),
                   ),
-<<<<<<< HEAD
                   const _DrawerSectionLabel('Cài đặt'),
                   _DrawerTile(
                     icon: Icons.category_outlined,
@@ -167,35 +162,6 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.categories,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.categories),
-=======
-                  _DrawerTile(
-                    icon: Icons.assignment_return_outlined,
-                    activeIcon: Icons.assignment_return_rounded,
-                    label: 'Phê duyệt trả hàng',
-                    destination: ManagerNavDestination.returns,
-                    selected: selected,
-                    onTap: _select(context, ManagerNavDestination.returns),
-                    trailing: pendingCount > 0
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.statusError,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              '$pendingCount',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                        : null,
->>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
                   ),
                 ],
               ),

@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'package:mini_mart_management_mobile_app/screens/employee_profile_screen.dart';
-import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_navigation_bar.dart';
-=======
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
@@ -10,16 +6,11 @@ import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_na
 import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:provider/provider.dart';
->>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
-<<<<<<< HEAD
-  Widget build(BuildContext context) {
-    return const EmployeeProfileScreen(
-=======
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
@@ -135,7 +126,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
->>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
       bottomNavigationBar: CashierBottomNavigationBar(
         selectedTab: CashierNavTab.profile,
       ),

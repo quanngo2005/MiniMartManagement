@@ -67,11 +67,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.promotions: 8,
     ManagerNavDestination.invoices: 9,
     ManagerNavDestination.analyze: 10,
-<<<<<<< HEAD
     ManagerNavDestination.categories: 11,
-=======
-    ManagerNavDestination.returns: 11,
->>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
   };
 
   static const _bottomNavDestinations = [
@@ -138,11 +134,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           ),
           const InvoiceListScreen(),
           AnalyzeScreen(onMenuTap: _openDrawer),
-<<<<<<< HEAD
           CategoryManagementScreen.withProvider(onMenuTap: _openDrawer),
-=======
-          ManagerReturnListScreen(onMenuTap: _openDrawer),
->>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(
