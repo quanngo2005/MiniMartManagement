@@ -13,21 +13,19 @@ namespace MiniMart.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<decimal>(
-                name: "MinimumOrderAmount",
-                table: "Promotions",
-                type: "decimal(18,2)",
-                precision: 18,
-                scale: 2,
-                nullable: true);
+            migrationBuilder.Sql(@"
+IF COL_LENGTH(N'dbo.Promotions', N'MinimumOrderAmount') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Promotions] ADD [MinimumOrderAmount] decimal(18,2) NULL;
+END
+");
 
-            migrationBuilder.AddColumn<byte[]>(
-                name: "RowVersion",
-                table: "Products",
-                type: "rowversion",
-                rowVersion: true,
-                nullable: false,
-                defaultValue: new byte[0]);
+            migrationBuilder.Sql(@"
+IF COL_LENGTH(N'dbo.Products', N'RowVersion') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Products] ADD [RowVersion] rowversion NOT NULL;
+END
+");
 
             migrationBuilder.AddColumn<int>(
                 name: "SubReferenceId",
@@ -50,13 +48,12 @@ namespace MiniMart.Migrations
                 nullable: false,
                 defaultValue: 1);
 
-            migrationBuilder.AddColumn<byte[]>(
-                name: "RowVersion",
-                table: "Batches",
-                type: "rowversion",
-                rowVersion: true,
-                nullable: false,
-                defaultValue: new byte[0]);
+            migrationBuilder.Sql(@"
+IF COL_LENGTH(N'dbo.Batches', N'RowVersion') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Batches] ADD [RowVersion] rowversion NOT NULL;
+END
+");
 
             migrationBuilder.Sql("UPDATE [Batches] SET [Provenance] = 1 WHERE [Provenance] <> 1;");
 
@@ -333,27 +330,38 @@ namespace MiniMart.Migrations
                 column: "SubReferenceId",
                 value: null);
 
-            migrationBuilder.InsertData(
-                table: "Promotions",
-                columns: new[] { "PromotionId", "BuyQuantity", "Description", "DiscountAmount", "DiscountPercent", "EndDate", "GiftProductId", "GiftQuantity", "IsActive", "MinimumOrderAmount", "Name", "StartDate", "Type" },
-                values: new object[,]
-                {
-                    { 1, 1, "Mua 1 tặng 1 cho nhóm snack chọn lọc.", null, null, new DateTime(2026, 7, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), 24, 1, true, null, "Snack mua 1 tặng 1", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
-                    { 2, null, "Đơn hàng từ 150.000đ giảm 10.000đ.", 10000m, null, new DateTime(2026, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, true, 150000m, "Hóa đơn từ 150K", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 0 }
-                });
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Promotions] WHERE [PromotionId] = 1)
+BEGIN
+    SET IDENTITY_INSERT [dbo].[Promotions] ON;
+    INSERT INTO [dbo].[Promotions] ([PromotionId], [BuyQuantity], [Description], [DiscountAmount], [DiscountPercent], [EndDate], [GiftProductId], [GiftQuantity], [IsActive], [MinimumOrderAmount], [Name], [StartDate], [Type])
+    VALUES (1, 1, N'Mua 1 tặng 1 cho nhóm snack chọn lọc.', NULL, NULL, '2026-07-31T00:00:00.0000000', 24, 1, CAST(1 AS bit), NULL, N'Snack mua 1 tặng 1', '2026-07-01T00:00:00.0000000', 1);
+    SET IDENTITY_INSERT [dbo].[Promotions] OFF;
+END
 
-            migrationBuilder.InsertData(
-                table: "PromotionProducts",
-                columns: new[] { "ProductId", "PromotionId" },
-                values: new object[,]
-                {
-                    { 24, 1 },
-                    { 26, 1 },
-                    { 1, 2 },
-                    { 3, 2 },
-                    { 11, 2 },
-                    { 18, 2 }
-                });
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Promotions] WHERE [PromotionId] = 2)
+BEGIN
+    SET IDENTITY_INSERT [dbo].[Promotions] ON;
+    INSERT INTO [dbo].[Promotions] ([PromotionId], [BuyQuantity], [Description], [DiscountAmount], [DiscountPercent], [EndDate], [GiftProductId], [GiftQuantity], [IsActive], [MinimumOrderAmount], [Name], [StartDate], [Type])
+    VALUES (2, NULL, N'Đơn hàng từ 150.000đ giảm 10.000đ.', 10000.0, NULL, '2026-08-31T00:00:00.0000000', NULL, NULL, CAST(1 AS bit), 150000.0, N'Hóa đơn từ 150K', '2026-07-01T00:00:00.0000000', 0);
+    SET IDENTITY_INSERT [dbo].[Promotions] OFF;
+END
+");
+
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM [dbo].[PromotionProducts] WHERE [PromotionId] = 1 AND [ProductId] = 24)
+    INSERT INTO [dbo].[PromotionProducts] ([ProductId], [PromotionId]) VALUES (24, 1);
+IF NOT EXISTS (SELECT 1 FROM [dbo].[PromotionProducts] WHERE [PromotionId] = 1 AND [ProductId] = 26)
+    INSERT INTO [dbo].[PromotionProducts] ([ProductId], [PromotionId]) VALUES (26, 1);
+IF NOT EXISTS (SELECT 1 FROM [dbo].[PromotionProducts] WHERE [PromotionId] = 2 AND [ProductId] = 1)
+    INSERT INTO [dbo].[PromotionProducts] ([ProductId], [PromotionId]) VALUES (1, 2);
+IF NOT EXISTS (SELECT 1 FROM [dbo].[PromotionProducts] WHERE [PromotionId] = 2 AND [ProductId] = 3)
+    INSERT INTO [dbo].[PromotionProducts] ([ProductId], [PromotionId]) VALUES (3, 2);
+IF NOT EXISTS (SELECT 1 FROM [dbo].[PromotionProducts] WHERE [PromotionId] = 2 AND [ProductId] = 11)
+    INSERT INTO [dbo].[PromotionProducts] ([ProductId], [PromotionId]) VALUES (11, 2);
+IF NOT EXISTS (SELECT 1 FROM [dbo].[PromotionProducts] WHERE [PromotionId] = 2 AND [ProductId] = 18)
+    INSERT INTO [dbo].[PromotionProducts] ([ProductId], [PromotionId]) VALUES (18, 2);
+");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StockCountCategories_CategoryId",

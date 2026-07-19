@@ -6,3 +6,5 @@ http.Client createHttpClient() {
 }
 
 void clearCookieStore() {}
+
+String? getCookieHeader() => null;

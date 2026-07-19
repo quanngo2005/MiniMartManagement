@@ -19,6 +19,7 @@ namespace MiniMart.Services.Implementations
         private readonly IBatchRepository _batchRepository;
         private readonly IInventoryTransactionRepository _inventoryTransactionRepository;
         private readonly IProductRepository _productRepository;
+        private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
 
         public OrderReturnService(
@@ -28,6 +29,7 @@ namespace MiniMart.Services.Implementations
             IBatchRepository batchRepository,
             IInventoryTransactionRepository inventoryTransactionRepository,
             IProductRepository productRepository,
+            INotificationService notificationService,
             IMapper mapper)
         {
             _orderReturnRepository = orderReturnRepository;
@@ -36,6 +38,7 @@ namespace MiniMart.Services.Implementations
             _batchRepository = batchRepository;
             _inventoryTransactionRepository = inventoryTransactionRepository;
             _productRepository = productRepository;
+            _notificationService = notificationService;
             _mapper = mapper;
         }
 
@@ -145,6 +148,27 @@ namespace MiniMart.Services.Implementations
             };
 
             var created = await _orderReturnRepository.CreateAsync(orderReturn);
+
+            // Trigger SignalR notification to Managers in background
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _notificationService.SendToRoleAsync(
+                        "Manager",
+                        "Yêu cầu trả hàng mới",
+                        $"Đơn hàng #{order.OrderCode} có yêu cầu hoàn trả sản phẩm.",
+                        new Dictionary<string, string>
+                        {
+                            { "type", "order_return_request" },
+                            { "orderReturnId", created.OrderReturnId.ToString() }
+                        });
+                }
+                catch
+                {
+                    // Fail silently to avoid blocking client
+                }
+            });
             
             // Reload database graph details to map to DTO properly
             var result = await _orderReturnRepository.GetByIdAsync(created.OrderReturnId);
@@ -227,6 +251,28 @@ namespace MiniMart.Services.Implementations
             orderReturn.Status = OrderReturnStatus.Approved;
             await _orderReturnRepository.UpdateAsync(orderReturn);
 
+            // Trigger SignalR notification to Cashier in background
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _notificationService.SendToUserAsync(
+                        orderReturn.EmployeeId,
+                        "Yêu cầu trả hàng đã được duyệt",
+                        $"Yêu cầu trả hàng {orderReturn.ReturnCode} đã được phê duyệt.",
+                        new Dictionary<string, string>
+                        {
+                            { "type", "order_return_response" },
+                            { "status", "approved" },
+                            { "orderReturnId", orderReturn.OrderReturnId.ToString() }
+                        });
+                }
+                catch
+                {
+                    // Fail silently
+                }
+            });
+
             return _mapper.Map<OrderReturnDto>(orderReturn);
         }
 
@@ -246,6 +292,28 @@ namespace MiniMart.Services.Implementations
             orderReturn.Status = OrderReturnStatus.Rejected;
             orderReturn.Reason = $"{orderReturn.Reason} | Lý do từ chối: {rejectDto.Note}";
             await _orderReturnRepository.UpdateAsync(orderReturn);
+
+            // Trigger SignalR notification to Cashier in background
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _notificationService.SendToUserAsync(
+                        orderReturn.EmployeeId,
+                        "Yêu cầu trả hàng đã bị từ chối",
+                        $"Yêu cầu trả hàng {orderReturn.ReturnCode} đã bị từ chối.",
+                        new Dictionary<string, string>
+                        {
+                            { "type", "order_return_response" },
+                            { "status", "rejected" },
+                            { "orderReturnId", orderReturn.OrderReturnId.ToString() }
+                        });
+                }
+                catch
+                {
+                    // Fail silently
+                }
+            });
 
             return _mapper.Map<OrderReturnDto>(orderReturn);
         }

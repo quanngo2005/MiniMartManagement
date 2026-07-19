@@ -42,10 +42,16 @@ namespace MiniMart.Shared.Extensions
                     {
                         OnMessageReceived = context =>
                         {
-                            if (string.IsNullOrWhiteSpace(context.Token) &&
-                                context.Request.Cookies.TryGetValue("access_token", out var accessToken))
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
                             {
                                 context.Token = accessToken;
+                            }
+                            else if (string.IsNullOrWhiteSpace(context.Token) &&
+                                context.Request.Cookies.TryGetValue("access_token", out var cookieToken))
+                            {
+                                context.Token = cookieToken;
                             }
 
                             return Task.CompletedTask;

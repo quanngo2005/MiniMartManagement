@@ -2,7 +2,7 @@ class Promotion {
   final int promotionId;
   final String name;
   final String description;
-  final int type; // 0 = PercentDiscount, 1 = BuyXGetYFree
+  final int type; // 0 = PercentDiscount, 1 = BuyXGetYFree, 2 = ProductDiscount
   final double? discountPercent;
   final double? discountAmount;
   final double? minimumOrderAmount;
@@ -73,7 +73,16 @@ class Promotion {
     return 'Active';
   }
 
-  String get discountType => type == 0 ? 'Percentage' : 'BuyXGetYFree';
+  String get discountType {
+    switch (type) {
+      case 0:
+        return 'Percentage';
+      case 1:
+        return 'BuyXGetYFree';
+      default:
+        return 'ProductDiscount';
+    }
+  }
   double get discountValue => discountPercent ?? discountAmount ?? 0;
   double get minPurchaseAmount => minimumOrderAmount ?? 0;
 }

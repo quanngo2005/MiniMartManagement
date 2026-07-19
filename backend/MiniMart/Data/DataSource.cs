@@ -365,12 +365,23 @@ namespace MiniMart.Models
             {
                 PromotionId = 2,
                 Name = "Hóa đơn từ 150K",
-                Description = "Đơn hàng từ 150.000đ giảm 10.000đ.",
+                Description = "Đơn hàng từ 150.000đ giảm 10%.",
                 Type = PromotionType.PercentDiscount,
-                DiscountAmount = 10000,
+                DiscountPercent = 10,
                 MinimumOrderAmount = 150000,
                 StartDate = new DateTime(2026, 7, 1),
                 EndDate = new DateTime(2026, 8, 31),
+                IsActive = true,
+            },
+            new Promotion
+            {
+                PromotionId = 3,
+                Name = "Giảm giá bánh Oreo",
+                Description = "Bánh Oreo giảm 15% trong tháng 7.",
+                Type = PromotionType.ProductDiscount,
+                DiscountPercent = 15,
+                StartDate = new DateTime(2026, 7, 1),
+                EndDate = new DateTime(2026, 7, 31),
                 IsActive = true,
             },
         };
@@ -379,10 +390,7 @@ namespace MiniMart.Models
         {
             new PromotionProduct { PromotionId = 1, ProductId = 24 },
             new PromotionProduct { PromotionId = 1, ProductId = 26 },
-            new PromotionProduct { PromotionId = 2, ProductId = 1 },
-            new PromotionProduct { PromotionId = 2, ProductId = 3 },
-            new PromotionProduct { PromotionId = 2, ProductId = 11 },
-            new PromotionProduct { PromotionId = 2, ProductId = 18 },
+            new PromotionProduct { PromotionId = 3, ProductId = 11 },
         };
 
         // ========================= INVENTORY TRANSACTIONS =========================

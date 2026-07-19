@@ -5,26 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="121dffde-9d4f-4fc3-a0fd-4ee9d3b8cca4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Controllers/ProductsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Controllers/ProductsController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Controllers/SuppliersController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Controllers/SuppliersController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Dtos/ProductDtos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Dtos/ProductDtos.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Mapping/ProductMappingProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Mapping/ProductMappingProfile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Mapping/SupplierMappingProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Mapping/SupplierMappingProfile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Migrations/MiniMartDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Migrations/MiniMartDbContextModelSnapshot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/ProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/ProductRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/SupplierRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/SupplierRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/IProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/IProductRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/ISupplierRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/ISupplierRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/ProductService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/SupplierService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/SupplierService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Services/Interfaces/IProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Interfaces/IProductService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Services/Interfaces/ISupplierService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Interfaces/ISupplierService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Data/DataSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Data/DataSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Models/Enums/PromotionType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Models/Enums/PromotionType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/PromotionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/PromotionService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/MiniMart/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/appsettings.Development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/app.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/app.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/models/supplier.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/models/supplier.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/category_management_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/category_management_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/services/supplier_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/services/supplier_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/models/promotion.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/models/promotion.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/manager_dashboard_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/manager_dashboard_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/promotion_management_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/promotion_management_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/settings_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/settings_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/widgets/promotions/promotion_rule_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/widgets/promotions/promotion_rule_card.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +50,7 @@
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;kiet__dev&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;phu__dev&quot;,
     &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/MiniMart/MiniMart&quot;,
