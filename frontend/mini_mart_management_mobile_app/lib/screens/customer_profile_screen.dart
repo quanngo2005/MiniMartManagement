@@ -501,7 +501,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                           'customerStatus': c.customerStatus,
                         });
                     if (ctx.mounted) Navigator.pop(ctx);
-                    if (!mounted) return;
+                    if (!context.mounted) return;
                     if (success) {
                       // Refresh
                       final updated = await context
@@ -563,7 +563,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                     'point': c.points,
                     'customerStatus': !isActive,
                   });
-              if (!mounted) return;
+              if (!context.mounted) return;
               if (success) {
                 final updated = await context
                     .read<CustomerProvider>()

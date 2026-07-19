@@ -47,14 +47,39 @@ namespace MiniMart.Services.Implementations
 
             var shift = _mapper.Map<Shift>(createDto);
 
-            // Determine if morning or afternoon based on StartTime hour
+            // Determine shift type based on StartTime hour
             var hour = createDto.StartTime.Hour;
-            var isMorning = hour >= 6 && hour < 14;
+            string shiftName;
+            DateTime startTime;
+            DateTime endTime;
+            string shiftCodePrefix;
+            
+            if (hour >= 6 && hour < 11)
+            {
+                shiftName = "Ca sáng";
+                startTime = createDto.WorkDate.Date.AddHours(6);
+                endTime = createDto.WorkDate.Date.AddHours(11);
+                shiftCodePrefix = "SA-";
+            }
+            else if (hour >= 11 && hour < 16)
+            {
+                shiftName = "Ca chiều";
+                startTime = createDto.WorkDate.Date.AddHours(11);
+                endTime = createDto.WorkDate.Date.AddHours(16);
+                shiftCodePrefix = "CH-";
+            }
+            else
+            {
+                shiftName = "Ca tối";
+                startTime = createDto.WorkDate.Date.AddHours(16);
+                endTime = createDto.WorkDate.Date.AddHours(22).AddMinutes(30);
+                shiftCodePrefix = "TO-";
+            }
 
-            shift.ShiftName = isMorning ? "Ca sáng" : "Ca chiều";
-            shift.StartTime = createDto.WorkDate.Date.AddHours(isMorning ? 6 : 14);
-            shift.EndTime = createDto.WorkDate.Date.AddHours(isMorning ? 14 : 22);
-            shift.ShiftCode = (isMorning ? "SA-" : "CH-") + createDto.WorkDate.ToString("yyyyMMdd") + "-" + shift.EmployeeId;
+            shift.ShiftName = shiftName;
+            shift.StartTime = startTime;
+            shift.EndTime = endTime;
+            shift.ShiftCode = shiftCodePrefix + createDto.WorkDate.ToString("yyyyMMdd") + "-" + shift.EmployeeId;
 
             // Verify shift slot uniqueness for the employee
             var alreadyExists = await _shiftRepository.GetAllShiftsQueryable()
@@ -84,14 +109,39 @@ namespace MiniMart.Services.Implementations
             _mapper.Map(updateDto, existing);
             existing.ShiftId = id;
 
-            // Determine if morning or afternoon based on StartTime hour
+            // Determine shift type based on StartTime hour
             var hour = updateDto.StartTime.Hour;
-            var isMorning = hour >= 6 && hour < 14;
+            string shiftName;
+            DateTime startTime;
+            DateTime endTime;
+            string shiftCodePrefix;
+            
+            if (hour >= 6 && hour < 11)
+            {
+                shiftName = "Ca sáng";
+                startTime = updateDto.WorkDate.Date.AddHours(6);
+                endTime = updateDto.WorkDate.Date.AddHours(11);
+                shiftCodePrefix = "SA-";
+            }
+            else if (hour >= 11 && hour < 16)
+            {
+                shiftName = "Ca chiều";
+                startTime = updateDto.WorkDate.Date.AddHours(11);
+                endTime = updateDto.WorkDate.Date.AddHours(16);
+                shiftCodePrefix = "CH-";
+            }
+            else
+            {
+                shiftName = "Ca tối";
+                startTime = updateDto.WorkDate.Date.AddHours(16);
+                endTime = updateDto.WorkDate.Date.AddHours(22).AddMinutes(30);
+                shiftCodePrefix = "TO-";
+            }
 
-            existing.ShiftName = isMorning ? "Ca sáng" : "Ca chiều";
-            existing.StartTime = updateDto.WorkDate.Date.AddHours(isMorning ? 6 : 14);
-            existing.EndTime = updateDto.WorkDate.Date.AddHours(isMorning ? 14 : 22);
-            existing.ShiftCode = (isMorning ? "SA-" : "CH-") + updateDto.WorkDate.ToString("yyyyMMdd") + "-" + updateDto.EmployeeId;
+            existing.ShiftName = shiftName;
+            existing.StartTime = startTime;
+            existing.EndTime = endTime;
+            existing.ShiftCode = shiftCodePrefix + updateDto.WorkDate.ToString("yyyyMMdd") + "-" + updateDto.EmployeeId;
 
             // Verify shift slot uniqueness for the employee (excluding current shift)
             var alreadyExists = await _shiftRepository.GetAllShiftsQueryable()

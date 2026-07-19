@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/batch_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/inventory_lookup_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/customer_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/inventory_provider.dart';
@@ -14,6 +15,7 @@ import 'package:mini_mart_management_mobile_app/providers/report_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/product_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/auth_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/batch_repository.dart';
+import 'package:mini_mart_management_mobile_app/repositories/category_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/product_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/inventory_lookup_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/inventory_repository.dart';
@@ -25,12 +27,14 @@ import 'package:mini_mart_management_mobile_app/repositories/supplier_repository
 import 'package:mini_mart_management_mobile_app/repositories/supplier_debt_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/stock_count_repository.dart';
 import 'package:mini_mart_management_mobile_app/screens/cashier_return_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/settings_screen.dart';
 import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
 import 'package:mini_mart_management_mobile_app/services/batch_service.dart';
+import 'package:mini_mart_management_mobile_app/services/category_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_lookup_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_service.dart';
 import 'package:mini_mart_management_mobile_app/services/order_return_service.dart';
@@ -73,6 +77,9 @@ class MiniMartManagementApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => BatchProvider(BatchRepository(BatchService())),
+        ),
+         ChangeNotifierProvider(
+          create: (_) => CategoryProvider(CategoryRepository(CategoryService())),
         ),
         ChangeNotifierProvider(
           create: (_) =>
@@ -143,6 +150,7 @@ class MiniMartManagementApp extends StatelessWidget {
           '/employee-performance': (_) => const EmployeePerformanceScreen(),
           '/members': (_) => const MemberManagementScreen(),
           '/promotions': (_) => const PromotionManagementScreen(),
+          '/categories': (_) => const CategoryManagementScreen(),
           '/returns': (_) => const CashierReturnScreen(),
           '/settings': (_) => const SettingsScreen(),
         },
