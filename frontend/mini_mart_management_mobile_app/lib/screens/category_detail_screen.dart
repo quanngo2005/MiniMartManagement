@@ -5,6 +5,7 @@ import 'package:mini_mart_management_mobile_app/models/category.dart'
 import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 
 class CategoryDetailScreen extends StatefulWidget {
   const CategoryDetailScreen({this.categoryId, super.key});
@@ -26,12 +27,14 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   bool _status = true;
   bool _isLoading = false;
   bool _isSaving = false;
+  String? _parentCategoryName;
 
   bool get _isNew => widget.categoryId == null;
 
   @override
   void initState() {
     super.initState();
+    _parentCtrl.addListener(() => setState(_updateParentCategoryName));
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_isNew) return;
       setState(() => _isLoading = true);
@@ -54,6 +57,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
 
   @override
   void dispose() {
+    _parentCtrl.removeListener(_updateParentCategoryName);
     _codeCtrl.dispose();
     _nameCtrl.dispose();
     _descCtrl.dispose();
@@ -71,6 +75,24 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
     _parentCtrl.text = category?.parentCategoryId?.toString() ?? '';
     _taxCtrl.text = (category?.taxRateId ?? 4).toString();
     _status = category?.status ?? true;
+    _updateParentCategoryName();
+  }
+
+  void _updateParentCategoryName() {
+    final id = int.tryParse(_parentCtrl.text.trim());
+    if (id == null) {
+      _parentCategoryName = null;
+      return;
+    }
+    final categories = context.read<CategoryProvider>().categories;
+    product_category.Category? parent;
+    for (final category in categories) {
+      if (category.categoryId == id) {
+        parent = category;
+        break;
+      }
+    }
+    _parentCategoryName = parent?.categoryName;
   }
 
   Future<void> _save() async {
@@ -111,10 +133,8 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isNew ? 'Thêm Danh Mục' : 'Chi tiết Danh Mục'),
-        backgroundColor: AppColors.surfaceContainerLowest,
-        foregroundColor: AppColors.primary,
+      appBar: MiniMartAppBar.secondary(
+        title: _isNew ? 'Thêm Danh Mục' : 'Chi tiết Danh Mục',
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -198,24 +218,17 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
     final id = int.tryParse(_parentCtrl.text.trim());
     if (id == null) return const SizedBox.shrink();
     final categories = context.watch<CategoryProvider>().categories;
+    String? name = _parentCategoryName;
     for (final category in categories) {
       if (category.categoryId == id) {
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Danh mục cha: ${category.categoryName}',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: AppColors.textMuted,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        );
+        name = category.categoryName;
+        break;
       }
     }
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
-        'Danh mục cha chưa tìm thấy',
+        name == null ? 'Danh mục cha chưa tìm thấy' : 'Danh mục cha: $name',
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
           color: AppColors.textMuted,
           fontStyle: FontStyle.italic,

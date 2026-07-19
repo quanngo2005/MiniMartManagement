@@ -8,6 +8,7 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 
 enum EmployeePerformanceFilter { all, morning, afternoon, night }
 
@@ -57,7 +58,10 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: _buildAppBar(context),
+      appBar: MiniMartAppBar.primary(
+        title: 'Hiệu suất nhân viên',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: SafeArea(
         child: provider.isLoading && items.isEmpty
             ? const LoadingOverlay()
@@ -94,25 +98,6 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
       bottomNavigationBar: widget.showBottomNavBar
           ? const AppBottomNavBar(selectedTab: AppNavTab.staff)
           : null,
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceContainerLowest,
-      foregroundColor: AppColors.primary,
-      leading: widget.onMenuTap != null
-          ? IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: widget.onMenuTap,
-            )
-          : const SizedBox.shrink(),
-      title: const Text('Hiệu suất nhân viên'),
-      actions: [IconButton(onPressed: _load, icon: const Icon(Icons.refresh))],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(color: AppColors.borderGray, height: 1),
-      ),
     );
   }
 

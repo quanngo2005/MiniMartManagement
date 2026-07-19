@@ -4,10 +4,19 @@ import '../models/customer_summary.dart';
 import '../providers/customer_provider.dart';
 import '../theme/app_colors.dart';
 import '../widgets/customers/customer_card.dart';
+import '../widgets/layout/mini_mart_app_bar.dart';
 import 'customer_profile_screen.dart';
+import '../widgets/layout/app_bottom_nav_bar.dart';
 
 class CustomerListScreen extends StatefulWidget {
-  const CustomerListScreen({super.key});
+  const CustomerListScreen({
+    this.showBottomNavBar = true,
+    this.onMenuTap,
+    super.key,
+  });
+
+  final bool showBottomNavBar;
+  final VoidCallback? onMenuTap;
 
   @override
   State<CustomerListScreen> createState() => _CustomerListScreenState();
@@ -53,7 +62,10 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
+      appBar: MiniMartAppBar.primary(
+        title: 'Khách hàng',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -63,41 +75,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () => _showAddCustomerDialog(context),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        child: const Icon(Icons.person_add_outlined),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceContainerLowest,
-      foregroundColor: AppColors.primary,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context);
-          } else {
-            Navigator.of(context).pushReplacementNamed('/members');
-          }
-        },
-      ),
-      title: Text(
-        'Danh sách khách hàng',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(color: AppColors.borderGray, height: 1),
-      ),
+      bottomNavigationBar: widget.showBottomNavBar
+          ? const AppBottomNavBar(selectedTab: AppNavTab.customers)
+          : null,
     );
   }
 
@@ -263,25 +243,6 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
               );
             },
           );
-        },
-      ),
-    );
-  }
-
-  void _showAddCustomerDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (_) => _AddCustomerSheet(
-        onSave: (data) async {
-          final success = await context.read<CustomerProvider>().createCustomer(
-            data,
-          );
-          if (success && context.mounted) Navigator.pop(context);
         },
       ),
     );

@@ -17,5 +17,5 @@ class TaxRate {
     );
   }
 
-  String get label => '${description} (${(rate * 100).toStringAsFixed(0)}%)';
+  String get label => '$description (${(rate * 100).toStringAsFixed(0)}%)';
 }

@@ -9,6 +9,7 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class StockCountHistoryScreen extends StatefulWidget {
@@ -37,45 +38,14 @@ class _StockCountHistoryScreenState extends State<StockCountHistoryScreen> {
     final stockCounts = _filter(provider.stockCounts);
 
     return Scaffold(
-      appBar: _buildAppBar(context),
+      appBar: const MiniMartAppBar.primary(title: 'Kiểm kê'),
       backgroundColor: AppColors.backgroundSlate,
       body: RefreshIndicator(
         onRefresh: provider.loadStockCounts,
         child: _buildBody(provider, stockCounts),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: _createStockCount,
-        tooltip: 'Tạo phiếu kiểm kê',
-        backgroundColor: AppColors.secondary,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add_rounded),
-      ),
     );
   }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) => AppBar(
-    backgroundColor: AppColors.surfaceBright,
-    foregroundColor: AppColors.primary,
-    titleSpacing: 0,
-    leading: const Icon(Icons.storefront_rounded),
-    title: Text(
-      'Cửa hàng #402 | Nhập/Xuất',
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-        color: AppColors.primary,
-        fontWeight: FontWeight.w800,
-      ),
-    ),
-    actions: [
-      IconButton(
-        onPressed: () => ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Tài khoản'))),
-        tooltip: 'Tài khoản',
-        icon: const Icon(Icons.account_circle_outlined),
-      ),
-    ],
-  );
 
   Widget _buildBody(StockCountProvider provider, List<StockCount> stockCounts) {
     if (provider.isLoading && provider.stockCounts.isEmpty) {
@@ -95,6 +65,15 @@ class _StockCountHistoryScreenState extends State<StockCountHistoryScreen> {
         _buildSearchField(),
         const SizedBox(height: 12),
         _buildStatusFilters(),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerRight,
+          child: FilledButton.icon(
+            onPressed: _createStockCount,
+            icon: const Icon(Icons.add_rounded),
+            label: const Text('Tạo phiếu kiểm kê'),
+          ),
+        ),
         if (provider.errorMessage != null)
           ErrorBanner(
             message: provider.errorMessage!,

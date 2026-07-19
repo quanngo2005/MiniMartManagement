@@ -4,11 +4,11 @@ import 'package:mini_mart_management_mobile_app/models/supplier.dart';
 import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/supplier_debt_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/supplier_detail_screen.dart';
-import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 
 class SupplierManagementScreen extends StatefulWidget {
   const SupplierManagementScreen({this.showBottomNavBar = true, super.key});
@@ -53,21 +53,12 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quản lý Nhà Cung Cấp'),
-        backgroundColor: AppColors.surfaceContainerLowest,
-        foregroundColor: AppColors.primary,
-        actions: [
-          IconButton(
-            tooltip: 'Theo dõi công nợ',
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const SupplierDebtScreen(),
-              ),
-            ),
-          ),
-        ],
+      appBar: MiniMartAppBar.primary(
+        title: 'Nhà cung cấp',
+        onBrandTap: null,
+        onProfileTap: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const SupplierDebtScreen()),
+        ),
       ),
       body: SafeArea(
         child: Column(
@@ -119,16 +110,6 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push<void>(
-          context,
-          MaterialPageRoute(builder: (_) => const SupplierDetailScreen()),
-        ),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        tooltip: 'Thêm nhà cung cấp',
-        child: const Icon(Icons.add_rounded),
       ),
       bottomNavigationBar: widget.showBottomNavBar
           ? const AppBottomNavBar(selectedTab: AppNavTab.suppliers)

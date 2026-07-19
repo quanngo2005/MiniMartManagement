@@ -8,6 +8,7 @@ import 'package:mini_mart_management_mobile_app/providers/tier_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/customer_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/members/recent_upgrade_tile.dart';
 import 'package:mini_mart_management_mobile_app/widgets/members/tier_distribution_card.dart';
 import 'package:mini_mart_management_mobile_app/widgets/members/tier_overview_card.dart';
@@ -52,7 +53,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: _buildAppBar(context),
+      appBar: const MiniMartAppBar.primary(title: 'Thành viên'),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
@@ -74,47 +75,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: _openCustomerList,
-        backgroundColor: AppColors.primaryContainer,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.person_add_outlined),
-      ),
       bottomNavigationBar: widget.showBottomNavBar
           ? const AppBottomNavBar(selectedTab: AppNavTab.customers)
           : null,
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceContainerLowest,
-      foregroundColor: AppColors.primary,
-      titleSpacing: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.menu),
-        color: AppColors.primary,
-        onPressed: widget.onMenuTap ?? () {},
-      ),
-      title: Text(
-        'Quản lý thành viên',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.account_circle_outlined),
-          color: AppColors.primary,
-          onPressed: () {},
-        ),
-      ],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(color: AppColors.borderGray, height: 1),
-      ),
     );
   }
 
