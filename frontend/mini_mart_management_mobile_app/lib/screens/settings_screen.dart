@@ -16,8 +16,10 @@ class SettingsScreen extends StatelessWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   void _showLogoutConfirmation() {
+    final auth = context.read<AuthProvider>();
+    final isCashier = auth.currentUser?.roleName == 'Cashier';
     final shift = context.read<ShiftProvider>().currentShift;
-    if (shift != null) {
+    if (isCashier && shift != null) {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(

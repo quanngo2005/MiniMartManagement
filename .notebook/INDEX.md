@@ -3,6 +3,7 @@
 ## Entries
 
 - [Batch write boundary](batch-write-boundary.md) - batch API is read-only; all writes require an inventory workflow and audit trail.
+- [Batch status mobile flow](batch-status-mobile-flow.md) - authenticated batch status list and its Manager/Warehouse entry points.
 
 - [Receipt import flow](receipt-import-flow.md) - mobile receipt creation and completion path, plus atomicity risk.
 
