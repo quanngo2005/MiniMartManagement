@@ -5,12 +5,15 @@ import 'package:mini_mart_management_mobile_app/providers/e_invoice_provider.dar
 import 'package:mini_mart_management_mobile_app/screens/invoice_detail_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
-import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class InvoiceListScreen extends StatefulWidget {
-  const InvoiceListScreen({super.key});
+  const InvoiceListScreen({this.onMenuTap, super.key});
+
+  final VoidCallback? onMenuTap;
 
   @override
   State<InvoiceListScreen> createState() => _InvoiceListScreenState();
@@ -39,18 +42,9 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
     final invoices = provider.invoices;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Hóa đơn'),
-        backgroundColor: AppColors.primaryContainer,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: provider.isLoading
-                ? null
-                : () => provider.loadInvoices(),
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
+      appBar: MiniMartAppBar.primary(
+        title: 'Hóa đơn',
+        onBrandTap: widget.onMenuTap,
       ),
       backgroundColor: AppColors.backgroundSlate,
       body: Stack(

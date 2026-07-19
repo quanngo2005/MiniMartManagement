@@ -5,12 +5,11 @@ import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/repositories/category_repository.dart';
 
 class CategoryProvider extends ChangeNotifier {
-  CategoryProvider(this._repo);
+  CategoryProvider(this._repository);
 
-  final CategoryRepository _repo;
-
-  List<Category> _categories = [];
-  List<TaxRate> _taxRates = [];
+  final CategoryRepository _repository;
+  List<Category> _categories = const [];
+  List<TaxRate> _taxRates = const [];
   bool _isLoading = false;
   String? _error;
 
@@ -21,9 +20,11 @@ class CategoryProvider extends ChangeNotifier {
 
   Future<void> fetchTaxRates() async {
     try {
-      _taxRates = await _repo.getTaxRates();
+      _taxRates = await _repository.getTaxRates();
       notifyListeners();
-    } catch (_) {}
+    } catch (_) {
+      // The category list remains usable without tax metadata.
+    }
   }
 
   Future<void> fetchAll() async {
@@ -31,14 +32,14 @@ class CategoryProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
-      _categories = await _repo.getAll();
+      _categories = await _repository.getAll();
       try {
-        _taxRates = await _repo.getTaxRates();
+        _taxRates = await _repository.getTaxRates();
       } catch (_) {
-        // taxRates không bắt buộc để hiển thị list
+        // The category list remains usable without tax metadata.
       }
-    } on ApiException catch (e) {
-      _error = e.message;
+    } on ApiException catch (error) {
+      _error = error.message;
     } catch (_) {
       _error = 'Đã xảy ra lỗi khi tải dữ liệu.';
     } finally {
@@ -49,12 +50,12 @@ class CategoryProvider extends ChangeNotifier {
 
   Future<String?> create(Map<String, dynamic> data) async {
     try {
-      final created = await _repo.create(data);
-      _categories = [..._categories, created];
+      final category = await _repository.create(data);
+      _categories = [..._categories, category];
       notifyListeners();
       return null;
-    } on ApiException catch (e) {
-      return e.message;
+    } on ApiException catch (error) {
+      return error.message;
     } catch (_) {
       return 'Không thể tạo danh mục.';
     }
@@ -62,14 +63,15 @@ class CategoryProvider extends ChangeNotifier {
 
   Future<String?> update(int id, Map<String, dynamic> data) async {
     try {
-      final updated = await _repo.update(id, data);
+      final category = await _repository.update(id, data);
       _categories = [
-        for (final c in _categories) c.categoryId == id ? updated : c,
+        for (final item in _categories)
+          if (item.categoryId == id) category else item,
       ];
       notifyListeners();
       return null;
-    } on ApiException catch (e) {
-      return e.message;
+    } on ApiException catch (error) {
+      return error.message;
     } catch (_) {
       return 'Không thể cập nhật danh mục.';
     }
@@ -77,12 +79,12 @@ class CategoryProvider extends ChangeNotifier {
 
   Future<String?> delete(int id) async {
     try {
-      await _repo.delete(id);
-      _categories = _categories.where((c) => c.categoryId != id).toList();
+      await _repository.delete(id);
+      _categories = _categories.where((item) => item.categoryId != id).toList();
       notifyListeners();
       return null;
-    } on ApiException catch (e) {
-      return e.message;
+    } on ApiException catch (error) {
+      return error.message;
     } catch (_) {
       return 'Không thể xóa danh mục.';
     }

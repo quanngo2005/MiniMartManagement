@@ -14,6 +14,7 @@ enum ManagerNavDestination {
   staff,
   suppliers,
   customers,
+  customerInformation,
   promotions,
   analyze,
   invoices,

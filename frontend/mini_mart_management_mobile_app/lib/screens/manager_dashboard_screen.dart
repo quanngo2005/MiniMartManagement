@@ -30,7 +30,6 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
     await Future.wait([
       provider.fetchRevenueSummary(),
       provider.fetchAllReportsForDate(DateTime.now()),
-      provider.fetchTopProducts(top: 5),
     ]);
   }
 
@@ -41,7 +40,7 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
     if (provider.isLoading &&
         provider.revenueSummary == null &&
         provider.dailyRevenue.isEmpty &&
-        provider.topProducts.isEmpty) {
+        provider.dashboardTopProducts.isEmpty) {
       return Scaffold(
         appBar: _buildAppBar(),
         body: const SafeArea(child: LoadingOverlay()),
@@ -50,7 +49,7 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
 
     if (provider.error != null &&
         provider.revenueSummary == null &&
-        provider.topProducts.isEmpty &&
+        provider.dashboardTopProducts.isEmpty &&
         provider.dailyRevenue.isEmpty) {
       return Scaffold(
         appBar: _buildAppBar(),
@@ -69,8 +68,8 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
       0,
       (sum, item) => sum + item.orderCount,
     );
-    final topProduct = provider.topProducts.isNotEmpty
-        ? provider.topProducts.first
+    final topProduct = provider.dashboardTopProducts.isNotEmpty
+        ? provider.dashboardTopProducts.first
         : null;
     final lowStockCount = provider.lowStockAlerts.length;
     final inventoryBadge = lowStockCount > 0
@@ -91,7 +90,7 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                     crossAxisCount: 2,
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
-                    mainAxisExtent: 122,
+                    mainAxisExtent: 146,
                   ),
                   delegate: SliverChildListDelegate([
                     _MetricCard(
@@ -138,7 +137,7 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                     ),
                     _MetricCard(
                       label: 'Sản phẩm bán chạy',
-                      value: '${provider.topProducts.length}',
+                      value: '${provider.dashboardTopProducts.length}',
                       caption: topProduct == null
                           ? 'Chưa có dữ liệu'
                           : topProduct.productName,

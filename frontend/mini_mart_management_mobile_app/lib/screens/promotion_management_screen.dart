@@ -114,10 +114,18 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
       backgroundColor: AppColors.surfaceContainerLowest,
       foregroundColor: AppColors.primary,
       titleSpacing: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.menu),
-        color: AppColors.primary,
-        onPressed: widget.onMenuTap ?? () {},
+      leading: InkWell(
+        onTap: widget.onMenuTap ?? () {},
+        child: Center(
+          child: Text(
+            'MMMS',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
       ),
       title: Text(
         'Chương trình khuyến mãi',

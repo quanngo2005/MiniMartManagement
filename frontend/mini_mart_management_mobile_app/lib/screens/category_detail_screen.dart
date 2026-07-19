@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:mini_mart_management_mobile_app/models/category.dart'
-    as product_category;
+import 'package:mini_mart_management_mobile_app/models/category.dart';
+import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
-import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
+import 'package:provider/provider.dart';
 
 class CategoryDetailScreen extends StatefulWidget {
   const CategoryDetailScreen({this.categoryId, super.key});
@@ -18,97 +17,74 @@ class CategoryDetailScreen extends StatefulWidget {
 
 class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   final _formKey = GlobalKey<FormState>();
-  late final _codeCtrl = TextEditingController();
-  late final _nameCtrl = TextEditingController();
-  late final _descCtrl = TextEditingController();
-  late final _orderCtrl = TextEditingController(text: '1');
-  late final _parentCtrl = TextEditingController();
-  late final _taxCtrl = TextEditingController(text: '4');
+  final _codeController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _orderController = TextEditingController(text: '0');
+
+  bool _loading = true;
+  bool _saving = false;
   bool _status = true;
-  bool _isLoading = false;
-  bool _isSaving = false;
-  String? _parentCategoryName;
+  int? _parentCategoryId;
+  int? _taxRateId;
 
   bool get _isNew => widget.categoryId == null;
 
   @override
   void initState() {
     super.initState();
-    _parentCtrl.addListener(() => setState(_updateParentCategoryName));
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (_isNew) return;
-      setState(() => _isLoading = true);
-      final provider = context.read<CategoryProvider>();
-      if (provider.categories.isEmpty) {
-        await provider.fetchAll();
-      }
-      product_category.Category? found;
-      for (final category in provider.categories) {
-        if (category.categoryId == widget.categoryId) {
-          found = category;
-          break;
-        }
-      }
-      if (!mounted) return;
-      _fillFields(found);
-      setState(() => _isLoading = false);
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
   @override
   void dispose() {
-    _parentCtrl.removeListener(_updateParentCategoryName);
-    _codeCtrl.dispose();
-    _nameCtrl.dispose();
-    _descCtrl.dispose();
-    _orderCtrl.dispose();
-    _parentCtrl.dispose();
-    _taxCtrl.dispose();
+    _codeController.dispose();
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _orderController.dispose();
     super.dispose();
   }
 
-  void _fillFields(product_category.Category? category) {
-    _codeCtrl.text = category?.categoryCode ?? '';
-    _nameCtrl.text = category?.categoryName ?? '';
-    _descCtrl.text = category?.description ?? '';
-    _orderCtrl.text = (category?.displayOrder ?? 1).toString();
-    _parentCtrl.text = category?.parentCategoryId?.toString() ?? '';
-    _taxCtrl.text = (category?.taxRateId ?? 4).toString();
-    _status = category?.status ?? true;
-    _updateParentCategoryName();
-  }
+  Future<void> _load() async {
+    final provider = context.read<CategoryProvider>();
+    if (provider.categories.isEmpty) await provider.fetchAll();
+    if (!mounted) return;
 
-  void _updateParentCategoryName() {
-    final id = int.tryParse(_parentCtrl.text.trim());
-    if (id == null) {
-      _parentCategoryName = null;
+    Category? category;
+    for (final item in provider.categories) {
+      if (item.categoryId == widget.categoryId) category = item;
+    }
+    if (!_isNew && category == null) {
+      Navigator.pop(context);
       return;
     }
-    final categories = context.read<CategoryProvider>().categories;
-    product_category.Category? parent;
-    for (final category in categories) {
-      if (category.categoryId == id) {
-        parent = category;
-        break;
-      }
+    if (category != null) {
+      _codeController.text = category.categoryCode;
+      _nameController.text = category.categoryName;
+      _descriptionController.text = category.description ?? '';
+      _orderController.text = category.displayOrder.toString();
+      _parentCategoryId = category.parentCategoryId;
+      _taxRateId = category.taxRateId;
+      _status = category.status;
     }
-    _parentCategoryName = parent?.categoryName;
+    if (_taxRateId == null && provider.taxRates.isNotEmpty) {
+      _taxRateId = provider.taxRates.first.taxRateId;
+    }
+    setState(() => _loading = false);
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _isSaving = true);
-    final data = {
-      'categoryCode': _codeCtrl.text.trim(),
-      'categoryName': _nameCtrl.text.trim(),
-      'description': _descCtrl.text.trim().isEmpty
+    setState(() => _saving = true);
+    final data = <String, dynamic>{
+      'categoryCode': _codeController.text.trim(),
+      'categoryName': _nameController.text.trim(),
+      'description': _descriptionController.text.trim().isEmpty
           ? null
-          : _descCtrl.text.trim(),
-      'displayOrder': int.tryParse(_orderCtrl.text.trim()) ?? 1,
-      'parentCategoryId': _parentCtrl.text.trim().isEmpty
-          ? null
-          : int.tryParse(_parentCtrl.text.trim()),
-      'taxRateId': int.tryParse(_taxCtrl.text.trim()) ?? 4,
+          : _descriptionController.text.trim(),
+      'displayOrder': int.tryParse(_orderController.text.trim()) ?? 0,
+      'parentCategoryId': _parentCategoryId,
+      'taxRateId': _taxRateId,
       'status': _status,
     };
     final provider = context.read<CategoryProvider>();
@@ -116,124 +92,157 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
         ? await provider.create(data)
         : await provider.update(widget.categoryId!, data);
     if (!mounted) return;
-    setState(() => _isSaving = false);
+    setState(() => _saving = false);
     if (error == null) {
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error)));
+      Navigator.pop(context, true);
+      return;
     }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(body: SafeArea(child: LoadingOverlay()));
-    }
-
     return Scaffold(
       appBar: MiniMartAppBar.secondary(
-        title: _isNew ? 'Thêm Danh Mục' : 'Chi tiết Danh Mục',
+        title: _isNew ? 'Thêm danh mục' : 'Chỉnh sửa danh mục',
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _field(_codeCtrl, 'Mã danh mục'),
-                const SizedBox(height: 12),
-                _field(_nameCtrl, 'Tên danh mục'),
-                const SizedBox(height: 12),
-                _field(_descCtrl, 'Mô tả', maxLines: 3),
-                const SizedBox(height: 12),
-                Row(
+        child: _loading
+            ? const LoadingOverlay()
+            : Form(
+                key: _formKey,
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                   children: [
-                    Expanded(child: _field(_orderCtrl, 'Thứ tự', number: true)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _field(_taxCtrl, 'Tax Rate ID', number: true),
+                    _textField(
+                      controller: _codeController,
+                      label: 'Mã danh mục',
+                      hint: 'Ví dụ: RAU_CU',
+                    ),
+                    const SizedBox(height: 12),
+                    _textField(
+                      controller: _nameController,
+                      label: 'Tên danh mục',
+                      hint: 'Ví dụ: Rau củ',
+                    ),
+                    const SizedBox(height: 12),
+                    _textField(
+                      controller: _descriptionController,
+                      label: 'Mô tả',
+                      required: false,
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildTaxField(context),
+                    const SizedBox(height: 12),
+                    _buildParentField(context),
+                    const SizedBox(height: 12),
+                    _textField(
+                      controller: _orderController,
+                      label: 'Thứ tự hiển thị',
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 8),
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      value: _status,
+                      onChanged: (value) => setState(() => _status = value),
+                      title: const Text('Đang hoạt động'),
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton.icon(
+                      onPressed: _saving ? null : _save,
+                      icon: _saving
+                          ? const SizedBox.square(
+                              dimension: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.save_outlined),
+                      label: Text(_saving ? 'Đang lưu...' : 'Lưu danh mục'),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                _field(_parentCtrl, 'Parent Category ID', number: true),
-                const SizedBox(height: 4),
-                _parentLookup(context),
-                const SizedBox(height: 12),
-                SwitchListTile(
-                  value: _status,
-                  onChanged: (value) => setState(() => _status = value),
-                  title: const Text('Đang hoạt động'),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: _isSaving ? null : _save,
-                    icon: _isSaving
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Icon(Icons.save_rounded),
-                    label: const Text('Lưu'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }
 
-  Widget _field(
-    TextEditingController controller,
-    String label, {
+  Widget _buildTaxField(BuildContext context) {
+    final rates = context.watch<CategoryProvider>().taxRates;
+    if (rates.isEmpty) {
+      return TextFormField(
+        initialValue: _taxRateId?.toString() ?? '',
+        keyboardType: TextInputType.number,
+        decoration: const InputDecoration(labelText: 'Mã thuế'),
+        onChanged: (value) => _taxRateId = int.tryParse(value),
+        validator: (value) => int.tryParse(value ?? '') == null
+            ? 'Mã thuế không hợp lệ'
+            : null,
+      );
+    }
+    return DropdownButtonFormField<int>(
+      initialValue: rates.any((rate) => rate.taxRateId == _taxRateId)
+          ? _taxRateId
+          : null,
+      decoration: const InputDecoration(labelText: 'Thuế áp dụng'),
+      items: [for (final rate in rates) _taxMenuItem(rate)],
+      onChanged: (value) => setState(() => _taxRateId = value),
+      validator: (value) => value == null ? 'Vui lòng chọn thuế' : null,
+    );
+  }
+
+  DropdownMenuItem<int> _taxMenuItem(TaxRate rate) {
+    return DropdownMenuItem(value: rate.taxRateId, child: Text(rate.label));
+  }
+
+  Widget _buildParentField(BuildContext context) {
+    final categories = context
+        .watch<CategoryProvider>()
+        .categories
+        .where((item) => item.categoryId != widget.categoryId)
+        .toList();
+    return DropdownButtonFormField<int?>(
+      initialValue: categories.any(
+        (item) => item.categoryId == _parentCategoryId,
+      )
+          ? _parentCategoryId
+          : null,
+      decoration: const InputDecoration(labelText: 'Danh mục cha'),
+      items: [
+        const DropdownMenuItem<int?>(value: null, child: Text('Không có')),
+        for (final category in categories)
+          DropdownMenuItem<int?>(
+            value: category.categoryId,
+            child: Text(category.categoryName),
+          ),
+      ],
+      onChanged: (value) => setState(() => _parentCategoryId = value),
+    );
+  }
+
+  Widget _textField({
+    required TextEditingController controller,
+    required String label,
+    String? hint,
+    bool required = true,
     int maxLines = 1,
-    bool number = false,
+    TextInputType? keyboardType,
+    ValueChanged<String>? onChanged,
   }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
-      keyboardType: number ? TextInputType.number : TextInputType.text,
-      decoration: InputDecoration(labelText: label),
-      validator: (value) {
-        if (label == 'Mô tả') return null;
-        if (value == null || value.trim().isEmpty) return 'Không được trống';
-        return null;
-      },
-    );
-  }
-
-  Widget _parentLookup(BuildContext context) {
-    final id = int.tryParse(_parentCtrl.text.trim());
-    if (id == null) return const SizedBox.shrink();
-    final categories = context.watch<CategoryProvider>().categories;
-    String? name = _parentCategoryName;
-    for (final category in categories) {
-      if (category.categoryId == id) {
-        name = category.categoryName;
-        break;
-      }
-    }
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        name == null ? 'Danh mục cha chưa tìm thấy' : 'Danh mục cha: $name',
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: AppColors.textMuted,
-          fontStyle: FontStyle.italic,
-        ),
-      ),
+      keyboardType: keyboardType,
+      onChanged: onChanged,
+      decoration: InputDecoration(labelText: label, hintText: hint),
+      validator: required
+          ? (value) => value == null || value.trim().isEmpty
+                ? 'Không được để trống'
+                : null
+          : null,
     );
   }
 }
