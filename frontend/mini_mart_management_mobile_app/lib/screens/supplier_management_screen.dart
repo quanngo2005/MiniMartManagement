@@ -57,6 +57,17 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
         title: const Text('Quản lý Nhà Cung Cấp'),
         backgroundColor: AppColors.surfaceContainerLowest,
         foregroundColor: AppColors.primary,
+        actions: [
+          IconButton(
+            tooltip: 'Theo dõi công nợ',
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SupplierDebtScreen(),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -91,7 +102,7 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
                       child: ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
                         itemCount: filtered.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        separatorBuilder: (_, _) => const SizedBox(height: 12),
                         itemBuilder: (_, index) => _SupplierTile(
                           supplier: filtered[index],
                           onTap: () => Navigator.push<void>(

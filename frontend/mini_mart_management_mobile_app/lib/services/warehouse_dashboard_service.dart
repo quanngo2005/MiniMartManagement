@@ -19,8 +19,9 @@ class WarehouseDashboardService {
     final json = _decode(response);
     _checkStatus(response, json);
     final data = json['data'] ?? json['Data'] ?? json;
-    if (data is List)
+    if (data is List) {
       return data.map((e) => InventoryStatus.fromJson(e)).toList();
+    }
     throw const ApiException('Không thể đọc báo cáo tồn kho.');
   }
 
@@ -32,8 +33,9 @@ class WarehouseDashboardService {
     final json = _decode(response);
     _checkStatus(response, json);
     final data = json['data'] ?? json['Data'] ?? json;
-    if (data is List)
+    if (data is List) {
       return data.map((e) => InventoryStatus.fromJson(e)).toList();
+    }
     throw const ApiException('Không thể đọc cảnh báo tồn kho thấp.');
   }
 
@@ -45,12 +47,14 @@ class WarehouseDashboardService {
     final json = _decode(response);
     _checkStatus(response, json);
     final data = json['data'] ?? json['Data'] ?? json;
-    if (data is List)
+    if (data is List) {
       return data.map((e) => NearExpiryProduct.fromJson(e)).toList();
+    }
     if (data is Map<String, dynamic>) {
       final value = data['value'] ?? data['Value'];
-      if (value is List)
+      if (value is List) {
         return value.map((e) => NearExpiryProduct.fromJson(e)).toList();
+      }
     }
     return [];
   }
@@ -72,8 +76,9 @@ class WarehouseDashboardService {
     try {
       final decoded = jsonDecode(response.body);
       final value = decoded is Map ? (decoded['value'] ?? decoded) : decoded;
-      if (value is List)
+      if (value is List) {
         return value.map((e) => RecentBatch.fromJson(e)).toList();
+      }
     } catch (_) {}
     return [];
   }
