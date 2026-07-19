@@ -6,5 +6,6 @@ namespace MiniMart.Services.Interfaces
     {
         IQueryable<BatchDto> GetAllBatchesQueryable();
         Task<BatchDto?> GetBatchByIdAsync(int id);
+        Task<InventoryTransactionDto> DisposeExpiredBatchAsync(int batchId, int employeeId);
     }
 }

@@ -25,6 +25,20 @@ class CartProvider extends ChangeNotifier {
     return total;
   }
 
+  double get vatAmount {
+    double totalVat = 0;
+    for (var item in _items) {
+      final itemVat = item.totalPrice * item.product.categoryTaxRate;
+      totalVat += itemVat;
+    }
+    return (totalVat * 100).roundToDouble() / 100;
+  }
+
+  double get averageVatRate {
+    if (totalAmount == 0) return 0.08;
+    return vatAmount / totalAmount;
+  }
+
   double get discountAmount {
     return _pointsToUse * 1000.0;
   }

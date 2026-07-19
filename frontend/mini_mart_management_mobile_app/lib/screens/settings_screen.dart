@@ -7,7 +7,7 @@ import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:provider/provider.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
@@ -16,8 +16,10 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   void _showLogoutConfirmation() {
+    final auth = context.read<AuthProvider>();
+    final isCashier = auth.currentUser?.roleName == 'Cashier';
     final shift = context.read<ShiftProvider>().currentShift;
-    if (shift != null) {
+    if (isCashier && shift != null) {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(

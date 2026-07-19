@@ -45,7 +45,7 @@ class AppBottomNavBar extends StatelessWidget {
       case 1:
         Navigator.of(context).pushReplacement(
           MaterialPageRoute<void>(
-            builder: (_) => const CategoryManagementScreen(),
+            builder: (_) => CategoryManagementScreen.withProvider(),
           ),
         );
       case 2:

@@ -4,6 +4,8 @@ import 'package:mini_mart_management_mobile_app/providers/order_return_provider.
 import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/batch_status_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart';
@@ -115,6 +117,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
+          BatchStatusScreen(onMenuTap: _openDrawer),
           EmployeePerformanceScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
@@ -136,7 +139,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           ),
           const InvoiceListScreen(),
           AnalyzeScreen(onMenuTap: _openDrawer),
-          ManagerReturnListScreen(onMenuTap: _openDrawer),
+          CategoryManagementScreen.withProvider(onMenuTap: _openDrawer),
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(

@@ -1,9 +1,11 @@
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/category.dart';
+import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/services/category_service.dart';
 
 class CategoryRepository {
   const CategoryRepository(this._service);
+
   final CategoryService _service;
 
   Future<List<Category>> getAll() async {
@@ -13,6 +15,16 @@ class CategoryRepository {
       rethrow;
     } catch (e) {
       throw ApiException('Không thể tải danh mục: $e');
+    }
+  }
+
+  Future<List<TaxRate>> getTaxRates() async {
+    try {
+      return await _service.getTaxRates();
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Không thể tải danh sách thuế: $e');
     }
   }
 
