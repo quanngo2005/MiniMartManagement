@@ -54,4 +54,24 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
   }
+
+  Future<void> fetchCurrentUser() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _currentUser = await _authRepository.fetchCurrentUser();
+    } on UnauthorizedException {
+      _currentUser = null;
+      _errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+    } catch (_) {
+      _errorMessage = 'Không thể tải hồ sơ. Vui lòng thử lại.';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

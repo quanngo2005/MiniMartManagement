@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart';
@@ -41,6 +42,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.promotions: 8,
     ManagerNavDestination.invoices: 9,
     ManagerNavDestination.analyze: 10,
+    ManagerNavDestination.categories: 11,
   };
 
   static const _bottomNavDestinations = [
@@ -107,6 +109,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           ),
           const InvoiceListScreen(),
           AnalyzeScreen(onMenuTap: _openDrawer),
+          CategoryManagementScreen.withProvider(onMenuTap: _openDrawer),
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(

@@ -1,213 +1,390 @@
 import 'package:flutter/material.dart';
-import 'package:mini_mart_management_mobile_app/models/category_summary.dart';
-import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
+import 'package:provider/provider.dart';
+import 'package:mini_mart_management_mobile_app/models/category.dart';
+import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
+import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
+import 'package:mini_mart_management_mobile_app/repositories/category_repository.dart';
+import 'package:mini_mart_management_mobile_app/services/category_service.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
-import 'package:mini_mart_management_mobile_app/widgets/categories/category_stat_card.dart';
-import 'package:mini_mart_management_mobile_app/widgets/categories/category_tree_card.dart';
 
 class CategoryManagementScreen extends StatelessWidget {
-  const CategoryManagementScreen({super.key});
+  const CategoryManagementScreen({this.onMenuTap, super.key});
 
-  static const List<CategorySummary> _categories = [
-    CategorySummary(
-      name: 'Fresh Produce',
-      productCount: 452,
-      icon: Icons.folder_rounded,
-      children: [
-        CategorySummary(
-          name: 'Vegetables',
-          productCount: 210,
-          icon: Icons.folder_rounded,
-          children: [
-            CategorySummary(
-              name: 'Organic Greens',
-              productCount: 45,
-              icon: Icons.folder_rounded,
-            ),
-          ],
-        ),
-        CategorySummary(
-          name: 'Fruits',
-          productCount: 184,
-          icon: Icons.folder_rounded,
-        ),
-      ],
-    ),
-    CategorySummary(
-      name: 'Electronics',
-      productCount: 1204,
-      icon: Icons.devices_rounded,
-      children: [
-        CategorySummary(
-          name: 'Accessories',
-          productCount: 840,
-          icon: Icons.folder_rounded,
-        ),
-      ],
-    ),
-    CategorySummary(
-      name: 'Home & Kitchen',
-      productCount: 890,
-      icon: Icons.soup_kitchen_rounded,
-    ),
-    CategorySummary(
-      name: 'Frozen Foods',
-      productCount: 320,
-      icon: Icons.ac_unit_rounded,
-    ),
-  ];
+  final VoidCallback? onMenuTap;
+
+  static Widget withProvider({VoidCallback? onMenuTap}) {
+    return ChangeNotifierProvider(
+      create: (_) => CategoryProvider(
+        CategoryRepository(CategoryService()),
+      )..fetchAll(),
+      child: CategoryManagementScreen(onMenuTap: onMenuTap),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: _buildSearchSection(context)),
-            SliverPadding(
-              padding: const EdgeInsets.all(16),
-              sliver: SliverList.separated(
-                itemCount: _categories.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  return CategoryTreeCard(
-                    category: _categories[index],
-                    onEdit: (category) =>
-                        _showActionSnackBar(context, 'Edit ${category.name}'),
-                    onDelete: (category) =>
-                        _showActionSnackBar(context, 'Delete ${category.name}'),
-                  );
-                },
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 88),
-              sliver: SliverGrid.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.45,
-                children: const [
-                  CategoryStatCard(
-                    label: 'Top Category',
-                    value: 'Electronics',
-                    progress: 0.8,
-                  ),
-                  CategoryStatCard(
-                    label: 'Empty Slotted',
-                    value: '12 Empty',
-                    caption: 'Categories w/o Products',
-                    valueColor: AppColors.statusWarning,
-                  ),
-                ],
-              ),
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.surfaceContainerLowest,
+        titleSpacing: 0,
+        leading: onMenuTap != null
+            ? IconButton(onPressed: onMenuTap, icon: const Icon(Icons.menu_rounded))
+            : null,
+        title: Text(
+          'Danh mục sản phẩm',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: AppColors.surfaceContainerLowest,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      body: const _CategoryBody(),
+    );
+  }
+}
+
+// ── Body ─────────────────────────────────────────────────────────────────────
+
+class _CategoryBody extends StatefulWidget {
+  const _CategoryBody();
+  @override
+  State<_CategoryBody> createState() => _CategoryBodyState();
+}
+
+class _CategoryBodyState extends State<_CategoryBody> {
+  final _searchController = TextEditingController();
+  String _search = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<CategoryProvider>();
+
+    if (provider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (provider.error != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(provider.error!, style: const TextStyle(color: Colors.red)),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: () => context.read<CategoryProvider>().fetchAll(),
+              child: const Text('Thử lại'),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () => _showActionSnackBar(context, 'Add category'),
-        tooltip: 'Add category',
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        child: const Icon(Icons.add_box_outlined),
-      ),
-      bottomNavigationBar: const AppBottomNavBar(
-        selectedTab: AppNavTab.categories,
-      ),
-    );
-  }
+      );
+    }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.surfaceContainerLowest,
-      titleSpacing: 0,
-      leading: IconButton(
-        onPressed: () {},
-        tooltip: 'Menu',
-        icon: const Icon(Icons.menu_rounded),
-      ),
-      title: Text(
-        'Retail Manager',
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          color: AppColors.surfaceContainerLowest,
-          fontWeight: FontWeight.w700,
+    final filtered = provider.categories
+        .where((c) => c.name.toLowerCase().contains(_search.toLowerCase()))
+        .toList();
+
+    return Column(
+      children: [
+        _SearchBar(
+          controller: _searchController,
+          onChanged: (v) => setState(() => _search = v),
+          onAdd: () => _showForm(context, provider),
         ),
-      ),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          tooltip: 'Search',
-          icon: const Icon(Icons.search_rounded),
-        ),
-        IconButton(
-          onPressed: () {},
-          tooltip: 'Notifications',
-          icon: const Icon(Icons.notifications_none_rounded),
+        Expanded(
+          child: filtered.isEmpty
+              ? const Center(child: Text('Không có danh mục nào.'))
+              : ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: filtered.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (ctx, i) => _CategoryTile(
+              category: filtered[i],
+              onEdit: () => _showForm(ctx, provider, category: filtered[i]),
+              onDelete: () => _confirmDelete(ctx, provider, filtered[i]),
+            ),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildSearchSection(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+  void _showForm(BuildContext context, CategoryProvider provider, {Category? category}) {
+    showDialog<void>(
+      context: context,
+      builder: (_) => ChangeNotifierProvider.value(
+        value: provider,
+        child: _CategoryFormDialog(category: category),
+      ),
+    );
+  }
 
-    return DecoratedBox(
+  void _confirmDelete(BuildContext context, CategoryProvider provider, Category category) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xóa danh mục'),
+        content: Text('Bạn chắc chắn muốn xóa "${category.name}"?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final error = await provider.delete(category.id);
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(error ?? 'Đã xóa "${category.name}"'),
+                backgroundColor: error != null ? Colors.red : Colors.green,
+              ));
+            },
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Search bar ───────────────────────────────────────────────────────────────
+
+class _SearchBar extends StatelessWidget {
+  const _SearchBar({required this.controller, required this.onChanged, required this.onAdd});
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
       decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.borderGray)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Categories',
-                    style: textTheme.titleLarge?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                FilledButton.icon(
-                  onPressed: () => _showActionSnackBar(context, 'Add category'),
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text('Add Category'),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.surfaceContainerLowest,
-                    minimumSize: const Size(0, 48),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search_rounded),
-                hintText: 'Search categories (e.g. Dairy, Electronics)...',
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text('Danh mục',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppColors.primary, fontWeight: FontWeight.w700)),
               ),
-              textInputAction: TextInputAction.search,
+              FilledButton.icon(
+                onPressed: onAdd,
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Thêm'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.surfaceContainerLowest,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: controller,
+            onChanged: onChanged,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.search_rounded),
+              hintText: 'Tìm kiếm danh mục...',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Category tile ─────────────────────────────────────────────────────────────
+
+class _CategoryTile extends StatelessWidget {
+  const _CategoryTile({required this.category, required this.onEdit, required this.onDelete});
+
+  final Category category;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: const BorderSide(color: AppColors.borderGray),
+      ),
+      child: ListTile(
+        leading: const Icon(Icons.category_outlined, color: AppColors.primary),
+        title: Text(category.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text(
+          category.taxDescription.isNotEmpty
+              ? category.taxDescription
+              : 'Thuế: ${(category.taxRate * 100).toStringAsFixed(0)}%',
+          style: const TextStyle(fontSize: 12),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit_outlined, size: 20),
+              tooltip: 'Sửa',
+              onPressed: onEdit,
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline, size: 20, color: Colors.red),
+              tooltip: 'Xóa',
+              onPressed: onDelete,
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  void _showActionSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+// ── Form dialog ───────────────────────────────────────────────────────────────
+
+class _CategoryFormDialog extends StatefulWidget {
+  const _CategoryFormDialog({this.category});
+  final Category? category;
+  @override
+  State<_CategoryFormDialog> createState() => _CategoryFormDialogState();
+}
+
+class _CategoryFormDialogState extends State<_CategoryFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _codeCtrl;
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _descCtrl;
+  int? _selectedTaxRateId;
+  bool _saving = false;
+  String? _error;
+
+  bool get _isEdit => widget.category != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final c = widget.category;
+    _codeCtrl = TextEditingController();
+    _nameCtrl = TextEditingController(text: c?.name ?? '');
+    _descCtrl = TextEditingController(text: c?.description ?? '');
+    _selectedTaxRateId = c?.taxRateId;
+  }
+
+  @override
+  void dispose() {
+    _codeCtrl.dispose();
+    _nameCtrl.dispose();
+    _descCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final taxRates = context.watch<CategoryProvider>().taxRates;
+
+    return AlertDialog(
+      title: Text(_isEdit ? 'Sửa danh mục' : 'Thêm danh mục'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!_isEdit) ...[
+                TextFormField(
+                  controller: _codeCtrl,
+                  decoration: const InputDecoration(labelText: 'Mã danh mục *'),
+                  validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Nhập mã danh mục' : null,
+                ),
+                const SizedBox(height: 12),
+              ],
+              TextFormField(
+                controller: _nameCtrl,
+                decoration: const InputDecoration(labelText: 'Tên danh mục *'),
+                validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Nhập tên danh mục' : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _descCtrl,
+                decoration: const InputDecoration(labelText: 'Mô tả'),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<int>(
+                value: _selectedTaxRateId,
+                decoration: const InputDecoration(labelText: 'Thuế suất *'),
+                items: taxRates
+                    .map((t) => DropdownMenuItem(value: t.taxRateId, child: Text(t.label)))
+                    .toList(),
+                onChanged: (v) => setState(() => _selectedTaxRateId = v),
+                validator: (v) => v == null ? 'Chọn thuế suất' : null,
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.pop(context),
+          child: const Text('Hủy'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : () => _submit(context),
+          child: _saving
+              ? const SizedBox(
+            width: 16, height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+          )
+              : Text(_isEdit ? 'Lưu' : 'Tạo'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _submit(BuildContext context) async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() { _saving = true; _error = null; });
+
+    final provider = context.read<CategoryProvider>();
+    final data = <String, dynamic>{
+      if (!_isEdit) 'categoryCode': _codeCtrl.text.trim(),
+      'name': _nameCtrl.text.trim(),
+      if (_descCtrl.text.trim().isNotEmpty) 'description': _descCtrl.text.trim(),
+      'taxRateId': _selectedTaxRateId,
+    };
+
+    final error = _isEdit
+        ? await provider.update(widget.category!.id, data)
+        : await provider.create(data);
+
+    if (!mounted) return;
+    setState(() => _saving = false);
+
+    if (error != null) {
+      setState(() => _error = error);
+      return;
+    }
+
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(_isEdit ? 'Đã cập nhật danh mục.' : 'Đã tạo danh mục.'),
+      backgroundColor: Colors.green,
+    ));
   }
 }

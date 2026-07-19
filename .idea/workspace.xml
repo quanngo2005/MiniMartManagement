@@ -5,26 +5,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="121dffde-9d4f-4fc3-a0fd-4ee9d3b8cca4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/MiniMart/Controllers/CategoriesController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/MiniMart/Migrations/20260718123501_AddCategoryCrudConstraints.Designer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/MiniMart/Migrations/20260718123501_AddCategoryCrudConstraints.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/CategoryRepository.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Implementations/CategoryService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/MiniMart/Services/Interfaces/ICategoryService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/MiniMart.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MiniMart.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Data/MiniMartDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Data/MiniMartDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Dtos/CategoryDtos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Dtos/CategoryDtos.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Dtos/OrderDetailDtos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Dtos/OrderDetailDtos.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Dtos/OrderDtos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Dtos/OrderDtos.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Migrations/MiniMartDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Migrations/MiniMartDbContextModelSnapshot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Dtos/AuthDtos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Dtos/AuthDtos.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/OrderRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Implementations/OrderRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/ICategoryRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/Repositories/Interfaces/ICategoryRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MiniMart/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/MiniMart/appsettings.Development.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/android/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/android/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/app.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/app.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/models/employee_user.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/models/employee_user.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/providers/auth_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/providers/auth_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/repositories/auth_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/repositories/auth_repository.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/category_management_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/category_management_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/manager_navigation_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/manager_navigation_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/mock_role_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/mock_role_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/settings_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/settings_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/warehouse_navigation_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/warehouse_navigation_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/services/auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/services/auth_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/widgets/layout/app_bottom_nav_bar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/widgets/layout/app_bottom_nav_bar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/widgets/layout/manager_drawer.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/widgets/layout/manager_drawer.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/linux/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/linux/flutter/generated_plugin_registrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/windows/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/windows/flutter/generated_plugin_registrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,25 +52,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Flutter.main.dart.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "kiet__dev",
-    "io.flutter.reload.alreadyRun": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/MiniMart_develop_test/MiniMart",
-    "settings.editor.selected.configurable": "AndroidSdkUpdater",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Flutter.main.dart.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;kiet__dev&quot;,
+    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/MiniMart_develop_test/MiniMart&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="main.dart" type="FlutterRunConfigurationType" factoryName="Flutter" temporary="true" nameIsGenerated="true">
       <option name="filePath" value="$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/main.dart" />
@@ -85,5 +91,16 @@
       <updated>1783104856037</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/frontend/mini_mart_management_mobile_app/lib/screens/settings_screen.dart</url>
+          <line>2</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

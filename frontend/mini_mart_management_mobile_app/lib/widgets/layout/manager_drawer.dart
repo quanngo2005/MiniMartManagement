@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_profile_screen.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
@@ -14,6 +15,7 @@ enum ManagerNavDestination {
   promotions,
   analyze,
   invoices,
+  categories,
 }
 
 class ManagerDrawer extends StatelessWidget {
@@ -146,6 +148,15 @@ class ManagerDrawer extends StatelessWidget {
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.invoices),
                   ),
+                  const _DrawerSectionLabel('Cài đặt'),
+                  _DrawerTile(
+                    icon: Icons.category_outlined,
+                    activeIcon: Icons.category_rounded,
+                    label: 'Danh mục sản phẩm',
+                    destination: ManagerNavDestination.categories,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.categories),
+                  ),
                 ],
               ),
             ),
@@ -221,7 +232,15 @@ class ManagerDrawer extends StatelessWidget {
             context,
           ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
         ),
-        onTap: () => Navigator.pop(context),
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push<void>(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => const EmployeeProfileScreen(),
+            ),
+          );
+        },
       ),
     );
   }
