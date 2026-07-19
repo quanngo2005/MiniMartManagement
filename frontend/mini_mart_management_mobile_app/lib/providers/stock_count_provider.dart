@@ -34,16 +34,28 @@ class StockCountProvider extends ChangeNotifier {
 
   Future<StockCount> getDetail(int id) => _run(() => _repository.getDetail(id));
 
-  Future<StockCount> createAndStart() async {
-    final created = await _run(() => _repository.create(StockCountScope.global));
+  Future<StockCount> createAndStart(
+    StockCountScope scope, {
+    List<int> categoryIds = const [],
+  }) async {
+    final created = await _run(
+      () => _repository.create(scope, categoryIds: categoryIds),
+    );
     return _run(() => _repository.start(created));
   }
 
+  Future<StockCount> cancelDraft(StockCount count) =>
+      _run(() => _repository.cancelDraft(count));
+  Future<StockCount> addLines(StockCount count, List<int> productIds) =>
+      _run(() => _repository.addLines(count, productIds));
   Future<StockCount> saveLines(StockCount count, List<StockCountLine> lines) =>
       _run(() => _repository.updateLines(count, lines));
-  Future<StockCount> submit(StockCount count) => _run(() => _repository.submit(count));
-  Future<StockCount> approve(StockCount count) => _run(() => _repository.approve(count));
-  Future<StockCount> reject(StockCount count, String reason) => _run(() => _repository.reject(count, reason));
+  Future<StockCount> submit(StockCount count) =>
+      _run(() => _repository.submit(count));
+  Future<StockCount> approve(StockCount count) =>
+      _run(() => _repository.approve(count));
+  Future<StockCount> reject(StockCount count, String reason) =>
+      _run(() => _repository.reject(count, reason));
 
   Future<StockCount> _run(Future<StockCount> Function() action) async {
     _isLoading = true;

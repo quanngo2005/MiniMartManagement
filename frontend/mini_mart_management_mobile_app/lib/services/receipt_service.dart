@@ -77,6 +77,19 @@ class ReceiptService {
     return Receipt.fromJson(responseJson);
   }
 
+  Future<void> deleteReceipt(int id) async {
+    final csrfToken = await _fetchCsrfToken();
+    final response = await _client.delete(
+      ApiConfig.uri('/api/receipts/$id'),
+      headers: _mutationHeaders(csrfToken),
+    );
+
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(_readMessage(responseJson));
+    }
+  }
+
   Map<String, dynamic> _decodeResponse(http.Response response) {
     if (response.body.isEmpty) return {};
     try {

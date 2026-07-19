@@ -2,8 +2,12 @@
 
 ## Entries
 
+- [Batch write boundary](batch-write-boundary.md) - batch API is read-only; all writes require an inventory workflow and audit trail.
+
+- [Receipt import flow](receipt-import-flow.md) - mobile receipt creation and completion path, plus atomicity risk.
+
 - [Flutter stock count scanning](flutter-stock-count-scanning.md) - live count screen reuses barcode scan flow.
-- [Flutter stock-count API flow](flutter-stock-count-api-flow.md) - create, save, submit, approve/reject, and post-approval transaction refresh.
+- [Flutter stock-count API flow](flutter-stock-count-api-flow.md) - create, save, cancel, submit, approve/reject, and transaction refresh.
 
 - [Stock count domain foundation](stock-count-domain-foundation.md) - stock-count tables, row versions, and batch provenance.
 

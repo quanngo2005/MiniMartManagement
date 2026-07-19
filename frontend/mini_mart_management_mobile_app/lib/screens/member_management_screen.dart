@@ -155,7 +155,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: tiers.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemBuilder: (_, index) {
               final tier = tiers[index];
               return TierOverviewCard(

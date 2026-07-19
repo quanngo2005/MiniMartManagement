@@ -5,13 +5,11 @@ class ReceiptActionBar extends StatelessWidget {
   const ReceiptActionBar({
     super.key,
     required this.onExport,
-    required this.onShare,
     this.onComplete,
     this.isCompleting = false,
   });
 
   final VoidCallback onExport;
-  final VoidCallback onShare;
   final VoidCallback? onComplete;
   final bool isCompleting;
 
@@ -43,32 +41,24 @@ class ReceiptActionBar extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: isCompleting ? null : onComplete ?? onShare,
-                  icon: Icon(
-                    onComplete == null
-                        ? Icons.share_outlined
-                        : Icons.check_circle_outline_rounded,
-                  ),
-                  label: Text(
-                    isCompleting
-                        ? 'Đang xử lý'
-                        : onComplete == null
-                        ? 'Chia sẻ'
-                        : 'Hoàn thành',
-                  ),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.surfaceContainerLowest,
-                    minimumSize: const Size(0, 48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              if (onComplete != null) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: isCompleting ? null : onComplete,
+                    icon: const Icon(Icons.check_circle_outline_rounded),
+                    label: Text(isCompleting ? 'Đang xử lý' : 'Hoàn thành'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.surfaceContainerLowest,
+                      minimumSize: const Size(0, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

@@ -264,6 +264,10 @@ namespace MiniMart.Data
                 .HasForeignKey(scl => scl.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<StockCountLine>()
+                .HasIndex(scl => new { scl.StockCountId, scl.ProductId })
+                .IsUnique();
+
             modelBuilder.Entity<StockCountCategory>()
                 .HasOne(scc => scc.StockCount)
                 .WithMany(sc => sc.Categories)

@@ -1,28 +1,40 @@
 enum StockCountScope {
   global,
-  category;
+  category,
+  selected;
 
   String get label => switch (this) {
     StockCountScope.global => 'Toàn kho',
     StockCountScope.category => 'Theo danh mục',
+    StockCountScope.selected => 'Sản phẩm chọn lọc',
   };
 
-  int get apiValue => this == StockCountScope.global ? 1 : 2;
-  static StockCountScope fromJson(Object? value) =>
-      value == 1 || value == 'Global' ? StockCountScope.global : StockCountScope.category;
+  int get apiValue => switch (this) {
+    StockCountScope.global => 1,
+    StockCountScope.category => 2,
+    StockCountScope.selected => 3,
+  };
+  static StockCountScope fromJson(Object? value) => switch (value) {
+    1 || 'Global' => StockCountScope.global,
+    2 || 'Category' => StockCountScope.category,
+    3 || 'Selected' => StockCountScope.selected,
+    _ => throw FormatException('Invalid stock count scope.'),
+  };
 }
 
 enum StockCountStatus {
   draft,
   counting,
   pendingApproval,
-  closed;
+  closed,
+  cancelled;
 
   String get label => switch (this) {
     StockCountStatus.draft => 'Bản nháp',
     StockCountStatus.counting => 'Đang kiểm kê',
     StockCountStatus.pendingApproval => 'Chờ duyệt',
     StockCountStatus.closed => 'Đã hoàn tất',
+    StockCountStatus.cancelled => 'Đã hủy',
   };
 
   static StockCountStatus fromJson(Object? value) => switch (value) {
@@ -30,6 +42,7 @@ enum StockCountStatus {
     2 || 'Counting' => StockCountStatus.counting,
     3 || 'PendingApproval' => StockCountStatus.pendingApproval,
     4 || 'Closed' => StockCountStatus.closed,
+    5 || 'Cancelled' => StockCountStatus.cancelled,
     _ => throw FormatException('Invalid stock count status.'),
   };
 }

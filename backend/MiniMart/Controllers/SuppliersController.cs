@@ -27,6 +27,14 @@ namespace MiniMart.Controllers
             return Ok(_supplierService.GetAllQueryable());
         }
 
+        // GET /api/suppliers/debts
+        [HttpGet("debts")]
+        public async Task<ActionResult<IReadOnlyList<SupplierDebtSummaryDto>>> GetDebtSummaries()
+        {
+            var summaries = await _supplierService.GetDebtSummariesAsync();
+            return Ok(summaries);
+        }
+
         // GET /api/suppliers/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<SupplierResponseDto>> GetById(int id)
@@ -35,6 +43,17 @@ namespace MiniMart.Controllers
             if (supplier == null)
                 return NotFound(new { message = $"Supplier with ID {id} not found." });
             return Ok(supplier);
+        }
+
+        // GET /api/suppliers/{id}/debt
+        [HttpGet("{id}/debt")]
+        public async Task<ActionResult<SupplierDebtDetailDto>> GetDebtDetail(int id)
+        {
+            var debtDetail = await _supplierService.GetDebtDetailAsync(id);
+            if (debtDetail == null)
+                return NotFound(new { message = $"Supplier with ID {id} not found." });
+
+            return Ok(debtDetail);
         }
 
         // POST /api/suppliers

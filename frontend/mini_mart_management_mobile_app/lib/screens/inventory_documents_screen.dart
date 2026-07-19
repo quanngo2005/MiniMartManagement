@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/receipt.dart';
+import 'package:mini_mart_management_mobile_app/models/receipt_editor_result.dart';
 import 'package:mini_mart_management_mobile_app/models/receipt_inventory_document_mapper.dart';
 import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/create_inventory_receipt_screen.dart';
@@ -13,9 +14,14 @@ import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/inve
 import 'package:provider/provider.dart';
 
 class InventoryDocumentsScreen extends StatefulWidget {
-  const InventoryDocumentsScreen({this.onMenuTap, super.key});
+  const InventoryDocumentsScreen({
+    this.onMenuTap,
+    this.onOpenStockCountHistory,
+    super.key,
+  });
 
   final VoidCallback? onMenuTap;
+  final VoidCallback? onOpenStockCountHistory;
 
   @override
   State<InventoryDocumentsScreen> createState() =>
@@ -177,11 +183,13 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
       ),
       actions: [
         IconButton(
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const StockCountHistoryScreen(),
-            ),
-          ),
+          onPressed:
+              widget.onOpenStockCountHistory ??
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const StockCountHistoryScreen(),
+                ),
+              ),
           tooltip: 'Lịch sử kiểm kê',
           icon: const Icon(Icons.history_rounded),
         ),
@@ -255,19 +263,21 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
   }
 
   Future<void> _openCreateReceipt(BuildContext context) async {
-    final draft = await Navigator.of(context).push<CreateReceipt>(
-      MaterialPageRoute<CreateReceipt>(
+    final result = await Navigator.of(context).push<ReceiptEditorResult>(
+      MaterialPageRoute<ReceiptEditorResult>(
         builder: (_) => const CreateInventoryReceiptScreen(),
       ),
     );
-    if (!context.mounted || draft == null) return;
+    if (!context.mounted || result?.createReceipt == null) return;
 
-    final created = await context.read<ReceiptProvider>().createReceipt(draft);
+    final created = await context.read<ReceiptProvider>().createReceipt(
+      result!.createReceipt!,
+    );
     if (!context.mounted) return;
 
     final provider = context.read<ReceiptProvider>();
     final message = created
-        ? 'Đã tạo ${draft.receiptCode}.'
+        ? 'Đã tạo phiếu nhập.'
         : provider.errorMessage ?? 'Không thể tạo phiếu nhập.';
     _showActionSnackBar(context, message);
   }

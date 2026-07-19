@@ -1211,7 +1211,7 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
                 Navigator.pop(context);
                 final provider = context.read<OrderReturnProvider>();
                 final success = await provider.confirmCashRefund(id);
-                if (!mounted) return;
+                if (!context.mounted) return;
                 if (success) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
