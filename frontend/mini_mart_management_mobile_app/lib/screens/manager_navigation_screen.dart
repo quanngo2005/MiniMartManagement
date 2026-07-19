@@ -5,6 +5,7 @@ import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/customer_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/batch_status_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
@@ -71,6 +72,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.invoices: 11,
     ManagerNavDestination.analyze: 12,
     ManagerNavDestination.categories: 13,
+    ManagerNavDestination.customerInformation: 14,
   };
 
   static const _bottomNavDestinations = [
@@ -81,6 +83,9 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
   ];
 
   int get _bottomNavIndex {
+    if (_destination == ManagerNavDestination.customerInformation) {
+      return _bottomNavDestinations.indexOf(ManagerNavDestination.customers);
+    }
     final idx = _bottomNavDestinations.indexOf(_destination);
     return idx >= 0 ? idx : 0;
   }
@@ -103,7 +108,9 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
       key: _scaffoldKey,
       drawer: ManagerDrawer(
         user: widget.user,
-        selected: _destination,
+        selected: _destination == ManagerNavDestination.customerInformation
+            ? ManagerNavDestination.customers
+            : _destination,
         onDestinationSelected: _selectDestination,
       ),
       body: IndexedStack(
@@ -132,14 +139,17 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           MemberManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
+            onManageCustomers: () =>
+                _selectDestination(ManagerNavDestination.customerInformation),
           ),
           PromotionManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
-          const InvoiceListScreen(),
+          InvoiceListScreen(onMenuTap: _openDrawer),
           AnalyzeScreen(onMenuTap: _openDrawer),
           CategoryManagementScreen.withProvider(onMenuTap: _openDrawer),
+          CustomerListScreen(showBottomNavBar: false, onMenuTap: _openDrawer),
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(

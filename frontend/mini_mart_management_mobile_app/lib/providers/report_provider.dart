@@ -17,6 +17,7 @@ class ReportProvider with ChangeNotifier {
 
   List<CashierPerformance> _cashierPerformance = [];
   List<TopProduct> _topProducts = [];
+  List<TopProduct> _dashboardTopProducts = [];
   List<DailyRevenue> _dailyRevenue = [];
   List<HourlyRevenue> _hourlyRevenue = [];
   List<InventoryStatus> _lowStockAlerts = [];
@@ -29,6 +30,7 @@ class ReportProvider with ChangeNotifier {
 
   List<CashierPerformance> get cashierPerformance => _cashierPerformance;
   List<TopProduct> get topProducts => _topProducts;
+  List<TopProduct> get dashboardTopProducts => _dashboardTopProducts;
   List<DailyRevenue> get dailyRevenue => _dailyRevenue;
   List<HourlyRevenue> get hourlyRevenue => _hourlyRevenue;
   List<InventoryStatus> get lowStockAlerts => _lowStockAlerts;
@@ -95,7 +97,7 @@ class ReportProvider with ChangeNotifier {
         _fetchHourlyRevenue(date),
         _fetchLowStockAlerts(),
         _fetchSupplierDebt(),
-        _fetchTopProducts(startDate: date, endDate: date, top: top),
+        _fetchDashboardTopProducts(startDate: date, endDate: date, top: top),
       ]);
     } catch (e) {
       _error = e is ApiException
@@ -164,12 +166,12 @@ class ReportProvider with ChangeNotifier {
     _supplierDebt = await _reportRepository.getSupplierDebt();
   }
 
-  Future<void> _fetchTopProducts({
+  Future<void> _fetchDashboardTopProducts({
     DateTime? startDate,
     DateTime? endDate,
     int top = 10,
   }) async {
-    _topProducts = await _reportRepository.getTopProducts(
+    _dashboardTopProducts = await _reportRepository.getTopProducts(
       startDate: startDate,
       endDate: endDate,
       top: top,

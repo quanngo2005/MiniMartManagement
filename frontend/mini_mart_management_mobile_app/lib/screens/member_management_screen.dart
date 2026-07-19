@@ -17,11 +17,13 @@ class MemberManagementScreen extends StatefulWidget {
   const MemberManagementScreen({
     this.showBottomNavBar = true,
     this.onMenuTap,
+    this.onManageCustomers,
     super.key,
   });
 
   final bool showBottomNavBar;
   final VoidCallback? onMenuTap;
+  final VoidCallback? onManageCustomers;
 
   @override
   State<MemberManagementScreen> createState() => _MemberManagementScreenState();
@@ -38,6 +40,10 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
   }
 
   void _openCustomerList() {
+    if (widget.onManageCustomers != null) {
+      widget.onManageCustomers!();
+      return;
+    }
     Navigator.push<void>(
       context,
       MaterialPageRoute(builder: (_) => const CustomerListScreen()),
@@ -53,7 +59,10 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: const MiniMartAppBar.primary(title: 'Thành viên'),
+      appBar: MiniMartAppBar.primary(
+        title: 'Thành viên',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),

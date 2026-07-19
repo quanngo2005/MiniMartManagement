@@ -5,6 +5,7 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class BatchStatusScreen extends StatefulWidget {
@@ -35,32 +36,13 @@ class _BatchStatusScreenState extends State<BatchStatusScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: _buildAppBar(),
+      appBar: MiniMartAppBar.primary(
+        title: 'Quản lý hạn sử dụng',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: RefreshIndicator(
         onRefresh: () => context.read<BatchProvider>().loadBatches(),
         child: _buildBody(provider, batches),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.surfaceBright,
-      foregroundColor: AppColors.primary,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      titleSpacing: widget.onMenuTap == null ? null : 0,
-      leading: widget.onMenuTap == null
-          ? null
-          : IconButton(
-              onPressed: widget.onMenuTap,
-              tooltip: 'Mở menu',
-              icon: const Icon(Icons.menu_rounded),
-            ),
-      title: const Text('Quản lý hạn sử dụng'),
-      bottom: const PreferredSize(
-        preferredSize: Size.fromHeight(1),
-        child: Divider(height: 1, color: AppColors.outlineVariant),
       ),
     );
   }

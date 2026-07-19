@@ -8,53 +8,38 @@ class CategoryRepository {
 
   final CategoryService _service;
 
-  Future<List<Category>> getAll() async {
-    try {
-      return await _service.getAll();
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException('Không thể tải danh mục: $e');
-    }
-  }
+  Future<List<Category>> getAll() => _guard(
+    _service.getAll,
+    'Không thể tải danh mục',
+  );
 
-  Future<List<TaxRate>> getTaxRates() async {
-    try {
-      return await _service.getTaxRates();
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException('Không thể tải danh sách thuế: $e');
-    }
-  }
+  Future<List<TaxRate>> getTaxRates() => _guard(
+    _service.getTaxRates,
+    'Không thể tải danh sách thuế',
+  );
 
-  Future<Category> create(Map<String, dynamic> data) async {
-    try {
-      return await _service.create(data);
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException('Không thể tạo danh mục: $e');
-    }
-  }
+  Future<Category> create(Map<String, dynamic> data) => _guard(
+    () => _service.create(data),
+    'Không thể tạo danh mục',
+  );
 
-  Future<Category> update(int id, Map<String, dynamic> data) async {
-    try {
-      return await _service.update(id, data);
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException('Không thể cập nhật danh mục: $e');
-    }
-  }
+  Future<Category> update(int id, Map<String, dynamic> data) => _guard(
+    () => _service.update(id, data),
+    'Không thể cập nhật danh mục',
+  );
 
-  Future<void> delete(int id) async {
+  Future<void> delete(int id) => _guard(
+    () => _service.delete(id),
+    'Không thể xóa danh mục',
+  );
+
+  Future<T> _guard<T>(Future<T> Function() action, String message) async {
     try {
-      await _service.delete(id);
+      return await action();
     } on ApiException {
       rethrow;
-    } catch (e) {
-      throw ApiException('Không thể xóa danh mục: $e');
+    } catch (error) {
+      throw ApiException('$message: $error');
     }
   }
 }
