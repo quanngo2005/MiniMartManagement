@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_profile_screen.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
-import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
-import 'package:provider/provider.dart';
 
 enum ManagerNavDestination {
   home,
@@ -36,10 +34,6 @@ class ManagerDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pendingCount = context.select<OrderReturnProvider, int>(
-      (provider) => provider.allReturns.where((r) => r.status == 1).length,
-    );
-
     return Drawer(
       backgroundColor: AppColors.surfaceContainerLowest,
       child: SafeArea(
@@ -285,7 +279,6 @@ class _DrawerTile extends StatelessWidget {
     required this.destination,
     required this.selected,
     required this.onTap,
-    this.trailing,
   });
 
   final IconData icon;
@@ -294,7 +287,6 @@ class _DrawerTile extends StatelessWidget {
   final ManagerNavDestination destination;
   final ManagerNavDestination selected;
   final VoidCallback onTap;
-  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +309,6 @@ class _DrawerTile extends StatelessWidget {
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
-        trailing: trailing,
         onTap: onTap,
       ),
     );
