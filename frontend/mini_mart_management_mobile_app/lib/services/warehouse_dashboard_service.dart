@@ -7,7 +7,7 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory.dar
 
 class WarehouseDashboardService {
   WarehouseDashboardService({http.Client? client})
-      : _client = client ?? createConfiguredClient();
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 
@@ -19,7 +19,8 @@ class WarehouseDashboardService {
     final json = _decode(response);
     _checkStatus(response, json);
     final data = json['data'] ?? json['Data'] ?? json;
-    if (data is List) return data.map((e) => InventoryStatus.fromJson(e)).toList();
+    if (data is List)
+      return data.map((e) => InventoryStatus.fromJson(e)).toList();
     throw const ApiException('Không thể đọc báo cáo tồn kho.');
   }
 
@@ -31,7 +32,8 @@ class WarehouseDashboardService {
     final json = _decode(response);
     _checkStatus(response, json);
     final data = json['data'] ?? json['Data'] ?? json;
-    if (data is List) return data.map((e) => InventoryStatus.fromJson(e)).toList();
+    if (data is List)
+      return data.map((e) => InventoryStatus.fromJson(e)).toList();
     throw const ApiException('Không thể đọc cảnh báo tồn kho thấp.');
   }
 
@@ -43,18 +45,23 @@ class WarehouseDashboardService {
     final json = _decode(response);
     _checkStatus(response, json);
     final data = json['data'] ?? json['Data'] ?? json;
-    if (data is List) return data.map((e) => NearExpiryProduct.fromJson(e)).toList();
+    if (data is List)
+      return data.map((e) => NearExpiryProduct.fromJson(e)).toList();
     if (data is Map<String, dynamic>) {
       final value = data['value'] ?? data['Value'];
-      if (value is List) return value.map((e) => NearExpiryProduct.fromJson(e)).toList();
+      if (value is List)
+        return value.map((e) => NearExpiryProduct.fromJson(e)).toList();
     }
     return [];
   }
 
   Future<List<RecentBatch>> getRecentBatches() async {
     final today = DateTime.now();
-    final from = DateTime(today.year, today.month, today.day)
-        .subtract(const Duration(days: 7));
+    final from = DateTime(
+      today.year,
+      today.month,
+      today.day,
+    ).subtract(const Duration(days: 7));
     final response = await _client.get(
       ApiConfig.uri(
         '/odata/Batches?\$filter=ImportDate ge ${from.toIso8601String()}&\$orderby=ImportDate desc&\$top=10',
@@ -65,7 +72,8 @@ class WarehouseDashboardService {
     try {
       final decoded = jsonDecode(response.body);
       final value = decoded is Map ? (decoded['value'] ?? decoded) : decoded;
-      if (value is List) return value.map((e) => RecentBatch.fromJson(e)).toList();
+      if (value is List)
+        return value.map((e) => RecentBatch.fromJson(e)).toList();
     } catch (_) {}
     return [];
   }
@@ -85,7 +93,9 @@ class WarehouseDashboardService {
   void _checkStatus(http.Response response, Map<String, dynamic> json) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final msg = json['message'] ?? json['Message'];
-      throw ApiException(msg is String && msg.isNotEmpty ? msg : 'Yêu cầu thất bại.');
+      throw ApiException(
+        msg is String && msg.isNotEmpty ? msg : 'Yêu cầu thất bại.',
+      );
     }
   }
 }

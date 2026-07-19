@@ -54,7 +54,9 @@ class ReportService {
     );
     final json = _decode(response);
     _checkStatus(response, json);
-    final data = _list(json).isNotEmpty ? _list(json).first : json['data'] ?? json['Data'] ?? json;
+    final data = _list(json).isNotEmpty
+        ? _list(json).first
+        : json['data'] ?? json['Data'] ?? json;
     if (data is Map<String, dynamic>) {
       return RevenueSummary.fromJson(data);
     }

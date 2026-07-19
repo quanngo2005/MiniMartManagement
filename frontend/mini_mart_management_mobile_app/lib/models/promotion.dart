@@ -83,6 +83,7 @@ class Promotion {
         return 'ProductDiscount';
     }
   }
+
   double get discountValue => discountPercent ?? discountAmount ?? 0;
   double get minPurchaseAmount => minimumOrderAmount ?? 0;
 }

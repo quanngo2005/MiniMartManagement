@@ -217,10 +217,7 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
   Future<void> _submit() async {
     try {
       final provider = context.read<StockCountProvider>();
-      final saved = await provider.saveLines(
-        _count!,
-        _updatedLines,
-      );
+      final saved = await provider.saveLines(_count!, _updatedLines);
       _setCount(await provider.submit(saved));
       _message('Đã gửi phiếu chờ duyệt.');
     } on ApiException catch (error) {
@@ -299,9 +296,7 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
     try {
       if (!mounted) return;
       final provider = context.read<StockCountProvider>();
-      _setCount(
-        await provider.reject(_count!, reason),
-      );
+      _setCount(await provider.reject(_count!, reason));
       _message('Đã trả phiếu để kiểm kê lại.');
     } on ApiException catch (error) {
       _message(error.message);

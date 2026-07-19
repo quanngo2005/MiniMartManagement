@@ -89,9 +89,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
               await context.read<AuthProvider>().logout();
               if (context.mounted) {
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const LoginScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
                   (route) => false,
                 );
               }

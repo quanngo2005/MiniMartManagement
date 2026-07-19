@@ -16,8 +16,9 @@ class WarehouseDashboardScreen extends StatelessWidget {
 
   static Widget withProvider({required EmployeeUser user}) {
     return ChangeNotifierProvider(
-      create: (_) => WarehouseDashboardProvider(WarehouseDashboardService())
-        ..fetchDashboard(),
+      create: (_) =>
+          WarehouseDashboardProvider(WarehouseDashboardService())
+            ..fetchDashboard(),
       child: WarehouseDashboardScreen(user: user),
     );
   }
@@ -109,8 +110,7 @@ class _DashboardBody extends StatelessWidget {
               subtitle: '${data.nearExpiryProducts.length} sản phẩm',
             ),
             const SizedBox(height: 10),
-            ...data.nearExpiryProducts
-                .map((p) => _NearExpiryTile(product: p)),
+            ...data.nearExpiryProducts.map((p) => _NearExpiryTile(product: p)),
             const SizedBox(height: 20),
           ],
           if (data.recentBatches.isNotEmpty) ...[
@@ -144,15 +144,25 @@ class _GreetingHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hour = DateTime.now().hour;
-    final greeting = hour < 12 ? 'Chào buổi sáng' : hour < 18 ? 'Chào buổi chiều' : 'Chào buổi tối';
+    final greeting = hour < 12
+        ? 'Chào buổi sáng'
+        : hour < 18
+        ? 'Chào buổi chiều'
+        : 'Chào buổi tối';
     return Row(
       children: [
         CircleAvatar(
           radius: 22,
           backgroundColor: AppColors.primaryContainer,
           child: Text(
-            user.fullName.isNotEmpty ? user.fullName.trim().split(' ').last[0].toUpperCase() : '?',
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16),
+            user.fullName.isNotEmpty
+                ? user.fullName.trim().split(' ').last[0].toUpperCase()
+                : '?',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -162,10 +172,16 @@ class _GreetingHeader extends StatelessWidget {
             Text(
               '$greeting, ${user.fullName.trim().split(' ').last}!',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700, color: AppColors.primary),
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+              ),
             ),
-            Text(user.roleName,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.textMuted)),
+            Text(
+              user.roleName,
+              style: Theme.of(
+                context,
+              ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
+            ),
           ],
         ),
       ],
@@ -181,18 +197,44 @@ class _StatsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _StatCard(label: 'Tổng SP', value: '${data.totalProducts}', icon: Icons.inventory_2_outlined, color: AppColors.primary)),
+        Expanded(
+          child: _StatCard(
+            label: 'Tổng SP',
+            value: '${data.totalProducts}',
+            icon: Icons.inventory_2_outlined,
+            color: AppColors.primary,
+          ),
+        ),
         const SizedBox(width: 10),
-        Expanded(child: _StatCard(label: 'Sắp hết', value: '${data.lowStockCount}', icon: Icons.warning_amber_rounded, color: Colors.orange)),
+        Expanded(
+          child: _StatCard(
+            label: 'Sắp hết',
+            value: '${data.lowStockCount}',
+            icon: Icons.warning_amber_rounded,
+            color: Colors.orange,
+          ),
+        ),
         const SizedBox(width: 10),
-        Expanded(child: _StatCard(label: 'Hết hàng', value: '${data.outOfStockCount}', icon: Icons.remove_shopping_cart_outlined, color: Colors.red)),
+        Expanded(
+          child: _StatCard(
+            label: 'Hết hàng',
+            value: '${data.outOfStockCount}',
+            icon: Icons.remove_shopping_cart_outlined,
+            color: Colors.red,
+          ),
+        ),
       ],
     );
   }
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({required this.label, required this.value, required this.icon, required this.color});
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
   final String label;
   final String value;
   final IconData icon;
@@ -213,9 +255,21 @@ class _StatCard extends StatelessWidget {
           children: [
             Icon(icon, color: color, size: 26),
             const SizedBox(height: 6),
-            Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: color)),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
+            ),
             const SizedBox(height: 2),
-            Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.textMuted)),
+            Text(
+              label,
+              style: Theme.of(
+                context,
+              ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
+            ),
           ],
         ),
       ),
@@ -252,7 +306,9 @@ class _QuickActions extends StatelessWidget {
             color: Colors.teal,
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute<void>(builder: (_) => const StockCountHistoryScreen()),
+              MaterialPageRoute<void>(
+                builder: (_) => const StockCountHistoryScreen(),
+              ),
             ),
           ),
         ),
@@ -262,7 +318,12 @@ class _QuickActions extends StatelessWidget {
 }
 
 class _ActionButton extends StatelessWidget {
-  const _ActionButton({required this.icon, required this.label, required this.color, required this.onTap});
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
   final IconData icon;
   final String label;
   final Color color;
@@ -284,7 +345,14 @@ class _ActionButton extends StatelessWidget {
           children: [
             Icon(icon, color: color, size: 24),
             const SizedBox(height: 6),
-            Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 12)),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
           ],
         ),
       ),
@@ -293,7 +361,12 @@ class _ActionButton extends StatelessWidget {
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.icon, required this.iconColor, required this.title, required this.subtitle});
+  const _SectionHeader({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+  });
   final IconData icon;
   final Color iconColor;
   final String title;
@@ -306,9 +379,20 @@ class _SectionHeader extends StatelessWidget {
         Icon(icon, color: iconColor, size: 20),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, color: AppColors.primary)),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
+          ),
         ),
-        Text(subtitle, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.textMuted)),
+        Text(
+          subtitle,
+          style: Theme.of(
+            context,
+          ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
+        ),
       ],
     );
   }
@@ -334,16 +418,37 @@ class _LowStockTile extends StatelessWidget {
         leading: CircleAvatar(
           radius: 18,
           backgroundColor: color.withValues(alpha: 0.12),
-          child: Icon(isOut ? Icons.remove_shopping_cart_outlined : Icons.warning_amber_rounded, color: color, size: 18),
+          child: Icon(
+            isOut
+                ? Icons.remove_shopping_cart_outlined
+                : Icons.warning_amber_rounded,
+            color: color,
+            size: 18,
+          ),
         ),
-        title: Text(item.productName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+        title: Text(
+          item.productName,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         subtitle: Text(item.categoryName, style: const TextStyle(fontSize: 11)),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(isOut ? 'Hết hàng' : 'Còn ${item.currentStock}', style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
-            Text('Tối thiểu: ${item.minimumStock}', style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+            Text(
+              isOut ? 'Hết hàng' : 'Còn ${item.currentStock}',
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+            Text(
+              'Tối thiểu: ${item.minimumStock}',
+              style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+            ),
           ],
         ),
       ),
@@ -369,11 +474,30 @@ class _NearExpiryTile extends StatelessWidget {
         leading: CircleAvatar(
           radius: 18,
           backgroundColor: Colors.deepOrange.withValues(alpha: 0.12),
-          child: const Icon(Icons.hourglass_bottom_rounded, color: Colors.deepOrange, size: 18),
+          child: const Icon(
+            Icons.hourglass_bottom_rounded,
+            color: Colors.deepOrange,
+            size: 18,
+          ),
         ),
-        title: Text(product.productName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Text(product.categoryName ?? '', style: const TextStyle(fontSize: 11)),
-        trailing: Text('Tồn: ${product.stockQuantity}', style: const TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.w700, fontSize: 12)),
+        title: Text(
+          product.productName,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          product.categoryName ?? '',
+          style: const TextStyle(fontSize: 11),
+        ),
+        trailing: Text(
+          'Tồn: ${product.stockQuantity}',
+          style: const TextStyle(
+            color: Colors.deepOrange,
+            fontWeight: FontWeight.w700,
+            fontSize: 12,
+          ),
+        ),
       ),
     );
   }
@@ -387,7 +511,11 @@ class _RecentBatchTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final fmt = DateFormat('dd/MM/yyyy');
     final daysLeft = batch.expiryDate.difference(DateTime.now()).inDays;
-    final expiryColor = daysLeft < 30 ? Colors.orange : daysLeft < 0 ? Colors.red : Colors.green;
+    final expiryColor = daysLeft < 30
+        ? Colors.orange
+        : daysLeft < 0
+        ? Colors.red
+        : Colors.green;
 
     return Card(
       elevation: 0,
@@ -401,16 +529,38 @@ class _RecentBatchTile extends StatelessWidget {
         leading: const CircleAvatar(
           radius: 18,
           backgroundColor: AppColors.primaryContainer,
-          child: Icon(Icons.local_shipping_outlined, color: Colors.white, size: 16),
+          child: Icon(
+            Icons.local_shipping_outlined,
+            color: Colors.white,
+            size: 16,
+          ),
         ),
-        title: Text(batch.productName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Text('Nhập: ${fmt.format(batch.importDate)} | SL: ${batch.quantityImported}', style: const TextStyle(fontSize: 11)),
+        title: Text(
+          batch.productName,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          'Nhập: ${fmt.format(batch.importDate)} | SL: ${batch.quantityImported}',
+          style: const TextStyle(fontSize: 11),
+        ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text('HSD: ${fmt.format(batch.expiryDate)}', style: TextStyle(color: expiryColor, fontWeight: FontWeight.w700, fontSize: 11)),
-            Text(daysLeft >= 0 ? 'Còn $daysLeft ngày' : 'Đã hết hạn', style: TextStyle(fontSize: 10, color: expiryColor)),
+            Text(
+              'HSD: ${fmt.format(batch.expiryDate)}',
+              style: TextStyle(
+                color: expiryColor,
+                fontWeight: FontWeight.w700,
+                fontSize: 11,
+              ),
+            ),
+            Text(
+              daysLeft >= 0 ? 'Còn $daysLeft ngày' : 'Đã hết hạn',
+              style: TextStyle(fontSize: 10, color: expiryColor),
+            ),
           ],
         ),
       ),
@@ -419,7 +569,11 @@ class _RecentBatchTile extends StatelessWidget {
 }
 
 class _EmptyCard extends StatelessWidget {
-  const _EmptyCard({required this.icon, required this.message, required this.color});
+  const _EmptyCard({
+    required this.icon,
+    required this.message,
+    required this.color,
+  });
   final IconData icon;
   final String message;
   final Color color;
@@ -438,7 +592,10 @@ class _EmptyCard extends StatelessWidget {
           children: [
             Icon(icon, color: color, size: 36),
             const SizedBox(height: 10),
-            Text(message, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
+            Text(
+              message,
+              style: TextStyle(color: color, fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),

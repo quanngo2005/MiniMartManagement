@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/product.dart';
@@ -115,10 +115,7 @@ class PromotionDetailScreen extends StatelessWidget {
           ? null
           : productById[promotion.giftProductId!];
       return [
-        _InfoRow(
-          label: 'Số lượng mua',
-          value: '${promotion.buyQuantity ?? 0}',
-        ),
+        _InfoRow(label: 'Số lượng mua', value: '${promotion.buyQuantity ?? 0}'),
         _InfoRow(
           label: 'Số lượng tặng',
           value: '${promotion.giftQuantity ?? 0}',
@@ -129,7 +126,12 @@ class PromotionDetailScreen extends StatelessWidget {
         ),
         _InfoRow(
           label: 'Sản phẩm tặng kèm',
-          value: _productLabel(giftProduct, promotion.giftProductId == null ? const [] : [promotion.giftProductId!]),
+          value: _productLabel(
+            giftProduct,
+            promotion.giftProductId == null
+                ? const []
+                : [promotion.giftProductId!],
+          ),
         ),
       ];
     }
@@ -148,8 +150,11 @@ class PromotionDetailScreen extends StatelessWidget {
         value: selectedProducts.isEmpty
             ? '-'
             : selectedProducts
-                .map((product) => '${product.productName} (${product.productCode})')
-                .join('\n'),
+                  .map(
+                    (product) =>
+                        '${product.productName} (${product.productCode})',
+                  )
+                  .join('\n'),
       ),
     ];
   }
@@ -219,14 +224,12 @@ class _InfoRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label, style: const TextStyle(color: AppColors.textMuted)),
-          ),
-          Expanded(
             child: Text(
-              value,
-              style: const TextStyle(height: 1.35),
+              label,
+              style: const TextStyle(color: AppColors.textMuted),
             ),
           ),
+          Expanded(child: Text(value, style: const TextStyle(height: 1.35))),
         ],
       ),
     );
@@ -315,21 +318,30 @@ class _PromotionEditFormState extends State<_PromotionEditForm> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Sửa khuyến mãi', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'Sửa khuyến mãi',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(labelText: 'Tên chương trình'),
+                decoration: const InputDecoration(
+                  labelText: 'Tên chương trình',
+                ),
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<int>(
                 initialValue: _promotionRule,
                 items: const [
-                  DropdownMenuItem(value: 0, child: Text('Giảm giá ngưỡng hóa đơn')),
+                  DropdownMenuItem(
+                    value: 0,
+                    child: Text('Giảm giá ngưỡng hóa đơn'),
+                  ),
                   DropdownMenuItem(value: 1, child: Text('Mua X tặng Y')),
                   DropdownMenuItem(value: 2, child: Text('Giảm giá sản phẩm')),
                 ],
-                onChanged: (value) => setState(() => _promotionRule = value ?? 0),
+                onChanged: (value) =>
+                    setState(() => _promotionRule = value ?? 0),
               ),
               const SizedBox(height: 12),
               if (_promotionRule == 0) ...[
@@ -357,7 +369,9 @@ class _PromotionEditFormState extends State<_PromotionEditForm> {
                       child: TextFormField(
                         controller: _buyQuantityCtrl,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'Số lượng mua'),
+                        decoration: const InputDecoration(
+                          labelText: 'Số lượng mua',
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -365,7 +379,9 @@ class _PromotionEditFormState extends State<_PromotionEditForm> {
                       child: TextFormField(
                         controller: _giftQuantityCtrl,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'Số lượng tặng'),
+                        decoration: const InputDecoration(
+                          labelText: 'Số lượng tặng',
+                        ),
                       ),
                     ),
                   ],
@@ -423,10 +439,7 @@ class _PromotionEditFormState extends State<_PromotionEditForm> {
                 ),
               ],
               const SizedBox(height: 16),
-              FilledButton(
-                onPressed: _save,
-                child: const Text('Lưu thay đổi'),
-              ),
+              FilledButton(onPressed: _save, child: const Text('Lưu thay đổi')),
             ],
           ),
         ),
@@ -463,7 +476,10 @@ class _PromotionEditFormState extends State<_PromotionEditForm> {
           : _selectedDiscountProductIds.toList(),
     };
 
-    final ok = await provider.updatePromotion(widget.promotion.promotionId, data);
+    final ok = await provider.updatePromotion(
+      widget.promotion.promotionId,
+      data,
+    );
     if (ok && mounted) Navigator.pop(context);
   }
 
@@ -534,7 +550,9 @@ class _ProductPickerState extends State<_ProductPicker> {
           spacing: 8,
           runSpacing: 8,
           children: filtered.map((product) {
-            final selected = widget.selectedProductIds.contains(product.productId);
+            final selected = widget.selectedProductIds.contains(
+              product.productId,
+            );
             return FilterChip(
               selected: selected,
               label: Text('${product.productName} (${product.productCode})'),

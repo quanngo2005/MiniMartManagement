@@ -55,10 +55,7 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
       return Scaffold(
         appBar: _buildAppBar(),
         body: SafeArea(
-          child: ErrorBanner(
-            message: provider.error!,
-            onRetry: _load,
-          ),
+          child: ErrorBanner(message: provider.error!, onRetry: _load),
         ),
       );
     }
@@ -72,9 +69,13 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
       0,
       (sum, item) => sum + item.orderCount,
     );
-    final topProduct = provider.topProducts.isNotEmpty ? provider.topProducts.first : null;
+    final topProduct = provider.topProducts.isNotEmpty
+        ? provider.topProducts.first
+        : null;
     final lowStockCount = provider.lowStockAlerts.length;
-    final inventoryBadge = lowStockCount > 0 ? '$lowStockCount sản phẩm' : 'Ổn định';
+    final inventoryBadge = lowStockCount > 0
+        ? '$lowStockCount sản phẩm'
+        : 'Ổn định';
 
     return Scaffold(
       appBar: _buildAppBar(),
@@ -109,7 +110,9 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                     ),
                     _MetricCard(
                       label: 'Tổng doanh thu',
-                      value: _formatMoney(revenue?.totalRevenue ?? todayRevenue),
+                      value: _formatMoney(
+                        revenue?.totalRevenue ?? todayRevenue,
+                      ),
                       caption: '${revenue?.totalOrders ?? todayOrders} đơn',
                       icon: Icons.payments_outlined,
                       iconColor: AppColors.primaryContainer,
@@ -152,9 +155,9 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                     trailing: Text(
                       '${DateTime.now().month}/${DateTime.now().year}',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     child: SizedBox(
                       height: 180,
@@ -180,8 +183,7 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                             icon: Icons.inventory_2_outlined,
                             iconColor: AppColors.statusError,
                             iconBackground: AppColors.errorContainer,
-                            title:
-                                provider.lowStockAlerts.first.productName,
+                            title: provider.lowStockAlerts.first.productName,
                             subtitle:
                                 'Tồn kho còn ${provider.lowStockAlerts.first.currentStock} / tối thiểu ${provider.lowStockAlerts.first.minimumStock}',
                             time: 'Hôm nay',
@@ -198,7 +200,8 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                                 'Bán ra ${topProduct.totalQuantitySold} sp, ${_formatMoney(topProduct.totalRevenue)}',
                             time: 'Top',
                           ),
-                        if (provider.lowStockAlerts.isEmpty && topProduct == null)
+                        if (provider.lowStockAlerts.isEmpty &&
+                            topProduct == null)
                           const EmptyState(
                             message: 'Chưa có cảnh báo nổi bật.',
                             icon: Icons.notifications_none_rounded,
@@ -225,7 +228,10 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
   }
 
   PreferredSizeWidget _buildAppBar() {
-    return MiniMartAppBar.primary(title: 'Tổng quan', onBrandTap: widget.onMenuTap);
+    return MiniMartAppBar.primary(
+      title: 'Tổng quan',
+      onBrandTap: widget.onMenuTap,
+    );
   }
 
   void _showActionSnackBar(BuildContext context, String message) {
@@ -356,9 +362,9 @@ class _DashboardPanel extends StatelessWidget {
                   child: Text(
                     title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
                 if (trailing != null) trailing!,
@@ -423,8 +429,9 @@ class _SalesChartPainter extends CustomPainter {
         .fold<double>(0, (a, b) => a > b ? a : b);
     final dataPoints = <Offset>[];
     for (var i = 0; i < points.length; i++) {
-      final x =
-          points.length <= 1 ? 0.0 : size.width * (i / (points.length - 1));
+      final x = points.length <= 1
+          ? 0.0
+          : size.width * (i / (points.length - 1));
       final revenue = (points[i].revenue as num).toDouble();
       final normalized = maxRevenue == 0 ? 0 : revenue / maxRevenue;
       final y =
@@ -452,10 +459,7 @@ class _SalesChartPainter extends CustomPainter {
 }
 
 class _TinySparkline extends StatelessWidget {
-  const _TinySparkline({
-    required this.points,
-    required this.color,
-  });
+  const _TinySparkline({required this.points, required this.color});
 
   final List<double> points;
   final Color color;
@@ -491,7 +495,9 @@ class _TinySparklinePainter extends CustomPainter {
 
     final offsets = <Offset>[];
     for (var i = 0; i < points.length; i++) {
-      final x = points.length <= 1 ? 0.0 : size.width * (i / (points.length - 1));
+      final x = points.length <= 1
+          ? 0.0
+          : size.width * (i / (points.length - 1));
       final y = size.height - ((points[i] / maxValue) * size.height);
       offsets.add(Offset(x, y));
     }

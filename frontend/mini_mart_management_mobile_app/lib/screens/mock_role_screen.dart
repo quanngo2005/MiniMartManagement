@@ -68,9 +68,9 @@ class MockRoleScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineMedium
                           ?.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w800,
-                      ),
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w800,
+                          ),
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton.icon(
@@ -97,7 +97,8 @@ class MockRoleScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute<void>(
-                            builder: (_) => CategoryManagementScreen.withProvider(),
+                            builder: (_) =>
+                                CategoryManagementScreen.withProvider(),
                           ),
                         );
                       },

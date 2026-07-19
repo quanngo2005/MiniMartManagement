@@ -161,9 +161,11 @@ class _FakeAuthProvider extends AuthProvider {
   _FakeAuthProvider() : super(AuthRepository(AuthService()));
 
   @override
-  EmployeeUser? get currentUser => const EmployeeUser(
+  EmployeeUser? get currentUser => EmployeeUser(
     employeeId: 1,
     fullName: 'Manager',
+    gender: true,
+    dateOfBirth: DateTime.utc(1990, 1, 1),
     username: 'manager',
     status: 1,
     roleId: 1,

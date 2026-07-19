@@ -59,7 +59,10 @@ class ProfileDetailRow extends StatelessWidget {
               flex: 2,
               child: Text(
                 label,
-                style: const TextStyle(fontSize: 14, color: AppColors.textMuted),
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textMuted,
+                ),
               ),
             ),
             const SizedBox(width: 12),

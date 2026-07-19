@@ -35,9 +35,7 @@ class _WarehouseNavigationScreenState extends State<WarehouseNavigationScreen> {
           // 2 — Tồn kho / kiểm kê
           const StockCountHistoryScreen(),
           // 3 — Cá nhân
-          const EmployeeProfileScreen(
-            appBar: _WarehouseProfileAppBar(),
-          ),
+          const EmployeeProfileScreen(appBar: _WarehouseProfileAppBar()),
         ],
       ),
       bottomNavigationBar: WarehouseBottomNavigationBar(

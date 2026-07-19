@@ -8,7 +8,7 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory.dar
 
 class CategoryService {
   CategoryService({http.Client? client})
-      : _client = client ?? createConfiguredClient();
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 
@@ -92,9 +92,9 @@ class CategoryService {
     if (token is! String || token.isEmpty) {
       throw const ApiException('CSRF token thiếu.');
     }
-    final cookieToken = RegExp(r'XSRF-TOKEN=([^;,\s]+)')
-        .firstMatch(response.headers['set-cookie'] ?? '')
-        ?.group(1);
+    final cookieToken = RegExp(
+      r'XSRF-TOKEN=([^;,\s]+)',
+    ).firstMatch(response.headers['set-cookie'] ?? '')?.group(1);
     return _CsrfToken(
       value: token,
       cookieHeader: cookieToken == null ? null : 'XSRF-TOKEN=$cookieToken',

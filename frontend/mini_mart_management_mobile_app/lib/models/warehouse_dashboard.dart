@@ -23,7 +23,8 @@ class InventoryStatus {
       productName: (json['productName'] ?? json['ProductName'] ?? '') as String,
       currentStock: (json['currentStock'] ?? json['CurrentStock'] ?? 0) as int,
       minimumStock: (json['minimumStock'] ?? json['MinimumStock'] ?? 0) as int,
-      categoryName: (json['categoryName'] ?? json['CategoryName'] ?? '') as String,
+      categoryName:
+          (json['categoryName'] ?? json['CategoryName'] ?? '') as String,
     );
   }
 }
@@ -49,8 +50,11 @@ class NearExpiryProduct {
       productId: (json['productId'] ?? json['ProductId'] ?? 0) as int,
       productCode: (json['productCode'] ?? json['ProductCode'] ?? '') as String,
       productName: (json['productName'] ?? json['ProductName'] ?? '') as String,
-      stockQuantity: (json['stockQuantity'] ?? json['StockQuantity'] ?? 0) as int,
-      categoryName: category is Map ? (category['name'] ?? category['Name']) as String? : null,
+      stockQuantity:
+          (json['stockQuantity'] ?? json['StockQuantity'] ?? 0) as int,
+      categoryName: category is Map
+          ? (category['name'] ?? category['Name']) as String?
+          : null,
     );
   }
 }
@@ -77,9 +81,14 @@ class RecentBatch {
       batchId: (json['batchId'] ?? json['BatchId'] ?? 0) as int,
       batchCode: (json['batchCode'] ?? json['BatchCode'] ?? '') as String,
       productName: (json['productName'] ?? json['ProductName'] ?? '') as String,
-      expiryDate: DateTime.parse((json['expiryDate'] ?? json['ExpiryDate']).toString()),
-      quantityImported: (json['quantityImported'] ?? json['QuantityImported'] ?? 0) as int,
-      importDate: DateTime.parse((json['importDate'] ?? json['ImportDate']).toString()),
+      expiryDate: DateTime.parse(
+        (json['expiryDate'] ?? json['ExpiryDate']).toString(),
+      ),
+      quantityImported:
+          (json['quantityImported'] ?? json['QuantityImported'] ?? 0) as int,
+      importDate: DateTime.parse(
+        (json['importDate'] ?? json['ImportDate']).toString(),
+      ),
     );
   }
 }

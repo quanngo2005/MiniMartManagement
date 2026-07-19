@@ -25,12 +25,15 @@ class Category {
     final parent = json['parentCategory'] ?? json['ParentCategory'];
     return Category(
       categoryId: (json['categoryId'] ?? json['CategoryId'] ?? 0) as int,
-      categoryCode: (json['categoryCode'] ?? json['CategoryCode'] ?? '') as String,
-      categoryName: (json['categoryName'] ?? json['CategoryName'] ?? '') as String,
+      categoryCode:
+          (json['categoryCode'] ?? json['CategoryCode'] ?? '') as String,
+      categoryName:
+          (json['categoryName'] ?? json['CategoryName'] ?? '') as String,
       description: json['description'] ?? json['Description'],
       status: (json['status'] ?? json['Status'] ?? true) as bool,
       displayOrder: (json['displayOrder'] ?? json['DisplayOrder'] ?? 0) as int,
-      parentCategoryId: (json['parentCategoryId'] ?? json['ParentCategoryId']) as int?,
+      parentCategoryId:
+          (json['parentCategoryId'] ?? json['ParentCategoryId']) as int?,
       parentCategoryName: parent is Map<String, dynamic>
           ? (parent['categoryName'] ?? parent['CategoryName']) as String?
           : null,
