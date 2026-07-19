@@ -87,12 +87,11 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               await context.read<AuthProvider>().logout();
-              if (context.mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
-              }
+              if (!mounted) return;
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
+                (route) => false,
+              );
             },
             child: const Text('Đăng xuất'),
           ),

@@ -3,7 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/category.dart';
 import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/category_repository.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_detail_screen.dart';
 import 'package:mini_mart_management_mobile_app/services/category_service.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
 class CategoryManagementScreen extends StatelessWidget {
@@ -22,33 +27,18 @@ class CategoryManagementScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        titleSpacing: 0,
-        leading: onMenuTap != null
-            ? IconButton(
-                onPressed: onMenuTap,
-                icon: const Icon(Icons.menu_rounded),
-              )
-            : null,
-        title: Text(
-          'Danh mục sản phẩm',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: AppColors.surfaceContainerLowest,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+      appBar: MiniMartAppBar.primary(
+        title: 'Danh mục sản phẩm',
+        onBrandTap: onMenuTap,
       ),
-      body: const _CategoryBody(),
+      body: const SafeArea(child: _CategoryBody()),
     );
   }
 }
 
-// ── Body ─────────────────────────────────────────────────────────────────────
-
 class _CategoryBody extends StatefulWidget {
   const _CategoryBody();
+
   @override
   State<_CategoryBody> createState() => _CategoryBodyState();
 }
@@ -56,6 +46,14 @@ class _CategoryBody extends StatefulWidget {
 class _CategoryBodyState extends State<_CategoryBody> {
   final _searchController = TextEditingController();
   String _search = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(
+      () => setState(() => _search = _searchController.text.trim()),
+    );
+  }
 
   @override
   void dispose() {
@@ -68,107 +66,137 @@ class _CategoryBodyState extends State<_CategoryBody> {
     final provider = context.watch<CategoryProvider>();
 
     if (provider.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const LoadingOverlay();
     }
 
-    if (provider.error != null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(provider.error!, style: const TextStyle(color: Colors.red)),
-            const SizedBox(height: 12),
-            FilledButton(
-              onPressed: () => context.read<CategoryProvider>().fetchAll(),
-              child: const Text('Thử lại'),
-            ),
-          ],
-        ),
+    if (provider.error != null && provider.categories.isEmpty) {
+      return ErrorBanner(
+        message: provider.error!,
+        onRetry: () => context.read<CategoryProvider>().fetchAll(),
       );
     }
 
-    final filtered = provider.categories
-        .where(
-          (c) => c.categoryName.toLowerCase().contains(_search.toLowerCase()),
-        )
-        .toList();
+    final filtered = provider.categories.where((category) {
+      if (_search.isEmpty) return true;
+      final query = _search.toLowerCase();
+      return category.categoryName.toLowerCase().contains(query) ||
+          category.categoryCode.toLowerCase().contains(query) ||
+          (category.description?.toLowerCase().contains(query) ?? false);
+    }).toList();
 
-    return Column(
-      children: [
-        _SearchBar(
-          controller: _searchController,
-          onChanged: (v) => setState(() => _search = v),
-          onAdd: () => _showForm(context, provider),
-        ),
-        Expanded(
-          child: filtered.isEmpty
-              ? const Center(child: Text('Không có danh mục nào.'))
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filtered.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
-                  itemBuilder: (ctx, i) {
-                    final category = filtered[i];
-                    return _CategoryTile(
-                      category: category,
-                      taxLabel: _taxLabel(provider, category),
-                      onEdit: () =>
-                          _showForm(ctx, provider, category: category),
-                      onDelete: () => _confirmDelete(ctx, provider, category),
-                    );
-                  },
+    return RefreshIndicator(
+      onRefresh: () => context.read<CategoryProvider>().fetchAll(),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(child: _buildSearchHeader(context)),
+          if (provider.error != null)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: ErrorBanner(
+                  message: provider.error!,
+                  onRetry: () => context.read<CategoryProvider>().fetchAll(),
                 ),
-        ),
-      ],
-    );
-  }
-
-  String _taxLabel(CategoryProvider provider, Category category) {
-    for (final taxRate in provider.taxRates) {
-      if (taxRate.taxRateId == category.taxRateId) return taxRate.label;
-    }
-    return 'Chưa có thuế suất';
-  }
-
-  void _showForm(
-    BuildContext context,
-    CategoryProvider provider, {
-    Category? category,
-  }) {
-    showDialog<void>(
-      context: context,
-      builder: (_) => ChangeNotifierProvider.value(
-        value: provider,
-        child: _CategoryFormDialog(category: category),
+              ),
+            ),
+          if (filtered.isEmpty)
+            const SliverFillRemaining(
+              hasScrollBody: false,
+              child: EmptyState(
+                message: 'Chưa có danh mục nào.',
+                icon: Icons.category_outlined,
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
+              sliver: SliverList.separated(
+                itemCount: filtered.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  final category = filtered[index];
+                  return _CategoryTile(
+                    category: category,
+                    taxLabel: _taxLabel(provider, category),
+                    onEdit: () => _openDetail(context, category),
+                    onDelete: () => _confirmDelete(context, category),
+                  );
+                },
+              ),
+            ),
+        ],
       ),
     );
   }
 
-  void _confirmDelete(
-    BuildContext context,
-    CategoryProvider provider,
-    Category category,
-  ) {
+  Widget _buildSearchHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Danh mục',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _searchController,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.search_rounded),
+              hintText: 'Tìm kiếm danh mục...',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _taxLabel(CategoryProvider provider, Category category) {
+    final tax = provider.taxRates.firstWhere(
+      (rate) => rate.taxRateId == category.taxRateId,
+      orElse: () => provider.taxRates.isNotEmpty
+          ? provider.taxRates.first
+          : throw StateError('no tax rates'),
+    );
+    return tax.label;
+  }
+
+  void _openDetail(BuildContext context, Category category) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => CategoryDetailScreen(categoryId: category.categoryId),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, Category category) {
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Xóa danh mục'),
         content: Text('Bạn chắc chắn muốn xóa "${category.categoryName}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Hủy'),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
-              Navigator.pop(ctx);
-              final error = await provider.delete(category.categoryId);
+              Navigator.pop(dialogContext);
+              final error = await context.read<CategoryProvider>().delete(
+                category.categoryId,
+              );
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(error ?? 'Đã xóa "${category.categoryName}"'),
-                  backgroundColor: error != null ? Colors.red : Colors.green,
+                  backgroundColor: error == null ? Colors.green : Colors.red,
                 ),
               );
             },
@@ -179,68 +207,6 @@ class _CategoryBodyState extends State<_CategoryBody> {
     );
   }
 }
-
-// ── Search bar ───────────────────────────────────────────────────────────────
-
-class _SearchBar extends StatelessWidget {
-  const _SearchBar({
-    required this.controller,
-    required this.onChanged,
-    required this.onAdd,
-  });
-
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onAdd;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.borderGray)),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Danh mục',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              FilledButton.icon(
-                onPressed: onAdd,
-                icon: const Icon(Icons.add_rounded),
-                label: const Text('Thêm'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.surfaceContainerLowest,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: controller,
-            onChanged: onChanged,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.search_rounded),
-              hintText: 'Tìm kiếm danh mục...',
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Category tile ─────────────────────────────────────────────────────────────
 
 class _CategoryTile extends StatelessWidget {
   const _CategoryTile({
@@ -260,7 +226,7 @@ class _CategoryTile extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: AppColors.borderGray),
       ),
       child: ListTile(
@@ -269,9 +235,12 @@ class _CategoryTile extends StatelessWidget {
           category.categoryName,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        subtitle: Text(taxLabel, style: const TextStyle(fontSize: 12)),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
+        subtitle: Text(
+          '${category.categoryCode} • $taxLabel',
+          style: const TextStyle(fontSize: 12),
+        ),
+        trailing: Wrap(
+          spacing: 4,
           children: [
             IconButton(
               icon: const Icon(Icons.edit_outlined, size: 20),
@@ -289,165 +258,6 @@ class _CategoryTile extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ── Form dialog ───────────────────────────────────────────────────────────────
-
-class _CategoryFormDialog extends StatefulWidget {
-  const _CategoryFormDialog({this.category});
-  final Category? category;
-  @override
-  State<_CategoryFormDialog> createState() => _CategoryFormDialogState();
-}
-
-class _CategoryFormDialogState extends State<_CategoryFormDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _codeCtrl;
-  late final TextEditingController _nameCtrl;
-  late final TextEditingController _descCtrl;
-  int? _selectedTaxRateId;
-  bool _saving = false;
-  String? _error;
-
-  bool get _isEdit => widget.category != null;
-
-  @override
-  void initState() {
-    super.initState();
-    final c = widget.category;
-    _codeCtrl = TextEditingController();
-    _nameCtrl = TextEditingController(text: c?.categoryName ?? '');
-    _descCtrl = TextEditingController(text: c?.description ?? '');
-    _selectedTaxRateId = c?.taxRateId;
-  }
-
-  @override
-  void dispose() {
-    _codeCtrl.dispose();
-    _nameCtrl.dispose();
-    _descCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final taxRates = context.watch<CategoryProvider>().taxRates;
-
-    return AlertDialog(
-      title: Text(_isEdit ? 'Sửa danh mục' : 'Thêm danh mục'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (!_isEdit) ...[
-                TextFormField(
-                  controller: _codeCtrl,
-                  decoration: const InputDecoration(labelText: 'Mã danh mục *'),
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Nhập mã danh mục'
-                      : null,
-                ),
-                const SizedBox(height: 12),
-              ],
-              TextFormField(
-                controller: _nameCtrl,
-                decoration: const InputDecoration(labelText: 'Tên danh mục *'),
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Nhập tên danh mục'
-                    : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _descCtrl,
-                decoration: const InputDecoration(labelText: 'Mô tả'),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<int>(
-                initialValue: _selectedTaxRateId,
-                decoration: const InputDecoration(labelText: 'Thuế suất *'),
-                items: {for (final t in taxRates) t.taxRateId: t}.values
-                    .map(
-                      (t) => DropdownMenuItem(
-                        value: t.taxRateId,
-                        child: Text(t.label),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (v) => setState(() => _selectedTaxRateId = v),
-                validator: (v) => v == null ? 'Chọn thuế suất' : null,
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                Text(
-                  _error!,
-                  style: const TextStyle(color: Colors.red, fontSize: 13),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: _saving ? null : () => Navigator.pop(context),
-          child: const Text('Hủy'),
-        ),
-        FilledButton(
-          onPressed: _saving ? null : () => _submit(context),
-          child: _saving
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : Text(_isEdit ? 'Lưu' : 'Tạo'),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _submit(BuildContext context) async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _saving = true;
-      _error = null;
-    });
-
-    final provider = context.read<CategoryProvider>();
-    final data = <String, dynamic>{
-      if (!_isEdit) 'categoryCode': _codeCtrl.text.trim(),
-      'name': _nameCtrl.text.trim(),
-      if (_descCtrl.text.trim().isNotEmpty)
-        'description': _descCtrl.text.trim(),
-      'taxRateId': _selectedTaxRateId,
-    };
-
-    final error = _isEdit
-        ? await provider.update(widget.category!.categoryId, data)
-        : await provider.create(data);
-
-    if (!mounted || !context.mounted) return;
-    setState(() => _saving = false);
-
-    if (error != null) {
-      setState(() => _error = error);
-      return;
-    }
-
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_isEdit ? 'Đã cập nhật danh mục.' : 'Đã tạo danh mục.'),
-        backgroundColor: Colors.green,
       ),
     );
   }

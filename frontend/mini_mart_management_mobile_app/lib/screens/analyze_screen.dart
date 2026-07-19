@@ -3,12 +3,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/report_provider.dart';
 import 'package:mini_mart_management_mobile_app/models/monthly_financial_report.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 
 class AnalyzeScreen extends StatefulWidget {
   const AnalyzeScreen({this.onMenuTap, super.key});
@@ -44,22 +44,16 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
     context.read<ReportProvider>().fetchMonthlyFinancialReport(nextMonth);
   }
 
-  void _selectPreset(DateTime month) {
-    setState(() => _selectedMonth = month);
-    context.read<ReportProvider>().fetchMonthlyFinancialReport(month);
-  }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ReportProvider>();
     final report = provider.monthlyFinancialReport;
-    final currentUser = context.select<AuthProvider, String?>(
-      (auth) => auth.currentUser?.fullName,
-    );
-    final avatarText = _avatarText(currentUser);
-
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
+      appBar: MiniMartAppBar.primary(
+        title: 'Báo Cáo Tài Chính',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: SafeArea(
         child: provider.isLoading && report == null
             ? const LoadingOverlay()
@@ -78,15 +72,9 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _buildTopBar(context, avatarText),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
                         child: _buildHeader(context),
-                      ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _buildPresetTabs(context),
                       ),
                       const SizedBox(height: 16),
                       if (report != null) ...[
@@ -119,52 +107,6 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
                   ),
                 ),
               ),
-      ),
-      floatingActionButton: _buildScannerButton(),
-    );
-  }
-
-  Widget _buildTopBar(BuildContext context, String avatarText) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        border: Border(bottom: BorderSide(color: AppColors.borderGray)),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints.tightFor(width: 40, height: 40),
-            icon: const Icon(
-              Icons.storefront_outlined,
-              color: AppColors.primary,
-            ),
-            onPressed: widget.onMenuTap,
-          ),
-          const SizedBox(width: 4),
-          const Expanded(
-            child: Text(
-              'RetailMaster',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: AppColors.primaryContainer,
-            child: Text(
-              avatarText,
-              style: const TextStyle(
-                color: AppColors.surfaceContainerLowest,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -248,72 +190,6 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildPresetTabs(BuildContext context) {
-    final currentMonth = DateTime(_selectedMonth.year, _selectedMonth.month, 1);
-    final previousMonth = DateTime(
-      _selectedMonth.year,
-      _selectedMonth.month - 1,
-      1,
-    );
-    final isCurrentMonth =
-        currentMonth.year == DateTime.now().year &&
-        currentMonth.month == DateTime.now().month;
-    final isPreviousMonth =
-        previousMonth.year == DateTime.now().year &&
-        previousMonth.month == DateTime.now().month;
-
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        border: Border.all(color: AppColors.primary),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _PresetTab(
-              label: 'Tháng này',
-              selected: isCurrentMonth,
-              onTap: () => _selectPreset(
-                DateTime(DateTime.now().year, DateTime.now().month, 1),
-              ),
-            ),
-          ),
-          Expanded(
-            child: _PresetTab(
-              label: 'Tháng trước',
-              selected: isPreviousMonth,
-              onTap: () => _selectPreset(
-                DateTime(DateTime.now().year, DateTime.now().month - 1, 1),
-              ),
-            ),
-          ),
-          Expanded(
-            child: _PresetTab(
-              label: 'Tùy chọn',
-              selected: !isCurrentMonth && !isPreviousMonth,
-              onTap: () {},
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 4),
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.calendar_month_outlined,
-              color: AppColors.primary,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -535,16 +411,6 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
     );
   }
 
-  Widget _buildScannerButton() {
-    return FloatingActionButton(
-      onPressed: () {},
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.surfaceContainerLowest,
-      shape: const CircleBorder(),
-      child: const Icon(Icons.document_scanner_outlined, size: 30),
-    );
-  }
-
   String _formatCurrency(num value) {
     final formatter = NumberFormat('#,##0', 'vi_VN');
     return '${formatter.format(value)} đ';
@@ -571,50 +437,6 @@ class _AnalyzeScreenState extends State<AnalyzeScreen> {
       'tháng 12',
     ];
     return '${months[date.month - 1]} ${date.year}';
-  }
-
-  String _avatarText(String? fullName) {
-    if (fullName == null || fullName.trim().isEmpty) return '?';
-    final parts = fullName.trim().split(RegExp(r'\s+'));
-    return parts.last.substring(0, 1).toUpperCase();
-  }
-}
-
-class _PresetTab extends StatelessWidget {
-  const _PresetTab({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: selected ? AppColors.primary : Colors.transparent,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: SizedBox(
-          height: 44,
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: selected
-                    ? AppColors.surfaceContainerLowest
-                    : AppColors.primary,
-                fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 

@@ -7,6 +7,7 @@ import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.da
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_transactions/inventory_transaction_card.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class InventoryTransactionsScreen extends StatefulWidget {
@@ -37,52 +38,14 @@ class _InventoryTransactionsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
-      body: SafeArea(child: _buildBody(context)),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () => context.read<InventoryProvider>().loadTransactions(),
-        tooltip: 'Tải lại',
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        child: const Icon(Icons.sync_rounded),
+      appBar: MiniMartAppBar.primary(
+        title: 'Giao dịch kho',
+        onBrandTap: widget.onMenuTap,
       ),
+      body: SafeArea(child: _buildBody(context)),
       bottomNavigationBar: widget.showBottomNavBar
           ? const AppBottomNavBar(selectedTab: AppNavTab.catalog)
           : null,
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceBright,
-      foregroundColor: AppColors.primary,
-      titleSpacing: 0,
-      leading: widget.onMenuTap != null
-          ? IconButton(
-              icon: const Icon(Icons.menu_rounded),
-              onPressed: widget.onMenuTap,
-            )
-          : const Icon(Icons.storefront_rounded),
-      title: Text(
-        'Cửa hàng #402 | Giao dịch kho',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-      actions: [
-        IconButton(
-          onPressed: () => context.read<InventoryProvider>().loadTransactions(),
-          tooltip: 'Tải lại',
-          icon: const Icon(Icons.refresh_rounded),
-        ),
-        IconButton(
-          onPressed: () => _showActionSnackBar(context, 'Tài khoản'),
-          tooltip: 'Tài khoản',
-          icon: const Icon(Icons.account_circle_outlined),
-        ),
-      ],
     );
   }
 
@@ -185,11 +148,5 @@ class _InventoryTransactionsScreenState
         ),
       ),
     );
-  }
-
-  void _showActionSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }

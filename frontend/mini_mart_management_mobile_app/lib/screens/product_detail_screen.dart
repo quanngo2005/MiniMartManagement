@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/product.dart';
 import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/product_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -70,6 +71,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
     _supplierCtrl.addListener(() {
       if (mounted) setState(() {});
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final categoryProvider = context.read<CategoryProvider>();
+      final supplierProvider = context.read<SupplierProvider>();
+      if (categoryProvider.categories.isEmpty) {
+        await categoryProvider.fetchAll();
+      }
+      if (supplierProvider.suppliers.isEmpty) {
+        await supplierProvider.fetchSuppliers();
+      }
     });
   }
 
@@ -198,23 +210,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection('Danh mục & NCC', [
-                  _field(
-                    _categoryCtrl,
-                    'Category ID *',
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: _req,
-                  ),
-                  _lookupText(_categoryCtrl, _categoryLabel(context)),
-                  _field(
-                    _supplierCtrl,
-                    'Supplier ID *',
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: _req,
-                  ),
-                  _lookupText(_supplierCtrl, _supplierLabel(context)),
+                _buildSection('Danh m?c & NCC', [
+                  _categorySelector(context),
+                  _supplierSelector(context),
                 ]),
                 const SizedBox(height: 16),
                 _buildSection('Mô tả', [
@@ -372,6 +370,68 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  Widget _categorySelector(BuildContext context) {
+    final categories = context.watch<CategoryProvider>().categories;
+    final currentId = int.tryParse(_categoryCtrl.text.trim());
+
+    return DropdownButtonFormField<int>(
+      initialValue: categories.any((item) => item.categoryId == currentId)
+          ? currentId
+          : null,
+      decoration: InputDecoration(
+        labelText: 'Danh mục *',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: !_isEditing,
+        fillColor: _isEditing ? null : AppColors.surfaceContainerLow,
+      ),
+      items: categories
+          .map(
+            (category) => DropdownMenuItem<int>(
+              value: category.categoryId,
+              child: Text(category.categoryName),
+            ),
+          )
+          .toList(),
+      onChanged: _isEditing
+          ? (value) => setState(() {
+              _categoryCtrl.text = value?.toString() ?? '';
+            })
+          : null,
+      validator: (value) => value == null ? 'Chọn danh mục' : null,
+    );
+  }
+
+  Widget _supplierSelector(BuildContext context) {
+    final suppliers = context.watch<SupplierProvider>().suppliers;
+    final currentId = int.tryParse(_supplierCtrl.text.trim());
+
+    return DropdownButtonFormField<int>(
+      initialValue: suppliers.any((item) => item.supplierId == currentId)
+          ? currentId
+          : null,
+      decoration: InputDecoration(
+        labelText: 'Nhà cung cấp *',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: !_isEditing,
+        fillColor: _isEditing ? null : AppColors.surfaceContainerLow,
+      ),
+      items: suppliers
+          .map(
+            (supplier) => DropdownMenuItem<int>(
+              value: supplier.supplierId,
+              child: Text(supplier.supplierName),
+            ),
+          )
+          .toList(),
+      onChanged: _isEditing
+          ? (value) => setState(() {
+              _supplierCtrl.text = value?.toString() ?? '';
+            })
+          : null,
+      validator: (value) => value == null ? 'Chọn nhà cung cấp' : null,
+    );
+  }
+
   Widget _buildStatusToggle() {
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -432,37 +492,4 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   String? _req(String? v) =>
       (v == null || v.trim().isEmpty) ? 'Trường này không được trống' : null;
-
-  Widget _lookupText(TextEditingController controller, String? text) {
-    if (text == null || text.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: AppColors.textMuted,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      ),
-    );
-  }
-
-  String? _categoryLabel(BuildContext context) {
-    final id = int.tryParse(_categoryCtrl.text.trim());
-    if (id == null) return null;
-    final categories = context.watch<CategoryProvider>().categories;
-    for (final category in categories) {
-      if (category.categoryId == id) {
-        return 'Danh mục: ${category.categoryName}';
-      }
-    }
-    return 'Danh mục chưa tìm thấy';
-  }
-
-  String? _supplierLabel(BuildContext context) {
-    return null;
-  }
 }

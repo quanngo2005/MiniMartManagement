@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/top_product.dart';
 import 'package:mini_mart_management_mobile_app/providers/report_provider.dart';
@@ -8,6 +8,7 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 
 enum _SortMode { highestFirst, lowestFirst }
 
@@ -51,50 +52,11 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: _buildAppBar(context),
+      appBar: MiniMartAppBar.primary(
+        title: 'Sản phẩm',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: SafeArea(child: _buildBody(context)),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () {},
-        tooltip: 'Quét mã vạch',
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: const Icon(Icons.barcode_reader),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceContainerLowest,
-      foregroundColor: AppColors.primary,
-      titleSpacing: 0,
-      leading: widget.onMenuTap != null
-          ? IconButton(
-              icon: const Icon(Icons.menu_rounded),
-              onPressed: widget.onMenuTap,
-              color: AppColors.primary,
-            )
-          : const Icon(Icons.storefront_rounded),
-      title: Text(
-        'RetailMaster',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          tooltip: 'Tìm kiếm',
-          icon: const Icon(Icons.search_rounded),
-        ),
-      ],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(color: AppColors.borderGray, height: 1),
-      ),
     );
   }
 
@@ -243,7 +205,9 @@ class _ProductPerformanceScreenState extends State<ProductPerformanceScreen> {
             onPressed: () => Navigator.push<void>(
               context,
               MaterialPageRoute(
-                builder: (_) => const CategoryManagementScreen(),
+                builder: (_) => CategoryManagementScreen.withProvider(
+                  onMenuTap: widget.onMenuTap,
+                ),
               ),
             ),
             icon: const Icon(Icons.category_outlined),

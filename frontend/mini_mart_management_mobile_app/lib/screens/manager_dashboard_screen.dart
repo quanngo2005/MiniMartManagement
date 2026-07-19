@@ -86,16 +86,18 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
             slivers: [
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                sliver: SliverGrid.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 0.98,
-                  children: [
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    mainAxisExtent: 122,
+                  ),
+                  delegate: SliverChildListDelegate([
                     _MetricCard(
                       label: 'Doanh thu hôm nay',
                       value: _formatMoney(todayRevenue),
-                      caption: '${todayOrders} đơn hàng',
+                      caption: '$todayOrders đơn hàng',
                       icon: Icons.trending_up_rounded,
                       iconColor: AppColors.secondary,
                       valueColor: AppColors.primary,
@@ -144,7 +146,7 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                       iconColor: AppColors.statusWarning,
                       valueColor: AppColors.primary,
                     ),
-                  ],
+                  ]),
                 ),
               ),
               SliverPadding(
@@ -160,7 +162,7 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                       ),
                     ),
                     child: SizedBox(
-                      height: 180,
+                      height: 160,
                       child: provider.dailyRevenue.isEmpty
                           ? const EmptyState(
                               message: 'Chưa có dữ liệu doanh thu ngày.',
@@ -188,7 +190,8 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                                 'Tồn kho còn ${provider.lowStockAlerts.first.currentStock} / tối thiểu ${provider.lowStockAlerts.first.minimumStock}',
                             time: 'Hôm nay',
                           ),
-                        if (provider.lowStockAlerts.isNotEmpty)
+                        if (provider.lowStockAlerts.isNotEmpty &&
+                            topProduct != null)
                           const SizedBox(height: 12),
                         if (topProduct != null)
                           _NotificationTile(
@@ -211,18 +214,10 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
                   ),
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 176)),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () => _showActionSnackBar(context, 'Quét mã vạch'),
-        tooltip: 'Quét mã vạch',
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        child: const Icon(Icons.qr_code_scanner_rounded),
       ),
     );
   }
@@ -234,12 +229,6 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
     );
   }
 
-  void _showActionSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
-  }
-
   String _formatMoney(num value) {
     final str = value.round().toString();
     final buffer = StringBuffer();
@@ -247,7 +236,7 @@ class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
       if (i > 0 && (str.length - i) % 3 == 0) buffer.write('.');
       buffer.write(str[i]);
     }
-    return '${buffer}đ';
+    return '$bufferđ';
   }
 }
 
@@ -280,7 +269,7 @@ class _MetricCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -301,7 +290,7 @@ class _MetricCard extends StatelessWidget {
                 Icon(icon, color: iconColor, size: 22),
               ],
             ),
-            const Spacer(),
+            const SizedBox(height: 8),
             Text(
               value,
               maxLines: 1,
@@ -322,8 +311,8 @@ class _MetricCard extends StatelessWidget {
               ),
             ),
             if (footer != null) ...[
-              const SizedBox(height: 10),
-              SizedBox(height: 34, width: double.infinity, child: footer),
+              const SizedBox(height: 6),
+              SizedBox(height: 24, width: double.infinity, child: footer),
             ],
           ],
         ),
@@ -367,12 +356,12 @@ class _DashboardPanel extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (trailing != null) trailing!,
+                ?trailing,
               ],
             ),
           ),
           const Divider(height: 1, color: AppColors.borderGray),
-          Padding(padding: const EdgeInsets.all(16), child: child),
+          Padding(padding: const EdgeInsets.all(12), child: child),
         ],
       ),
     );
@@ -455,7 +444,15 @@ class _SalesChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _SalesChartPainter oldDelegate) {
+    if (oldDelegate.points.length != points.length) return true;
+    for (var i = 0; i < points.length; i++) {
+      final oldPoint = oldDelegate.points[i];
+      final newPoint = points[i];
+      if (oldPoint.revenue != newPoint.revenue) return true;
+    }
+    return false;
+  }
 }
 
 class _TinySparkline extends StatelessWidget {
@@ -515,7 +512,14 @@ class _TinySparklinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _TinySparklinePainter oldDelegate) => false;
+  bool shouldRepaint(covariant _TinySparklinePainter oldDelegate) {
+    if (oldDelegate.color != color) return true;
+    if (oldDelegate.points.length != points.length) return true;
+    for (var i = 0; i < points.length; i++) {
+      if (oldDelegate.points[i] != points[i]) return true;
+    }
+    return false;
+  }
 }
 
 class _NotificationTile extends StatelessWidget {
