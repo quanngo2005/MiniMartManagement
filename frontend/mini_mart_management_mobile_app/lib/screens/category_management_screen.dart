@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/category.dart';
-import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/category_repository.dart';
 import 'package:mini_mart_management_mobile_app/services/category_service.dart';
@@ -14,9 +13,8 @@ class CategoryManagementScreen extends StatelessWidget {
 
   static Widget withProvider({VoidCallback? onMenuTap}) {
     return ChangeNotifierProvider(
-      create: (_) => CategoryProvider(
-        CategoryRepository(CategoryService()),
-      )..fetchAll(),
+      create: (_) =>
+          CategoryProvider(CategoryRepository(CategoryService()))..fetchAll(),
       child: CategoryManagementScreen(onMenuTap: onMenuTap),
     );
   }
@@ -29,14 +27,17 @@ class CategoryManagementScreen extends StatelessWidget {
         foregroundColor: AppColors.surfaceContainerLowest,
         titleSpacing: 0,
         leading: onMenuTap != null
-            ? IconButton(onPressed: onMenuTap, icon: const Icon(Icons.menu_rounded))
+            ? IconButton(
+                onPressed: onMenuTap,
+                icon: const Icon(Icons.menu_rounded),
+              )
             : null,
         title: Text(
           'Danh mục sản phẩm',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: AppColors.surfaceContainerLowest,
-                fontWeight: FontWeight.w700,
-              ),
+            color: AppColors.surfaceContainerLowest,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
       body: const _CategoryBody(),
@@ -87,7 +88,9 @@ class _CategoryBodyState extends State<_CategoryBody> {
     }
 
     final filtered = provider.categories
-        .where((c) => c.name.toLowerCase().contains(_search.toLowerCase()))
+        .where(
+          (c) => c.categoryName.toLowerCase().contains(_search.toLowerCase()),
+        )
         .toList();
 
     return Column(
@@ -103,19 +106,35 @@ class _CategoryBodyState extends State<_CategoryBody> {
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (ctx, i) => _CategoryTile(
-                    category: filtered[i],
-                    onEdit: () => _showForm(ctx, provider, category: filtered[i]),
-                    onDelete: () => _confirmDelete(ctx, provider, filtered[i]),
-                  ),
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  itemBuilder: (ctx, i) {
+                    final category = filtered[i];
+                    return _CategoryTile(
+                      category: category,
+                      taxLabel: _taxLabel(provider, category),
+                      onEdit: () =>
+                          _showForm(ctx, provider, category: category),
+                      onDelete: () => _confirmDelete(ctx, provider, category),
+                    );
+                  },
                 ),
         ),
       ],
     );
   }
 
-  void _showForm(BuildContext context, CategoryProvider provider, {Category? category}) {
+  String _taxLabel(CategoryProvider provider, Category category) {
+    for (final taxRate in provider.taxRates) {
+      if (taxRate.taxRateId == category.taxRateId) return taxRate.label;
+    }
+    return 'Chưa có thuế suất';
+  }
+
+  void _showForm(
+    BuildContext context,
+    CategoryProvider provider, {
+    Category? category,
+  }) {
     showDialog<void>(
       context: context,
       builder: (_) => ChangeNotifierProvider.value(
@@ -125,24 +144,33 @@ class _CategoryBodyState extends State<_CategoryBody> {
     );
   }
 
-  void _confirmDelete(BuildContext context, CategoryProvider provider, Category category) {
+  void _confirmDelete(
+    BuildContext context,
+    CategoryProvider provider,
+    Category category,
+  ) {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Xóa danh mục'),
-        content: Text('Bạn chắc chắn muốn xóa "${category.name}"?'),
+        content: Text('Bạn chắc chắn muốn xóa "${category.categoryName}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Hủy'),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(ctx);
-              final error = await provider.delete(category.id);
+              final error = await provider.delete(category.categoryId);
               if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(error ?? 'Đã xóa "${category.name}"'),
-                backgroundColor: error != null ? Colors.red : Colors.green,
-              ));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(error ?? 'Đã xóa "${category.categoryName}"'),
+                  backgroundColor: error != null ? Colors.red : Colors.green,
+                ),
+              );
             },
             child: const Text('Xóa'),
           ),
@@ -155,7 +183,11 @@ class _CategoryBodyState extends State<_CategoryBody> {
 // ── Search bar ───────────────────────────────────────────────────────────────
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar({required this.controller, required this.onChanged, required this.onAdd});
+  const _SearchBar({
+    required this.controller,
+    required this.onChanged,
+    required this.onAdd,
+  });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -174,9 +206,13 @@ class _SearchBar extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text('Danh mục',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppColors.primary, fontWeight: FontWeight.w700)),
+                child: Text(
+                  'Danh mục',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
               FilledButton.icon(
                 onPressed: onAdd,
@@ -207,9 +243,15 @@ class _SearchBar extends StatelessWidget {
 // ── Category tile ─────────────────────────────────────────────────────────────
 
 class _CategoryTile extends StatelessWidget {
-  const _CategoryTile({required this.category, required this.onEdit, required this.onDelete});
+  const _CategoryTile({
+    required this.category,
+    required this.taxLabel,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   final Category category;
+  final String taxLabel;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -223,13 +265,11 @@ class _CategoryTile extends StatelessWidget {
       ),
       child: ListTile(
         leading: const Icon(Icons.category_outlined, color: AppColors.primary),
-        title: Text(category.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(
-          category.taxDescription.isNotEmpty
-              ? category.taxDescription
-              : 'Thuế: ${(category.taxRate * 100).toStringAsFixed(0)}%',
-          style: const TextStyle(fontSize: 12),
+        title: Text(
+          category.categoryName,
+          style: const TextStyle(fontWeight: FontWeight.w600),
         ),
+        subtitle: Text(taxLabel, style: const TextStyle(fontSize: 12)),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -239,7 +279,11 @@ class _CategoryTile extends StatelessWidget {
               onPressed: onEdit,
             ),
             IconButton(
-              icon: const Icon(Icons.delete_outline, size: 20, color: Colors.red),
+              icon: const Icon(
+                Icons.delete_outline,
+                size: 20,
+                color: Colors.red,
+              ),
               tooltip: 'Xóa',
               onPressed: onDelete,
             ),
@@ -275,7 +319,7 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
     super.initState();
     final c = widget.category;
     _codeCtrl = TextEditingController();
-    _nameCtrl = TextEditingController(text: c?.name ?? '');
+    _nameCtrl = TextEditingController(text: c?.categoryName ?? '');
     _descCtrl = TextEditingController(text: c?.description ?? '');
     _selectedTaxRateId = c?.taxRateId;
   }
@@ -304,16 +348,18 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
                 TextFormField(
                   controller: _codeCtrl,
                   decoration: const InputDecoration(labelText: 'Mã danh mục *'),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Nhập mã danh mục' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Nhập mã danh mục'
+                      : null,
                 ),
                 const SizedBox(height: 12),
               ],
               TextFormField(
                 controller: _nameCtrl,
                 decoration: const InputDecoration(labelText: 'Tên danh mục *'),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Nhập tên danh mục' : null,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Nhập tên danh mục'
+                    : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -323,18 +369,25 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<int>(
-                value: _selectedTaxRateId,
+                initialValue: _selectedTaxRateId,
                 decoration: const InputDecoration(labelText: 'Thuế suất *'),
-                items: {for (final t in taxRates) t.taxRateId: t}
-                    .values
-                    .map((t) => DropdownMenuItem(value: t.taxRateId, child: Text(t.label)))
+                items: {for (final t in taxRates) t.taxRateId: t}.values
+                    .map(
+                      (t) => DropdownMenuItem(
+                        value: t.taxRateId,
+                        child: Text(t.label),
+                      ),
+                    )
                     .toList(),
                 onChanged: (v) => setState(() => _selectedTaxRateId = v),
                 validator: (v) => v == null ? 'Chọn thuế suất' : null,
               ),
               if (_error != null) ...[
                 const SizedBox(height: 12),
-                Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.red, fontSize: 13),
+                ),
               ],
             ],
           ),
@@ -349,8 +402,12 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
           onPressed: _saving ? null : () => _submit(context),
           child: _saving
               ? const SizedBox(
-                  width: 16, height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
                 )
               : Text(_isEdit ? 'Lưu' : 'Tạo'),
         ),
@@ -360,21 +417,25 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
 
   Future<void> _submit(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() { _saving = true; _error = null; });
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
 
     final provider = context.read<CategoryProvider>();
     final data = <String, dynamic>{
       if (!_isEdit) 'categoryCode': _codeCtrl.text.trim(),
       'name': _nameCtrl.text.trim(),
-      if (_descCtrl.text.trim().isNotEmpty) 'description': _descCtrl.text.trim(),
+      if (_descCtrl.text.trim().isNotEmpty)
+        'description': _descCtrl.text.trim(),
       'taxRateId': _selectedTaxRateId,
     };
 
     final error = _isEdit
-        ? await provider.update(widget.category!.id, data)
+        ? await provider.update(widget.category!.categoryId, data)
         : await provider.create(data);
 
-    if (!mounted) return;
+    if (!mounted || !context.mounted) return;
     setState(() => _saving = false);
 
     if (error != null) {
@@ -383,9 +444,11 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
     }
 
     Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(_isEdit ? 'Đã cập nhật danh mục.' : 'Đã tạo danh mục.'),
-      backgroundColor: Colors.green,
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_isEdit ? 'Đã cập nhật danh mục.' : 'Đã tạo danh mục.'),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 }

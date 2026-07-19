@@ -7,9 +7,8 @@ class ProductLookup {
     required this.sellingPrice,
     required this.stockQuantity,
     required this.status,
-
     this.categoryTaxRate = 0.08,
-
+    this.category,
   });
 
   final int productId;
@@ -19,11 +18,8 @@ class ProductLookup {
   final double sellingPrice;
   final int stockQuantity;
   final bool status;
-<<<<<<< HEAD
   final double categoryTaxRate;
-=======
   final ProductLookupCategory? category;
->>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
 
   factory ProductLookup.fromJson(Map<String, dynamic> json) {
     double parseTaxRate(dynamic value) {
@@ -47,13 +43,10 @@ class ProductLookup {
       sellingPrice: _readDouble(json, 'sellingPrice', 'SellingPrice'),
       stockQuantity: _readInt(json, 'stockQuantity', 'StockQuantity'),
       status: _readBool(json, 'status', 'Status'),
-<<<<<<< HEAD
       categoryTaxRate: taxRate,
-=======
       category: ProductLookupCategory.fromJsonOrNull(
         json['category'] ?? json['Category'],
       ),
->>>>>>> 6a257e272ff9daf3f065009c0ab40d691bd20939
     );
   }
 }

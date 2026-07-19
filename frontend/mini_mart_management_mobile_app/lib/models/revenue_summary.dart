@@ -13,7 +13,8 @@ class RevenueSummary {
 
   factory RevenueSummary.fromJson(Map<String, dynamic> json) {
     return RevenueSummary(
-      totalRevenue: (json['totalRevenue'] ?? json['TotalRevenue'] ?? 0).toDouble(),
+      totalRevenue: (json['totalRevenue'] ?? json['TotalRevenue'] ?? 0)
+          .toDouble(),
       totalOrders: (json['totalOrders'] ?? json['TotalOrders'] ?? 0) as int,
       startDate: _readDate(json, 'startDate', 'StartDate'),
       endDate: _readDate(json, 'endDate', 'EndDate'),

@@ -93,14 +93,26 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
     final data = {
       'supplierCode': _codeCtrl.text.trim(),
       'supplierName': _nameCtrl.text.trim(),
-      'contactPerson': _contactCtrl.text.trim().isEmpty ? null : _contactCtrl.text.trim(),
+      'contactPerson': _contactCtrl.text.trim().isEmpty
+          ? null
+          : _contactCtrl.text.trim(),
       'phoneNumber': _phoneCtrl.text.trim(),
       'email': _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
-      'address': _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
-      'taxCode': _taxCodeCtrl.text.trim().isEmpty ? null : _taxCodeCtrl.text.trim(),
-      'bankAccount': _bankAccountCtrl.text.trim().isEmpty ? null : _bankAccountCtrl.text.trim(),
-      'bankName': _bankNameCtrl.text.trim().isEmpty ? null : _bankNameCtrl.text.trim(),
-      'description': _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+      'address': _addressCtrl.text.trim().isEmpty
+          ? null
+          : _addressCtrl.text.trim(),
+      'taxCode': _taxCodeCtrl.text.trim().isEmpty
+          ? null
+          : _taxCodeCtrl.text.trim(),
+      'bankAccount': _bankAccountCtrl.text.trim().isEmpty
+          ? null
+          : _bankAccountCtrl.text.trim(),
+      'bankName': _bankNameCtrl.text.trim().isEmpty
+          ? null
+          : _bankNameCtrl.text.trim(),
+      'description': _descCtrl.text.trim().isEmpty
+          ? null
+          : _descCtrl.text.trim(),
       'status': _status,
     };
     final provider = context.read<SupplierProvider>();
@@ -113,7 +125,9 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(provider.error ?? 'Không thể lưu nhà cung cấp.')),
+        SnackBar(
+          content: Text(provider.error ?? 'Không thể lưu nhà cung cấp.'),
+        ),
       );
     }
   }
@@ -121,13 +135,20 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
   Future<void> _delete() async {
     final supplier = _supplier;
     if (supplier == null) return;
-    final ok = await context.read<SupplierProvider>().deleteSupplier(supplier.supplierId);
+    final ok = await context.read<SupplierProvider>().deleteSupplier(
+      supplier.supplierId,
+    );
     if (!mounted) return;
     if (ok) {
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.read<SupplierProvider>().error ?? 'Không thể xóa nhà cung cấp.')),
+        SnackBar(
+          content: Text(
+            context.read<SupplierProvider>().error ??
+                'Không thể xóa nhà cung cấp.',
+          ),
+        ),
       );
     }
   }
@@ -210,7 +231,11 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
     );
   }
 
-  Widget _field(TextEditingController controller, String label, {int maxLines = 1}) {
+  Widget _field(
+    TextEditingController controller,
+    String label, {
+    int maxLines = 1,
+  }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:mini_mart_management_mobile_app/models/category.dart' as product_category;
+import 'package:mini_mart_management_mobile_app/models/category.dart'
+    as product_category;
 import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
@@ -78,24 +79,28 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
     final data = {
       'categoryCode': _codeCtrl.text.trim(),
       'categoryName': _nameCtrl.text.trim(),
-      'description': _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+      'description': _descCtrl.text.trim().isEmpty
+          ? null
+          : _descCtrl.text.trim(),
       'displayOrder': int.tryParse(_orderCtrl.text.trim()) ?? 1,
-      'parentCategoryId': _parentCtrl.text.trim().isEmpty ? null : int.tryParse(_parentCtrl.text.trim()),
+      'parentCategoryId': _parentCtrl.text.trim().isEmpty
+          ? null
+          : int.tryParse(_parentCtrl.text.trim()),
       'taxRateId': int.tryParse(_taxCtrl.text.trim()) ?? 4,
       'status': _status,
     };
     final provider = context.read<CategoryProvider>();
-    final ok = _isNew
+    final error = _isNew
         ? await provider.create(data)
         : await provider.update(widget.categoryId!, data);
     if (!mounted) return;
     setState(() => _isSaving = false);
-    if (ok) {
+    if (error == null) {
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(provider.error ?? 'Không thể lưu danh mục.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error)));
     }
   }
 
@@ -129,7 +134,9 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                   children: [
                     Expanded(child: _field(_orderCtrl, 'Thứ tự', number: true)),
                     const SizedBox(width: 12),
-                    Expanded(child: _field(_taxCtrl, 'Tax Rate ID', number: true)),
+                    Expanded(
+                      child: _field(_taxCtrl, 'Tax Rate ID', number: true),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -151,7 +158,10 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
                           )
                         : const Icon(Icons.save_rounded),
                     label: const Text('Lưu'),
@@ -195,9 +205,9 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
           child: Text(
             'Danh mục cha: ${category.categoryName}',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.textMuted,
-                  fontStyle: FontStyle.italic,
-                ),
+              color: AppColors.textMuted,
+              fontStyle: FontStyle.italic,
+            ),
           ),
         );
       }
@@ -207,9 +217,9 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       child: Text(
         'Danh mục cha chưa tìm thấy',
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: AppColors.textMuted,
-              fontStyle: FontStyle.italic,
-            ),
+          color: AppColors.textMuted,
+          fontStyle: FontStyle.italic,
+        ),
       ),
     );
   }

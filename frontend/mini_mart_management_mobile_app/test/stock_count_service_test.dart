@@ -45,17 +45,19 @@ void main() {
           expect(request.headers['Cookie'], contains('XSRF-TOKEN=csrf-token'));
         }
 
-        final cancellation = unsafeRequests.singleWhere(
-          (request) => request.method == 'DELETE',
-        ) as http.Request;
+        final cancellation =
+            unsafeRequests.singleWhere((request) => request.method == 'DELETE')
+                as http.Request;
         expect(cancellation.url.path, '/api/stock-counts/1');
         expect(jsonDecode(cancellation.body), {'rowVersion': 'count-version'});
 
-        final addLines = unsafeRequests.singleWhere(
-          (request) =>
-              request.method == 'POST' &&
-              request.url.path == '/api/stock-counts/1/lines',
-        ) as http.Request;
+        final addLines =
+            unsafeRequests.singleWhere(
+                  (request) =>
+                      request.method == 'POST' &&
+                      request.url.path == '/api/stock-counts/1/lines',
+                )
+                as http.Request;
         expect(jsonDecode(addLines.body), {
           'stockCountRowVersion': 'count-version',
           'productIds': [20, 21],
@@ -65,7 +67,10 @@ void main() {
 
     test('decodes cancelled status', () {
       expect(StockCountStatus.fromJson(5), StockCountStatus.cancelled);
-      expect(StockCountStatus.fromJson('Cancelled'), StockCountStatus.cancelled);
+      expect(
+        StockCountStatus.fromJson('Cancelled'),
+        StockCountStatus.cancelled,
+      );
     });
 
     test('encodes and decodes selected scope', () {

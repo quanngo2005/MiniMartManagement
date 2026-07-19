@@ -22,9 +22,7 @@ class BatchService {
       throw ApiException(_readMessage(responseJson));
     }
 
-    return _readItems(responseJson)
-        .map(Batch.fromJson)
-        .toList(growable: false);
+    return _readItems(responseJson).map(Batch.fromJson).toList(growable: false);
   }
 
   Future<void> disposeExpiredBatch(int batchId) async {
@@ -57,10 +55,12 @@ class BatchService {
       throw const ApiException('Batch response is missing items.');
     }
 
-    return source.map((item) {
-      if (item is Map<String, dynamic>) return item;
-      throw const ApiException('Batch item could not be read.');
-    }).toList(growable: false);
+    return source
+        .map((item) {
+          if (item is Map<String, dynamic>) return item;
+          throw const ApiException('Batch item could not be read.');
+        })
+        .toList(growable: false);
   }
 
   String _readMessage(Object? responseJson) {
@@ -113,9 +113,9 @@ class BatchService {
 
   String? _readCookieToken(String? setCookieHeader) {
     if (setCookieHeader == null || setCookieHeader.isEmpty) return null;
-    return RegExp(r'XSRF-TOKEN=([^;,\s]+)')
-        .firstMatch(setCookieHeader)
-        ?.group(1);
+    return RegExp(
+      r'XSRF-TOKEN=([^;,\s]+)',
+    ).firstMatch(setCookieHeader)?.group(1);
   }
 }
 

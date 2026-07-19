@@ -7,7 +7,7 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory.dar
 
 class ProductService {
   ProductService({http.Client? client})
-      : _client = client ?? createConfiguredClient();
+    : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 
@@ -22,12 +22,19 @@ class ProductService {
     if (decoded is List) {
       list = decoded;
     } else if (decoded is Map<String, dynamic>) {
-      final v = decoded['value'] ?? decoded['Value'] ?? decoded['data'] ?? decoded['Data'];
+      final v =
+          decoded['value'] ??
+          decoded['Value'] ??
+          decoded['data'] ??
+          decoded['Data'];
       list = v is List ? v : [];
     } else {
       return [];
     }
-    return list.whereType<Map<String, dynamic>>().map(Product.fromJson).toList();
+    return list
+        .whereType<Map<String, dynamic>>()
+        .map(Product.fromJson)
+        .toList();
   }
 
   Future<Product> create(Map<String, dynamic> data) async {

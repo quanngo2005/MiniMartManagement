@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/supplier.dart';
 import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart';
@@ -31,7 +31,8 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
       context.read<SupplierProvider>().fetchSuppliers();
     });
     _searchController.addListener(
-      () => setState(() => _query = _searchController.text.trim().toLowerCase()),
+      () =>
+          setState(() => _query = _searchController.text.trim().toLowerCase()),
     );
   }
 
@@ -74,34 +75,36 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
               child: provider.isLoading && provider.suppliers.isEmpty
                   ? const LoadingOverlay()
                   : provider.error != null && provider.suppliers.isEmpty
-                      ? ErrorBanner(
-                          message: provider.error!,
-                          onRetry: () => context.read<SupplierProvider>().fetchSuppliers(),
-                        )
-                      : filtered.isEmpty
-                          ? const EmptyState(
-                              message: 'Chưa có nhà cung cấp nào.',
-                              icon: Icons.local_shipping_outlined,
-                            )
-                          : RefreshIndicator(
-                              onRefresh: () => context.read<SupplierProvider>().fetchSuppliers(),
-                              child: ListView.separated(
-                                padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
-                                itemCount: filtered.length,
-                                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                                itemBuilder: (_, index) => _SupplierTile(
-                                  supplier: filtered[index],
-                                  onTap: () => Navigator.push<void>(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => SupplierDetailScreen(
-                                        supplierId: filtered[index].supplierId,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                  ? ErrorBanner(
+                      message: provider.error!,
+                      onRetry: () =>
+                          context.read<SupplierProvider>().fetchSuppliers(),
+                    )
+                  : filtered.isEmpty
+                  ? const EmptyState(
+                      message: 'Chưa có nhà cung cấp nào.',
+                      icon: Icons.local_shipping_outlined,
+                    )
+                  : RefreshIndicator(
+                      onRefresh: () =>
+                          context.read<SupplierProvider>().fetchSuppliers(),
+                      child: ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
+                        itemCount: filtered.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (_, index) => _SupplierTile(
+                          supplier: filtered[index],
+                          onTap: () => Navigator.push<void>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SupplierDetailScreen(
+                                supplierId: filtered[index].supplierId,
                               ),
                             ),
+                          ),
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),
