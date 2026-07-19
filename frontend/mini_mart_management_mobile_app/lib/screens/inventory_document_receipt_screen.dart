@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/inventory_document.dart';
 import 'package:mini_mart_management_mobile_app/models/receipt.dart';
+import 'package:mini_mart_management_mobile_app/models/receipt_editor_result.dart';
 import 'package:mini_mart_management_mobile_app/models/receipt_inventory_document_mapper.dart';
 import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
+import 'package:mini_mart_management_mobile_app/screens/create_inventory_receipt_screen.dart';
+import 'package:mini_mart_management_mobile_app/services/receipt_pdf_service.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/document_status_badge.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/receipt_action_bar.dart';
@@ -30,7 +33,7 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
     final canComplete = currentReceipt.receiptStatus == ReceiptStatus.pending;
 
     return Scaffold(
-      appBar: _buildAppBar(context),
+      appBar: _buildAppBar(context, currentReceipt),
       body: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -61,8 +64,7 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: ReceiptActionBar(
-        onExport: () => _showActionSnackBar(context, 'In / Xuất PDF'),
-        onShare: () => _showActionSnackBar(context, 'Chia sẻ chứng từ'),
+        onExport: () => _printReceipt(context, currentReceipt),
         onComplete: canComplete
             ? () => _completeReceipt(context, currentReceipt.receiptId)
             : null,
@@ -71,7 +73,7 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, Receipt receipt) {
     return AppBar(
       backgroundColor: AppColors.surfaceBright,
       foregroundColor: AppColors.primary,
@@ -82,6 +84,20 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
           fontWeight: FontWeight.w800,
         ),
       ),
+      actions: receipt.receiptStatus == ReceiptStatus.pending
+          ? [
+              IconButton(
+                onPressed: () => _editReceipt(context, receipt),
+                tooltip: 'Chỉnh sửa',
+                icon: const Icon(Icons.edit_outlined),
+              ),
+              IconButton(
+                onPressed: () => _cancelReceipt(context, receipt),
+                tooltip: 'Hủy phiếu',
+                icon: const Icon(Icons.cancel_outlined),
+              ),
+            ]
+          : null,
       centerTitle: true,
     );
   }
@@ -226,6 +242,79 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
         ? 'Đã hoàn thành chứng từ.'
         : provider.errorMessage ?? 'Không thể hoàn thành chứng từ.';
     _showActionSnackBar(context, message);
+  }
+
+  Future<void> _printReceipt(BuildContext context, Receipt receipt) async {
+    try {
+      await const ReceiptPdfService().printReceipt(receipt);
+    } catch (_) {
+      if (context.mounted) {
+        _showActionSnackBar(context, 'Không thể tạo PDF. Vui lòng thử lại.');
+      }
+    }
+  }
+
+  Future<void> _editReceipt(BuildContext context, Receipt receipt) async {
+    final result = await Navigator.of(context).push<ReceiptEditorResult>(
+      MaterialPageRoute<ReceiptEditorResult>(
+        builder: (_) => CreateInventoryReceiptScreen(receipt: receipt),
+      ),
+    );
+    if (!context.mounted ||
+        result?.updateReceipt == null ||
+        result?.receiptId == null)
+      return;
+
+    final updated = await context.read<ReceiptProvider>().updateReceipt(
+      result!.receiptId!,
+      result.updateReceipt!,
+    );
+    if (!context.mounted) return;
+    _showActionSnackBar(
+      context,
+      updated
+          ? 'Đã cập nhật chứng từ.'
+          : context.read<ReceiptProvider>().errorMessage ??
+                'Không thể cập nhật chứng từ.',
+    );
+  }
+
+  Future<void> _cancelReceipt(BuildContext context, Receipt receipt) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Hủy phiếu nhập?'),
+        content: Text(
+          'Phiếu ${receipt.receiptCode} sẽ bị hủy và không thể hoàn thành.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Quay lại'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Hủy phiếu'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final deleted = await context.read<ReceiptProvider>().deleteReceipt(
+      receipt.receiptId,
+    );
+    if (!context.mounted) return;
+    if (deleted) {
+      _showActionSnackBar(context, 'Đã hủy chứng từ.');
+      Navigator.of(context).pop();
+    } else {
+      _showActionSnackBar(
+        context,
+        context.read<ReceiptProvider>().errorMessage ??
+            'Không thể hủy chứng từ.',
+      );
+    }
   }
 
   void _showActionSnackBar(BuildContext context, String message) {

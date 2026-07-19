@@ -69,6 +69,31 @@ namespace MiniMart.Controllers
             return Ok(started);
         }
 
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "ManagerUp")]
+        public async Task<ActionResult<StockCountDetailDto>> CancelDraft(int id, [FromBody] StockCountTransitionDto transitionDto)
+        {
+            if (transitionDto == null || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var cancelled = await _stockCountService.CancelDraftAsync(id, transitionDto.RowVersion);
+            return Ok(cancelled);
+        }
+
+        [HttpPost("{id}/lines")]
+        public async Task<ActionResult<StockCountDetailDto>> AddLines(int id, [FromBody] AddStockCountLinesDto addDto)
+        {
+            if (addDto == null || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var updated = await _stockCountService.AddLinesAsync(id, addDto);
+            return Ok(updated);
+        }
+
         [HttpPut("{id}/lines")]
         public async Task<ActionResult<StockCountDetailDto>> UpdateLines(int id, [FromBody] UpdateStockCountLinesDto updateDto)
         {

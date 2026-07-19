@@ -39,4 +39,9 @@ Phase 6 validation (2026-07-15)
 - `dotnet build backend/MiniMart.sln --no-restore`, the stock-count in-memory harness, and `migrations has-pending-model-changes` passed. There are no exhaustive `ReferenceType` switches outside migration history; consumers assign enum values directly.
 - Auth-route verification requires normal authenticated test accounts; creating privileged JWTs directly from the signing secret is intentionally not used for verification.
 
-Updated: 2026-07-15
+Selected-product counts (2026-07-18)
+- `StockCountScope.Selected` creates a draft with no lines; `StockCountService.AddLinesAsync()` only permits active products while the document is Counting and snapshots current product stock.
+- `StockCountService.CreateAsync()` rejects new documents with HTTP 409 while any stock count is already `Counting`, preventing overlapping inventory-count sessions.
+- `20260718231706_AddStockCountLineUniqueness` enforces one product per stock-count document. Empty selected counts cannot submit.
+
+Updated: 2026-07-18

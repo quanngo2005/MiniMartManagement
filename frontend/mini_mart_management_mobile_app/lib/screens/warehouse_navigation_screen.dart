@@ -27,7 +27,9 @@ class _WarehouseNavigationScreenState extends State<WarehouseNavigationScreen> {
           // 0 — Tổng quan
           _buildOverview(),
           // 1 — Kho
-          const InventoryDocumentsScreen(),
+          InventoryDocumentsScreen(
+            onOpenStockCountHistory: () => setState(() => _selectedIndex = 2),
+          ),
           // 2 — Tồn kho / kiểm kê
           const StockCountHistoryScreen(),
           // 3 — Cá nhân

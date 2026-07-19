@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
+import 'package:mini_mart_management_mobile_app/models/receipt_editor_result.dart';
 import 'package:mini_mart_management_mobile_app/models/product_lookup.dart';
 import 'package:mini_mart_management_mobile_app/models/receipt.dart';
 import 'package:mini_mart_management_mobile_app/models/scanned_product.dart';
@@ -11,7 +12,9 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
 class CreateInventoryReceiptScreen extends StatefulWidget {
-  const CreateInventoryReceiptScreen({super.key});
+  const CreateInventoryReceiptScreen({this.receipt, super.key});
+
+  final Receipt? receipt;
 
   @override
   State<CreateInventoryReceiptScreen> createState() =>
@@ -29,13 +32,12 @@ class _CreateInventoryReceiptScreenState
   final List<_ReceiptProductDraft> _lines = [];
 
   Supplier? _selectedSupplier;
+  bool get _isEditing => widget.receipt != null;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<InventoryLookupProvider>().loadLookups();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadLookups());
   }
 
   @override
@@ -101,7 +103,7 @@ class _CreateInventoryReceiptScreenState
       backgroundColor: AppColors.surfaceBright,
       foregroundColor: AppColors.primary,
       title: Text(
-        'Tạo phiếu nhập',
+        _isEditing ? 'Chỉnh sửa phiếu nhập' : 'Tạo phiếu nhập',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: AppColors.primary,
           fontWeight: FontWeight.w800,
@@ -324,7 +326,7 @@ class _CreateInventoryReceiptScreenState
                 child: FilledButton.icon(
                   onPressed: () => _submit(context, currentUser),
                   icon: const Icon(Icons.check_rounded),
-                  label: const Text('Tạo phiếu'),
+                  label: Text(_isEditing ? 'Lưu thay đổi' : 'Tạo phiếu'),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.surfaceContainerLowest,
@@ -436,9 +438,37 @@ class _CreateInventoryReceiptScreenState
 
     final totalAmount = _totalAmount;
     final paidAmount = _readMoney(_paidAmountController.text);
-    final receipt = CreateReceipt(
-      receiptCode: '',
-      importDate: DateTime.now(),
+    final receipt = _buildReceipt(currentUser, totalAmount, paidAmount);
+    Navigator.of(context).pop(
+      _isEditing
+          ? ReceiptEditorResult.update(
+              widget.receipt!.receiptId,
+              UpdateReceipt(
+                receiptCode: widget.receipt!.receiptCode,
+                importDate: widget.receipt!.importDate,
+                totalAmount: receipt.totalAmount,
+                paidAmount: receipt.paidAmount,
+                debtAmount: receipt.debtAmount,
+                receiptStatus: ReceiptStatus.pending,
+                note: receipt.note,
+                supplierId: receipt.supplierId,
+                employeeId: receipt.employeeId,
+                batchLines: receipt.batchLines,
+              ),
+            )
+          : ReceiptEditorResult.create(receipt),
+    );
+  }
+
+  CreateReceipt _buildReceipt(
+    EmployeeUser? currentUser,
+    double totalAmount,
+    double paidAmount,
+  ) {
+    final existing = widget.receipt;
+    return CreateReceipt(
+      receiptCode: existing?.receiptCode ?? '',
+      importDate: existing?.importDate ?? DateTime.now(),
       totalAmount: totalAmount,
       paidAmount: paidAmount,
       debtAmount: (totalAmount - paidAmount).clamp(0, double.infinity),
@@ -447,11 +477,45 @@ class _CreateInventoryReceiptScreenState
           ? null
           : _noteController.text.trim(),
       supplierId: _selectedSupplier!.supplierId,
-      employeeId: currentUser.employeeId,
+      employeeId: existing?.employeeId ?? currentUser!.employeeId,
       batchLines: _lines.map((line) => line.toReceiptBatchLine()).toList(),
     );
+  }
 
-    Navigator.of(context).pop(receipt);
+  Future<void> _loadLookups() async {
+    final provider = context.read<InventoryLookupProvider>();
+    await provider.loadLookups();
+    if (!mounted || !_isEditing) return;
+    final receipt = widget.receipt!;
+    final matchingSuppliers = provider.suppliers
+        .where((item) => item.supplierId == receipt.supplierId)
+        .toList();
+    final supplier = matchingSuppliers.isEmpty ? null : matchingSuppliers.first;
+    final lines = receipt.batchLines.map((line) {
+      final matchingProducts = provider.products
+          .where((item) => item.productId == line.productId)
+          .toList();
+      final product = matchingProducts.isEmpty
+          ? ProductLookup(
+              productId: line.productId,
+              productCode: line.productCode,
+              barcode: '',
+              productName: line.productName,
+              sellingPrice: line.importPrice,
+              stockQuantity: 0,
+              status: true,
+            )
+          : matchingProducts.first;
+      return _ReceiptProductDraft.fromReceiptLine(product, line);
+    }).toList();
+    setState(() {
+      _selectedSupplier = supplier;
+      _supplierSearchController.text =
+          supplier?.supplierName ?? receipt.supplierName;
+      _paidAmountController.text = receipt.paidAmount.toString();
+      _noteController.text = receipt.note ?? '';
+      _lines.addAll(lines);
+    });
   }
 
   double get _totalAmount {
@@ -999,15 +1063,38 @@ class _InlineMessage extends StatelessWidget {
 }
 
 class _ReceiptProductDraft {
-  _ReceiptProductDraft(this.product)
-    : manufactureDate = DateTime.now(),
-      expiryDate = DateTime.now().add(const Duration(days: 180)),
-      importPriceController = TextEditingController(
-        text: product.sellingPrice.round().toString(),
-      );
+  _ReceiptProductDraft(
+    this.product, {
+    String? batchCode,
+    DateTime? manufactureDate,
+    DateTime? expiryDate,
+    double? importPrice,
+    int quantity = 1,
+  }) : batchCode =
+           batchCode ??
+           'LOT-${product.productCode}-${DateTime.now().millisecondsSinceEpoch}',
+       manufactureDate = manufactureDate ?? DateTime.now(),
+       expiryDate = expiryDate ?? DateTime.now().add(const Duration(days: 180)),
+       quantityController = TextEditingController(text: quantity.toString()),
+       importPriceController = TextEditingController(
+         text: (importPrice ?? product.sellingPrice).round().toString(),
+       );
+
+  factory _ReceiptProductDraft.fromReceiptLine(
+    ProductLookup product,
+    ReceiptBatchLineResponse line,
+  ) => _ReceiptProductDraft(
+    product,
+    batchCode: line.batchCode,
+    manufactureDate: line.manufactureDate,
+    expiryDate: line.expiryDate,
+    importPrice: line.importPrice,
+    quantity: line.quantity,
+  );
 
   final ProductLookup product;
-  final quantityController = TextEditingController(text: '1');
+  final String batchCode;
+  final TextEditingController quantityController;
   final TextEditingController importPriceController;
   DateTime manufactureDate;
   DateTime expiryDate;
@@ -1024,8 +1111,7 @@ class _ReceiptProductDraft {
     return ReceiptBatchLine(
       productId: product.productId,
       barcode: product.barcode,
-      batchCode:
-          'LOT-${product.productCode}-${DateTime.now().millisecondsSinceEpoch}',
+      batchCode: batchCode,
       manufactureDate: manufactureDate,
       expiryDate: expiryDate,
       importPrice: _CreateInventoryReceiptScreenState._readMoney(

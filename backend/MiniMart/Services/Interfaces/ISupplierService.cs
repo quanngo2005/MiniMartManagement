@@ -9,5 +9,7 @@ namespace MiniMart.Services.Interfaces
         Task<SupplierResponseDto> CreateAsync(SupplierCreateDto dto);
         Task<SupplierResponseDto> UpdateAsync(int id, SupplierUpdateDto dto);
         Task DeleteAsync(int id);
+        Task<IReadOnlyList<SupplierDebtSummaryDto>> GetDebtSummariesAsync();
+        Task<SupplierDebtDetailDto?> GetDebtDetailAsync(int supplierId);
     }
 }

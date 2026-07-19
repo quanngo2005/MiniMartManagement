@@ -46,4 +46,14 @@ class ReceiptRepository {
       throw const ApiException('Receipt response could not be read.');
     }
   }
+
+  Future<void> deleteReceipt(int id) async {
+    try {
+      await _receiptService.deleteReceipt(id);
+    } on ApiException {
+      rethrow;
+    } on FormatException {
+      throw const ApiException('Receipt response could not be read.');
+    }
+  }
 }
