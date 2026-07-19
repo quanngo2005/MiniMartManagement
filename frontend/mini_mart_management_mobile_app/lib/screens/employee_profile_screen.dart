@@ -8,6 +8,8 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_navigation_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_drawer.dart';
 import 'package:mini_mart_management_mobile_app/widgets/profile/profile_detail_row.dart';
 import 'package:provider/provider.dart';
 
@@ -17,11 +19,18 @@ class EmployeeProfileScreen extends StatefulWidget {
     this.appBar,
     this.bottomNavigationBar,
     this.backgroundColor = AppColors.surfaceContainerLow,
-  });
+  }) : cashierLayout = false;
+
+  const EmployeeProfileScreen.cashier({super.key})
+    : appBar = null,
+      bottomNavigationBar = null,
+      backgroundColor = AppColors.backgroundSlate,
+      cashierLayout = true;
 
   final PreferredSizeWidget? appBar;
   final Widget? bottomNavigationBar;
   final Color backgroundColor;
+  final bool cashierLayout;
 
   @override
   State<EmployeeProfileScreen> createState() => _EmployeeProfileScreenState();
@@ -107,9 +116,13 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
 
     return Scaffold(
       backgroundColor: widget.backgroundColor,
-      appBar:
-          widget.appBar ??
-          const MiniMartAppBar.secondary(title: 'Hồ sơ & Cài đặt'),
+      drawer: widget.cashierLayout
+          ? const CashierDrawer(selectedTab: CashierNavTab.profile)
+          : null,
+      appBar: widget.cashierLayout
+          ? const MiniMartAppBar.primary(title: 'Cá nhân', showMenu: true)
+          : widget.appBar ??
+                const MiniMartAppBar.secondary(title: 'Hồ sơ & Cài đặt'),
       body: SafeArea(
         child: authProvider.isLoading && user == null
             ? const LoadingOverlay()
@@ -119,7 +132,9 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
             ? const Center(child: Text('Không tìm thấy thông tin nhân viên.'))
             : _buildBody(context, user),
       ),
-      bottomNavigationBar: widget.bottomNavigationBar,
+      bottomNavigationBar: widget.cashierLayout
+          ? const CashierBottomNavigationBar(selectedTab: CashierNavTab.profile)
+          : widget.bottomNavigationBar,
     );
   }
 

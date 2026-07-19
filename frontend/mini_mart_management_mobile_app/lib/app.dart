@@ -10,6 +10,7 @@ import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart
 import 'package:mini_mart_management_mobile_app/providers/supplier_debt_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/stock_count_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/order_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/e_invoice_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/report_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/product_provider.dart';
@@ -122,6 +123,9 @@ class MiniMartManagementApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => TierProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         Provider<OrderRepository>(create: (_) => OrderRepository()),
+        ChangeNotifierProvider(
+          create: (context) => OrderProvider(context.read<OrderRepository>()),
+        ),
         ChangeNotifierProvider(
           create: (_) =>
               SupplierProvider(SupplierRepository(SupplierService())),

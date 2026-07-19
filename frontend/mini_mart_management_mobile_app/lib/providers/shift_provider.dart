@@ -64,6 +64,27 @@ class ShiftProvider extends ChangeNotifier {
 
     try {
       final now = DateTime.now();
+      final shifts = await _shiftRepository.getAllShifts();
+      final assignedShift = shifts.cast<Shift?>().firstWhere(
+        (shift) =>
+            shift != null &&
+            shift.status == 1 &&
+            shift.employeeId == cashierId &&
+            _isSameDay(shift.workDate, now) &&
+            _shiftTypeFromStartTime(shift.startTime) == shiftType,
+        orElse: () => null,
+      );
+
+      if (assignedShift != null) {
+        _currentShift = await _shiftRepository.openShift(
+          shiftId: assignedShift.shiftId,
+          cashierId: cashierId,
+          startCash: startCash,
+          note: note,
+        );
+        return true;
+      }
+
       final dateStr =
           '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
 
@@ -144,6 +165,18 @@ class ShiftProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  bool _isSameDay(DateTime left, DateTime right) {
+    return left.year == right.year &&
+        left.month == right.month &&
+        left.day == right.day;
+  }
+
+  int _shiftTypeFromStartTime(DateTime startTime) {
+    if (startTime.hour >= 6 && startTime.hour < 11) return 0;
+    if (startTime.hour >= 11 && startTime.hour < 16) return 1;
+    return 2;
   }
 
   Future<bool> openShift({

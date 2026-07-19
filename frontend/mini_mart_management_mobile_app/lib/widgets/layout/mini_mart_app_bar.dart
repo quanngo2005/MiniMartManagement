@@ -10,6 +10,7 @@ class MiniMartAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.onBrandTap,
     this.onProfileTap,
+    this.showMenu = false,
     super.key,
   }) : type = MiniMartAppBarType.primary,
        onBack = null,
@@ -20,6 +21,7 @@ class MiniMartAppBar extends StatelessWidget implements PreferredSizeWidget {
     : type = MiniMartAppBarType.secondary,
       onBrandTap = null,
       onProfileTap = null,
+      showMenu = false,
       isTorchOn = null,
       onToggleTorch = null;
 
@@ -31,13 +33,15 @@ class MiniMartAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
   }) : type = MiniMartAppBarType.scanner,
        onBrandTap = null,
-       onProfileTap = null;
+       onProfileTap = null,
+       showMenu = false;
 
   final String title;
   final MiniMartAppBarType type;
   final VoidCallback? onBrandTap;
   final VoidCallback? onProfileTap;
   final VoidCallback? onBack;
+  final bool showMenu;
   final bool? isTorchOn;
   final VoidCallback? onToggleTorch;
 
@@ -84,6 +88,13 @@ class MiniMartAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _buildLeading(BuildContext context) {
     if (type == MiniMartAppBarType.primary) {
+      if (showMenu) {
+        return IconButton(
+          onPressed: () => Scaffold.of(context).openDrawer(),
+          tooltip: 'Mở menu',
+          icon: const Icon(Icons.menu_rounded, color: AppColors.primary),
+        );
+      }
       return InkWell(
         onTap: onBrandTap,
         borderRadius: BorderRadius.circular(8),
@@ -131,6 +142,9 @@ class MiniMartAppBar extends StatelessWidget implements PreferredSizeWidget {
       );
     }
     if (type == MiniMartAppBarType.secondary) {
+      return const SizedBox.square(dimension: 48);
+    }
+    if (showMenu && onProfileTap == null) {
       return const SizedBox.square(dimension: 48);
     }
 
