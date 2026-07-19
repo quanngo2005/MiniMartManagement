@@ -10,6 +10,7 @@ enum ManagerNavDestination {
   productPerformance,
   inventoryDocuments,
   inventoryTransactions,
+  batches,
   staffPerformance,
   staff,
   customers,
@@ -107,6 +108,14 @@ class ManagerDrawer extends StatelessWidget {
                       context,
                       ManagerNavDestination.inventoryTransactions,
                     ),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.inventory_outlined,
+                    activeIcon: Icons.inventory_rounded,
+                    label: 'Trạng thái lô hàng',
+                    destination: ManagerNavDestination.batches,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.batches),
                   ),
                   const _DrawerSectionLabel('Nhân sự & Khách hàng'),
                   _DrawerTile(

@@ -17,8 +17,11 @@ class BarcodeScannerScreen extends StatefulWidget {
   State<BarcodeScannerScreen> createState() => _BarcodeScannerScreenState();
 }
 
-class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
-  final MobileScannerController _scannerController = MobileScannerController();
+class _BarcodeScannerScreenState extends State<BarcodeScannerScreen>
+    with WidgetsBindingObserver {
+  final MobileScannerController _scannerController = MobileScannerController(
+    autoZoom: true,
+  );
   final TextEditingController _manualController = TextEditingController();
   final FocusNode _manualFocusNode = FocusNode();
   final Map<String, _ScannedEntry> _scannedItems = {};
@@ -31,7 +34,14 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
       _scannedItems.values.fold(0, (sum, e) => sum + e.quantity);
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scannerController.dispose();
     _manualController.dispose();
     _manualFocusNode.dispose();
@@ -53,9 +63,8 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
 
-    final product = await context
-        .read<InventoryLookupProvider>()
-        .fetchProductByBarcode(rawValue);
+    final provider = context.read<InventoryLookupProvider>();
+    final product = await provider.fetchProductByBarcode(rawValue);
 
     if (!mounted) return;
 
@@ -65,9 +74,26 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     } else {
       HapticFeedback.heavyImpact();
       setState(() {
-        _errorMessage = 'Không tìm thấy sản phẩm với mã vạch "$rawValue"';
+        _errorMessage =
+            provider.errorMessage ??
+            'Không tìm thấy sản phẩm với mã vạch "$rawValue"';
         _isProcessing = false;
       });
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _scannerController.start();
+        return;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        _scannerController.stop();
+        return;
     }
   }
 
@@ -163,6 +189,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         children: [
           MobileScanner(
             controller: _scannerController,
+            errorBuilder: (context, error) => _buildCameraError(error),
             onDetect: (capture) {
               final barcode = capture.barcodes.firstOrNull;
               if (barcode?.rawValue != null && !_isProcessing) {
@@ -179,6 +206,44 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCameraError(MobileScannerException error) {
+    final isPermissionError =
+        error.errorCode == MobileScannerErrorCode.permissionDenied;
+
+    return ColoredBox(
+      color: Colors.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.camera_alt_outlined,
+                color: Colors.white,
+                size: 36,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                isPermissionError
+                    ? 'Chưa được cấp quyền dùng camera.'
+                    : 'Không thể khởi động camera để quét mã vạch.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: _scannerController.start,
+                style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
+                child: const Text('Thử lại'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

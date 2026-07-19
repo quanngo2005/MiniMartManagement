@@ -4,6 +4,7 @@ import 'package:mini_mart_management_mobile_app/providers/order_return_provider.
 import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/batch_status_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart';
@@ -60,13 +61,14 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.productPerformance: 2,
     ManagerNavDestination.inventoryDocuments: 3,
     ManagerNavDestination.inventoryTransactions: 4,
-    ManagerNavDestination.staffPerformance: 5,
-    ManagerNavDestination.staff: 6,
-    ManagerNavDestination.customers: 7,
-    ManagerNavDestination.promotions: 8,
-    ManagerNavDestination.invoices: 9,
-    ManagerNavDestination.analyze: 10,
-    ManagerNavDestination.returns: 11,
+    ManagerNavDestination.batches: 5,
+    ManagerNavDestination.staffPerformance: 6,
+    ManagerNavDestination.staff: 7,
+    ManagerNavDestination.customers: 8,
+    ManagerNavDestination.promotions: 9,
+    ManagerNavDestination.invoices: 10,
+    ManagerNavDestination.analyze: 11,
+    ManagerNavDestination.returns: 12,
   };
 
   static const _bottomNavDestinations = [
@@ -113,6 +115,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
+          BatchStatusScreen(onMenuTap: _openDrawer),
           EmployeePerformanceScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,

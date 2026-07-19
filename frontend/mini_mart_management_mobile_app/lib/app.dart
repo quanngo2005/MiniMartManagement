@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/batch_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/inventory_lookup_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/customer_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/inventory_provider.dart';
@@ -12,6 +13,7 @@ import 'package:mini_mart_management_mobile_app/providers/e_invoice_provider.dar
 import 'package:mini_mart_management_mobile_app/providers/report_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/product_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/auth_repository.dart';
+import 'package:mini_mart_management_mobile_app/repositories/batch_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/product_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/inventory_lookup_repository.dart';
 import 'package:mini_mart_management_mobile_app/repositories/inventory_repository.dart';
@@ -28,6 +30,7 @@ import 'package:mini_mart_management_mobile_app/screens/employee_performance_scr
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/settings_screen.dart';
 import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
+import 'package:mini_mart_management_mobile_app/services/batch_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_lookup_service.dart';
 import 'package:mini_mart_management_mobile_app/services/inventory_service.dart';
 import 'package:mini_mart_management_mobile_app/services/order_return_service.dart';
@@ -67,6 +70,9 @@ class MiniMartManagementApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => AuthProvider(AuthRepository(AuthService())),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => BatchProvider(BatchRepository(BatchService())),
         ),
         ChangeNotifierProvider(
           create: (_) =>
