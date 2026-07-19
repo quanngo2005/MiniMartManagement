@@ -2,38 +2,29 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
-import 'package:mini_mart_management_mobile_app/models/product.dart';
+import 'package:mini_mart_management_mobile_app/models/category.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
-class ProductService {
-  ProductService({http.Client? client})
+class CategoryService {
+  CategoryService({http.Client? client})
       : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
 
-  Future<List<Product>> getAll() async {
-    final r = await _client.get(
-      ApiConfig.uri('/api/products'),
+  Future<List<Category>> getAll() async {
+    final response = await _client.get(
+      ApiConfig.uri('/api/categories'),
       headers: const {'Accept': 'application/json'},
     );
-    if (r.body.isEmpty) return [];
-    final decoded = jsonDecode(r.body);
-    List<dynamic> list;
-    if (decoded is List) {
-      list = decoded;
-    } else if (decoded is Map<String, dynamic>) {
-      final v = decoded['value'] ?? decoded['Value'] ?? decoded['data'] ?? decoded['Data'];
-      list = v is List ? v : [];
-    } else {
-      return [];
-    }
-    return list.whereType<Map<String, dynamic>>().map(Product.fromJson).toList();
+    final decoded = response.body.isEmpty ? [] : jsonDecode(response.body);
+    final data = decoded is List ? decoded : (decoded['data'] ?? decoded['Data'] ?? []);
+    return (data as List).whereType<Map<String, dynamic>>().map(Category.fromJson).toList();
   }
 
-  Future<Product> create(Map<String, dynamic> data) async {
+  Future<Category> create(Map<String, dynamic> data) async {
     final csrf = await _fetchCsrf();
-    final r = await _client.post(
-      ApiConfig.uri('/api/products'),
+    final response = await _client.post(
+      ApiConfig.uri('/api/categories'),
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -41,19 +32,19 @@ class ProductService {
       },
       body: jsonEncode(data),
     );
-    final json = _decodeMap(r.body);
-    if (r.statusCode >= 400) {
+    final json = _decodeMap(response.body);
+    if (response.statusCode >= 400) {
       throw ApiException(
-        json['message'] ?? json['Message'] ?? 'Lỗi tạo sản phẩm.',
+        json['message'] ?? json['Message'] ?? 'Tạo danh mục thất bại.',
       );
     }
-    return Product.fromJson(json);
+    return Category.fromJson(json);
   }
 
-  Future<Product> update(int id, Map<String, dynamic> data) async {
+  Future<Category> update(int id, Map<String, dynamic> data) async {
     final csrf = await _fetchCsrf();
-    final r = await _client.put(
-      ApiConfig.uri('/api/products/$id'),
+    final response = await _client.put(
+      ApiConfig.uri('/api/categories/$id'),
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -61,13 +52,30 @@ class ProductService {
       },
       body: jsonEncode(data),
     );
-    final json = _decodeMap(r.body);
-    if (r.statusCode >= 400) {
+    final json = _decodeMap(response.body);
+    if (response.statusCode >= 400) {
       throw ApiException(
-        json['message'] ?? json['Message'] ?? 'Lỗi cập nhật sản phẩm.',
+        json['message'] ?? json['Message'] ?? 'Cập nhật danh mục thất bại.',
       );
     }
-    return Product.fromJson(json);
+    return Category.fromJson(json);
+  }
+
+  Future<void> delete(int id) async {
+    final csrf = await _fetchCsrf();
+    final response = await _client.delete(
+      ApiConfig.uri('/api/categories/$id'),
+      headers: {
+        'Accept': 'application/json',
+        'X-XSRF-TOKEN': csrf,
+      },
+    );
+    if (response.statusCode != 204) {
+      final json = _decodeMap(response.body);
+      throw ApiException(
+        json['message'] ?? json['Message'] ?? 'Xóa danh mục thất bại.',
+      );
+    }
   }
 
   Future<String> _fetchCsrf() async {

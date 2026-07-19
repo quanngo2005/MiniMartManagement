@@ -324,7 +324,7 @@ namespace MiniMart.Services.Implementations
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
                 .Include(o => o.Customer)
-                .FirstOrDefaultAsync(o => o.OrderCode == orderCode);
+                .FirstOrDefaultAsync(o => o.OrderCode.ToLower().Contains(orderCode.ToLower()));
 
             if (order == null) return null;
 

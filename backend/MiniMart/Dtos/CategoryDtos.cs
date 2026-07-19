@@ -6,11 +6,11 @@ namespace MiniMart.DTOs
         public string CategoryCode { get; set; } = string.Empty;
         public string CategoryName { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public string? ImageUrl { get; set; }
         public bool Status { get; set; }
         public int DisplayOrder { get; set; }
         public int? ParentCategoryId { get; set; }
         public int TaxRateId { get; set; }
+        public string? ParentCategoryName { get; set; }
     }
 
     public class CreateCategoryDto
@@ -18,8 +18,6 @@ namespace MiniMart.DTOs
         public string CategoryCode { get; set; } = string.Empty;
         public string CategoryName { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public string? ImageUrl { get; set; }
-        public bool Status { get; set; }
         public int DisplayOrder { get; set; }
         public int? ParentCategoryId { get; set; }
         public int TaxRateId { get; set; }
@@ -30,10 +28,9 @@ namespace MiniMart.DTOs
         public string CategoryCode { get; set; } = string.Empty;
         public string CategoryName { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public string? ImageUrl { get; set; }
-        public bool Status { get; set; }
         public int DisplayOrder { get; set; }
         public int? ParentCategoryId { get; set; }
         public int TaxRateId { get; set; }
+        public bool Status { get; set; }
     }
 }
