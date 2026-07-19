@@ -16,6 +16,7 @@ import 'package:mini_mart_management_mobile_app/screens/manager_return_list_scre
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/product_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/supplier_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_bottom_navigation_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_drawer.dart';
@@ -64,14 +65,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.inventoryTransactions: 4,
     ManagerNavDestination.staffPerformance: 5,
     ManagerNavDestination.staff: 6,
-    ManagerNavDestination.customers: 7,
-    ManagerNavDestination.promotions: 8,
-    ManagerNavDestination.invoices: 9,
-    ManagerNavDestination.analyze: 10,
-    ManagerNavDestination.categories: 11,
-    ManagerNavDestination.batches: 5,
-    ManagerNavDestination.staffPerformance: 6,
-    ManagerNavDestination.staff: 7,
+    ManagerNavDestination.suppliers: 7,
     ManagerNavDestination.customers: 8,
     ManagerNavDestination.promotions: 9,
     ManagerNavDestination.invoices: 10,
@@ -134,6 +128,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
+          const SupplierManagementScreen(showBottomNavBar: false),
           MemberManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,

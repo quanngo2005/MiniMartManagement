@@ -5,6 +5,7 @@ import 'package:mini_mart_management_mobile_app/models/daily_revenue.dart';
 import 'package:mini_mart_management_mobile_app/models/hourly_revenue.dart';
 import 'package:mini_mart_management_mobile_app/models/inventory_status.dart';
 import 'package:mini_mart_management_mobile_app/models/monthly_financial_report.dart';
+import 'package:mini_mart_management_mobile_app/models/revenue_summary.dart';
 import 'package:mini_mart_management_mobile_app/models/supplier_debt.dart';
 import 'package:mini_mart_management_mobile_app/models/top_product.dart';
 import 'package:mini_mart_management_mobile_app/repositories/report_repository.dart';
@@ -21,6 +22,7 @@ class ReportProvider with ChangeNotifier {
   List<InventoryStatus> _lowStockAlerts = [];
   List<SupplierDebt> _supplierDebt = [];
   MonthlyFinancialReport? _monthlyFinancialReport;
+  RevenueSummary? _revenueSummary;
 
   bool _isLoading = false;
   String? _error;
@@ -32,6 +34,7 @@ class ReportProvider with ChangeNotifier {
   List<InventoryStatus> get lowStockAlerts => _lowStockAlerts;
   List<SupplierDebt> get supplierDebt => _supplierDebt;
   MonthlyFinancialReport? get monthlyFinancialReport => _monthlyFinancialReport;
+  RevenueSummary? get revenueSummary => _revenueSummary;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -116,6 +119,29 @@ class ReportProvider with ChangeNotifier {
       _error = e.message;
     } catch (_) {
       _error = 'Đã xảy ra lỗi khi tải báo cáo tài chính tháng.';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchRevenueSummary({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _revenueSummary = await _reportRepository.getRevenueSummary(
+        startDate: startDate,
+        endDate: endDate,
+      );
+    } on ApiException catch (e) {
+      _error = e.message;
+    } catch (_) {
+      _error = 'Đã xảy ra lỗi khi tải tổng quan doanh thu.';
     } finally {
       _isLoading = false;
       notifyListeners();
