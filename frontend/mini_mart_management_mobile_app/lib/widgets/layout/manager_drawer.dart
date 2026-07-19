@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_profile_screen.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
@@ -17,7 +18,7 @@ enum ManagerNavDestination {
   promotions,
   analyze,
   invoices,
-  returns,
+  categories,
 }
 
 class ManagerDrawer extends StatelessWidget {
@@ -162,33 +163,14 @@ class ManagerDrawer extends StatelessWidget {
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.invoices),
                   ),
+                  const _DrawerSectionLabel('Cài đặt'),
                   _DrawerTile(
-                    icon: Icons.assignment_return_outlined,
-                    activeIcon: Icons.assignment_return_rounded,
-                    label: 'Phê duyệt trả hàng',
-                    destination: ManagerNavDestination.returns,
+                    icon: Icons.category_outlined,
+                    activeIcon: Icons.category_rounded,
+                    label: 'Danh mục sản phẩm',
+                    destination: ManagerNavDestination.categories,
                     selected: selected,
-                    onTap: _select(context, ManagerNavDestination.returns),
-                    trailing: pendingCount > 0
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.statusError,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              '$pendingCount',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                        : null,
+                    onTap: _select(context, ManagerNavDestination.categories),
                   ),
                 ],
               ),
@@ -265,7 +247,15 @@ class ManagerDrawer extends StatelessWidget {
             context,
           ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
         ),
-        onTap: () => Navigator.pop(context),
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push<void>(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => const EmployeeProfileScreen(),
+            ),
+          );
+        },
       ),
     );
   }

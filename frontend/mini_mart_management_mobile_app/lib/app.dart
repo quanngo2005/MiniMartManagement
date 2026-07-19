@@ -31,6 +31,7 @@ import 'package:mini_mart_management_mobile_app/screens/category_management_scre
 import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_profile_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/settings_screen.dart';
 import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
 import 'package:mini_mart_management_mobile_app/services/batch_service.dart';
@@ -152,7 +153,7 @@ class MiniMartManagementApp extends StatelessWidget {
           '/promotions': (_) => const PromotionManagementScreen(),
           '/categories': (_) => const CategoryManagementScreen(),
           '/returns': (_) => const CashierReturnScreen(),
-          '/settings': (_) => const SettingsScreen(),
+          '/settings': (_) => const EmployeeProfileScreen(),
         },
       ),
     );

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .expiry-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+            gap: 12px;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-subtle { animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#6cf8bb",
+                        "tertiary-fixed": "#ffdcbe",
+                        "primary": "#000f22",
+                        "surface-container": "#efedf0",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#6ffbbe",
+                        "background-slate": "#F8FAFC",
+                        "surface-dim": "#dbd9dc",
+                        "outline-variant": "#c4c6ce",
+                        "status-warning": "#F59E0B",
+                        "inverse-primary": "#b0c8eb",
+                        "on-tertiary": "#ffffff",
+                        "background": "#faf9fb",
+                        "secondary": "#006c49",
+                        "tertiary-container": "#381d00",
+                        "surface-container-high": "#e9e8ea",
+                        "surface-bright": "#faf9fb",
+                        "surface": "#faf9fb",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001c37",
+                        "on-secondary-fixed-variant": "#005236",
+                        "primary-container": "#0a2540",
+                        "inverse-surface": "#2f3033",
+                        "surface-container-highest": "#e3e2e5",
+                        "on-tertiary-fixed": "#2d1600",
+                        "inverse-on-surface": "#f2f0f3",
+                        "on-tertiary-container": "#ae835a",
+                        "primary-fixed": "#d2e4ff",
+                        "surface-tint": "#49607e",
+                        "outline": "#74777e",
+                        "on-tertiary-fixed-variant": "#613f1c",
+                        "status-error": "#EF4444",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#314865",
+                        "surface-container-lowest": "#ffffff",
+                        "text-muted": "#64748B",
+                        "on-surface-variant": "#43474d",
+                        "border-gray": "#E2E8F0",
+                        "surface-container-low": "#f5f3f6",
+                        "on-error-container": "#93000a",
+                        "on-background": "#1b1c1e",
+                        "tertiary": "#1a0b00",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e3e2e5",
+                        "primary-fixed-dim": "#b0c8eb",
+                        "on-secondary-container": "#00714d",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#768dad",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-secondary-fixed": "#002113",
+                        "text-dark": "#334155",
+                        "tertiary-fixed-dim": "#eebd90",
+                        "on-surface": "#1b1c1e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target": "48px",
+                        "gutter": "12px",
+                        "safe-area": "16px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "metadata": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "data-tabular": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-slate text-on-background font-body-md min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface-bright dark:bg-surface-container-highest w-full top-0 sticky z-50 border-b border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch-target">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">storefront</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Cửa hàng #402 | Quản lý HSD</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">account_circle</span>
+</div>
+</header>
+<main class="px-safe-area pt-stack-md space-y-gutter">
+<!-- Summary Dashboard (High Density Pattern) -->
+<div class="grid grid-cols-2 gap-stack-sm">
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-3 flex flex-col justify-between h-24">
+<div class="flex items-center gap-2 text-status-error">
+<span class="material-symbols-outlined text-sm">emergency</span>
+<span class="font-metadata text-metadata">Hết hạn trong < 7 ngày</span>
+</div>
+<div class="flex items-end justify-between">
+<span class="font-headline-lg text-headline-lg">12</span>
+<div class="w-12 h-6 bg-error-container/20 rounded-full flex items-center justify-center">
+<span class="text-error font-metadata text-xs">+3</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-3 flex flex-col justify-between h-24">
+<div class="flex items-center gap-2 text-status-warning">
+<span class="material-symbols-outlined text-sm">warning</span>
+<span class="font-metadata text-metadata">Cần lưu ý (< 30 ngày)</span>
+</div>
+<div class="flex items-end justify-between">
+<span class="font-headline-lg text-headline-lg">45</span>
+<div class="w-12 h-6 bg-status-warning/10 rounded-full flex items-center justify-center">
+<span class="text-status-warning font-metadata text-xs">-2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Filter/Search Bar -->
+<div class="relative">
+<input class="w-full h-touch-target pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Tìm kiếm SKU hoặc tên sản phẩm..." type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+</div>
+<!-- Section Title -->
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-primary">Danh sách sản phẩm</h2>
+<button class="text-primary font-metadata flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                Lọc theo tầng
+            </button>
+</div>
+<!-- Expiry List -->
+<div class="expiry-card-grid">
+<!-- Product Card 1: Critical State -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-3 shadow-sm flex flex-col gap-3">
+<div class="flex gap-3">
+<div class="w-20 h-20 bg-surface-container-high rounded-lg flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up shot of a carton of fresh whole milk, professionally lit in a commercial retail product photography style. The packaging shows vibrant branding with a high-contrast deep blue and white theme. The background is a clean, neutral industrial grey tile typical of a high-end supermarket shelf. Soft studio lighting highlights the condensation on the surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIqlRyo6LjDe9I4Mb2PcbBuIS_aedcNitk8fi_5EsPnyxWfo38EmxNHLAW2-fv8msvwvF6VQpqtmycyd5AM71JlMxQ_9vxV9jqwKj8U_Q1SlTJqK5_SrgbOmQJr_-8q8OzrBcmvQpmep7_FUZgm6ByiLZwkJ_vrnrQ-gk4-uLO3fwXJgwr3p7FxFiX0Xxf5wip52x4ELinhVSrSoTTMNYGD7fLHCSu3hMOsr2muwUDgwnOvwPmGtw2a2nakxyBE5rAT8bXmxHJRbN8"/>
+</div>
+<div class="flex-1 flex flex-col justify-between min-w-0">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-sm truncate pr-2">Sữa Tươi Tiệt Trùng Vinamilk 1L</h3>
+<span class="bg-error text-on-error px-2 py-0.5 rounded-full font-metadata text-[10px] animate-pulse-subtle">CÒN 3 NGÀY</span>
+</div>
+<p class="font-data-tabular text-metadata text-text-muted mt-0.5">SKU: VN-M-4029-X</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-outline">inventory_2</span>
+<span class="font-data-tabular text-body-md font-bold">14</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-outline">calendar_month</span>
+<span class="font-data-tabular text-body-md">24/11/2024</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 h-touch-target bg-primary text-on-primary rounded-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">sell</span>
+                        Giảm giá
+                    </button>
+<button class="flex-1 h-touch-target border border-primary text-primary rounded-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">delete</span>
+                        Hủy kệ
+                    </button>
+</div>
+</div>
+<!-- Product Card 2: Warning State -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-3 shadow-sm flex flex-col gap-3">
+<div class="flex gap-3">
+<div class="w-20 h-20 bg-surface-container-high rounded-lg flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A pack of sliced premium cheddar cheese in a clear plastic vacuum-sealed container. The lighting is crisp and utilitarian, showcasing the rich golden-yellow color of the cheese slices. The background consists of a blurred refrigerated store aisle with blue and white accents. Sharp focus on the product label which indicates professional retail standards." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVZiGEp3B66flRbxGSct3yNNoS1LMrCMPmXyTt6CKwNBkv-DdM49o3ClsYu1ASGLOTGU2o0vcOU-yBXmvdEyO1zpV9epRXfsxdZhrtWmORKuAe0SP27uWmoVjpcblqp6Ei8-vwUiKMURlYenoHfx0_HnYFKkmFBEJBd8oXUK8kaz-y-0q9CibJVCdTLRlZqoGY5sEitidNaNhqY3U195XqEtSS-1WszXiCQWHHrUWltRVajWv2kXN7FPI8TgxWfdqR2O90vOleI1zb"/>
+</div>
+<div class="flex-1 flex flex-col justify-between min-w-0">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-sm truncate pr-2">Phô Mai Lát Cheddar Anchor 200g</h3>
+<span class="bg-status-warning text-primary px-2 py-0.5 rounded-full font-metadata text-[10px]">CÒN 18 NGÀY</span>
+</div>
+<p class="font-data-tabular text-metadata text-text-muted mt-0.5">SKU: AN-C-1122-A</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-outline">inventory_2</span>
+<span class="font-data-tabular text-body-md font-bold">42</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-outline">calendar_month</span>
+<span class="font-data-tabular text-body-md">09/12/2024</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 h-touch-target bg-primary text-on-primary rounded-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">sell</span>
+                        Giảm giá
+                    </button>
+<button class="flex-1 h-touch-target border border-primary text-primary rounded-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">delete</span>
+                        Hủy kệ
+                    </button>
+</div>
+</div>
+<!-- Product Card 3: Warning State -->
+<div class="bg-surface-container-lowest border border-border-gray rounded-xl p-3 shadow-sm flex flex-col gap-3">
+<div class="flex gap-3">
+<div class="w-20 h-20 bg-surface-container-high rounded-lg flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A jar of dark chocolate hazelnut spread, viewed from a three-quarter angle. The jar is made of smooth glass with a dark brown lid. The label is modern and minimal with deep blue and white typography. Lighting is industrial yet clean, highlighting the smooth texture of the jar's surface. The setting is a warehouse-style supermarket shelf." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBooSZiQiZYC63mDJIjZdaGim8EcgUOI1q-gaMVMkgF-sMTtCwoNIYgNtWFVhrby5N2NrQ3sFm9I7CPJAMTneZzb5pbq2ijuKv_fUgIP4thtUgPttd4Hp-85cto4OxrKpICdaTz_KWFWkEPay_P9ngjCXqYv1AWIKq64O71I_x053OJEaW9_OWgV8LaZ_SPk8Z3_7JNFN7UDgHw3St3xrfi6RgIn6JUTQ09VbFpDoXFjHTn7q6-B5nlzdhUob9ZHsOibYe6XW-K4407"/>
+</div>
+<div class="flex-1 flex flex-col justify-between min-w-0">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-sm truncate pr-2">Bơ Hạt Phỉ Socola Ferrero 350g</h3>
+<span class="bg-status-warning text-primary px-2 py-0.5 rounded-full font-metadata text-[10px]">CÒN 25 NGÀY</span>
+</div>
+<p class="font-data-tabular text-metadata text-text-muted mt-0.5">SKU: FR-S-9931-B</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-outline">inventory_2</span>
+<span class="font-data-tabular text-body-md font-bold">8</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-outline">calendar_month</span>
+<span class="font-data-tabular text-body-md">16/12/2024</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 h-touch-target bg-primary text-on-primary rounded-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">sell</span>
+                        Giảm giá
+                    </button>
+<button class="flex-1 h-touch-target border border-primary text-primary rounded-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">delete</span>
+                        Hủy kệ
+                    </button>
+</div>
+</div>
+</div>
+<!-- FAB: Scanner -->
+<button class="fixed right-safe-area bottom-24 w-14 h-14 bg-secondary-container text-on-secondary-container rounded-2xl shadow-xl flex items-center justify-center z-[60] active:scale-90 transition-transform border-2 border-secondary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">barcode_scanner</span>
+</button>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 h-touch-target bg-surface-container-lowest dark:bg-primary-container border-t border-outline-variant dark:border-outline shadow-sm flex justify-around items-center px-safe-area pb-safe">
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant px-4 py-1 transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined">point_of_sale</span>
+<span class="font-metadata text-metadata">Checkout</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant px-4 py-1 transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-metadata text-metadata">Kho</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-4 py-1 transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment_return</span>
+<span class="font-metadata text-metadata">Trả hàng</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant px-4 py-1 transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-metadata text-metadata">Cài đặt</span>
+</a>
+</nav>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Visual feedback only for this prototype
+                const originalContent = this.innerHTML;
+                if (this.innerText.includes('Giảm giá') || this.innerText.includes('Hủy kệ')) {
+                    this.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span>';
+                    setTimeout(() => {
+                        this.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Xong';
+                        this.classList.remove('bg-primary');
+                        this.classList.add('bg-secondary');
+                    }, 800);
+                }
+            });
+        });
+    </script>
+</body></html>

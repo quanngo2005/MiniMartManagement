@@ -9,7 +9,8 @@ namespace MiniMart.Repositories.RepoInterface
         Task<Category> CreateAsync(Category category);
         Task<Category?> UpdateAsync(Category category);
         Task<bool> DeleteAsync(int id);
+        Task<bool> HasProductsAsync(int categoryId);
         Task<bool> CategoryCodeExistsAsync(string categoryCode, int? excludeId = null);
-        Task<bool> CategoryExistsAsync(int categoryId);
+        Task<bool> TaxRateExistsAsync(int taxRateId);
     }
 }

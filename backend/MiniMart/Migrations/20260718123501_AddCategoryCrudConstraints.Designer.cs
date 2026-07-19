@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniMart.Data;
 
@@ -11,9 +12,11 @@ using MiniMart.Data;
 namespace MiniMart.Migrations
 {
     [DbContext(typeof(MiniMartDbContext))]
-    partial class MiniMartDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260718123501_AddCategoryCrudConstraints")]
+    partial class AddCategoryCrudConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -402,7 +405,7 @@ namespace MiniMart.Migrations
                             Description = "Thực phẩm và đồ uống các loại",
                             DisplayOrder = 1,
                             Status = true,
-                            TaxRateId = 3
+                            TaxRateId = 4
                         },
                         new
                         {
@@ -412,7 +415,7 @@ namespace MiniMart.Migrations
                             Description = "Sản phẩm vệ sinh và chăm sóc cá nhân",
                             DisplayOrder = 2,
                             Status = true,
-                            TaxRateId = 2
+                            TaxRateId = 4
                         },
                         new
                         {
@@ -422,7 +425,7 @@ namespace MiniMart.Migrations
                             Description = "Đồ dùng gia đình",
                             DisplayOrder = 3,
                             Status = true,
-                            TaxRateId = 1
+                            TaxRateId = 4
                         },
                         new
                         {
@@ -433,7 +436,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 1,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 3
+                            TaxRateId = 4
                         },
                         new
                         {
@@ -444,7 +447,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 2,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 3
+                            TaxRateId = 4
                         },
                         new
                         {
@@ -455,7 +458,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 3,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 3
+                            TaxRateId = 4
                         },
                         new
                         {
@@ -466,7 +469,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 4,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 3
+                            TaxRateId = 4
                         },
                         new
                         {
@@ -477,7 +480,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 5,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 3
+                            TaxRateId = 4
                         },
                         new
                         {
@@ -488,7 +491,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 1,
                             ParentCategoryId = 2,
                             Status = true,
-                            TaxRateId = 2
+                            TaxRateId = 4
                         },
                         new
                         {
@@ -499,7 +502,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 2,
                             ParentCategoryId = 2,
                             Status = true,
-                            TaxRateId = 2
+                            TaxRateId = 4
                         });
                 });
 
@@ -3609,10 +3612,6 @@ namespace MiniMart.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal?>("MinimumOrderAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -4186,9 +4185,6 @@ namespace MiniMart.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("StockCountId");
-
-                    b.HasIndex("StockCountId", "ProductId")
-                        .IsUnique();
 
                     b.ToTable("StockCountLines");
                 });

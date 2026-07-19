@@ -16,7 +16,7 @@ namespace MiniMart.Repositories.RepoImplement
             _context = context;
         }
 
-        // GET ALL (OData) 
+        // GET ALL (OData)
         public IQueryable<Order> GetAllOrdersQueryable()
         {
             return _context.Orders
@@ -27,7 +27,7 @@ namespace MiniMart.Repositories.RepoImplement
                     .ThenInclude(od => od.Product);
         }
 
-        // GET BY ID 
+        // GET BY ID
         public async Task<Order?> GetOrderByIdAsync(int id)
         {
             return await _context.Orders
@@ -39,7 +39,7 @@ namespace MiniMart.Repositories.RepoImplement
                 .FirstOrDefaultAsync(o => o.OrderId == id);
         }
 
-        // GET RECEIPT 
+        // GET RECEIPT
         public async Task<OrderReceiptDto?> GetOrderReceiptAsync(int id)
         {
             var order = await _context.Orders
@@ -55,7 +55,6 @@ namespace MiniMart.Repositories.RepoImplement
             {
                 OrderId = order.OrderId,
                 OrderCode = order.OrderCode,
-
                 CashierName = order.Employee?.FullName ?? "",
                 CustomerName = order.Customer?.FullName,
                 CustomerPhone = order.Customer?.PhoneNumber,
@@ -93,7 +92,7 @@ namespace MiniMart.Repositories.RepoImplement
             return $"HD{(maxNum + 1):D3}";
         }
 
-        // CREATE ORDER (Pending) 
+        // CREATE ORDER (Pending)
         public async Task<Order> CreateOrderAsync(Order order)
         {
             order.Status = OrderStatus.Pending;
@@ -105,7 +104,7 @@ namespace MiniMart.Repositories.RepoImplement
             return order;
         }
 
-        // CHECKOUT 
+        // CHECKOUT
         public async Task<CheckoutResponseDto> CheckoutAsync(CheckoutRequestDto request)
         {
             // BR-POS-01
@@ -113,7 +112,6 @@ namespace MiniMart.Repositories.RepoImplement
             if (shift == null)
                 throw new InvalidOperationException("Ca làm việc không tồn tại hoặc đã đóng.");
 
-            
             Customer? customer = null;
             int loyaltyPointsUsed = 0;
             decimal loyaltyDiscount = 0;
@@ -132,6 +130,7 @@ namespace MiniMart.Repositories.RepoImplement
             // BR-INV-01
             decimal subTotal = 0;
             var orderDetails = new List<OrderDetail>();
+            var taxDescriptionsByProductId = new Dictionary<int, string>();
 
             foreach (var item in request.Items)
             {
@@ -145,7 +144,19 @@ namespace MiniMart.Repositories.RepoImplement
                         $"Hiện có: {product.StockQuantity}, yêu cầu: {item.Quantity}.");
 
                 var lineTotal = product.SellingPrice * item.Quantity;
+                var taxRate = product.Category?.TaxRate
+                    ?? throw new InvalidOperationException($"Product '{product.ProductName}' does not have a category tax rate.");
+
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                if (!taxRate.Status || taxRate.EffectiveFrom > today ||
+                    (taxRate.EffectiveTo.HasValue && taxRate.EffectiveTo.Value < today))
+                {
+                    throw new InvalidOperationException($"Tax rate for category '{product.Category.CategoryName}' is not active.");
+                }
+
+                var vatAmount = Math.Round(lineTotal * taxRate.Rate, 2, MidpointRounding.AwayFromZero);
                 subTotal += lineTotal;
+                taxDescriptionsByProductId[item.ProductId] = taxRate.Description;
 
                 orderDetails.Add(new OrderDetail
                 {
@@ -154,12 +165,15 @@ namespace MiniMart.Repositories.RepoImplement
                     UnitPrice = product.SellingPrice,
                     DiscountAmount = 0,
                     TotalPrice = lineTotal,
+                    VatRate = taxRate.Rate,
+                    VatAmount = vatAmount,
                     IsGift = false
                 });
             }
 
             decimal discountAmount = loyaltyDiscount;
-            decimal finalAmount = subTotal - discountAmount;
+            decimal taxAmount = orderDetails.Sum(detail => detail.VatAmount);
+            decimal finalAmount = subTotal - discountAmount + taxAmount;
             if (finalAmount < 0) finalAmount = 0;
 
             decimal changeAmount = 0;
@@ -178,6 +192,7 @@ namespace MiniMart.Repositories.RepoImplement
                 {
                     OrderCode = await GenerateNextOrderCodeAsync(),
                     SubTotal = subTotal,
+                    TaxAmount = taxAmount,
                     DiscountAmount = discountAmount,
                     FinalAmount = finalAmount,
                     PaidAmount = request.PaidAmount,
@@ -225,8 +240,8 @@ namespace MiniMart.Repositories.RepoImplement
                     pointsEarned = (int)(finalAmount / 50000);
                     if (customer != null)
                     {
-                        customer.Point -= loyaltyPointsUsed;   
-                        customer.Point += pointsEarned;        
+                        customer.Point -= loyaltyPointsUsed;
+                        customer.Point += pointsEarned;
                     }
 
                     shift.Revenue += finalAmount;
@@ -240,6 +255,7 @@ namespace MiniMart.Repositories.RepoImplement
                     OrderId = order.OrderId,
                     OrderCode = order.OrderCode,
                     SubTotal = subTotal,
+                    TaxAmount = taxAmount,
                     DiscountAmount = discountAmount,
                     FinalAmount = finalAmount,
                     PaidAmount = request.PaidAmount,
@@ -249,14 +265,16 @@ namespace MiniMart.Repositories.RepoImplement
                     CustomerPointBalance = customer?.Point,
                     PaymentMethod = request.PaymentMethod,
                     Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
-
                     Items = orderDetails.Select(od => new OrderDetailDto
                     {
                         ProductId = od.ProductId,
                         Quantity = od.Quantity,
                         UnitPrice = od.UnitPrice,
                         DiscountAmount = od.DiscountAmount,
-                        TotalPrice = od.TotalPrice
+                        TotalPrice = od.TotalPrice,
+                        VatRate = od.VatRate,
+                        VatAmount = od.VatAmount,
+                        TaxDescription = taxDescriptionsByProductId[od.ProductId]
                     }).ToList()
                 };
             }
@@ -281,7 +299,10 @@ namespace MiniMart.Repositories.RepoImplement
 
         public async Task<Product?> GetProductByIdAsync(int productId)
         {
-            return await _context.Products.FindAsync(productId);
+            return await _context.Products
+                .Include(p => p.Category)
+                    .ThenInclude(c => c.TaxRate)
+                .FirstOrDefaultAsync(p => p.ProductId == productId);
         }
 
         public async Task ConfirmOrderCompletionAsync(int orderId)

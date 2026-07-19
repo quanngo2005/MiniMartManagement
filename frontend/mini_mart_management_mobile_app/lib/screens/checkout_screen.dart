@@ -264,6 +264,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           throw Exception('Không tìm thấy OrderId từ server.');
         }
 
+
         final client = createConfiguredClient();
         final csrfRes = await client.get(
           ApiConfig.uri('/api/auth/csrf-token'),
@@ -1255,28 +1256,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                   const SizedBox(height: 16),
                 ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Tạm tính', style: TextStyle(fontSize: 16, color: AppColors.textMuted)),
+                    Text(currencyFormatter.format(cart.totalAmount), style: const TextStyle(fontSize: 16, color: AppColors.textDark)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Thuế VAT ${(cart.averageVatRate * 100).toInt()}%', style: const TextStyle(fontSize: 14, color: AppColors.textMuted)),
+                    Text(currencyFormatter.format(cart.vatAmount), style: const TextStyle(fontSize: 14, color: AppColors.textDark)),
+                  ],
+                ),
                 if (cart.pointsToUse > 0) ...[
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Tạm tính',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      Text(
-                        currencyFormatter.format(cart.totalAmount),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: AppColors.textDark,
-                        ),
-                      ),
+                      const Text('Giảm giá', style: TextStyle(fontSize: 14, color: AppColors.statusError)),
+                      Text('- ${currencyFormatter.format(cart.discountAmount)}', style: const TextStyle(fontSize: 14, color: AppColors.statusError)),
                     ],
                   ),
-                  const SizedBox(height: 8),
                 ],
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

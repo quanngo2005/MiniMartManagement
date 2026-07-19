@@ -18,6 +18,7 @@ namespace MiniMart.Repositories.RepoImplement
         {
             return _context.Products
                 .Include(p => p.Category)
+                    .ThenInclude(c => c.TaxRate)
                 .Include(p => p.Supplier);
         }
 
@@ -25,6 +26,7 @@ namespace MiniMart.Repositories.RepoImplement
         {
             return await _context.Products
                 .Include(p => p.Category)
+                    .ThenInclude(c => c.TaxRate)
                 .Include(p => p.Supplier)
                 .FirstOrDefaultAsync(p => p.ProductId == id);
         }
