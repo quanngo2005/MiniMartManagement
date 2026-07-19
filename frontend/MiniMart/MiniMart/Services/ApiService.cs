@@ -300,12 +300,18 @@ namespace MiniMart.Services
             }
         }
 
+    public class ODataResponse<T>
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
+        public List<T> Value { get; set; } = new();
+    }
+
         public async Task<List<ProductDto>> SearchProductsAsync(string query)
         {
             try
             {
                 var odataFilter = $"contains(tolower(ProductName), '{query.ToLower().Replace("'", "''")}') or contains(Barcode, '{query.Replace("'", "''")}')";
-                var response = await _client.GetAsync($"/odata/Products?$filter={Uri.EscapeDataString(odataFilter)}");
+                var response = await _client.GetAsync($"/api/products?$filter={Uri.EscapeDataString(odataFilter)}");
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<List<ProductDto>>();
@@ -326,7 +332,7 @@ namespace MiniMart.Services
         {
             try
             {
-                var response = await _client.GetAsync($"/odata/Customers?$filter=PhoneNumber eq '{phone}'");
+                var response = await _client.GetAsync($"/api/customers?$filter=PhoneNumber eq '{phone}'");
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<List<CustomerDto>>();
@@ -338,6 +344,25 @@ namespace MiniMart.Services
             }
             catch { }
             return null;
+        }
+
+        public async Task<bool> CheckoutAsync(CheckoutRequestDto request)
+        {
+            try
+            {
+                var response = await _client.PostAsJsonAsync("/api/orders/checkout", request);
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                var error = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"Checkout Error: {error}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Checkout Exception: {ex.Message}");
+            }
+            return false;
         }
 
         public async Task<(bool Success, CheckoutResponseDto? Data, string ErrorMessage)> CheckoutCashAsync(CheckoutRequestDto requestDto)
@@ -355,18 +380,35 @@ namespace MiniMart.Services
                 }
 
                 var response = await _client.SendAsync(request);
-                var result = await response.Content.ReadFromJsonAsync<ApiResponse<CheckoutResponseDto>>();
 
-                if (response.IsSuccessStatusCode && result != null && result.Data != null)
+                if (response.IsSuccessStatusCode)
                 {
-                    return (true, result.Data, string.Empty);
+                    var result = await response.Content.ReadFromJsonAsync<CheckoutResponseDto>();
+                    if (result != null)
+                    {
+                        return (true, result, string.Empty);
+                    }
+                }
+                else
+                {
+                    var errorJson = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        var errorObj = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<object>>(errorJson, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (errorObj != null && !string.IsNullOrEmpty(errorObj.Message))
+                        {
+                            return (false, null, errorObj.Message);
+                        }
+                    }
+                    catch { }
+                    return (false, null, errorJson);
                 }
 
-                return (false, null, result?.Message ?? "Thanh toán thất bại.");
+                return (false, null, "Lỗi không xác định từ server.");
             }
             catch (Exception ex)
             {
-                return (false, null, $"Lỗi kết nối: {ex.Message}");
+                return (false, null, ex.Message);
             }
         }
     }

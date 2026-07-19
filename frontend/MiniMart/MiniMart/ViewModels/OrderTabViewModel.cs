@@ -39,14 +39,16 @@ namespace MiniMart.ViewModels
                 if (SetProperty(ref _loyaltyPointsToUse, value))
                 {
                     Discount = _loyaltyPointsToUse * 1000;
+                    CalculateTotal();
                 }
             }
         }
 
-        public decimal FinalAmount => SubTotal - Discount;
+        [ObservableProperty]
+        private decimal _finalAmount;
 
         [ObservableProperty]
-        private string _customerName = "Khách vãng lai";
+        private string _customerName = string.Empty;
 
         [ObservableProperty]
         private string _customerPhone = "";
@@ -57,15 +59,43 @@ namespace MiniMart.ViewModels
         [ObservableProperty]
         private int? _customerId;
 
+        [ObservableProperty]
+        private decimal _amountGiven;
+
+        [ObservableProperty]
+        private decimal _changeAmount;
+
+        partial void OnAmountGivenChanged(decimal value)
+        {
+            CalculateTotal();
+        }
+
         public void CalculateTotal()
         {
             SubTotal = CartItems.Sum(item => item.Total);
+            FinalAmount = Math.Max(0, SubTotal - Discount);
+            
+            if (AmountGiven > 0)
+            {
+                ChangeAmount = AmountGiven - FinalAmount;
+            }
+            else
+            {
+                ChangeAmount = 0;
+            }
         }
 
         public void AddItem(CartItem item)
         {
             item.PropertyChanged += Item_PropertyChanged;
             CartItems.Add(item);
+            CalculateTotal();
+        }
+
+        public void RemoveItem(CartItem item)
+        {
+            item.PropertyChanged -= Item_PropertyChanged;
+            CartItems.Remove(item);
             CalculateTotal();
         }
 

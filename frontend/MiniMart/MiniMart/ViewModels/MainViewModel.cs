@@ -59,6 +59,39 @@ namespace MiniMart.ViewModels
         private string _tempCustomerPhone = string.Empty;
 
         [ObservableProperty]
+        private string _customerSearchQuery = string.Empty;
+
+        [ObservableProperty]
+        private ObservableCollection<CustomerDto> _customerSearchResults = new();
+
+        partial void OnCustomerSearchQueryChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value) || value.Length != 10) 
+            {
+                CustomerSearchResults.Clear();
+                return;
+            }
+            _ = SearchCustomerAsync(value);
+        }
+
+        [RelayCommand]
+        private void ClearCustomer()
+        {
+            if (ActiveTab != null)
+            {
+                ActiveTab.CustomerName = string.Empty;
+                ActiveTab.CustomerPhone = string.Empty;
+                ActiveTab.CustomerPoints = 0;
+                ActiveTab.CustomerId = null;
+                ActiveTab.LoyaltyPointsToUse = 0;
+            }
+            CustomerSearchQuery = "";
+        }
+
+        [ObservableProperty]
+        private string _shiftStartCashStr = string.Empty;
+
+        [ObservableProperty]
         private string _searchQuery = string.Empty;
 
         [ObservableProperty]
@@ -119,6 +152,15 @@ namespace MiniMart.ViewModels
         }
 
         [RelayCommand]
+        private void RemoveItem(CartItem? item)
+        {
+            if (item != null && ActiveTab != null)
+            {
+                ActiveTab.RemoveItem(item);
+            }
+        }
+
+        [RelayCommand]
         private void OpenEditCustomer()
         {
             if (ActiveTab != null)
@@ -136,8 +178,6 @@ namespace MiniMart.ViewModels
             {
                 ActiveTab.CustomerName = TempCustomerName;
                 ActiveTab.CustomerPhone = TempCustomerPhone;
-                // Also search customer by phone
-                _ = SearchCustomerAsync(TempCustomerPhone);
             }
             IsEditCustomerPopupOpen = false;
         }
@@ -151,11 +191,25 @@ namespace MiniMart.ViewModels
         private async Task SearchCustomerAsync(string phone)
         {
             var customer = await ApiService.Instance.GetCustomerByPhoneAsync(phone);
+            CustomerSearchResults.Clear();
+            if (customer != null)
+            {
+                CustomerSearchResults.Add(customer);
+            }
+        }
+
+        [RelayCommand]
+        private void SelectCustomer(CustomerDto customer)
+        {
             if (customer != null && ActiveTab != null)
             {
                 ActiveTab.CustomerName = customer.FullName;
                 ActiveTab.CustomerPoints = customer.Point;
                 ActiveTab.CustomerId = customer.CustomerId;
+                ActiveTab.CustomerPhone = customer.PhoneNumber;
+                
+                CustomerSearchResults.Clear();
+                CustomerSearchQuery = string.Empty;
             }
         }
 
@@ -203,10 +257,52 @@ namespace MiniMart.ViewModels
         }
 
         [RelayCommand]
-        private void Checkout()
+        private async Task Checkout()
         {
             if (ActiveTab == null || ActiveTab.CartItems.Count == 0) return;
-            IsCheckoutPopupOpen = true;
+
+            if (CurrentShift == null)
+            {
+                CurrentShift = await ApiService.Instance.GetCurrentShiftAsync();
+                if (CurrentShift == null)
+                {
+                    System.Windows.MessageBox.Show("Vui lòng mở ca làm việc trước khi thanh toán (Chưa có ca làm việc nào đang mở)!", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    return;
+                }
+            }
+
+            var request = new CheckoutRequestDto
+            {
+                EmployeeId = ApiService.Instance.CurrentUser?.EmployeeId ?? 1,
+                ShiftId = CurrentShift.ShiftId,
+                CustomerId = ActiveTab.CustomerId,
+                LoyaltyPointsToUse = ActiveTab.LoyaltyPointsToUse,
+                PaymentMethod = 1, // 1 for Cash
+                PaidAmount = ActiveTab.AmountGiven,
+                Note = "Thanh toán POS"
+            };
+
+            foreach (var item in ActiveTab.CartItems)
+            {
+                request.Items.Add(new CheckoutItemDto
+                {
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity
+                });
+            }
+
+            var result = await ApiService.Instance.CheckoutCashAsync(request);
+            if (result.Success)
+            {
+                ActiveTab.CartItems.Clear();
+                ActiveTab.AmountGiven = 0m;
+                ClearCustomer();
+                System.Windows.MessageBox.Show("Thanh toán hóa đơn thành công!", "Thành công", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            }
+            else
+            {
+                System.Windows.MessageBox.Show($"Thanh toán thất bại: {result.ErrorMessage}", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
 
         [RelayCommand]
