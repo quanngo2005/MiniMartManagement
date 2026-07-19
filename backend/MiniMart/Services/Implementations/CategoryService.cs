@@ -32,7 +32,7 @@ namespace MiniMart.Services.Implementations
             var category = new Category
             {
                 CategoryCode = request.CategoryCode.Trim(),
-                CategoryName = request.Name.Trim(),
+                CategoryName = request.CategoryName.Trim(),
                 Description = request.Description?.Trim(),
                 TaxRateId = request.TaxRateId,
                 Status = true
@@ -51,7 +51,7 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException($"Active tax rate with ID {request.TaxRateId} was not found.", StatusCodes.Status400BadRequest);
 
             existing.CategoryCode = request.CategoryCode.Trim();
-            existing.CategoryName = request.Name.Trim();
+            existing.CategoryName = request.CategoryName.Trim();
             existing.Description = request.Description?.Trim();
             existing.TaxRateId = request.TaxRateId;
             return MapToDto((await _categoryRepository.UpdateAsync(existing))!);

@@ -9,10 +9,10 @@ namespace MiniMart.Mapping
         public CategoryMappingProfile()
         {
             CreateMap<Category, CategoryDto>()
-                .ForMember(dest => dest.ParentCategoryName,
+                .ForMember(dest => dest.Name,
                     opt => opt.MapFrom(src => src.ParentCategory == null ? null : src.ParentCategory.CategoryName));
 
-            CreateMap<CreateCategoryDto, Category>()
+            CreateMap<CreateCategoryRequest, Category>()
                 .ForMember(dest => dest.CategoryId, opt => opt.Ignore())
                 .ForMember(dest => dest.ParentCategory, opt => opt.Ignore())
                 .ForMember(dest => dest.ChildCategories, opt => opt.Ignore())
