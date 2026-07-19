@@ -359,7 +359,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         value: _status,
         onChanged: (v) => setState(() => _status = v),
-        activeColor: AppColors.secondary,
+        activeThumbColor: AppColors.secondary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );

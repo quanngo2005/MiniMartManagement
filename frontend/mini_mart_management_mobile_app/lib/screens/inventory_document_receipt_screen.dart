@@ -262,8 +262,9 @@ class InventoryDocumentReceiptScreen extends StatelessWidget {
     );
     if (!context.mounted ||
         result?.updateReceipt == null ||
-        result?.receiptId == null)
+        result?.receiptId == null) {
       return;
+    }
 
     final updated = await context.read<ReceiptProvider>().updateReceipt(
       result!.receiptId!,

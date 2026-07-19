@@ -13,8 +13,9 @@ class StockCountService {
     final json = await _request('GET', '/api/stock-counts');
     final items =
         json['value'] ?? json['Value'] ?? json['data'] ?? json['Data'];
-    if (items is! List)
+    if (items is! List) {
       throw const ApiException('Không thể đọc lịch sử kiểm kê.');
+    }
     return items
         .whereType<Map<String, dynamic>>()
         .map(StockCount.fromJson)

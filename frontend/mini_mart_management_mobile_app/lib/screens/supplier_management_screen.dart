@@ -499,7 +499,7 @@ class _SupplierFormSheetState extends State<_SupplierFormSheet> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<bool>(
-                      value: _status,
+                      initialValue: _status,
                       dropdownColor: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                       decoration: const InputDecoration(

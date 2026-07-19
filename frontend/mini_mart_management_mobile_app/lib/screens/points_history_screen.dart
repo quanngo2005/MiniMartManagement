@@ -229,7 +229,7 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
               ? const Center(child: Text('Không có giao dịch nào.'))
               : ListView.separated(
                   itemCount: _filtered.length,
-                  separatorBuilder: (_, __) =>
+                  separatorBuilder: (_, _) =>
                       const Divider(height: 1, indent: 16, endIndent: 16),
                   itemBuilder: (_, i) => _buildTxnTile(context, _filtered[i]),
                 ),

@@ -176,15 +176,15 @@ class _StockCountHistoryScreenState extends State<StockCountHistoryScreen> {
         .toList(growable: false);
   }
 
-  void _openStockCount(StockCount stockCount) {
-    Navigator.of(context)
-        .push(
-          MaterialPageRoute<void>(
-            builder: (_) =>
-                StockCountDetailScreen(stockCountId: stockCount.stockCountId),
-          ),
-        )
-        .then((_) => context.read<StockCountProvider>().loadStockCounts());
+  Future<void> _openStockCount(StockCount stockCount) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            StockCountDetailScreen(stockCountId: stockCount.stockCountId),
+      ),
+    );
+    if (!mounted) return;
+    await context.read<StockCountProvider>().loadStockCounts();
   }
 
   Future<void> _createStockCount() async {
@@ -201,16 +201,16 @@ class _StockCountHistoryScreenState extends State<StockCountHistoryScreen> {
     );
     if (!mounted || options == null) return;
 
-    await Navigator.of(context)
-        .push(
-          MaterialPageRoute<void>(
-            builder: (_) => StockCountDetailScreen(
-              createScope: options.scope,
-              categoryIds: options.categoryIds,
-            ),
-          ),
-        )
-        .then((_) => context.read<StockCountProvider>().loadStockCounts());
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => StockCountDetailScreen(
+          createScope: options.scope,
+          categoryIds: options.categoryIds,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    await context.read<StockCountProvider>().loadStockCounts();
   }
 
   List<ProductLookupCategory> _categoriesFrom(List<ProductLookup> products) {
@@ -259,13 +259,19 @@ class _StockCountScopeSheetState extends State<_StockCountScopeSheet> {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 12),
-          ...StockCountScope.values.map(
-            (scope) => RadioListTile<StockCountScope>(
-              contentPadding: EdgeInsets.zero,
-              title: Text(scope.label),
-              value: scope,
-              groupValue: _scope,
-              onChanged: (value) => setState(() => _scope = value!),
+          RadioGroup<StockCountScope>(
+            groupValue: _scope,
+            onChanged: (value) => setState(() => _scope = value!),
+            child: Column(
+              children: StockCountScope.values
+                  .map(
+                    (scope) => RadioListTile<StockCountScope>(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(scope.label),
+                      value: scope,
+                    ),
+                  )
+                  .toList(growable: false),
             ),
           ),
           if (_scope == StockCountScope.category) ...[
