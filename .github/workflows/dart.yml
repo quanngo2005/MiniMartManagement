@@ -31,7 +31,7 @@ jobs:
         run: dart format --output=none --set-exit-if-changed .
 
       - name: Analyze project
-        run: flutter analyze --no-fatal-infos          # ← This is the key change
+        run: flutter analyze --no-fatal-infos           # Allows infos but fails on warnings + errors
 
       - name: Run tests
         run: flutter test
