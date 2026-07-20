@@ -69,3 +69,5 @@ frontend/mini_mart_management_mobile_app/windows/flutter/generated_plugins.cmake
 backend/MiniMart/appsettings.Development.json
 backend/MiniMart/appsettings.Development.json
 /backend/MiniMart/appsettings.Development.json
+/backend/MiniMart/.env
+/.claude
