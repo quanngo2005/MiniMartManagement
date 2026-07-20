@@ -22,6 +22,27 @@ namespace MiniMart.Repositories.RepoImplement
                 .Where(b => !b.IsDeleted);
         }
 
+        public async Task<List<Batch>> GetSellableBatchesForProductsAsync(
+            IEnumerable<int> productIds,
+            DateTime businessDate)
+        {
+            var productIdList = productIds.Distinct().ToList();
+
+            return await _context.Batches
+                .Include(batch => batch.Receipt)
+                .Where(batch => productIdList.Contains(batch.ProductId)
+                    && !batch.IsDeleted
+                    && batch.Status
+                    && batch.QuantityRemaining > 0
+                    && batch.ExpiryDate >= businessDate)
+                .OrderBy(batch => batch.ExpiryDate)
+                .ThenBy(batch => batch.Receipt != null
+                    ? batch.Receipt.ImportDate
+                    : DateTime.MaxValue)
+                .ThenBy(batch => batch.BatchId)
+                .ToListAsync();
+        }
+
         public async Task<Batch?> GetBatchByIdAsync(int id)
         {
             return await _context.Batches
