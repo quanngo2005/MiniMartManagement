@@ -13,6 +13,7 @@ import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart
 import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_dashboard_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/manager_return_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/product_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
@@ -73,6 +74,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.analyze: 12,
     ManagerNavDestination.categories: 13,
     ManagerNavDestination.customerInformation: 14,
+    ManagerNavDestination.returns: 15,
   };
 
   static const _bottomNavDestinations = [
@@ -150,6 +152,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           AnalyzeScreen(onMenuTap: _openDrawer),
           CategoryManagementScreen.withProvider(onMenuTap: _openDrawer),
           CustomerListScreen(showBottomNavBar: false, onMenuTap: _openDrawer),
+          ManagerReturnListScreen(onMenuTap: _openDrawer),
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(

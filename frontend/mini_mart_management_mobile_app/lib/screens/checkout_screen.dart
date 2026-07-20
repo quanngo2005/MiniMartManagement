@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mini_mart_management_mobile_app/models/product_lookup.dart';
 import 'package:mini_mart_management_mobile_app/models/cart_item.dart';
 import 'package:mini_mart_management_mobile_app/providers/cart_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/promotion_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/order_repository.dart';
@@ -29,12 +30,16 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _customerPhoneController =
       TextEditingController();
+  final TextEditingController _newCustomerNameController =
+      TextEditingController();
   final TextEditingController _productSearchController =
       TextEditingController();
   final currencyFormatter = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
 
   bool _isSearchingCustomer = false;
+  bool _isCreatingCustomer = false;
   bool _showCreateCustomerButton = false;
+  String? _customerLookupMessage;
   List<ProductLookup> _productSuggestions = [];
 
   final TextEditingController _customerGivenAmountController =
@@ -48,10 +53,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _resetForm() {
     setState(() {
       _customerPhoneController.clear();
+      _newCustomerNameController.clear();
       _customerGivenAmountController.clear();
       _pointsToUseController.clear();
       _isSearchingCustomer = false;
+      _isCreatingCustomer = false;
       _showCreateCustomerButton = false;
+      _customerLookupMessage = null;
       _productSuggestions.clear();
     });
   }
@@ -62,7 +70,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _customerGivenAmountController.addListener(_rebuildOnChange);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final shiftProvider = context.read<ShiftProvider>();
+      final promotionProvider = context.read<PromotionProvider>();
       await shiftProvider.fetchCurrentShift();
+      await promotionProvider.fetchPromotions();
+      if (mounted) {
+        context.read<CartProvider>().setPromotions(promotionProvider.promotions);
+      }
       if (mounted && shiftProvider.currentShift == null) {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -78,6 +91,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void dispose() {
     _productSearchController.dispose();
     _customerPhoneController.dispose();
+    _newCustomerNameController.dispose();
     _customerGivenAmountController.removeListener(_rebuildOnChange);
     _customerGivenAmountController.dispose();
     _pointsToUseController.dispose();
@@ -88,7 +102,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final phone = _customerPhoneController.text.trim();
     if (phone.isEmpty) return;
 
-    setState(() => _isSearchingCustomer = true);
+    setState(() {
+      _isSearchingCustomer = true;
+      _customerLookupMessage = null;
+    });
 
     try {
       final client = createConfiguredClient();
@@ -141,12 +158,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               fullName,
               parsedPoint,
             );
-            _customerPhoneController.clear();
-            _showCreateCustomerButton = false;
+            _newCustomerNameController.clear();
+            _pointsToUseController.clear();
+            setState(() {
+              _showCreateCustomerButton = false;
+              _customerLookupMessage = 'Tìm thấy khách hàng: $fullName';
+            });
           }
         } else {
-          setState(() => _showCreateCustomerButton = true);
-          _showError('Không tìm thấy khách hàng với số điện thoại này.');
+          if (mounted) {
+            context.read<CartProvider>().clearCustomer();
+          }
+          setState(() {
+            _showCreateCustomerButton = true;
+            _customerLookupMessage =
+                'Số điện thoại mới, vui lòng nhập họ và tên khách hàng.';
+          });
         }
       } else {
         _showError('Lỗi kết nối. Mã lỗi: ${response.statusCode}');
@@ -156,6 +183,91 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     } finally {
       if (mounted) {
         setState(() => _isSearchingCustomer = false);
+      }
+    }
+  }
+
+  int _parseCustomerId(dynamic rawId) {
+    if (rawId is int) return rawId;
+    if (rawId is num) return rawId.toInt();
+    if (rawId is String) return int.tryParse(rawId) ?? 0;
+    return 0;
+  }
+
+  Future<bool> _createCustomerFromInlineForm() async {
+    final phone = _customerPhoneController.text.trim();
+    final name = _newCustomerNameController.text.trim();
+
+    if (!_showCreateCustomerButton || phone.isEmpty) {
+      return true;
+    }
+
+    if (name.isEmpty) {
+      _showError('Vui lòng nhập họ và tên khách hàng mới.');
+      return false;
+    }
+
+    setState(() => _isCreatingCustomer = true);
+    try {
+      final client = createConfiguredClient();
+
+      final csrfRes = await client.get(
+        ApiConfig.uri('/api/auth/csrf-token'),
+        headers: {'Accept': 'application/json'},
+      );
+      String csrfToken = '';
+      if (csrfRes.statusCode >= 200 && csrfRes.statusCode < 300) {
+        final data = jsonDecode(csrfRes.body);
+        final payload = data['data'] ?? data['Data'];
+        csrfToken = payload['csrfToken'] ?? payload['CsrfToken'] ?? '';
+      }
+
+      final response = await client.post(
+        ApiConfig.uri('/api/customers'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          if (csrfToken.isNotEmpty) 'X-XSRF-TOKEN': csrfToken,
+        },
+        body: jsonEncode({
+          'customerCode': 'KH$phone',
+          'fullName': name,
+          'phoneNumber': phone,
+          'address': '',
+          'point': 0,
+          'customerStatus': true,
+        }),
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        final error = jsonDecode(response.body);
+        final errorMsg = error['message'] ?? error['title'] ?? response.body;
+        _showError('Không thể tạo khách hàng mới: $errorMsg');
+        return false;
+      }
+
+      final created = jsonDecode(response.body);
+      final customerId = _parseCustomerId(
+        created['customerId'] ?? created['CustomerId'],
+      );
+      if (customerId <= 0) {
+        _showError('Không đọc được mã khách hàng mới từ server.');
+        return false;
+      }
+
+      if (!mounted) return false;
+      context.read<CartProvider>().setCustomer(customerId, name, 0);
+      setState(() {
+        _showCreateCustomerButton = false;
+        _customerLookupMessage = 'Đã tạo khách hàng mới: $name';
+      });
+      return true;
+    } catch (e) {
+      _showError('Lỗi hệ thống khi tạo khách hàng: $e');
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() => _isCreatingCustomer = false);
       }
     }
   }
@@ -232,6 +344,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     try {
       final orderRepo = context.read<OrderRepository>();
+      final customerReady = await _createCustomerFromInlineForm();
+      if (!customerReady) return;
 
       final items = cart.items
           .map(
@@ -243,8 +357,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         RegExp(r'[^0-9]'),
         '',
       );
-      final givenAmount = double.tryParse(givenStr) ?? cart.totalAmount;
-      if (cart.paymentMethod == 1 && givenAmount < cart.totalAmount) {
+      final givenAmount = double.tryParse(givenStr) ?? cart.finalAmount;
+      if (cart.paymentMethod == 1 && givenAmount < cart.finalAmount) {
         _showError('Tiền khách đưa không đủ.');
         return;
       }
@@ -587,6 +701,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 name,
                                 0,
                               );
+                              _pointsToUseController.clear();
                               setState(() {
                                 _showCreateCustomerButton = false;
                               });
@@ -724,9 +839,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 TextField(
                   controller: _customerPhoneController,
                   onChanged: (val) {
-                    if (_showCreateCustomerButton) {
-                      setState(() => _showCreateCustomerButton = false);
-                    }
+                    setState(() {
+                      _showCreateCustomerButton = false;
+                      _customerLookupMessage = null;
+                    });
+                    _newCustomerNameController.clear();
+                    cart.clearCustomer();
+                    _pointsToUseController.clear();
                   },
                   decoration: InputDecoration(
                     hintText: 'Nhập số điện thoại khách hàng...',
@@ -766,6 +885,46 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   keyboardType: TextInputType.phone,
                   onSubmitted: (_) => _searchCustomer(),
                 ),
+                if (_customerLookupMessage != null) ...[
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      _customerLookupMessage!,
+                      style: TextStyle(
+                        color: _showCreateCustomerButton
+                            ? AppColors.statusWarning
+                            : AppColors.secondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+                if (_showCreateCustomerButton) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _newCustomerNameController,
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      hintText: 'Nhập họ và tên khách hàng mới...',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      suffixIcon: _isCreatingCustomer
+                          ? const Padding(
+                              padding: EdgeInsets.all(12.0),
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : null,
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: AppColors.outlineVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
                 if (cart.selectedCustomerId != null) ...[
                   const SizedBox(height: 12),
                   Container(
@@ -950,6 +1109,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         separatorBuilder: (_, _) => const Divider(height: 1),
                         itemBuilder: (context, index) {
                           final item = cart.items[index];
+                          final giftQuantity = cart.giftQuantityForProduct(
+                            item.product.productId,
+                          );
                           return Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Row(
@@ -974,6 +1136,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                           color: AppColors.textMuted,
                                         ),
                                       ),
+                                      if (giftQuantity > 0) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Tặng thêm: $giftQuantity',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppColors.secondary,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ),
@@ -1212,6 +1385,55 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               children: [
                 if (cart.selectedCustomerPoints != null &&
                     cart.selectedCustomerPoints! > 0) ...[
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    secondary: const Icon(
+                      Icons.stars_rounded,
+                      color: AppColors.secondary,
+                    ),
+                    title: const Text(
+                      'Sử dụng điểm tích lũy',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${cart.selectedCustomerPoints} điểm khả dụng • 1 điểm = 1.000 đ',
+                      style: const TextStyle(color: AppColors.textMuted),
+                    ),
+                    value: cart.useLoyaltyPoints,
+                    activeColor: AppColors.secondary,
+                    onChanged: (value) {
+                      cart.setUseLoyaltyPoints(value);
+                      _pointsToUseController.text = value
+                          ? cart.pointsToUse.toString()
+                          : '';
+                    },
+                  ),
+                  if (cart.useLoyaltyPoints) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        TextButton.icon(
+                          onPressed: () {
+                            cart.setPointsToUse(cart.maxPointsCanUse);
+                            _pointsToUseController.text = cart.pointsToUse
+                                .toString();
+                          },
+                          icon: const Icon(Icons.auto_awesome, size: 18),
+                          label: Text(
+                            'Dùng tối đa ${cart.maxPointsCanUse} điểm',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ],
+                if (cart.useLoyaltyPoints &&
+                    cart.selectedCustomerPoints != null &&
+                    cart.selectedCustomerPoints! > 0) ...[
                   Row(
                     children: [
                       Expanded(
@@ -1234,7 +1456,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             }
                           },
                           decoration: const InputDecoration(
-                            labelText: 'Dùng điểm tích lũy',
+                            labelText: 'Số điểm sử dụng',
                             hintText: 'Nhập số điểm...',
                             border: OutlineInputBorder(),
                             contentPadding: EdgeInsets.symmetric(
@@ -1246,7 +1468,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                       const SizedBox(width: 16),
                       Text(
-                        '- ${currencyFormatter.format(cart.discountAmount)}',
+                        '- ${currencyFormatter.format(cart.loyaltyDiscountAmount)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -1276,20 +1498,42 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                   ],
                 ),
-                if (cart.pointsToUse > 0) ...[
+                if (cart.promotionDiscountAmount > 0) ...[
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Giảm giá',
+                        'Khuyến mãi',
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.statusError,
                         ),
                       ),
                       Text(
-                        '- ${currencyFormatter.format(cart.discountAmount)}',
+                        '- ${currencyFormatter.format(cart.promotionDiscountAmount)}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.statusError,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (cart.pointsToUse > 0) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Điểm tích lũy',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.statusError,
+                        ),
+                      ),
+                      Text(
+                        '- ${currencyFormatter.format(cart.loyaltyDiscountAmount)}',
                         style: const TextStyle(
                           fontSize: 14,
                           color: AppColors.statusError,

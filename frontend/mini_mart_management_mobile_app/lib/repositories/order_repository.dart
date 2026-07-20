@@ -13,6 +13,11 @@ class OrderRepository {
       ..sort((left, right) => right.orderDate.compareTo(left.orderDate));
   }
 
+  Future<List<OrderSummary>> getAllOrders() async {
+    final orders = await _service.getAllOrders();
+    return orders..sort((left, right) => right.orderDate.compareTo(left.orderDate));
+  }
+
   Future<Map<String, dynamic>> checkout({
     required int employeeId,
     required int shiftId,

@@ -1,3 +1,4 @@
+﻿import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/order_return.dart';
@@ -51,6 +52,8 @@ class OrderReturnProvider extends ChangeNotifier {
     required String reason,
     required int classify,
     required String localImagePath,
+    String? localImageName,
+    Uint8List? localImageBytes,
     required List<Map<String, dynamic>> items,
   }) async {
     _isLoading = true;
@@ -58,14 +61,16 @@ class OrderReturnProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 1. Upload image first
-      final imageUrl = await _orderReturnRepository.uploadImage(localImagePath);
+      final imageUrl = await _orderReturnRepository.uploadImage(
+        localImagePath,
+        fileName: localImageName,
+        bytes: localImageBytes,
+      );
 
-      // 2. Submit request payload
       final payload = {
         'originalOrderId': originalOrderId,
         'reason': reason,
-        'refundMethod': 1, // Cash
+        'refundMethod': 1,
         'classify': classify,
         'imageEvidence': imageUrl,
         'items': items,

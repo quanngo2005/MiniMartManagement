@@ -92,6 +92,7 @@ class EInvoiceDetail {
     required this.productName,
     required this.unit,
     required this.quantity,
+    required this.isGift,
     required this.unitPrice,
     required this.discountAmount,
     required this.amountBeforeVAT,
@@ -106,6 +107,7 @@ class EInvoiceDetail {
   final String productName;
   final String unit;
   final int quantity;
+  final bool isGift;
   final double unitPrice;
   final double discountAmount;
   final double amountBeforeVAT;
@@ -123,6 +125,7 @@ class EInvoiceDetail {
       productName: (json['productName'] ?? json['ProductName'] ?? '') as String,
       unit: (json['unit'] ?? json['Unit'] ?? '') as String,
       quantity: _asInt(json['quantity'] ?? json['Quantity']),
+      isGift: (json['isGift'] ?? json['IsGift'] ?? false) == true,
       unitPrice: _asDouble(json['unitPrice'] ?? json['UnitPrice']),
       discountAmount: _asDouble(
         json['discountAmount'] ?? json['DiscountAmount'],

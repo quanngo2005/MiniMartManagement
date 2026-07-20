@@ -12,6 +12,7 @@ import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar
 import 'package:mini_mart_management_mobile_app/widgets/members/recent_upgrade_tile.dart';
 import 'package:mini_mart_management_mobile_app/widgets/members/tier_distribution_card.dart';
 import 'package:mini_mart_management_mobile_app/widgets/members/tier_overview_card.dart';
+import 'package:mini_mart_management_mobile_app/screens/tier_management_screen.dart';
 
 class MemberManagementScreen extends StatefulWidget {
   const MemberManagementScreen({
@@ -28,7 +29,6 @@ class MemberManagementScreen extends StatefulWidget {
   @override
   State<MemberManagementScreen> createState() => _MemberManagementScreenState();
 }
-
 class _MemberManagementScreenState extends State<MemberManagementScreen> {
   @override
   void initState() {
@@ -118,7 +118,14 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                 color: AppColors.primary,
               ),
             ),
-            TextButton(onPressed: () {}, child: const Text('Chi tiết')),
+            TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const TierManagementScreen(),
+                ),
+              ),
+              child: const Text('Chi tiết'),
+            ),
           ],
         ),
         const SizedBox(height: 8),

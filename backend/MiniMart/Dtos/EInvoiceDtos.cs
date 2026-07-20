@@ -33,6 +33,7 @@ namespace MiniMart.DTOs
         public string ProductName { get; set; } = string.Empty;
         public string Unit { get; set; } = string.Empty;
         public int Quantity { get; set; }
+        public bool IsGift { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal AmountBeforeVAT { get; set; }

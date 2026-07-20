@@ -18,6 +18,7 @@ enum ManagerNavDestination {
   promotions,
   analyze,
   invoices,
+  returns,
   categories,
 }
 
@@ -166,6 +167,14 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.invoices,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.invoices),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.assignment_return_outlined,
+                    activeIcon: Icons.assignment_return_rounded,
+                    label: 'Xử lý trả hàng',
+                    destination: ManagerNavDestination.returns,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.returns),
                   ),
                   const _DrawerSectionLabel('Cài đặt'),
                   _DrawerTile(

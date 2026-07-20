@@ -1,7 +1,7 @@
 abstract final class MembershipTierUtils {
-  static const int goldThreshold = 10000;
-  static const int silverThreshold = 5000;
-  static const int bronzeThreshold = 1000;
+  static const int goldThreshold = 1000;
+  static const int silverThreshold = 500;
+  static const int bronzeThreshold = 0;
 
   static String tierNameForPoints(int points) {
     if (points >= goldThreshold) return 'Gold';

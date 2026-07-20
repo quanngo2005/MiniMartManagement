@@ -138,7 +138,6 @@ class _CategoryBodyState extends State<_CategoryBody> {
                 separatorBuilder: (_, _) => const SizedBox(height: 8),
                 itemBuilder: (_, index) => _CategoryCard(
                   category: categories[index],
-                  taxLabel: _taxLabel(provider, categories[index]),
                   onEdit: () => CategoryManagementScreen._openEditor(
                     context,
                     categories[index],
@@ -191,13 +190,6 @@ class _CategoryBodyState extends State<_CategoryBody> {
     );
   }
 
-  String _taxLabel(CategoryProvider provider, Category category) {
-    for (final tax in provider.taxRates) {
-      if (tax.taxRateId == category.taxRateId) return tax.label;
-    }
-    return category.taxRateId == 0 ? 'Chưa có thuế' : 'Thuế #${category.taxRateId}';
-  }
-
   Future<void> _confirmDelete(BuildContext context, Category category) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -230,13 +222,11 @@ class _CategoryBodyState extends State<_CategoryBody> {
 class _CategoryCard extends StatelessWidget {
   const _CategoryCard({
     required this.category,
-    required this.taxLabel,
     required this.onEdit,
     required this.onDelete,
   });
 
   final Category category;
-  final String taxLabel;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -266,7 +256,7 @@ class _CategoryCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '${category.categoryCode} • $taxLabel',
+                    category.categoryCode,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(

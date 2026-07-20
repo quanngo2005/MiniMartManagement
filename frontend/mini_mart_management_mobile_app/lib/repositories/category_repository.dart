@@ -1,6 +1,5 @@
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/category.dart';
-import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/services/category_service.dart';
 
 class CategoryRepository {
@@ -11,11 +10,6 @@ class CategoryRepository {
   Future<List<Category>> getAll() => _guard(
     _service.getAll,
     'Không thể tải danh mục',
-  );
-
-  Future<List<TaxRate>> getTaxRates() => _guard(
-    _service.getTaxRates,
-    'Không thể tải danh sách thuế',
   );
 
   Future<Category> create(Map<String, dynamic> data) => _guard(
