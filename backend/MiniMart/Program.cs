@@ -18,6 +18,7 @@ using MiniMart.Hubs;
 using MiniMart.Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<TaxSettings>(builder.Configuration.GetSection("TaxSettings"));
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
 
 // ── OData EDM Model ──────────────────────────────────────────────

@@ -4,16 +4,19 @@ using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
+using MiniMart.Shared.Exceptions;
 
 namespace MiniMart.Repositories.RepoImplement
 {
     public class OrderRepository : IOrderRepository
     {
         private readonly MiniMartDbContext _context;
+        private readonly IBatchRepository _batchRepository;
 
-        public OrderRepository(MiniMartDbContext context)
+        public OrderRepository(MiniMartDbContext context, IBatchRepository batchRepository)
         {
             _context = context;
+            _batchRepository = batchRepository;
         }
 
         // GET ALL (OData)
@@ -112,6 +115,10 @@ namespace MiniMart.Repositories.RepoImplement
             if (shift == null)
                 throw new InvalidOperationException("Ca làm việc không tồn tại hoặc đã đóng.");
 
+            if (DateTime.Now > shift.EndTime)
+                throw new InvalidOperationException("Ca làm việc đã kết thúc. Vui lòng đóng ca trước khi thao tác tiếp.");
+
+            
             Customer? customer = null;
             int loyaltyPointsUsed = 0;
             decimal loyaltyDiscount = 0;
@@ -123,9 +130,11 @@ namespace MiniMart.Repositories.RepoImplement
                 {
                     loyaltyPointsUsed = Math.Min(request.LoyaltyPointsToUse, customer.Point);
                     // BR-LYT-02
-                    loyaltyDiscount = loyaltyPointsUsed * 1000m;
+                    loyaltyDiscount = loyaltyPointsUsed;
                 }
             }
+
+            var checkoutAt = DateTime.UtcNow.AddHours(7);
 
             // BR-INV-01
             decimal subTotal = 0;
@@ -359,6 +368,13 @@ namespace MiniMart.Repositories.RepoImplement
                     }).ToList()
                 };
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                await transaction.RollbackAsync();
+                throw new DomainException(
+                    "Batch data was updated by another operation. Please refresh and try again.",
+                    StatusCodes.Status409Conflict);
+            }
             catch
             {
                 await transaction.RollbackAsync();
@@ -385,6 +401,31 @@ namespace MiniMart.Repositories.RepoImplement
                 .FirstOrDefaultAsync(p => p.ProductId == productId);
         }
 
+        private async Task<Promotion?> GetActiveProductPromotionAsync(int productId, DateTime checkoutAt)
+        {
+            return await _context.Promotions
+                .AsNoTracking()
+                .Where(p => p.IsActive
+                    && p.Type == PromotionType.ProductDiscount
+                    && p.StartDate <= checkoutAt
+                    && p.EndDate >= checkoutAt
+                    && p.PromotionProducts.Any(pp => pp.ProductId == productId))
+                .OrderBy(p => p.PromotionId)
+                .FirstOrDefaultAsync();
+        }
+
+        private static decimal CalculateProductDiscount(decimal grossLineAmount, Promotion? promotion)
+        {
+            if (promotion == null)
+                return 0;
+
+            var discount = promotion.DiscountPercent.GetValueOrDefault() > 0
+                ? grossLineAmount * promotion.DiscountPercent.Value / 100m
+                : promotion.DiscountAmount.GetValueOrDefault();
+
+            return Math.Min(grossLineAmount, Math.Max(0, discount));
+        }
+
         public async Task ConfirmOrderCompletionAsync(int orderId)
         {
             var order = await _context.Orders
@@ -398,31 +439,13 @@ namespace MiniMart.Repositories.RepoImplement
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                foreach (var detail in order.OrderDetails)
-                {
-                    var product = await _context.Products.FindAsync(detail.ProductId);
-                    if (product != null)
-                    {
-                        int previousStock = product.StockQuantity;
-                        product.StockQuantity -= detail.Quantity;
+                await ConsumeSaleStockAsync(
+                    order.OrderId,
+                    order.OrderCode,
+                    order.EmployeeId,
+                    order.OrderDetails);
 
-                        _context.InventoryTransactions.Add(new InventoryTransaction
-                        {
-                            TransactionType = InventoryTransactionType.Sale,
-                            Quantity = detail.Quantity,
-                            PreviousStock = previousStock,
-                            CurrentStock = product.StockQuantity,
-                            ReferenceType = ReferenceType.Order,
-                            ReferenceId = order.OrderId,
-                            ProductId = detail.ProductId,
-                            EmployeeId = order.EmployeeId,
-                            Note = $"Bán hàng - Đơn {order.OrderCode}"
-                        });
-                    }
-                }
-
-                // Tính toán điểm ngược lại từ DiscountAmount (1 điểm = 1000 VND)
-                int loyaltyPointsUsed = (int)(order.DiscountAmount / 1000m);
+                int loyaltyPointsUsed = (int)order.DiscountAmount;
                 int pointsEarned = (int)(order.FinalAmount / 50000);
 
                 if (order.Customer != null)
@@ -441,10 +464,102 @@ namespace MiniMart.Repositories.RepoImplement
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                await transaction.RollbackAsync();
+                throw new DomainException(
+                    "Batch data was updated by another operation. Please refresh and try again.",
+                    StatusCodes.Status409Conflict);
+            }
             catch
             {
                 await transaction.RollbackAsync();
                 throw;
+            }
+        }
+
+        private async Task ConsumeSaleStockAsync(
+            int orderId,
+            string orderCode,
+            int employeeId,
+            IEnumerable<OrderDetail> orderDetails)
+        {
+            var requestedQuantities = orderDetails
+                .GroupBy(detail => detail.ProductId)
+                .ToDictionary(group => group.Key, group => group.Sum(detail => detail.Quantity));
+
+            var productIds = requestedQuantities.Keys.ToList();
+            var products = await _context.Products
+                .Where(product => productIds.Contains(product.ProductId))
+                .ToDictionaryAsync(product => product.ProductId);
+
+            if (products.Count != productIds.Count)
+            {
+                throw new KeyNotFoundException("One or more order products do not exist.");
+            }
+
+            var businessDate = DateTime.Today;
+            var sellableBatches = await _batchRepository
+                .GetSellableBatchesForProductsAsync(productIds, businessDate);
+
+            foreach (var (productId, quantity) in requestedQuantities)
+            {
+                var product = products[productId];
+                if (product.StockQuantity < quantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Sản phẩm '{product.ProductName}' không đủ tồn kho. Hiện có: {product.StockQuantity}, yêu cầu: {quantity}.");
+                }
+
+                var eligibleQuantity = sellableBatches
+                    .Where(batch => batch.ProductId == productId)
+                    .Sum(batch => batch.QuantityRemaining);
+
+                if (eligibleQuantity < quantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Sản phẩm '{product.ProductName}' không đủ tồn kho lô còn hạn sử dụng. Hiện có: {eligibleQuantity}, yêu cầu: {quantity}.");
+                }
+            }
+
+            foreach (var (productId, quantity) in requestedQuantities)
+            {
+                var product = products[productId];
+                product.StockQuantity -= quantity;
+
+                var quantityToAllocate = quantity;
+                foreach (var batch in sellableBatches.Where(batch => batch.ProductId == productId))
+                {
+                    if (quantityToAllocate == 0)
+                    {
+                        break;
+                    }
+
+                    var allocatedQuantity = Math.Min(batch.QuantityRemaining, quantityToAllocate);
+                    var previousBatchStock = batch.QuantityRemaining;
+                    batch.QuantityRemaining -= allocatedQuantity;
+                    batch.Status = batch.QuantityRemaining > 0;
+                    quantityToAllocate -= allocatedQuantity;
+
+                    _context.InventoryTransactions.Add(new InventoryTransaction
+                    {
+                        TransactionType = InventoryTransactionType.Sale,
+                        Quantity = allocatedQuantity,
+                        PreviousStock = previousBatchStock,
+                        CurrentStock = batch.QuantityRemaining,
+                        ReferenceType = ReferenceType.Order,
+                        ReferenceId = orderId,
+                        ProductId = productId,
+                        BatchId = batch.BatchId,
+                        EmployeeId = employeeId,
+                        Note = $"Bán hàng - Đơn {orderCode}"
+                    });
+                }
+
+                if (quantityToAllocate != 0)
+                {
+                    throw new InvalidOperationException("Eligible batch stock changed while completing the order.");
+                }
             }
         }
     }
