@@ -1,8 +1,7 @@
-﻿using MiniMart.Models.Base;
 
 namespace MiniMart.Models
 {
-    public class Product : BaseEntity
+    public class Product
     {
         public int ProductId { get; set; }
 
@@ -18,6 +17,8 @@ namespace MiniMart.Models
         public int StockQuantity { get; set; }
 
         public int MinimumStock { get; set; }
+
+        public byte[] RowVersion { get; set; }
 
         public string? Description { get; set; }
 
@@ -46,5 +47,8 @@ namespace MiniMart.Models
 
         public ICollection<OrderReturnDetail> OrderReturnDetails { get; set; }
             = new List<OrderReturnDetail>();
+
+        public ICollection<StockCountLine> StockCountLines { get; set; }
+            = new List<StockCountLine>();
     }
 }

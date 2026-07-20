@@ -1,13 +1,24 @@
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
 using MiniMart.Mapping;
 using MiniMart.Middleware;
 using MiniMart.Models;
 using MiniMart.Shared.Extensions;
+using MiniMart.Repositories.RepoInterface;
+using MiniMart.Repositories.RepoImplement;
+using MiniMart.Repositories.Implementations;
+using MiniMart.Repositories.Interfaces;
+using MiniMart.Services;
+using MiniMart.Services.Interfaces;
+using MiniMart.Services.Implementations;
+using MiniMart.Hubs;
+using MiniMart.Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<TaxSettings>(builder.Configuration.GetSection("TaxSettings"));
 const string DevelopmentCorsPolicy = "DevelopmentCorsPolicy";
 
 // ── OData EDM Model ──────────────────────────────────────────────
@@ -32,15 +43,61 @@ odataBuilder.EntitySet<Receipt>("Receipts");
 odataBuilder.EntitySet<Shift>("Shifts");
 odataBuilder.EntitySet<InventoryTransaction>("InventoryTransactions");
 odataBuilder.EntitySet<Promotion>("Promotions");
+odataBuilder.EntitySet<StockCount>("StockCounts");
 
 // ── Infrastructure ────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddRepositories();
-builder.Services.AddAppServices();
-builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
+builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
+builder.Services.AddScoped<IBatchRepository, BatchRepository>();
+builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IBatchService, BatchService>();
+builder.Services.AddScoped<IReceiptService, ReceiptService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IShiftService, ShiftService>();
+builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
+builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
+builder.Services.AddAutoMapper(typeof(SupplierMappingProfile));
+builder.Services.AddAutoMapper(typeof(CategoryMappingProfile));
+builder.Services.AddAutoMapper(typeof(OrderReturnMappingProfile));
+builder.Services.AddAutoMapper(typeof(EInvoiceMappingProfile));
+builder.Services.AddAutoMapper(typeof(StockCountMappingProfile));
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IOrderReturnRepository, OrderReturnRepository>();
+builder.Services.AddScoped<IOrderReturnService, OrderReturnService>();
+builder.Services.AddScoped<IEInvoiceRepository, EInvoiceRepository>();
+builder.Services.AddScoped<IEInvoiceService, EInvoiceService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IPromotionService, PromotionService>();
+builder.Services.AddStockCountRepository();
+builder.Services.AddStockCountServices();
+
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<MiniMart.Services.Interfaces.IPaymentGatewayService, VnPayService>();
 
 builder.Services.AddControllers()
     .AddOData(options => options
@@ -87,6 +144,19 @@ else
 }
 
 app.UseHttpsRedirection();
+var returnUploadsPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "wwwroot",
+    "uploads",
+    "returns");
+Directory.CreateDirectory(returnUploadsPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(returnUploadsPath),
+    RequestPath = "/uploads/returns",
+    ServeUnknownFileTypes = true,
+    DefaultContentType = "image/jpeg"
+});
 app.UseStaticFiles();
 app.UseRouting();
 if (app.Environment.IsDevelopment())
@@ -98,5 +168,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();

@@ -16,5 +16,6 @@ namespace MiniMart.Repositories.RepoInterface
         Task<Product?> GetActiveProductByBarcodeAsync(string barcode);
         Task DeleteBatchesByReceiptIdAsync(int receiptId);
         Task<bool> MarkReceiptAsCompletedAsync(int id);
+        Task ExecuteInTransactionAsync(Func<Task> operation);
     }
 }

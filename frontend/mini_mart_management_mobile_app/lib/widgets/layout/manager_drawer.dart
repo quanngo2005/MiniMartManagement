@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_profile_screen.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 
 enum ManagerNavDestination {
   home,
   shift,
+  productPerformance,
   inventoryDocuments,
   inventoryTransactions,
+  batches,
+  staffPerformance,
   staff,
+  suppliers,
   customers,
+  customerInformation,
   promotions,
+  analyze,
+  invoices,
+  returns,
+  categories,
 }
 
 class ManagerDrawer extends StatelessWidget {
@@ -48,12 +58,31 @@ class ManagerDrawer extends StatelessWidget {
                     onTap: _select(context, ManagerNavDestination.home),
                   ),
                   _DrawerTile(
+                    icon: Icons.analytics_outlined,
+                    activeIcon: Icons.analytics_rounded,
+                    label: 'Báo Cáo Tài Chính',
+                    destination: ManagerNavDestination.analyze,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.analyze),
+                  ),
+                  _DrawerTile(
                     icon: Icons.schedule_outlined,
                     activeIcon: Icons.schedule_rounded,
                     label: 'Quản lý ca',
                     destination: ManagerNavDestination.shift,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.shift),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.bar_chart_outlined,
+                    activeIcon: Icons.bar_chart_rounded,
+                    label: 'Sản Phẩm',
+                    destination: ManagerNavDestination.productPerformance,
+                    selected: selected,
+                    onTap: _select(
+                      context,
+                      ManagerNavDestination.productPerformance,
+                    ),
                   ),
                   const _DrawerSectionLabel('Kho hàng'),
                   _DrawerTile(
@@ -78,7 +107,26 @@ class ManagerDrawer extends StatelessWidget {
                       ManagerNavDestination.inventoryTransactions,
                     ),
                   ),
+                  _DrawerTile(
+                    icon: Icons.inventory_outlined,
+                    activeIcon: Icons.inventory_rounded,
+                    label: 'Trạng thái lô hàng',
+                    destination: ManagerNavDestination.batches,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.batches),
+                  ),
                   const _DrawerSectionLabel('Nhân sự & Khách hàng'),
+                  _DrawerTile(
+                    icon: Icons.show_chart_outlined,
+                    activeIcon: Icons.trending_up_rounded,
+                    label: 'Hiệu suất nhân viên',
+                    destination: ManagerNavDestination.staffPerformance,
+                    selected: selected,
+                    onTap: _select(
+                      context,
+                      ManagerNavDestination.staffPerformance,
+                    ),
+                  ),
                   _DrawerTile(
                     icon: Icons.group_outlined,
                     activeIcon: Icons.group_rounded,
@@ -86,6 +134,14 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.staff,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.staff),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.local_shipping_outlined,
+                    activeIcon: Icons.local_shipping_rounded,
+                    label: 'Nhà cung cấp',
+                    destination: ManagerNavDestination.suppliers,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.suppliers),
                   ),
                   _DrawerTile(
                     icon: Icons.people_alt_outlined,
@@ -103,6 +159,31 @@ class ManagerDrawer extends StatelessWidget {
                     destination: ManagerNavDestination.promotions,
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.promotions),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.receipt_long_outlined,
+                    activeIcon: Icons.receipt_long_rounded,
+                    label: 'Hóa đơn',
+                    destination: ManagerNavDestination.invoices,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.invoices),
+                  ),
+                  _DrawerTile(
+                    icon: Icons.assignment_return_outlined,
+                    activeIcon: Icons.assignment_return_rounded,
+                    label: 'Xử lý trả hàng',
+                    destination: ManagerNavDestination.returns,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.returns),
+                  ),
+                  const _DrawerSectionLabel('Cài đặt'),
+                  _DrawerTile(
+                    icon: Icons.category_outlined,
+                    activeIcon: Icons.category_rounded,
+                    label: 'Danh mục sản phẩm',
+                    destination: ManagerNavDestination.categories,
+                    selected: selected,
+                    onTap: _select(context, ManagerNavDestination.categories),
                   ),
                 ],
               ),
@@ -179,7 +260,15 @@ class ManagerDrawer extends StatelessWidget {
             context,
           ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
         ),
-        onTap: () => Navigator.pop(context),
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push<void>(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => const EmployeeProfileScreen(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -244,13 +333,12 @@ class _DrawerSectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
       child: Text(
-        label.toUpperCase(),
+        label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
           color: AppColors.textMuted,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
         ),
       ),
     );

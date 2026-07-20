@@ -61,7 +61,7 @@ String _formatImportDate(DateTime value) {
   final today = DateTime(now.year, now.month, now.day);
   final date = DateTime(localValue.year, localValue.month, localValue.day);
   final time =
-      _twoDigits(localValue.hour) + ':' + _twoDigits(localValue.minute);
+      '${_twoDigits(localValue.hour)}:${_twoDigits(localValue.minute)}';
 
   if (date == today) return 'Hôm nay, $time';
   if (date == today.subtract(const Duration(days: 1))) {

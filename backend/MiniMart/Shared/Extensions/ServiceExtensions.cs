@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MiniMart.Services;
+using MiniMart.Services.Implementations;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Settings;
 
@@ -41,10 +42,16 @@ namespace MiniMart.Shared.Extensions
                     {
                         OnMessageReceived = context =>
                         {
-                            if (string.IsNullOrWhiteSpace(context.Token) &&
-                                context.Request.Cookies.TryGetValue("access_token", out var accessToken))
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
                             {
                                 context.Token = accessToken;
+                            }
+                            else if (string.IsNullOrWhiteSpace(context.Token) &&
+                                context.Request.Cookies.TryGetValue("access_token", out var cookieToken))
+                            {
+                                context.Token = cookieToken;
                             }
 
                             return Task.CompletedTask;
@@ -59,6 +66,12 @@ namespace MiniMart.Shared.Extensions
                 options.AddPolicy("AnyEmployee", policy => policy.RequireRole("Admin", "Manager", "Cashier", "Warehouse", "Staff"));
             });
 
+            return services;
+        }
+
+        public static IServiceCollection AddStockCountServices(this IServiceCollection services)
+        {
+            services.AddScoped<IStockCountService, StockCountService>();
             return services;
         }
     }

@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
+import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
+import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
+import 'package:provider/provider.dart';
+import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/customer_list_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/batch_status_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_dashboard_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/manager_return_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/product_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/supplier_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_bottom_navigation_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_drawer.dart';
 
-/// IndexedStack layout:
-///   0 → Home (dashboard)
-///   1 → Shift management
-///   2 → Inventory documents
-///   3 → Inventory transactions
-///   4 → Staff
-///   5 → Customers
-///   6 → Promotions
-///
-/// Bottom nav (4 tabs):
-///   0 → Home         → stack index 0
-///   1 → Inventory    → stack index 2  (documents)
-///   2 → Staff        → stack index 4
-///   3 → Customers    → stack index 5
 class ManagerNavigationScreen extends StatefulWidget {
   const ManagerNavigationScreen({required this.user, super.key});
 
@@ -39,27 +37,58 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
 
   ManagerNavDestination _destination = ManagerNavDestination.home;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<OrderReturnProvider>().loadAllReturns();
+    });
+    SignalrService.instance.addListener(_onNotificationReceived);
+  }
+
+  @override
+  void dispose() {
+    SignalrService.instance.removeListener(_onNotificationReceived);
+    super.dispose();
+  }
+
+  void _onNotificationReceived() {
+    if (mounted) {
+      context.read<OrderReturnProvider>().loadAllReturns();
+    }
+  }
+
   static const _destinationToIndex = {
     ManagerNavDestination.home: 0,
     ManagerNavDestination.shift: 1,
-    ManagerNavDestination.inventoryDocuments: 2,
-    ManagerNavDestination.inventoryTransactions: 3,
-    ManagerNavDestination.staff: 4,
-    ManagerNavDestination.customers: 5,
-    ManagerNavDestination.promotions: 6,
+    ManagerNavDestination.productPerformance: 2,
+    ManagerNavDestination.inventoryDocuments: 3,
+    ManagerNavDestination.inventoryTransactions: 4,
+    ManagerNavDestination.batches: 5,
+    ManagerNavDestination.staffPerformance: 6,
+    ManagerNavDestination.staff: 7,
+    ManagerNavDestination.suppliers: 8,
+    ManagerNavDestination.customers: 9,
+    ManagerNavDestination.promotions: 10,
+    ManagerNavDestination.invoices: 11,
+    ManagerNavDestination.analyze: 12,
+    ManagerNavDestination.categories: 13,
+    ManagerNavDestination.customerInformation: 14,
+    ManagerNavDestination.returns: 15,
   };
 
-  // Only 4 bottom-nav tabs map to destinations; others are drawer-only.
   static const _bottomNavDestinations = [
-    ManagerNavDestination.home, // 0
-    ManagerNavDestination.inventoryDocuments, // 1
-    ManagerNavDestination.staff, // 2
-    ManagerNavDestination.customers, // 3
+    ManagerNavDestination.home,
+    ManagerNavDestination.inventoryDocuments,
+    ManagerNavDestination.staff,
+    ManagerNavDestination.customers,
   ];
 
   int get _bottomNavIndex {
+    if (_destination == ManagerNavDestination.customerInformation) {
+      return _bottomNavDestinations.indexOf(ManagerNavDestination.customers);
+    }
     final idx = _bottomNavDestinations.indexOf(_destination);
-    // Return 0 (home) for drawer-only destinations to avoid deselected state.
     return idx >= 0 ? idx : 0;
   }
 
@@ -81,41 +110,49 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
       key: _scaffoldKey,
       drawer: ManagerDrawer(
         user: widget.user,
-        selected: _destination,
+        selected: _destination == ManagerNavDestination.customerInformation
+            ? ManagerNavDestination.customers
+            : _destination,
         onDestinationSelected: _selectDestination,
       ),
       body: IndexedStack(
         index: stackIndex,
         children: [
-          // 0 — Home
-          ManagerDashboardScreen(
-            user: widget.user,
-            onMenuTap: _openDrawer,
-          ),
-          // 1 — Shift
+          ManagerDashboardScreen(user: widget.user, onMenuTap: _openDrawer),
           ShiftManagementScreen(onMenuTap: _openDrawer),
-          // 2 — Inventory documents
+          ProductPerformanceScreen(onMenuTap: _openDrawer),
           InventoryDocumentsScreen(onMenuTap: _openDrawer),
-          // 3 — Inventory transactions
           InventoryTransactionsScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
-          // 4 — Staff
+          BatchStatusScreen(onMenuTap: _openDrawer),
+          EmployeePerformanceScreen(
+            showBottomNavBar: false,
+            onMenuTap: _openDrawer,
+            onManageEmployees: () =>
+                _selectDestination(ManagerNavDestination.staff),
+          ),
           EmployeeManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
-          // 5 — Customers
+          const SupplierManagementScreen(showBottomNavBar: false),
           MemberManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
+            onManageCustomers: () =>
+                _selectDestination(ManagerNavDestination.customerInformation),
           ),
-          // 6 — Promotions
           PromotionManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
+          InvoiceListScreen(onMenuTap: _openDrawer),
+          AnalyzeScreen(onMenuTap: _openDrawer),
+          CategoryManagementScreen.withProvider(onMenuTap: _openDrawer),
+          CustomerListScreen(showBottomNavBar: false, onMenuTap: _openDrawer),
+          ManagerReturnListScreen(onMenuTap: _openDrawer),
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(

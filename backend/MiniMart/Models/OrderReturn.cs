@@ -1,13 +1,14 @@
-using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class OrderReturn : BaseEntity
+    public class OrderReturn
     {
         public int OrderReturnId { get; set; }
 
         public string ReturnCode { get; set; }
+
+        public DateTime CreatedAt { get; set; }
 
         public int OriginalOrderId { get; set; }
 
@@ -28,6 +29,14 @@ namespace MiniMart.Models
         public EInvoice? EInvoice { get; set; }
 
         public OrderReturnStatus Status { get; set; }
+
+        public ReturnClassify Classify { get; set; }
+
+        public string? ImageEvidence { get; set; }
+
+        public int? ShiftId { get; set; }
+
+        public Shift? Shift { get; set; }
 
         public ICollection<OrderReturnDetail> OrderReturnDetails { get; set; }
             = new List<OrderReturnDetail>();

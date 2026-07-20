@@ -1,0 +1,40 @@
+<Window x:Class="MiniMart.Views.ShiftManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewmodels="clr-namespace:MiniMart.ViewModels"
+        Title="Mở Ca Bán Hàng" Height="500" Width="600"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#F5F7FA" FontFamily="Segoe UI">
+
+    <Window.DataContext>
+        <viewmodels:ShiftManagementViewModel />
+    </Window.DataContext>
+
+    <Border Background="White" CornerRadius="16" Margin="30" Padding="30">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="15" ShadowDepth="2" Color="#D1D5DB" Opacity="0.5"/>
+        </Border.Effect>
+
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="MỞ CA BÁN HÀNG" FontSize="24" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+            <TextBlock Text="Bạn chưa có ca làm việc nào đang mở. Vui lòng nhập số tiền mặt có trong két để bắt đầu ca mới." 
+                       FontSize="14" Foreground="#64748B" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,30"/>
+
+            <TextBlock Text="Tiền đầu ca (Start Cash):" FontSize="14" Foreground="#64748B" Margin="0,0,0,5"/>
+            <TextBox Text="{Binding StartCashString, UpdateSourceTrigger=PropertyChanged}" 
+                     Height="45" Padding="15,0" VerticalContentAlignment="Center" FontSize="16" BorderBrush="#E2E8F0" BorderThickness="1" Margin="0,0,0,10"/>
+
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#EF4444" FontSize="13" TextWrapping="Wrap" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+
+            <Button Content="Bắt đầu ca" Command="{Binding StartShiftCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" 
+                    Height="50" Background="#4F46E5" Foreground="White" FontSize="16" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="8"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+    </Border>
+</Window>

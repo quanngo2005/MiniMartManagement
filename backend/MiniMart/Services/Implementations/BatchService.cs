@@ -1,7 +1,9 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using MiniMart.DTOs;
 using MiniMart.Models;
+using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
@@ -11,11 +13,16 @@ namespace MiniMart.Services
     public class BatchService : IBatchService
     {
         private readonly IBatchRepository _batchRepository;
+        private readonly IInventoryTransactionRepository _inventoryTransactionRepository;
         private readonly IMapper _mapper;
 
-        public BatchService(IBatchRepository batchRepository, IMapper mapper)
+        public BatchService(
+            IBatchRepository batchRepository,
+            IInventoryTransactionRepository inventoryTransactionRepository,
+            IMapper mapper)
         {
             _batchRepository = batchRepository;
+            _inventoryTransactionRepository = inventoryTransactionRepository;
             _mapper = mapper;
         }
 
@@ -32,47 +39,93 @@ namespace MiniMart.Services
             return batch == null ? null : _mapper.Map<BatchDto>(batch);
         }
 
-        public async Task<BatchDto> CreateBatchAsync(CreateBatchDto createDto)
+        public async Task<InventoryTransactionDto> DisposeExpiredBatchAsync(
+            int batchId,
+            int employeeId)
         {
-            if (!await _batchRepository.ProductExistsAsync(createDto.ProductId))
-                throw new DomainException("Product ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+            if (!await _inventoryTransactionRepository.EmployeeExistsAsync(employeeId))
+            {
+                throw new DomainException(
+                    "Employee ID does not exist.",
+                    StatusCodes.Status422UnprocessableEntity);
+            }
 
-            if (!await _batchRepository.ReceiptExistsAsync(createDto.ReceiptId))
-                throw new DomainException("Receipt ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+            for (var attempt = 0; attempt < 2; attempt++)
+            {
+                try
+                {
+                    return await DisposeExpiredBatchOnceAsync(batchId, employeeId);
+                }
+                catch (DbUpdateConcurrencyException) when (attempt == 0)
+                {
+                    // Reload the tracked batch and product once before reporting a conflict.
+                }
+            }
 
-            var batch = _mapper.Map<Batch>(createDto);
-            var created = await _batchRepository.CreateBatchAsync(batch);
-            var createdWithDetails = await _batchRepository.GetBatchByIdAsync(created.BatchId);
-            return _mapper.Map<BatchDto>(createdWithDetails ?? created);
+            throw new DomainException(
+                "Batch data was updated by another operation. Please refresh and try again.",
+                StatusCodes.Status409Conflict);
         }
 
-        public async Task<BatchDto> UpdateBatchAsync(int id, UpdateBatchDto updateDto)
+        private async Task<InventoryTransactionDto> DisposeExpiredBatchOnceAsync(
+            int batchId,
+            int employeeId)
         {
-            var existing = await _batchRepository.GetBatchByIdAsync(id);
-            if (existing == null)
-                throw new DomainException($"Batch with ID {id} not found.", StatusCodes.Status404NotFound);
+            InventoryTransaction? disposedTransaction = null;
+            await _batchRepository.ExecuteInTransactionAsync(async () =>
+            {
+                var batch = await _batchRepository.GetBatchByIdAsync(batchId)
+                    ?? throw new DomainException(
+                        "Batch ID does not exist.",
+                        StatusCodes.Status404NotFound);
 
-            if (!await _batchRepository.ProductExistsAsync(updateDto.ProductId))
-                throw new DomainException("Product ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                if (batch.ExpiryDate.Date >= DateTime.Today)
+                {
+                    throw new DomainException(
+                        "Only expired batches can be disposed.",
+                        StatusCodes.Status422UnprocessableEntity);
+                }
 
-            if (!await _batchRepository.ReceiptExistsAsync(updateDto.ReceiptId))
-                throw new DomainException("Receipt ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                if (batch.QuantityRemaining <= 0)
+                {
+                    throw new DomainException(
+                        "Batch has no remaining quantity to dispose.",
+                        StatusCodes.Status422UnprocessableEntity);
+                }
 
-            var batch = _mapper.Map<Batch>(updateDto);
-            batch.BatchId = id;
+                var product = batch.Product
+                    ?? throw new DomainException(
+                        "Batch product does not exist.",
+                        StatusCodes.Status422UnprocessableEntity);
+                var disposalQuantity = batch.QuantityRemaining;
+                var previousStock = product.StockQuantity;
+                if (previousStock < disposalQuantity)
+                {
+                    throw new DomainException(
+                        "Product stock is insufficient for this batch disposal.",
+                        StatusCodes.Status409Conflict);
+                }
 
-            var updated = await _batchRepository.UpdateBatchAsync(batch);
-            var updatedWithDetails = await _batchRepository.GetBatchByIdAsync(id);
-            return _mapper.Map<BatchDto>(updatedWithDetails ?? updated);
+                await _batchRepository.AdjustBatchRemainingQuantityAsync(
+                    batch.BatchId,
+                    -disposalQuantity);
+
+                disposedTransaction = await _inventoryTransactionRepository
+                    .CreateInventoryTransactionAsync(new InventoryTransaction
+                    {
+                        TransactionType = InventoryTransactionType.Damage,
+                        Quantity = disposalQuantity,
+                        PreviousStock = previousStock,
+                        CurrentStock = previousStock - disposalQuantity,
+                        Note = $"Disposed expired batch {batch.BatchCode}.",
+                        ProductId = product.ProductId,
+                        BatchId = batch.BatchId,
+                        EmployeeId = employeeId,
+                    });
+            });
+
+            return _mapper.Map<InventoryTransactionDto>(disposedTransaction!);
         }
 
-        public async Task DeleteBatchAsync(int id)
-        {
-            var exists = await _batchRepository.BatchExistsAsync(id);
-            if (!exists)
-                throw new DomainException($"Batch with ID {id} not found.", StatusCodes.Status404NotFound);
-
-            await _batchRepository.DeleteBatchAsync(id);
-        }
     }
 }

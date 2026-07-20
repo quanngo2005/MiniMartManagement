@@ -229,7 +229,7 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
               ? const Center(child: Text('Không có giao dịch nào.'))
               : ListView.separated(
                   itemCount: _filtered.length,
-                  separatorBuilder: (_, __) =>
+                  separatorBuilder: (_, _) =>
                       const Divider(height: 1, indent: 16, endIndent: 16),
                   itemBuilder: (_, i) => _buildTxnTile(context, _filtered[i]),
                 ),
@@ -242,7 +242,7 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
             'END OF RECENT HISTORY',
             style: TextStyle(
               fontSize: 11,
-              color: AppColors.textMuted.withOpacity(0.7),
+              color: AppColors.textMuted.withValues(alpha: 0.7),
               letterSpacing: 0.5,
             ),
           ),

@@ -353,6 +353,7 @@ BEGIN
         [Type]            INT            NOT NULL,
         [DiscountPercent] DECIMAL(18,2)  NULL,
         [DiscountAmount]  DECIMAL(18,2)  NULL,
+        [MinimumOrderAmount] DECIMAL(18,2) NULL,
         [BuyQuantity]     INT            NULL,
         [GiftQuantity]    INT            NULL,
         [GiftProductId]   INT            NULL,

@@ -1,8 +1,7 @@
-﻿using MiniMart.Models.Base;
 
 namespace MiniMart.Models
 {
-    public class Supplier : BaseEntity
+    public class Supplier
     {
         public int SupplierId { get; set; }
 

@@ -54,6 +54,9 @@ namespace MiniMart.Data
         public DbSet<TaxRate> TaxRates { get; set; }
         public DbSet<EInvoice> EInvoices { get; set; }
         public DbSet<EInvoiceDetail> EInvoiceDetails { get; set; }
+        public DbSet<StockCount> StockCounts { get; set; }
+        public DbSet<StockCountLine> StockCountLines { get; set; }
+        public DbSet<StockCountCategory> StockCountCategories { get; set; }
 
         public override int SaveChanges()
         {
@@ -107,6 +110,19 @@ namespace MiniMart.Data
                 .HasForeignKey(b => b.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Batch>()
+                .Property(b => b.Provenance)
+                .HasDefaultValue(BatchProvenance.Receipt)
+                .HasSentinel(BatchProvenance.Receipt);
+
+            modelBuilder.Entity<Batch>()
+                .Property(b => b.RowVersion)
+                .IsRowVersion();
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.RowVersion)
+                .IsRowVersion();
+
             // =========================
             // SHIFT
             // =========================
@@ -139,7 +155,17 @@ namespace MiniMart.Data
 
             modelBuilder.Entity<Category>()
                 .Property(c => c.CategoryName)
-                .HasMaxLength(255);
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<Category>()
+                .Property(c => c.CategoryCode)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            modelBuilder.Entity<Category>()
+                .Property(c => c.Description)
+                .HasMaxLength(500);
 
             modelBuilder.Entity<TaxRate>()
                 .Property(t => t.Rate)
@@ -148,6 +174,10 @@ namespace MiniMart.Data
             modelBuilder.Entity<TaxRate>()
                 .Property(t => t.Description)
                 .HasMaxLength(100);
+
+            modelBuilder.Entity<TaxRate>()
+                .Property(t => t.CreatedAt)
+                .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
 
             // =========================
             // SEARCHABLE LABEL BOUNDS
@@ -195,6 +225,69 @@ namespace MiniMart.Data
                 .HasOne(i => i.Batch)
                 .WithMany(b => b.InventoryTransactions)
                 .HasForeignKey(i => i.BatchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =========================
+            // STOCK COUNT
+            // =========================
+            modelBuilder.Entity<StockCount>()
+                .Property(sc => sc.RowVersion)
+                .IsRowVersion();
+
+            modelBuilder.Entity<StockCountLine>()
+                .Property(scl => scl.RowVersion)
+                .IsRowVersion();
+
+            modelBuilder.Entity<StockCount>()
+                .HasOne(sc => sc.CreatedByEmployee)
+                .WithMany(e => e.CreatedStockCounts)
+                .HasForeignKey(sc => sc.CreatedByEmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Receipt>()
+                .Property(r => r.CreatedAt)
+                .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.CreatedAt)
+                .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
+
+            modelBuilder.Entity<OrderReturn>()
+                .Property(or => or.CreatedAt)
+                .HasDefaultValueSql("DATEADD(HOUR, 7, SYSUTCDATETIME())");
+
+            modelBuilder.Entity<StockCount>()
+                .HasOne(sc => sc.ReviewedByEmployee)
+                .WithMany(e => e.ReviewedStockCounts)
+                .HasForeignKey(sc => sc.ReviewedByEmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StockCountLine>()
+                .HasOne(scl => scl.StockCount)
+                .WithMany(sc => sc.Lines)
+                .HasForeignKey(scl => scl.StockCountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<StockCountLine>()
+                .HasOne(scl => scl.Product)
+                .WithMany(p => p.StockCountLines)
+                .HasForeignKey(scl => scl.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StockCountLine>()
+                .HasIndex(scl => new { scl.StockCountId, scl.ProductId })
+                .IsUnique();
+
+            modelBuilder.Entity<StockCountCategory>()
+                .HasOne(scc => scc.StockCount)
+                .WithMany(sc => sc.Categories)
+                .HasForeignKey(scc => scc.StockCountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<StockCountCategory>()
+                .HasOne(scc => scc.Category)
+                .WithMany(c => c.StockCountCategories)
+                .HasForeignKey(scc => scc.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =========================
@@ -296,7 +389,7 @@ namespace MiniMart.Data
             modelBuilder.Entity<OrderReturn>()
                 .ToTable(t =>
                 {
-                    t.HasCheckConstraint("CK_OrderReturns_Status", "[Status] IN (1,2,3)");
+                    t.HasCheckConstraint("CK_OrderReturns_Status", "[Status] IN (1,2,3,4)");
                     t.HasCheckConstraint("CK_OrderReturns_RefundMethod", "[RefundMethod] IN (1,2,3,4,5,6)");
                 });
 
@@ -415,6 +508,10 @@ namespace MiniMart.Data
             modelBuilder.Entity<Customer>().HasIndex(c => c.PhoneNumber).IsUnique();
             modelBuilder.Entity<Supplier>().HasIndex(s => s.SupplierCode).IsUnique();
             modelBuilder.Entity<Category>().HasIndex(c => c.CategoryCode).IsUnique();
+            modelBuilder.Entity<StockCount>().HasIndex(sc => sc.StockCountCode).IsUnique();
+            modelBuilder.Entity<StockCountCategory>()
+                .HasIndex(scc => new { scc.StockCountId, scc.CategoryId })
+                .IsUnique();
 
             // =========================
             // SEED DATA
@@ -431,6 +528,8 @@ namespace MiniMart.Data
             modelBuilder.Entity<Shift>().HasData(DataSource.GetShifts());
             modelBuilder.Entity<Order>().HasData(DataSource.GetOrders());
             modelBuilder.Entity<OrderDetail>().HasData(DataSource.GetOrderDetails());
+            modelBuilder.Entity<Promotion>().HasData(DataSource.GetPromotions());
+            modelBuilder.Entity<PromotionProduct>().HasData(DataSource.GetPromotionProducts());
             modelBuilder.Entity<InventoryTransaction>().HasData(DataSource.GetInventoryTransactions());
         }
 

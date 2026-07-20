@@ -7,6 +7,7 @@ class ProductLookup {
     required this.sellingPrice,
     required this.stockQuantity,
     required this.status,
+    this.category,
   });
 
   final int productId;
@@ -16,6 +17,7 @@ class ProductLookup {
   final double sellingPrice;
   final int stockQuantity;
   final bool status;
+  final ProductLookupCategory? category;
 
   factory ProductLookup.fromJson(Map<String, dynamic> json) {
     return ProductLookup(
@@ -26,7 +28,25 @@ class ProductLookup {
       sellingPrice: _readDouble(json, 'sellingPrice', 'SellingPrice'),
       stockQuantity: _readInt(json, 'stockQuantity', 'StockQuantity'),
       status: _readBool(json, 'status', 'Status'),
+      category: ProductLookupCategory.fromJsonOrNull(
+        json['category'] ?? json['Category'],
+      ),
     );
+  }
+}
+
+class ProductLookupCategory {
+  const ProductLookupCategory({required this.id, required this.name});
+
+  final int id;
+  final String name;
+
+  static ProductLookupCategory? fromJsonOrNull(Object? value) {
+    if (value is! Map<String, dynamic>) return null;
+    final id = value['id'] ?? value['Id'];
+    final name = value['name'] ?? value['Name'];
+    if (id is! num || name is! String) return null;
+    return ProductLookupCategory(id: id.toInt(), name: name);
   }
 }
 

@@ -60,3 +60,14 @@ nunit-*.xml
 .agents/AGENTS.md
 .agents/skills/code_review_graph/SKILL.md
 .vscode/mcp.json
+frontend/mini_mart_management_mobile_app/linux/flutter/generated_plugin_registrant.cc
+frontend/mini_mart_management_mobile_app/linux/flutter/generated_plugins.cmake
+frontend/mini_mart_management_mobile_app/macos/Flutter/GeneratedPluginRegistrant.swift
+frontend/mini_mart_management_mobile_app/windows/flutter/generated_plugin_registrant.cc
+frontend/mini_mart_management_mobile_app/windows/flutter/generated_plugins.cmake
+/stitch
+backend/MiniMart/appsettings.Development.json
+backend/MiniMart/appsettings.Development.json
+/backend/MiniMart/appsettings.Development.json
+/backend/MiniMart/.env
+/.claude

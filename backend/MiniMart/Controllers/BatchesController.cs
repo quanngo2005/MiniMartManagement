@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using System.Security.Claims;
 using MiniMart.DTOs;
 using MiniMart.Services.Interfaces;
 
@@ -38,34 +39,25 @@ namespace MiniMart.Controllers
             return Ok(batch);
         }
 
-        [Authorize(Policy = "ManagerUp")]
-        [HttpPost]
-        public async Task<ActionResult<BatchDto>> Create([FromBody] CreateBatchDto createDto)
+        [Authorize(Policy = "WarehouseUp")]
+        [HttpPost("{id}/dispose-expired")]
+        public async Task<ActionResult<InventoryTransactionDto>> DisposeExpired(int id)
         {
-            if (createDto == null) return BadRequest(new { message = "Invalid batch data." });
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var employeeId = GetCurrentEmployeeId();
+            if (employeeId == 0)
+            {
+                return Unauthorized(new { message = "Không xác định được danh tính nhân viên." });
+            }
 
-            var created = await _batchService.CreateBatchAsync(createDto);
-            return CreatedAtAction(nameof(GetById), new { id = created.BatchId }, created);
+            var disposedTransaction = await _batchService.DisposeExpiredBatchAsync(id, employeeId);
+            return Ok(disposedTransaction);
         }
 
-        [Authorize(Policy = "ManagerUp")]
-        [HttpPut("{id}")]
-        public async Task<ActionResult<BatchDto>> Update(int id, [FromBody] UpdateBatchDto updateDto)
+        private int GetCurrentEmployeeId()
         {
-            if (updateDto == null) return BadRequest(new { message = "Invalid update data." });
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var updated = await _batchService.UpdateBatchAsync(id, updateDto);
-            return Ok(updated);
+            var employeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(employeeId, out var id) ? id : 0;
         }
 
-        [Authorize(Policy = "ManagerUp")]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            await _batchService.DeleteBatchAsync(id);
-            return NoContent();
-        }
     }
 }

@@ -22,6 +22,27 @@ namespace MiniMart.Repositories.RepoImplement
                 .Where(b => !b.IsDeleted);
         }
 
+        public async Task<List<Batch>> GetSellableBatchesForProductsAsync(
+            IEnumerable<int> productIds,
+            DateTime businessDate)
+        {
+            var productIdList = productIds.Distinct().ToList();
+
+            return await _context.Batches
+                .Include(batch => batch.Receipt)
+                .Where(batch => productIdList.Contains(batch.ProductId)
+                    && !batch.IsDeleted
+                    && batch.Status
+                    && batch.QuantityRemaining > 0
+                    && batch.ExpiryDate >= businessDate)
+                .OrderBy(batch => batch.ExpiryDate)
+                .ThenBy(batch => batch.Receipt != null
+                    ? batch.Receipt.ImportDate
+                    : DateTime.MaxValue)
+                .ThenBy(batch => batch.BatchId)
+                .ToListAsync();
+        }
+
         public async Task<Batch?> GetBatchByIdAsync(int id)
         {
             return await _context.Batches
@@ -30,44 +51,6 @@ namespace MiniMart.Repositories.RepoImplement
                 .FirstOrDefaultAsync(b => b.BatchId == id && !b.IsDeleted);
         }
 
-        public async Task<Batch> CreateBatchAsync(Batch batch)
-        {
-            await _context.Batches.AddAsync(batch);
-            await _context.SaveChangesAsync();
-            return batch;
-        }
-
-        public async Task<Batch?> UpdateBatchAsync(Batch batch)
-        {
-            var existing = await _context.Batches.FindAsync(batch.BatchId);
-            if (existing == null) return null;
-
-            existing.BatchCode = batch.BatchCode;
-            existing.ManufactureDate = batch.ManufactureDate;
-            existing.ExpiryDate = batch.ExpiryDate;
-            existing.ImportPrice = batch.ImportPrice;
-            existing.QuantityImported = batch.QuantityImported;
-            existing.QuantityRemaining = batch.QuantityRemaining;
-            existing.Quantity = batch.Quantity;
-            existing.TotalPrice = batch.TotalPrice;
-            existing.Status = batch.Status;
-            existing.IsDeleted = batch.IsDeleted;
-            existing.ProductId = batch.ProductId;
-            existing.ReceiptId = batch.ReceiptId;
-
-            await _context.SaveChangesAsync();
-            return existing;
-        }
-
-        public async Task<bool> DeleteBatchAsync(int id)
-        {
-            var batch = await _context.Batches.FindAsync(id);
-            if (batch == null) return false;
-
-            batch.IsDeleted = true;
-            await _context.SaveChangesAsync();
-            return true;
-        }
 
         public async Task<bool> BatchExistsAsync(int batchId)
         {
@@ -91,6 +74,28 @@ namespace MiniMart.Repositories.RepoImplement
 
             batch.QuantityRemaining += quantityDelta;
             batch.Status = batch.QuantityRemaining > 0;
+        }
+
+        public async Task ExecuteInTransactionAsync(Func<Task> operation)
+        {
+            if (!_context.Database.IsRelational())
+            {
+                await operation();
+                return;
+            }
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                await operation();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                _context.ChangeTracker.Clear();
+                throw;
+            }
         }
     }
 }

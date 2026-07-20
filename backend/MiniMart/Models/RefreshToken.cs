@@ -1,8 +1,7 @@
-using MiniMart.Models.Base;
 
 namespace MiniMart.Models
 {
-    public class RefreshToken : BaseEntity
+    public class RefreshToken
     {
         public int RefreshTokenId { get; set; }
 

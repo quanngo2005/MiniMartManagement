@@ -1,9 +1,8 @@
-using MiniMart.Models.Base;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
 {
-    public class PointTransaction : BaseEntity
+    public class PointTransaction
     {
         public int PointTransactionId { get; set; }
 

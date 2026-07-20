@@ -3,6 +3,7 @@ import 'package:mini_mart_management_mobile_app/models/employee.dart';
 import 'package:mini_mart_management_mobile_app/models/role.dart';
 import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
 import 'package:provider/provider.dart';
@@ -66,7 +67,10 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
     final activeCount = employees.where((e) => e.status == 1).length;
 
     return Scaffold(
-      appBar: _buildAppBar(context),
+      appBar: MiniMartAppBar.primary(
+        title: 'Nhân viên',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: SafeArea(
         child: Stack(
           children: [
@@ -210,67 +214,9 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Đang quét mã vạch...')));
-        },
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        child: const Icon(Icons.qr_code_scanner_rounded),
-      ),
       bottomNavigationBar: widget.showBottomNavBar
           ? const AppBottomNavBar(selectedTab: AppNavTab.staff)
           : null,
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surface,
-      elevation: 0,
-      titleSpacing: widget.onMenuTap != null ? 0 : 16,
-      leadingWidth: widget.onMenuTap != null ? null : 40,
-      leading: widget.onMenuTap != null
-          ? IconButton(
-              icon: const Icon(Icons.menu_rounded),
-              onPressed: widget.onMenuTap,
-              color: AppColors.primary,
-            )
-          : const Padding(
-              padding: EdgeInsets.only(left: 16),
-              child: Icon(Icons.storefront_rounded, color: AppColors.primary),
-            ),
-      title: Text(
-        'Store #402 | North Branch',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primaryContainer,
-              border: Border.all(color: AppColors.borderGray),
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.person_rounded,
-                size: 20,
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -630,21 +576,25 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
     final seen = <String>{};
     final uniqueRoles = <Role>[];
     for (final r in roles) {
-      if (seen.add(r.roleName.trim().toLowerCase())) {
+      final normalizedName = r.roleName.trim().toLowerCase();
+      if (_selectableRoleNames.contains(normalizedName) &&
+          seen.add(normalizedName)) {
         uniqueRoles.add(r);
       }
     }
     var roleItems = uniqueRoles
         .map(
-          (r) =>
-              DropdownMenuItem<int>(value: r.roleId, child: Text(r.roleName)),
+          (r) => DropdownMenuItem<int>(
+            value: r.roleId,
+            child: Text(_roleDisplayName(r.roleName)),
+          ),
         )
         .toList();
     if (roleItems.isEmpty) {
       roleItems = const [
         DropdownMenuItem(value: 1, child: Text('Manager')),
         DropdownMenuItem(value: 2, child: Text('Cashier')),
-        DropdownMenuItem(value: 3, child: Text('Warehouse')),
+        DropdownMenuItem(value: 3, child: Text('Warehouse Staff')),
         DropdownMenuItem(value: 4, child: Text('Admin')),
       ];
     }
@@ -885,6 +835,19 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
         ),
       ),
     );
+  }
+
+  static const _selectableRoleNames = {
+    'admin',
+    'manager',
+    'cashier',
+    'warehouse',
+  };
+
+  static String _roleDisplayName(String roleName) {
+    return roleName.trim().toLowerCase() == 'warehouse'
+        ? 'Warehouse Staff'
+        : roleName;
   }
 
   void _submit() async {

@@ -8,24 +8,27 @@ import 'package:mini_mart_management_mobile_app/providers/tier_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/customer_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/members/recent_upgrade_tile.dart';
 import 'package:mini_mart_management_mobile_app/widgets/members/tier_distribution_card.dart';
 import 'package:mini_mart_management_mobile_app/widgets/members/tier_overview_card.dart';
+import 'package:mini_mart_management_mobile_app/screens/tier_management_screen.dart';
 
 class MemberManagementScreen extends StatefulWidget {
   const MemberManagementScreen({
     this.showBottomNavBar = true,
     this.onMenuTap,
+    this.onManageCustomers,
     super.key,
   });
 
   final bool showBottomNavBar;
   final VoidCallback? onMenuTap;
+  final VoidCallback? onManageCustomers;
 
   @override
   State<MemberManagementScreen> createState() => _MemberManagementScreenState();
 }
-
 class _MemberManagementScreenState extends State<MemberManagementScreen> {
   @override
   void initState() {
@@ -37,6 +40,10 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
   }
 
   void _openCustomerList() {
+    if (widget.onManageCustomers != null) {
+      widget.onManageCustomers!();
+      return;
+    }
     Navigator.push<void>(
       context,
       MaterialPageRoute(builder: (_) => const CustomerListScreen()),
@@ -52,7 +59,10 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: _buildAppBar(context),
+      appBar: MiniMartAppBar.primary(
+        title: 'Thành viên',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
@@ -74,47 +84,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: _openCustomerList,
-        backgroundColor: AppColors.primaryContainer,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.person_add_outlined),
-      ),
       bottomNavigationBar: widget.showBottomNavBar
           ? const AppBottomNavBar(selectedTab: AppNavTab.customers)
           : null,
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceContainerLowest,
-      foregroundColor: AppColors.primary,
-      titleSpacing: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.menu),
-        color: AppColors.primary,
-        onPressed: widget.onMenuTap ?? () {},
-      ),
-      title: Text(
-        'Quản lý thành viên',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.account_circle_outlined),
-          color: AppColors.primary,
-          onPressed: () {},
-        ),
-      ],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(color: AppColors.borderGray, height: 1),
-      ),
     );
   }
 
@@ -146,7 +118,14 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                 color: AppColors.primary,
               ),
             ),
-            TextButton(onPressed: () {}, child: const Text('Chi tiết')),
+            TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const TierManagementScreen(),
+                ),
+              ),
+              child: const Text('Chi tiết'),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -155,7 +134,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: tiers.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemBuilder: (_, index) {
               final tier = tiers[index];
               return TierOverviewCard(

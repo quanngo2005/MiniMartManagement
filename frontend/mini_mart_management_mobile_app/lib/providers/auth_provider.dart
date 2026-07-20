@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/repositories/auth_repository.dart';
+import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   AuthProvider(this._authRepository);
@@ -31,6 +32,10 @@ class AuthProvider extends ChangeNotifier {
         password: password,
       );
       _currentUser = response.user;
+
+      // Connect SignalR WebSocket connection
+      await SignalrService.instance.connect();
+
       return _currentUser;
     } on UnauthorizedException {
       _currentUser = null;
@@ -49,9 +54,31 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    // Terminate SignalR WebSocket session
+    await SignalrService.instance.disconnect();
     await _authRepository.logout();
     _currentUser = null;
     _errorMessage = null;
     notifyListeners();
+  }
+
+  Future<void> fetchCurrentUser() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _currentUser = await _authRepository.fetchCurrentUser();
+    } on UnauthorizedException {
+      _currentUser = null;
+      _errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+    } catch (_) {
+      _errorMessage = 'Không thể tải hồ sơ. Vui lòng thử lại.';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

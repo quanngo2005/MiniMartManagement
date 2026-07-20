@@ -97,7 +97,8 @@ class MockRoleScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute<void>(
-                            builder: (_) => const CategoryManagementScreen(),
+                            builder: (_) =>
+                                CategoryManagementScreen.withProvider(),
                           ),
                         );
                       },

@@ -1,201 +1,241 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
+import 'package:mini_mart_management_mobile_app/providers/report_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 
-class ManagerDashboardScreen extends StatelessWidget {
+class ManagerDashboardScreen extends StatefulWidget {
   const ManagerDashboardScreen({required this.user, this.onMenuTap, super.key});
 
   final EmployeeUser user;
   final VoidCallback? onMenuTap;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-              sliver: SliverGrid.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.1,
-                children: const [
-                  _MetricCard(
-                    label: 'Doanh thu ngày',
-                    value: '45.2M',
-                    caption: '+12.5%',
-                    icon: Icons.trending_up_rounded,
-                    iconColor: AppColors.secondary,
-                    valueColor: AppColors.primary,
-                  ),
-                  _MetricCard(
-                    label: 'Đơn hàng',
-                    value: '342',
-                    caption: 'Trung bình 14 đơn/giờ',
-                    icon: Icons.shopping_cart_outlined,
-                    iconColor: AppColors.primaryContainer,
-                    valueColor: AppColors.primary,
-                  ),
-                  _MetricCard(
-                    label: 'Hàng sắp hết',
-                    value: '18',
-                    caption: 'Cần nhập kho ngay',
-                    icon: Icons.warning_rounded,
-                    iconColor: AppColors.statusError,
-                    valueColor: AppColors.statusError,
-                  ),
-                  _MetricCard(
-                    label: 'Doanh thu ca',
-                    value: '12.8M',
-                    caption: '65% mục tiêu',
-                    icon: Icons.payments_outlined,
-                    iconColor: AppColors.statusWarning,
-                    valueColor: AppColors.primary,
-                    progress: 0.65,
-                  ),
-                ],
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              sliver: SliverToBoxAdapter(child: _buildSalesActivity(context)),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 88),
-              sliver: SliverToBoxAdapter(child: _buildNotifications(context)),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () => _showActionSnackBar(context, 'Quét mã vạch'),
-        tooltip: 'Quét mã vạch',
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        child: const Icon(Icons.qr_code_scanner_rounded),
-      ),
-    );
+  State<ManagerDashboardScreen> createState() => _ManagerDashboardScreenState();
+}
+
+class _ManagerDashboardScreenState extends State<ManagerDashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceBright,
-      foregroundColor: AppColors.primary,
-      titleSpacing: 0,
-      leading: onMenuTap != null
-          ? IconButton(
-              icon: const Icon(Icons.menu_rounded),
-              onPressed: onMenuTap,
-              tooltip: 'Menu',
-            )
-          : const Icon(Icons.storefront_rounded),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'RetailMaster',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const _LiveDot(),
-              const SizedBox(width: 6),
-              Text(
-                'Ca sáng: 08:00 - 16:00',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w600,
+  Future<void> _load() async {
+    final provider = context.read<ReportProvider>();
+    await Future.wait([
+      provider.fetchRevenueSummary(),
+      provider.fetchAllReportsForDate(DateTime.now()),
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ReportProvider>();
+
+    if (provider.isLoading &&
+        provider.revenueSummary == null &&
+        provider.dailyRevenue.isEmpty &&
+        provider.dashboardTopProducts.isEmpty) {
+      return Scaffold(
+        appBar: _buildAppBar(),
+        body: const SafeArea(child: LoadingOverlay()),
+      );
+    }
+
+    if (provider.error != null &&
+        provider.revenueSummary == null &&
+        provider.dashboardTopProducts.isEmpty &&
+        provider.dailyRevenue.isEmpty) {
+      return Scaffold(
+        appBar: _buildAppBar(),
+        body: SafeArea(
+          child: ErrorBanner(message: provider.error!, onRetry: _load),
+        ),
+      );
+    }
+
+    final revenue = provider.revenueSummary;
+    final todayRevenue = provider.dailyRevenue.fold<double>(
+      0,
+      (sum, item) => sum + item.revenue,
+    );
+    final todayOrders = provider.dailyRevenue.fold<int>(
+      0,
+      (sum, item) => sum + item.orderCount,
+    );
+    final topProduct = provider.dashboardTopProducts.isNotEmpty
+        ? provider.dashboardTopProducts.first
+        : null;
+    final lowStockCount = provider.lowStockAlerts.length;
+    final inventoryBadge = lowStockCount > 0
+        ? '$lowStockCount sản phẩm'
+        : 'Ổn định';
+
+    return Scaffold(
+      appBar: _buildAppBar(),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _load,
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    mainAxisExtent: 146,
+                  ),
+                  delegate: SliverChildListDelegate([
+                    _MetricCard(
+                      label: 'Doanh thu hôm nay',
+                      value: _formatMoney(todayRevenue),
+                      caption: '$todayOrders đơn hàng',
+                      icon: Icons.trending_up_rounded,
+                      iconColor: AppColors.secondary,
+                      valueColor: AppColors.primary,
+                      footer: provider.dailyRevenue.isEmpty
+                          ? null
+                          : _TinySparkline(
+                              points: provider.dailyRevenue
+                                  .map((item) => item.revenue)
+                                  .toList(),
+                              color: AppColors.secondary,
+                            ),
+                    ),
+                    _MetricCard(
+                      label: 'Tổng doanh thu',
+                      value: _formatMoney(
+                        revenue?.totalRevenue ?? todayRevenue,
+                      ),
+                      caption: '${revenue?.totalOrders ?? todayOrders} đơn',
+                      icon: Icons.payments_outlined,
+                      iconColor: AppColors.primaryContainer,
+                      valueColor: AppColors.primary,
+                      footer: provider.dailyRevenue.isEmpty
+                          ? null
+                          : _TinySparkline(
+                              points: provider.dailyRevenue
+                                  .map((item) => item.orderCount.toDouble())
+                                  .toList(),
+                              color: AppColors.primaryContainer,
+                            ),
+                    ),
+                    _MetricCard(
+                      label: 'Hàng sắp hết',
+                      value: '$lowStockCount',
+                      caption: inventoryBadge,
+                      icon: Icons.warning_rounded,
+                      iconColor: AppColors.statusError,
+                      valueColor: AppColors.statusError,
+                    ),
+                    _MetricCard(
+                      label: 'Sản phẩm bán chạy',
+                      value: '${provider.dashboardTopProducts.length}',
+                      caption: topProduct == null
+                          ? 'Chưa có dữ liệu'
+                          : topProduct.productName,
+                      icon: Icons.star_rounded,
+                      iconColor: AppColors.statusWarning,
+                      valueColor: AppColors.primary,
+                    ),
+                  ]),
                 ),
               ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                sliver: SliverToBoxAdapter(
+                  child: _DashboardPanel(
+                    title: 'Doanh thu theo ngày',
+                    trailing: Text(
+                      '${DateTime.now().month}/${DateTime.now().year}',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    child: SizedBox(
+                      height: 160,
+                      child: provider.dailyRevenue.isEmpty
+                          ? const EmptyState(
+                              message: 'Chưa có dữ liệu doanh thu ngày.',
+                              icon: Icons.bar_chart_outlined,
+                            )
+                          : _SalesChart(points: provider.dailyRevenue),
+                    ),
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                sliver: SliverToBoxAdapter(
+                  child: _DashboardPanel(
+                    title: 'Cảnh báo & nổi bật',
+                    child: Column(
+                      children: [
+                        if (provider.lowStockAlerts.isNotEmpty)
+                          _NotificationTile(
+                            icon: Icons.inventory_2_outlined,
+                            iconColor: AppColors.statusError,
+                            iconBackground: AppColors.errorContainer,
+                            title: provider.lowStockAlerts.first.productName,
+                            subtitle:
+                                'Tồn kho còn ${provider.lowStockAlerts.first.currentStock} / tối thiểu ${provider.lowStockAlerts.first.minimumStock}',
+                            time: 'Hôm nay',
+                          ),
+                        if (provider.lowStockAlerts.isNotEmpty &&
+                            topProduct != null)
+                          const SizedBox(height: 12),
+                        if (topProduct != null)
+                          _NotificationTile(
+                            icon: Icons.local_fire_department_rounded,
+                            iconColor: AppColors.secondary,
+                            iconBackground: AppColors.secondaryFixed,
+                            title: topProduct.productName,
+                            subtitle:
+                                'Bán ra ${topProduct.totalQuantitySold} sp, ${_formatMoney(topProduct.totalRevenue)}',
+                            time: 'Top',
+                          ),
+                        if (provider.lowStockAlerts.isEmpty &&
+                            topProduct == null)
+                          const EmptyState(
+                            message: 'Chưa có cảnh báo nổi bật.',
+                            icon: Icons.notifications_none_rounded,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
             ],
           ),
-        ],
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: Tooltip(
-            message: user.fullName,
-            child: CircleAvatar(
-              radius: 17,
-              backgroundColor: AppColors.surfaceContainerHigh,
-              foregroundColor: AppColors.primary,
-              child: Text(
-                user.fullName.isEmpty ? '?' : user.fullName[0].toUpperCase(),
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800),
-              ),
-            ),
-          ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildSalesActivity(BuildContext context) {
-    return _DashboardPanel(
-      title: 'Hoạt động bán hàng thời gian thực',
-      trailing: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.secondaryFixed,
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          child: Text(
-            'Trực tiếp',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: AppColors.secondary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      ),
-      child: const SizedBox(height: 168, child: _SalesChart()),
-    );
-  }
-
-  Widget _buildNotifications(BuildContext context) {
-    return _DashboardPanel(
-      title: 'Thông báo quan trọng',
-      child: Column(
-        children: const [
-          _NotificationTile(
-            icon: Icons.inventory_2_outlined,
-            iconColor: AppColors.statusError,
-            iconBackground: AppColors.errorContainer,
-            title: 'Sữa tươi TH True Milk (1L)',
-            subtitle: 'Còn lại 5 hộp - Cần đặt hàng',
-            time: '10:45',
-          ),
-          SizedBox(height: 12),
-          _NotificationTile(
-            icon: Icons.person_pin_circle_outlined,
-            iconColor: AppColors.secondary,
-            iconBackground: AppColors.secondaryFixed,
-            title: 'Nguyễn Văn A',
-            subtitle: 'Đã bắt đầu ca trực (Quầy 02)',
-            time: '08:02',
-          ),
-        ],
       ),
     );
   }
 
-  void _showActionSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+  PreferredSizeWidget _buildAppBar() {
+    return MiniMartAppBar.primary(
+      title: 'Tổng quan',
+      onBrandTap: widget.onMenuTap,
+    );
+  }
+
+  String _formatMoney(num value) {
+    final str = value.round().toString();
+    final buffer = StringBuffer();
+    for (var i = 0; i < str.length; i++) {
+      if (i > 0 && (str.length - i) % 3 == 0) buffer.write('.');
+      buffer.write(str[i]);
+    }
+    return '$bufferđ';
   }
 }
 
@@ -207,7 +247,7 @@ class _MetricCard extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     required this.valueColor,
-    this.progress,
+    this.footer,
   });
 
   final String label;
@@ -216,12 +256,11 @@ class _MetricCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final Color valueColor;
-  final double? progress;
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
@@ -229,7 +268,7 @@ class _MetricCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -250,7 +289,7 @@ class _MetricCard extends StatelessWidget {
                 Icon(icon, color: iconColor, size: 22),
               ],
             ),
-            const Spacer(),
+            const SizedBox(height: 8),
             Text(
               value,
               maxLines: 1,
@@ -263,26 +302,16 @@ class _MetricCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               caption,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: textTheme.labelSmall?.copyWith(
-                color: valueColor == AppColors.statusError
-                    ? AppColors.statusError
-                    : AppColors.textMuted,
-                fontWeight: FontWeight.w700,
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            if (progress != null) ...[
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 4,
-                  backgroundColor: AppColors.surfaceContainerHigh,
-                  color: AppColors.statusWarning,
-                ),
-              ),
+            if (footer != null) ...[
+              const SizedBox(height: 6),
+              SizedBox(height: 24, width: double.infinity, child: footer),
             ],
           ],
         ),
@@ -331,7 +360,7 @@ class _DashboardPanel extends StatelessWidget {
             ),
           ),
           const Divider(height: 1, color: AppColors.borderGray),
-          Padding(padding: const EdgeInsets.all(16), child: child),
+          Padding(padding: const EdgeInsets.all(12), child: child),
         ],
       ),
     );
@@ -339,7 +368,9 @@ class _DashboardPanel extends StatelessWidget {
 }
 
 class _SalesChart extends StatelessWidget {
-  const _SalesChart();
+  const _SalesChart({required this.points});
+
+  final List<dynamic> points;
 
   @override
   Widget build(BuildContext context) {
@@ -347,20 +378,9 @@ class _SalesChart extends StatelessWidget {
       children: [
         Expanded(
           child: CustomPaint(
-            painter: _SalesChartPainter(),
+            painter: _SalesChartPainter(points: points),
             child: const SizedBox.expand(),
           ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            _ChartLabel('08:00'),
-            _ChartLabel('10:00'),
-            _ChartLabel('12:00'),
-            _ChartLabel('14:00'),
-            _ChartLabel('Hiện tại'),
-          ],
         ),
       ],
     );
@@ -368,6 +388,10 @@ class _SalesChart extends StatelessWidget {
 }
 
 class _SalesChartPainter extends CustomPainter {
+  _SalesChartPainter({required this.points});
+
+  final List<dynamic> points;
+
   @override
   void paint(Canvas canvas, Size size) {
     final gridPaint = Paint()
@@ -388,25 +412,26 @@ class _SalesChartPainter extends CustomPainter {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
 
-    final points = [
-      Offset(0, size.height * 0.85),
-      Offset(size.width * 0.1, size.height * 0.65),
-      Offset(size.width * 0.2, size.height * 0.78),
-      Offset(size.width * 0.3, size.height * 0.43),
-      Offset(size.width * 0.4, size.height * 0.52),
-      Offset(size.width * 0.5, size.height * 0.28),
-      Offset(size.width * 0.6, size.height * 0.4),
-      Offset(size.width * 0.7, size.height * 0.2),
-      Offset(size.width * 0.8, size.height * 0.32),
-      Offset(size.width * 0.9, size.height * 0.1),
-      Offset(size.width, size.height * 0.05),
-    ];
-
-    final linePath = Path()..moveTo(points.first.dx, points.first.dy);
-    for (final point in points.skip(1)) {
-      linePath.lineTo(point.dx, point.dy);
+    final maxRevenue = points
+        .map((e) => (e.revenue as num).toDouble())
+        .fold<double>(0, (a, b) => a > b ? a : b);
+    final dataPoints = <Offset>[];
+    for (var i = 0; i < points.length; i++) {
+      final x = points.length <= 1
+          ? 0.0
+          : size.width * (i / (points.length - 1));
+      final revenue = (points[i].revenue as num).toDouble();
+      final normalized = maxRevenue == 0 ? 0 : revenue / maxRevenue;
+      final y =
+          size.height - (normalized * size.height * 0.9) - (size.height * 0.05);
+      dataPoints.add(Offset(x, y));
     }
 
+    if (dataPoints.isEmpty) return;
+    final linePath = Path()..moveTo(dataPoints.first.dx, dataPoints.first.dy);
+    for (final point in dataPoints.skip(1)) {
+      linePath.lineTo(point.dx, point.dy);
+    }
     final fillPath = Path.from(linePath)
       ..lineTo(size.width, size.height)
       ..lineTo(0, size.height)
@@ -418,23 +443,81 @@ class _SalesChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _SalesChartPainter oldDelegate) {
+    if (oldDelegate.points.length != points.length) return true;
+    for (var i = 0; i < points.length; i++) {
+      final oldPoint = oldDelegate.points[i];
+      final newPoint = points[i];
+      if (oldPoint.revenue != newPoint.revenue) return true;
+    }
+    return false;
+  }
 }
 
-class _ChartLabel extends StatelessWidget {
-  const _ChartLabel(this.label);
+class _TinySparkline extends StatelessWidget {
+  const _TinySparkline({required this.points, required this.color});
 
-  final String label;
+  final List<double> points;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-        color: AppColors.textMuted,
-        fontWeight: FontWeight.w600,
-      ),
+    return CustomPaint(
+      painter: _TinySparklinePainter(points: points, color: color),
+      child: const SizedBox.expand(),
     );
+  }
+}
+
+class _TinySparklinePainter extends CustomPainter {
+  _TinySparklinePainter({required this.points, required this.color});
+
+  final List<double> points;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.isEmpty) return;
+    final maxValue = points.fold<double>(0, (a, b) => a > b ? a : b);
+    if (maxValue <= 0) return;
+    final linePaint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    final fillPaint = Paint()
+      ..color = color.withValues(alpha: 0.15)
+      ..style = PaintingStyle.fill;
+
+    final offsets = <Offset>[];
+    for (var i = 0; i < points.length; i++) {
+      final x = points.length <= 1
+          ? 0.0
+          : size.width * (i / (points.length - 1));
+      final y = size.height - ((points[i] / maxValue) * size.height);
+      offsets.add(Offset(x, y));
+    }
+    final path = Path()..moveTo(offsets.first.dx, offsets.first.dy);
+    for (final offset in offsets.skip(1)) {
+      path.lineTo(offset.dx, offset.dy);
+    }
+    final fillPath = Path.from(path)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas
+      ..drawPath(fillPath, fillPaint)
+      ..drawPath(path, linePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _TinySparklinePainter oldDelegate) {
+    if (oldDelegate.color != color) return true;
+    if (oldDelegate.points.length != points.length) return true;
+    for (var i = 0; i < points.length; i++) {
+      if (oldDelegate.points[i] != points[i]) return true;
+    }
+    return false;
   }
 }
 
@@ -458,7 +541,6 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
@@ -492,7 +574,7 @@ class _NotificationTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: textTheme.labelSmall?.copyWith(
                       color: AppColors.textMuted,
@@ -510,23 +592,6 @@ class _NotificationTile extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LiveDot extends StatelessWidget {
-  const _LiveDot();
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox.square(
-      dimension: 8,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.secondaryFixed,
-          shape: BoxShape.circle,
         ),
       ),
     );

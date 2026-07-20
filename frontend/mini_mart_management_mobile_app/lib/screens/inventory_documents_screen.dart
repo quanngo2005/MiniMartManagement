@@ -2,19 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/receipt.dart';
 import 'package:mini_mart_management_mobile_app/models/receipt_inventory_document_mapper.dart';
 import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
-import 'package:mini_mart_management_mobile_app/screens/create_inventory_receipt_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_document_receipt_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/inventory_documents/inventory_document_card.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class InventoryDocumentsScreen extends StatefulWidget {
-  const InventoryDocumentsScreen({this.onMenuTap, super.key});
+  const InventoryDocumentsScreen({
+    this.onMenuTap,
+    this.onOpenStockCountHistory,
+    super.key,
+  });
 
   final VoidCallback? onMenuTap;
+  final VoidCallback? onOpenStockCountHistory;
 
   @override
   State<InventoryDocumentsScreen> createState() =>
@@ -43,7 +48,10 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
     );
 
     return Scaffold(
-      appBar: _buildAppBar(context),
+      appBar: MiniMartAppBar.primary(
+        title: 'Nhập/Xuất',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => context.read<ReceiptProvider>().loadReceipts(),
@@ -98,14 +106,6 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () => _openCreateReceipt(context),
-        tooltip: 'Tạo receipt nhập hàng',
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surfaceContainerLowest,
-        child: const Icon(Icons.add_rounded),
-      ),
     );
   }
 
@@ -122,60 +122,37 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: GridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.48,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          _InventoryStatCard(
-            label: 'Tổng Nhập',
-            value: _formatNumber(importedQuantity),
-            trend: '${receipts.length} chứng từ',
-            trendIcon: Icons.receipt_long_rounded,
-            actionIcon: Icons.download_rounded,
-            accentColor: AppColors.secondary,
-          ),
-          const _InventoryStatCard(
-            label: 'Tổng Xuất',
-            value: '0',
-            trend: 'Từ receipt nhập',
-            trendIcon: Icons.trending_down_rounded,
-            actionIcon: Icons.upload_rounded,
-            accentColor: AppColors.onTertiaryContainer,
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final crossAxisCount = constraints.maxWidth >= 900 ? 4 : 2;
+          return GridView.count(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: constraints.maxWidth >= 900 ? 1.7 : 1.48,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _InventoryStatCard(
+                label: 'Tổng Nhập',
+                value: _formatNumber(importedQuantity),
+                trend: '${receipts.length} chứng từ',
+                trendIcon: Icons.receipt_long_rounded,
+                actionIcon: Icons.download_rounded,
+                accentColor: AppColors.secondary,
+              ),
+              const _InventoryStatCard(
+                label: 'Tổng Xuất',
+                value: '0',
+                trend: 'Từ receipt nhập',
+                trendIcon: Icons.trending_down_rounded,
+                actionIcon: Icons.upload_rounded,
+                accentColor: AppColors.onTertiaryContainer,
+              ),
+            ],
+          );
+        },
       ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceBright,
-      foregroundColor: AppColors.primary,
-      titleSpacing: 0,
-      leading: widget.onMenuTap != null
-          ? IconButton(
-              icon: const Icon(Icons.menu_rounded),
-              onPressed: widget.onMenuTap,
-            )
-          : const Icon(Icons.storefront_rounded),
-      title: Text(
-        'Cửa hàng #402 | Nhập/Xuất',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-      actions: [
-        IconButton(
-          onPressed: () => _showActionSnackBar(context, 'Tài khoản'),
-          tooltip: 'Tài khoản',
-          icon: const Icon(Icons.account_circle_outlined),
-        ),
-      ],
     );
   }
 
@@ -237,24 +214,6 @@ class _InventoryDocumentsScreenState extends State<InventoryDocumentsScreen> {
         builder: (_) => InventoryDocumentReceiptScreen(receipt: receipt),
       ),
     );
-  }
-
-  Future<void> _openCreateReceipt(BuildContext context) async {
-    final draft = await Navigator.of(context).push<CreateReceipt>(
-      MaterialPageRoute<CreateReceipt>(
-        builder: (_) => const CreateInventoryReceiptScreen(),
-      ),
-    );
-    if (!context.mounted || draft == null) return;
-
-    final created = await context.read<ReceiptProvider>().createReceipt(draft);
-    if (!context.mounted) return;
-
-    final provider = context.read<ReceiptProvider>();
-    final message = created
-        ? 'Đã tạo ${draft.receiptCode}.'
-        : provider.errorMessage ?? 'Không thể tạo phiếu nhập.';
-    _showActionSnackBar(context, message);
   }
 
   String _formatNumber(int value) {

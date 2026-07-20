@@ -3,8 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mini_mart_management_mobile_app/models/shift.dart';
 import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
+import 'package:intl/intl.dart';
+import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_navigation_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_drawer.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class ShiftManagementScreen extends StatefulWidget {
@@ -24,17 +32,35 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
   final _endCashController = TextEditingController();
   final _openNoteController = TextEditingController();
   final _closeNoteController = TextEditingController();
+  int? _endCashInitializedForShiftId;
   bool _isProcessing = false;
-  bool _selectedIsMorning = true;
+  int _selectedShiftType = 0;
 
   @override
   void initState() {
     super.initState();
     final hour = DateTime.now().hour;
-    _selectedIsMorning = hour >= 6 && hour < 14;
+    if (hour >= 6 && hour < 11) {
+      _selectedShiftType = 0;
+    } else if (hour >= 11 && hour < 16) {
+      _selectedShiftType = 1;
+    } else {
+      _selectedShiftType = 2;
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ShiftProvider>().fetchCurrentShift();
+      final currentUser = context.read<AuthProvider>().currentUser;
+      final isManager =
+          currentUser?.roleName == 'Manager' ||
+          currentUser?.roleName == 'Admin';
+      final shiftProvider = context.read<ShiftProvider>();
+
+      if (isManager) {
+        shiftProvider.fetchShifts();
+        context.read<EmployeeProvider>().fetchEmployees();
+      } else {
+        shiftProvider.fetchCurrentShift();
+      }
     });
 
     _pulseController = AnimationController(
@@ -84,7 +110,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
     final success = await context.read<ShiftProvider>().openNewShift(
       cashierId: cashierId,
       startCash: startCash,
-      isMorning: _selectedIsMorning,
+      shiftType: _selectedShiftType,
       note: _openNoteController.text.trim().isEmpty
           ? null
           : _openNoteController.text.trim(),
@@ -127,6 +153,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
 
     if (success) {
       _endCashController.clear();
+      _endCashInitializedForShiftId = null;
       _closeNoteController.clear();
       _showSuccessSnackBar('Đã đóng ca làm việc và chốt doanh thu thành công.');
     } else {
@@ -155,82 +182,78 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
     final currentUser = authProvider.currentUser;
     final activeShift = shiftProvider.currentShift;
 
+    final isManager =
+        currentUser?.roleName == 'Manager' || currentUser?.roleName == 'Admin';
+    if (isManager) {
+      return _buildManagerShiftView(context);
+    }
+
     return PopScope(
       canPop: activeShift != null,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: activeShift != null,
-          leading: widget.onMenuTap != null
-              ? IconButton(
-                  icon: const Icon(Icons.menu_rounded, color: AppColors.primary),
-                  onPressed: widget.onMenuTap,
-                )
-              : null,
-          title: Row(
-            children: [
-              if (widget.onMenuTap == null) ...[
-                const Icon(Icons.storefront_rounded, color: AppColors.primary),
-                const SizedBox(width: 8),
-              ],
-              Expanded(
-                child: Text(
-                  'Store #402 | Quản lý ca',
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
+        backgroundColor: AppColors.backgroundSlate,
+        drawer: widget.onMenuTap == null
+            ? const CashierDrawer(selectedTab: CashierNavTab.shift)
+            : null,
+        appBar: widget.onMenuTap == null
+            ? const MiniMartAppBar.primary(title: 'Quản lý ca', showMenu: true)
+            : AppBar(
+                leading: IconButton(
+                  icon: const Icon(
+                    Icons.menu_rounded,
                     color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
+                  ),
+                  onPressed: widget.onMenuTap,
+                ),
+                title: const Text('Quản lý lịch sử ca'),
+                backgroundColor: Colors.white,
+              ),
+        body: Stack(
+          children: [
+            if (shiftProvider.error != null && activeShift == null)
+              ErrorBanner(
+                message: shiftProvider.error!,
+                onRetry: () =>
+                    context.read<ShiftProvider>().fetchCurrentShift(),
+              )
+            else
+              SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (activeShift != null) ...[
+                        _buildActiveShiftCard(
+                          activeShift,
+                          currentUser?.fullName ?? 'Nhân viên',
+                        ),
+                        const SizedBox(height: 16),
+                        _buildBentoMetrics(activeShift),
+                        const SizedBox(height: 16),
+                        _buildCashReconciliation(activeShift),
+                        const SizedBox(height: 20),
+                        _buildCloseShiftButton(activeShift.shiftId),
+                      ] else ...[
+                        _buildNoActiveShiftCard(),
+                        const SizedBox(height: 16),
+                        _buildOpenShiftForm(currentUser?.employeeId ?? 1),
+                      ],
+                      const SizedBox(height: 80),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1),
-            child: Container(color: AppColors.borderGray, height: 1),
-          ),
-        ),
-        body: Stack(
-          children: [
-            SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (activeShift != null) ...[
-                      _buildActiveShiftCard(
-                        activeShift,
-                        currentUser?.fullName ?? 'Nhân viên',
-                      ),
-                      const SizedBox(height: 16),
-                      _buildBentoMetrics(activeShift),
-                      const SizedBox(height: 16),
-                      _buildCashReconciliation(activeShift),
-                      const SizedBox(height: 16),
-                      _buildSparklineChart(),
-                      const SizedBox(height: 20),
-                      _buildCloseShiftButton(activeShift.shiftId),
-                    ] else ...[
-                      _buildNoActiveShiftCard(),
-                      const SizedBox(height: 16),
-                      _buildOpenShiftForm(currentUser?.employeeId ?? 1),
-                    ],
-                    const SizedBox(height: 80),
-                  ],
-                ),
-              ),
-            ),
             if (shiftProvider.isLoading || _isProcessing)
               Container(
                 color: Colors.black.withValues(alpha: 0.15),
-                child: const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
+                child: const LoadingOverlay(),
               ),
           ],
         ),
+        bottomNavigationBar: widget.onMenuTap == null
+            ? const CashierBottomNavigationBar(selectedTab: CashierNavTab.shift)
+            : null,
       ),
     );
   }
@@ -485,71 +508,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
           const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(
-                child: InkWell(
-                  onTap: () => setState(() => _selectedIsMorning = true),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: _selectedIsMorning
-                          ? AppColors.secondary.withValues(alpha: 0.1)
-                          : Colors.white,
-                      border: Border.all(
-                        color: _selectedIsMorning
-                            ? AppColors.secondary
-                            : AppColors.borderGray,
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Ca sáng (06h - 14h)',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: _selectedIsMorning
-                              ? AppColors.secondary
-                              : AppColors.textDark,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: InkWell(
-                  onTap: () => setState(() => _selectedIsMorning = false),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: !_selectedIsMorning
-                          ? AppColors.secondary.withValues(alpha: 0.1)
-                          : Colors.white,
-                      border: Border.all(
-                        color: !_selectedIsMorning
-                            ? AppColors.secondary
-                            : AppColors.borderGray,
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Ca chiều (14h - 22h)',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: !_selectedIsMorning
-                              ? AppColors.secondary
-                              : AppColors.textDark,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              _buildShiftTypeButton(0, 'Sáng\n06h - 11h'),
+              const SizedBox(width: 8),
+              _buildShiftTypeButton(1, 'Chiều\n11h - 16h'),
+              const SizedBox(width: 8),
+              _buildShiftTypeButton(2, 'Tối\n16h - 22h30'),
             ],
           ),
           const SizedBox(height: 12),
@@ -591,12 +554,8 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
   }
 
   Widget _buildBentoMetrics(Shift shift) {
-    final currentCash = shift.startCash + shift.revenue;
-    final expectedEndCash = currentCash;
-
     return Column(
       children: [
-        // Cash Card
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -607,7 +566,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'TIỀN MẶT HIỆN TẠI',
+                'TIỀN MẶT ĐẦU CA',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
@@ -617,7 +576,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
               ),
               const SizedBox(height: 6),
               Text(
-                "${_formatCurrency(currentCash)} VNĐ",
+                "${_formatCurrency(shift.startCash)} VNĐ",
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -631,11 +590,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Dự kiến kết ca',
+                    'Doanh thu ghi nhận',
                     style: TextStyle(fontSize: 12, color: Color(0xFF768DAD)),
                   ),
                   Text(
-                    "${_formatCurrency(expectedEndCash)} VNĐ",
+                    "${_formatCurrency(shift.revenue)} VNĐ",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -648,100 +607,17 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
             ],
           ),
         ),
-        const SizedBox(height: 12),
-        // Bento stats row
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.borderGray),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Giao dịch',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.receipt_long_rounded,
-                          color: AppColors.secondary,
-                          size: 20,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          '142',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.borderGray),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Tốc độ phục vụ',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.speed_rounded,
-                          color: AppColors.statusWarning,
-                          size: 20,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          '1.2m',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
 
   Widget _buildCashReconciliation(Shift shift) {
+    if (_endCashInitializedForShiftId != shift.shiftId) {
+      final currentCash = shift.startCash + shift.revenue;
+      _endCashController.text = currentCash.toInt().toString();
+      _endCashInitializedForShiftId = shift.shiftId;
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -806,81 +682,6 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
     );
   }
 
-  Widget _buildSparklineChart() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderGray),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'DOANH THU THEO GIỜ',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textMuted,
-                ),
-              ),
-              Text(
-                '+12% vs Hôm qua',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.secondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 80,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _buildBar(0.40, AppColors.surface),
-                _buildBar(0.55, AppColors.surface),
-                _buildBar(0.35, AppColors.surface),
-                _buildBar(0.70, AppColors.surface),
-                _buildBar(0.90, AppColors.surface),
-                _buildBar(1.00, AppColors.primary),
-                _buildBar(0.80, AppColors.secondary),
-                _buildBar(0.60, AppColors.surface),
-                _buildBar(0.45, AppColors.surface),
-                _buildBar(0.30, AppColors.surface),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBar(double heightFactor, Color color) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2),
-        child: FractionallySizedBox(
-          heightFactor: heightFactor,
-          child: Container(
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(2),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildCloseShiftButton(int shiftId) {
     return FilledButton.icon(
       onPressed: () => _showCloseConfirmationDialog(shiftId),
@@ -921,6 +722,348 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
             child: const Text('Xác nhận Đóng ca'),
           ),
         ],
+      ),
+    );
+  }
+
+  // --- Manager Shift View Helpers ---
+  Widget _buildManagerShiftView(BuildContext context) {
+    final shiftProvider = context.watch<ShiftProvider>();
+    final activeShifts = shiftProvider.shifts
+        .where((s) => s.status == 2)
+        .toList();
+    final historicalShifts = shiftProvider.shifts
+        .where((s) => s.status != 2)
+        .toList();
+
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundSlate,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          leading: widget.onMenuTap != null
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.menu_rounded,
+                    color: AppColors.primary,
+                  ),
+                  onPressed: widget.onMenuTap,
+                )
+              : null,
+          title: Text(
+            'Quản lý lịch sử ca',
+            style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          bottom: const TabBar(
+            labelColor: AppColors.primary,
+            unselectedLabelColor: AppColors.textMuted,
+            indicatorColor: AppColors.primary,
+            indicatorSize: TabBarIndicatorSize.tab,
+            tabs: [
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.play_circle_outline_rounded, size: 18),
+                    SizedBox(width: 8),
+                    Text('Ca hiện tại'),
+                  ],
+                ),
+              ),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.history_rounded, size: 18),
+                    SizedBox(width: 8),
+                    Text('Lịch sử ca'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        body: shiftProvider.isLoading
+            ? const LoadingOverlay()
+            : shiftProvider.error != null
+            ? ErrorBanner(
+                message: shiftProvider.error!,
+                onRetry: () => context.read<ShiftProvider>().fetchShifts(),
+              )
+            : TabBarView(
+                children: [
+                  _buildShiftTabList(
+                    activeShifts,
+                    'Không có ca nào đang hoạt động.',
+                  ),
+                  _buildShiftTabList(
+                    historicalShifts,
+                    'Không có lịch sử ca làm việc.',
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildShiftTabList(List<Shift> shifts, String emptyMessage) {
+    if (shifts.isEmpty) {
+      return EmptyState(
+        message: emptyMessage,
+        icon: Icons.calendar_today_outlined,
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        await context.read<ShiftProvider>().fetchShifts();
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: shifts.length,
+        itemBuilder: (context, index) {
+          final shift = shifts[index];
+          return _buildManagerShiftCard(shift);
+        },
+      ),
+    );
+  }
+
+  Widget _buildManagerShiftCard(Shift shift) {
+    final staffName = _getEmployeeName(shift.employeeId);
+
+    // Status color & badge text
+    Color statusBgColor;
+    Color statusTextColor;
+    String statusLabel;
+
+    switch (shift.status) {
+      case 1:
+        statusBgColor = AppColors.warningContainer;
+        statusTextColor = AppColors.statusWarning;
+        statusLabel = 'Chờ duyệt';
+        break;
+      case 2:
+        statusBgColor = const Color(0xE0ECFDF5);
+        statusTextColor = AppColors.secondary;
+        statusLabel = 'Đang chạy';
+        break;
+      case 3:
+        statusBgColor = const Color(0xE0F1F5F9);
+        statusTextColor = AppColors.textMuted;
+        statusLabel = 'Đã đóng';
+        break;
+      case 4:
+      default:
+        statusBgColor = AppColors.errorContainer;
+        statusTextColor = AppColors.statusError;
+        statusLabel = 'Đã hủy';
+        break;
+    }
+
+    final dateStr = DateFormat('dd/MM/yyyy').format(shift.workDate);
+    final timeStr =
+        "${DateFormat('HH:mm').format(shift.startTime)} - ${DateFormat('HH:mm').format(shift.endTime)}";
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderGray),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header section
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      shift.shiftName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      shift.shiftCode,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusBgColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    statusLabel,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: statusTextColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: AppColors.borderGray),
+
+          // Details section
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _buildCardDetailRow(
+                  Icons.person_outline_rounded,
+                  'Nhân viên',
+                  staffName,
+                ),
+                const SizedBox(height: 10),
+                _buildCardDetailRow(
+                  Icons.calendar_today_outlined,
+                  'Ngày làm việc',
+                  dateStr,
+                ),
+                const SizedBox(height: 10),
+                _buildCardDetailRow(
+                  Icons.access_time_rounded,
+                  'Giờ hoạt động',
+                  timeStr,
+                ),
+                const SizedBox(height: 10),
+                _buildCardDetailRow(
+                  Icons.payments_outlined,
+                  'Tiền mặt đầu ca',
+                  '${_formatCurrency(shift.startCash)} đ',
+                ),
+                if (shift.status == 3) ...[
+                  const SizedBox(height: 10),
+                  _buildCardDetailRow(
+                    Icons.price_check_rounded,
+                    'Tiền mặt cuối ca',
+                    '${_formatCurrency(shift.endCash)} đ',
+                  ),
+                  const SizedBox(height: 10),
+                  _buildCardDetailRow(
+                    Icons.trending_up_rounded,
+                    'Doanh thu ca',
+                    '${_formatCurrency(shift.revenue)} đ',
+                  ),
+                ],
+                if (shift.note != null && shift.note!.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  _buildCardDetailRow(
+                    Icons.notes_rounded,
+                    'Ghi chú',
+                    shift.note!,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardDetailRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: AppColors.textMuted),
+        const SizedBox(width: 8),
+        Text(
+          '$label: ',
+          style: const TextStyle(
+            fontSize: 13,
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getEmployeeName(int employeeId) {
+    final employees = context.read<EmployeeProvider>().employees;
+    try {
+      final emp = employees.firstWhere((e) => e.employeeId == employeeId);
+      return emp.fullName;
+    } catch (_) {
+      return 'Mã NV: $employeeId';
+    }
+  }
+
+  Widget _buildShiftTypeButton(int type, String label) {
+    final isSelected = _selectedShiftType == type;
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _selectedShiftType = type),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.secondary.withValues(alpha: 0.1)
+                : Colors.white,
+            border: Border.all(
+              color: isSelected ? AppColors.secondary : AppColors.borderGray,
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: isSelected ? AppColors.secondary : AppColors.textDark,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

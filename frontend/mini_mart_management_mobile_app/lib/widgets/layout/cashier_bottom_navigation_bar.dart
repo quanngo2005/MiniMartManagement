@@ -1,9 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/screens/checkout_screen.dart';
-import 'package:mini_mart_management_mobile_app/screens/settings_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/cashier_return_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/cashier_order_history_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_profile_screen.dart';
 
-enum CashierNavTab { checkout, inventory, returns, settings }
+enum CashierNavTab { checkout, invoices, returns, shift, profile }
+
+String cashierNavLabel(CashierNavTab tab) {
+  return switch (tab) {
+    CashierNavTab.checkout => 'Bán hàng',
+    CashierNavTab.invoices => 'Lịch sử đơn',
+    CashierNavTab.returns => 'Hoàn trả',
+    CashierNavTab.shift => 'Ca làm',
+    CashierNavTab.profile => 'Cá nhân',
+  };
+}
+
+void navigateToCashierTab(BuildContext context, CashierNavTab tab) {
+  final page = switch (tab) {
+    CashierNavTab.checkout => const CheckoutScreen(),
+    CashierNavTab.invoices => const CashierOrderHistoryScreen(),
+    CashierNavTab.returns => const CashierReturnScreen(),
+    CashierNavTab.shift => const ShiftManagementScreen(),
+    CashierNavTab.profile => const EmployeeProfileScreen.cashier(),
+  };
+
+  Navigator.of(context).pushReplacement(
+    PageRouteBuilder(
+      pageBuilder: (_, _, _) => page,
+      transitionDuration: Duration.zero,
+    ),
+  );
+}
 
 class CashierBottomNavigationBar extends StatelessWidget {
   const CashierBottomNavigationBar({super.key, required this.selectedTab});
@@ -14,31 +44,7 @@ class CashierBottomNavigationBar extends StatelessWidget {
 
   void _onDestinationSelected(BuildContext context, int index) {
     if (index == _selectedIndex) return;
-
-    switch (index) {
-      case 0:
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const CheckoutScreen(),
-            transitionDuration: Duration.zero,
-          ),
-        );
-        break;
-      case 1:
-        // Navigator.of(context).pushReplacementNamed('/inventory');
-        break;
-      case 2:
-        // Navigator.of(context).pushReplacementNamed('/returns');
-        break;
-      case 3:
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const SettingsScreen(),
-            transitionDuration: Duration.zero,
-          ),
-        );
-        break;
-    }
+    navigateToCashierTab(context, CashierNavTab.values[index]);
   }
 
   @override
@@ -52,22 +58,27 @@ class CashierBottomNavigationBar extends StatelessWidget {
         NavigationDestination(
           selectedIcon: Icon(Icons.point_of_sale_rounded),
           icon: Icon(Icons.point_of_sale_outlined),
-          label: 'Checkout',
+          label: 'Bán hàng',
         ),
         NavigationDestination(
-          selectedIcon: Icon(Icons.inventory_2_rounded),
-          icon: Icon(Icons.inventory_2_outlined),
-          label: 'Inventory',
+          selectedIcon: Icon(Icons.receipt_rounded),
+          icon: Icon(Icons.receipt_outlined),
+          label: 'Lịch sử',
         ),
         NavigationDestination(
           selectedIcon: Icon(Icons.assignment_return_rounded),
           icon: Icon(Icons.assignment_return_outlined),
-          label: 'Returns',
+          label: 'Hoàn trả',
         ),
         NavigationDestination(
-          selectedIcon: Icon(Icons.settings_rounded),
-          icon: Icon(Icons.settings_outlined),
-          label: 'Settings',
+          selectedIcon: Icon(Icons.login_rounded),
+          icon: Icon(Icons.login_outlined),
+          label: 'Ca làm',
+        ),
+        NavigationDestination(
+          selectedIcon: Icon(Icons.person_rounded),
+          icon: Icon(Icons.person_outlined),
+          label: 'Cá nhân',
         ),
       ],
     );

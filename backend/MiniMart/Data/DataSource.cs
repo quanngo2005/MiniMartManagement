@@ -18,7 +18,7 @@ namespace MiniMart.Models
         public static List<Employee> GetEmployees() => new List<Employee>
         {
             new Employee { EmployeeId = 1,  FullName = "Nguyễn Văn An",    Gender = true,  DateOfBirth = new DateTime(1985, 3, 10), PhoneNumber = "0901000001", Email = "an.nguyen@minimart.vn",    Username = "an.nguyen",    PasswordHash = "AQAAAAEAACcQAAAAEHashed1",  Salary = 12000000, HireDate = new DateTime(2020, 1, 5),  Status = EmployeeStatus.Active, RoleId = 4 },
-            new Employee { EmployeeId = 2,  FullName = "Trần Thị Bích",    Gender = false, DateOfBirth = new DateTime(1992, 7, 22), PhoneNumber = "0901000002", Email = "bich.tran@minimart.vn",   Username = "bich.tran",    PasswordHash = "AQAAAAEAACcQAAAAEHashed2",  Salary = 8000000,  HireDate = new DateTime(2020, 3, 1),  Status = EmployeeStatus.Active, RoleId = 2 },
+            new Employee { EmployeeId = 2,  FullName = "Trần Thị Bích",    Gender = false, DateOfBirth = new DateTime(1992, 7, 22), PhoneNumber = "0901000002", Email = "bich.tran@minimart.vn",   Username = "bich.tran",    PasswordHash = "PBKDF2-SHA256:100000:S/U9bM/x3L6Il/P51uwARA==:J9gxLoZ70ZizwgLA30SPkHZhS09PYHgco/6j0eppBRo=",  Salary = 8000000,  HireDate = new DateTime(2020, 3, 1),  Status = EmployeeStatus.Active, RoleId = 2 },
             new Employee { EmployeeId = 3,  FullName = "Lê Minh Châu",     Gender = true,  DateOfBirth = new DateTime(1990, 5, 15), PhoneNumber = "0901000003", Email = "chau.le@minimart.vn",     Username = "chau.le",      PasswordHash = "AQAAAAEAACcQAAAAEHashed3",  Salary = 8000000,  HireDate = new DateTime(2020, 4, 1),  Status = EmployeeStatus.Active, RoleId = 2 },
             new Employee { EmployeeId = 4,  FullName = "Phạm Thị Dung",    Gender = false, DateOfBirth = new DateTime(1993, 9, 8),  PhoneNumber = "0901000004", Email = "dung.pham@minimart.vn",   Username = "dung.pham",    PasswordHash = "AQAAAAEAACcQAAAAEHashed4",  Salary = 8500000,  HireDate = new DateTime(2021, 1, 10), Status = EmployeeStatus.Active, RoleId = 3 },
             new Employee { EmployeeId = 5,  FullName = "Hoàng Văn Em",     Gender = true,  DateOfBirth = new DateTime(1988, 12, 3), PhoneNumber = "0901000005", Email = "em.hoang@minimart.vn",    Username = "em.hoang",     PasswordHash = "AQAAAAEAACcQAAAAEHashed5",  Salary = 8000000,  HireDate = new DateTime(2021, 3, 15), Status = EmployeeStatus.Active, RoleId = 2 },
@@ -30,7 +30,8 @@ namespace MiniMart.Models
             new Employee { EmployeeId = 11, FullName = "Lý Văn Phúc",      Gender = true,  DateOfBirth = new DateTime(1989, 1, 20), PhoneNumber = "0901000011", Email = "phuc.ly@minimart.vn",     Username = "phuc.ly",      PasswordHash = "AQAAAAEAACcQAAAAEHashed11", Salary = 7500000,  HireDate = new DateTime(2023, 2, 1),  Status = EmployeeStatus.Inactive, RoleId = 2 },
             new Employee { EmployeeId = 12, FullName = "Phan Thị Quỳnh",   Gender = false, DateOfBirth = new DateTime(1997, 5, 14), PhoneNumber = "0901000012", Email = "quynh.phan@minimart.vn",  Username = "quynh.phan",   PasswordHash = "AQAAAAEAACcQAAAAEHashed12", Salary = 8000000,  HireDate = new DateTime(2023, 4, 15), Status = EmployeeStatus.Active, RoleId = 2 },
             new Employee { EmployeeId = 13, FullName = "Admin Test",        Gender = true,  DateOfBirth = new DateTime(1990, 1, 1),  PhoneNumber = "0901000013", Email = "admin.test@minimart.vn",  Username = "admin.test",   PasswordHash = "PBKDF2-SHA256:100000:vECvXvSIQjcJHLryzwWLiA==:bpMkS8sN5DSw0AfpAUBvxc4IScpN1iWkTzLPrhFSk5g=",  Salary = 15000000, HireDate = new DateTime(2024, 1, 1), Status = EmployeeStatus.Active, RoleId = 4 },
-            new Employee { EmployeeId = 14, FullName = "Manager Test",      Gender = true,  DateOfBirth = new DateTime(1990, 1, 2),  PhoneNumber = "0901000014", Email = "manager.test@minimart.vn", Username = "manager.test", PasswordHash = "PBKDF2-SHA256:100000:CZNdjBIPynM3lzo4e7gK7A==:xiVhxkMlNdGago6CisgLJpYB9nXckw5sQW4HjrIVN1I=", Salary = 13000000, HireDate = new DateTime(2024, 1, 1), Status = EmployeeStatus.Active, RoleId = 1 },
+            new Employee { EmployeeId = 14, FullName = "Manager Test",      Gender = true,  DateOfBirth = new DateTime(1990, 1, 2),  PhoneNumber = "0901000014", Email = "manager.test@minimart.vn", Username = "manager.test", PasswordHash = "PBKDF2-SHA256:100000:4i06mXfdgXI4rFm+51SILA==:TSBEaTARkBveb/293mpk1+oJ98Ai3yoTyDllFlZIiO0=", Salary = 13000000, HireDate = new DateTime(2024, 1, 1), Status = EmployeeStatus.Active, RoleId = 1 },
+
         };
 
         // ========================= CUSTOMERS =========================
@@ -77,26 +78,31 @@ namespace MiniMart.Models
             new TaxRate { TaxRateId = 2, Rate = 5.00m, Description = "Thue suat 5% - hang thiet yeu", EffectiveFrom = new DateOnly(2025, 7, 1), EffectiveTo = null, Status = true },
             new TaxRate { TaxRateId = 3, Rate = 8.00m, Description = "Thue suat giam theo chinh sach", EffectiveFrom = new DateOnly(2022, 2, 1), EffectiveTo = new DateOnly(2024, 6, 30), Status = false },
             new TaxRate { TaxRateId = 4, Rate = 10.00m, Description = "Thue suat 10% - hang hoa thong thuong", EffectiveFrom = new DateOnly(2025, 7, 1), EffectiveTo = null, Status = true },
-        };
+        }.Select(taxRate =>
+        {
+            taxRate.CreatedAt = taxRate.EffectiveFrom.ToDateTime(TimeOnly.MinValue);
+            return taxRate;
+        }).ToList();
 
         // ========================= CATEGORIES =========================
         public static List<Category> GetCategories() => new List<Category>
         {
             // Parent categories
-            new Category { CategoryId = 1,  CategoryCode = "TPHUC",  CategoryName = "Thực phẩm & Đồ uống",  Description = "Thực phẩm và đồ uống các loại",  Status = true, DisplayOrder = 1, ParentCategoryId = null, TaxRateId = 4 },
-            new Category { CategoryId = 2,  CategoryCode = "VSCS",   CategoryName = "Vệ sinh & Chăm sóc",   Description = "Sản phẩm vệ sinh và chăm sóc cá nhân", Status = true, DisplayOrder = 2, ParentCategoryId = null, TaxRateId = 4 },
-            new Category { CategoryId = 3,  CategoryCode = "GIADUNG", CategoryName = "Gia dụng",             Description = "Đồ dùng gia đình",               Status = true, DisplayOrder = 3, ParentCategoryId = null, TaxRateId = 4 },
+            // Parent categories - mỗi category có VAT khác nhau để test
+            new Category { CategoryId = 1,  CategoryCode = "TPHUC",  CategoryName = "Thực phẩm & Đồ uống",  Description = "Thực phẩm và đồ uống các loại",  Status = true, DisplayOrder = 1, ParentCategoryId = null, TaxRateId = 3 }, // 8%
+            new Category { CategoryId = 2,  CategoryCode = "VSCS",   CategoryName = "Vệ sinh & Chăm sóc",   Description = "Sản phẩm vệ sinh và chăm sóc cá nhân", Status = true, DisplayOrder = 2, ParentCategoryId = null, TaxRateId = 2 }, // 5%
+            new Category { CategoryId = 3,  CategoryCode = "GIADUNG", CategoryName = "Gia dụng",             Description = "Đồ dùng gia đình",               Status = true, DisplayOrder = 3, ParentCategoryId = null, TaxRateId = 1 }, // 0%
 
-            // Child of TPHUC (1)
-            new Category { CategoryId = 4,  CategoryCode = "NUOCUONG", CategoryName = "Nước uống & Đồ uống", Description = "Nước uống, nước ngọt, nước tăng lực", Status = true, DisplayOrder = 1, ParentCategoryId = 1, TaxRateId = 4 },
-            new Category { CategoryId = 5,  CategoryCode = "SNACK",   CategoryName = "Bánh kẹo & Snack",    Description = "Bánh kẹo, snack các loại",        Status = true, DisplayOrder = 2, ParentCategoryId = 1, TaxRateId = 4 },
-            new Category { CategoryId = 6,  CategoryCode = "SUADANH", CategoryName = "Sữa & Sản phẩm từ sữa", Description = "Sữa tươi, sữa hộp, sữa chua",  Status = true, DisplayOrder = 3, ParentCategoryId = 1, TaxRateId = 4 },
-            new Category { CategoryId = 7,  CategoryCode = "MITOMIM", CategoryName = "Mì & Thực phẩm khô",  Description = "Mì gói, bún khô, phở khô",       Status = true, DisplayOrder = 4, ParentCategoryId = 1, TaxRateId = 4 },
-            new Category { CategoryId = 8,  CategoryCode = "GIACVI",  CategoryName = "Gia vị & Dầu ăn",     Description = "Gia vị, dầu ăn, nước mắm, tương",Status = true, DisplayOrder = 5, ParentCategoryId = 1, TaxRateId = 4 },
+            // Child of TPHUC (1) - 8%
+            new Category { CategoryId = 4,  CategoryCode = "NUOCUONG", CategoryName = "Nước uống & Đồ uống", Description = "Nước uống, nước ngọt, nước tăng lực", Status = true, DisplayOrder = 1, ParentCategoryId = 1, TaxRateId = 3 },
+            new Category { CategoryId = 5,  CategoryCode = "SNACK",   CategoryName = "Bánh kẹo & Snack",    Description = "Bánh kẹo, snack các loại",        Status = true, DisplayOrder = 2, ParentCategoryId = 1, TaxRateId = 3 },
+            new Category { CategoryId = 6,  CategoryCode = "SUADANH", CategoryName = "Sữa & Sản phẩm từ sữa", Description = "Sữa tươi, sữa hộp, sữa chua",  Status = true, DisplayOrder = 3, ParentCategoryId = 1, TaxRateId = 3 },
+            new Category { CategoryId = 7,  CategoryCode = "MITOMIM", CategoryName = "Mì & Thực phẩm khô",  Description = "Mì gói, bún khô, phở khô",       Status = true, DisplayOrder = 4, ParentCategoryId = 1, TaxRateId = 3 },
+            new Category { CategoryId = 8,  CategoryCode = "GIACVI",  CategoryName = "Gia vị & Dầu ăn",     Description = "Gia vị, dầu ăn, nước mắm, tương",Status = true, DisplayOrder = 5, ParentCategoryId = 1, TaxRateId = 3 },
 
-            // Child of VSCS (2)
-            new Category { CategoryId = 9,  CategoryCode = "GIATRANG", CategoryName = "Giặt tẩy",           Description = "Bột giặt, nước giặt, nước xả",   Status = true, DisplayOrder = 1, ParentCategoryId = 2, TaxRateId = 4 },
-            new Category { CategoryId = 10, CategoryCode = "VSCT",    CategoryName = "Vệ sinh cá nhân",     Description = "Dầu gội, sữa tắm, kem đánh răng", Status = true, DisplayOrder = 2, ParentCategoryId = 2, TaxRateId = 4 },
+            // Child of VSCS (2) - 5%
+            new Category { CategoryId = 9,  CategoryCode = "GIATRANG", CategoryName = "Giặt tẩy",           Description = "Bột giặt, nước giặt, nước xả",   Status = true, DisplayOrder = 1, ParentCategoryId = 2, TaxRateId = 2 },
+            new Category { CategoryId = 10, CategoryCode = "VSCT",    CategoryName = "Vệ sinh cá nhân",     Description = "Dầu gội, sữa tắm, kem đánh răng", Status = true, DisplayOrder = 2, ParentCategoryId = 2, TaxRateId = 2 },
         };
 
         // ========================= PRODUCTS =========================
@@ -172,7 +178,12 @@ namespace MiniMart.Models
             new Product { ProductId = 53, ProductCode = "SP053", Barcode = "8934588011053", ProductName = "Khăn giấy lau bếp 2 cuộn",           SellingPrice = 22000,  StockQuantity = 150, Status = true, CategoryId = 3,  SupplierId = 5 },
             new Product { ProductId = 54, ProductCode = "SP054", Barcode = "8934588011054", ProductName = "Bọc thực phẩm màng bọc 30m",        SellingPrice = 28000,  StockQuantity = 100, Status = true, CategoryId = 3,  SupplierId = 5 },
             new Product { ProductId = 55, ProductCode = "SP055", Barcode = "8934588011055", ProductName = "Nến thơm cốc nhỏ 100g",             SellingPrice = 45000,  StockQuantity = 60,  Status = true, CategoryId = 3,  SupplierId = 5 },
-        };
+        }
+        .Select(product =>
+        {
+            product.ImageUrl = GetProductImageUrl(product.ProductCode);
+            return product;
+        }).ToList();
 
         // ========================= RECEIPTS =========================
         public static List<Receipt> GetReceipts() => new List<Receipt>
@@ -182,7 +193,11 @@ namespace MiniMart.Models
             new Receipt { ReceiptId = 3, ReceiptCode = "PN003", ImportDate = new DateTime(2024, 2, 5),  TotalAmount = 4200000, PaidAmount = 2000000, DebtAmount = 2200000, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 3, EmployeeId = 7 },
             new Receipt { ReceiptId = 4, ReceiptCode = "PN004", ImportDate = new DateTime(2024, 3, 1),  TotalAmount = 6800000, PaidAmount = 6800000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 4, EmployeeId = 9 },
             new Receipt { ReceiptId = 5, ReceiptCode = "PN005", ImportDate = new DateTime(2024, 4, 10), TotalAmount = 3500000, PaidAmount = 3500000, DebtAmount = 0, ReceiptStatus = ReceiptStatus.Completed, SupplierId = 5, EmployeeId = 4 },
-        };
+        }.Select(receipt =>
+        {
+            receipt.CreatedAt = receipt.ImportDate;
+            return receipt;
+        }).ToList();
 
         // ========================= BATCHES =========================
         // Mỗi batch gắn với 1 product và 1 receipt (merged from ReceiptDetails)
@@ -208,27 +223,46 @@ namespace MiniMart.Models
         // ========================= SHIFTS =========================
         public static List<Shift> GetShifts() => new List<Shift>
         {
-            new Shift { ShiftId = 1, ShiftCode = "SA-20240601", ShiftName = "Ca sáng",   StartTime = new DateTime(2024, 6, 1, 6, 0, 0),  EndTime = new DateTime(2024, 6, 1, 14, 0, 0),  WorkDate = new DateTime(2024, 6, 1), StartCash = 500000, EndCash = 3200000, Revenue = 2700000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 2,  ClosedAt = new DateTime(2024, 6, 1, 14, 5, 0) },
-            new Shift { ShiftId = 2, ShiftCode = "CH-20240601", ShiftName = "Ca chiều",  StartTime = new DateTime(2024, 6, 1, 14, 0, 0), EndTime = new DateTime(2024, 6, 1, 22, 0, 0), WorkDate = new DateTime(2024, 6, 1), StartCash = 500000, EndCash = 4100000, Revenue = 3600000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 3,  ClosedAt = new DateTime(2024, 6, 1, 22, 10, 0) },
-            new Shift { ShiftId = 3, ShiftCode = "SA-20240602", ShiftName = "Ca sáng",   StartTime = new DateTime(2024, 6, 2, 6, 0, 0),  EndTime = new DateTime(2024, 6, 2, 14, 0, 0),  WorkDate = new DateTime(2024, 6, 2), StartCash = 500000, EndCash = 2800000, Revenue = 2300000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 5,  ClosedAt = new DateTime(2024, 6, 2, 14, 2, 0) },
-            new Shift { ShiftId = 4, ShiftCode = "CH-20240602", ShiftName = "Ca chiều",  StartTime = new DateTime(2024, 6, 2, 14, 0, 0), EndTime = new DateTime(2024, 6, 2, 22, 0, 0), WorkDate = new DateTime(2024, 6, 2), StartCash = 500000, EndCash = 5200000, Revenue = 4700000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 6,  ClosedAt = new DateTime(2024, 6, 2, 22, 8, 0) },
-            new Shift { ShiftId = 5, ShiftCode = "SA-20240603", ShiftName = "Ca sáng",   StartTime = new DateTime(2024, 6, 3, 6, 0, 0),  EndTime = new DateTime(2024, 6, 3, 14, 0, 0),  WorkDate = new DateTime(2024, 6, 3), StartCash = 500000, EndCash = 0,       Revenue = 0,       Status = ShiftStatus.Working, EmployeeId = 1, CashierId = 10, ClosedAt = null },
+            new Shift { ShiftId = 1, ShiftCode = "SA-20260701", ShiftName = "Ca sáng",  StartTime = new DateTime(2026, 7, 1, 6, 0, 0),  EndTime = new DateTime(2026, 7, 1, 14, 0, 0),  WorkDate = new DateTime(2026, 7, 1), StartCash = 500000, EndCash = 3800000, Revenue = 3300000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 2,  ClosedAt = new DateTime(2026, 7, 1, 14, 5, 0) },
+            new Shift { ShiftId = 2, ShiftCode = "CH-20260701", ShiftName = "Ca chiều", StartTime = new DateTime(2026, 7, 1, 14, 0, 0), EndTime = new DateTime(2026, 7, 1, 22, 0, 0), WorkDate = new DateTime(2026, 7, 1), StartCash = 500000, EndCash = 4200000, Revenue = 3700000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 3,  ClosedAt = new DateTime(2026, 7, 1, 22, 10, 0) },
+            new Shift { ShiftId = 3, ShiftCode = "SA-20260708", ShiftName = "Ca sáng",  StartTime = new DateTime(2026, 7, 8, 6, 0, 0),  EndTime = new DateTime(2026, 7, 8, 14, 0, 0),  WorkDate = new DateTime(2026, 7, 8), StartCash = 500000, EndCash = 3100000, Revenue = 2600000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 5,  ClosedAt = new DateTime(2026, 7, 8, 14, 2, 0) },
+            new Shift { ShiftId = 4, ShiftCode = "CH-20260708", ShiftName = "Ca chiều", StartTime = new DateTime(2026, 7, 8, 14, 0, 0), EndTime = new DateTime(2026, 7, 8, 22, 0, 0), WorkDate = new DateTime(2026, 7, 8), StartCash = 500000, EndCash = 5500000, Revenue = 5000000, Status = ShiftStatus.Closed, EmployeeId = 1, CashierId = 6,  ClosedAt = new DateTime(2026, 7, 8, 22, 8, 0) },
+            new Shift { ShiftId = 5, ShiftCode = "SA-20260709", ShiftName = "Ca sáng",  StartTime = new DateTime(2026, 7, 9, 6, 0, 0),  EndTime = new DateTime(2026, 7, 9, 14, 0, 0),  WorkDate = new DateTime(2026, 7, 9), StartCash = 500000, EndCash = 0,       Revenue = 0,       Status = ShiftStatus.Working, EmployeeId = 1, CashierId = 10, ClosedAt = null },
         };
 
         // ========================= ORDERS =========================
         public static List<Order> GetOrders() => new List<Order>
         {
-            new Order { OrderId = 1,  OrderCode = "HD001", SubTotal = 66000,  TaxAmount = 0, DiscountAmount = 0,    FinalAmount = 66000,  PaidAmount = 70000,  ChangeAmount = 4000,  Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 1 },
-            new Order { OrderId = 2,  OrderCode = "HD002", SubTotal = 110000, TaxAmount = 0, DiscountAmount = 0,    FinalAmount = 110000, PaidAmount = 110000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 4 },
-            new Order { OrderId = 3,  OrderCode = "HD003", SubTotal = 55000,  TaxAmount = 0, DiscountAmount = 5000, FinalAmount = 50000,  PaidAmount = 50000,  ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 3,  CustomerId = 2 },
-            new Order { OrderId = 4,  OrderCode = "HD004", SubTotal = 180000, TaxAmount = 0, DiscountAmount = 0,    FinalAmount = 180000, PaidAmount = 200000, ChangeAmount = 20000, Status = OrderStatus.Completed, EmployeeId = 3,  CustomerId = 8 },
-            new Order { OrderId = 5,  OrderCode = "HD005", SubTotal = 92000,  TaxAmount = 0, DiscountAmount = 0,    FinalAmount = 92000,  PaidAmount = 100000, ChangeAmount = 8000,  Status = OrderStatus.Completed, EmployeeId = 5,  CustomerId = 3 },
-            new Order { OrderId = 6,  OrderCode = "HD006", SubTotal = 245000, TaxAmount = 0, DiscountAmount = 10000, FinalAmount = 235000, PaidAmount = 235000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 6,  CustomerId = 12 },
-            new Order { OrderId = 7,  OrderCode = "HD007", SubTotal = 38000,  TaxAmount = 0, DiscountAmount = 0,    FinalAmount = 38000,  PaidAmount = 40000,  ChangeAmount = 2000,  Status = OrderStatus.Completed, EmployeeId = 5,  CustomerId = null },
-            new Order { OrderId = 8,  OrderCode = "HD008", SubTotal = 130000, TaxAmount = 0, DiscountAmount = 0,    FinalAmount = 130000, PaidAmount = 130000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 10, CustomerId = 6 },
-            new Order { OrderId = 9,  OrderCode = "HD009", SubTotal = 75000,  TaxAmount = 0, DiscountAmount = 0,    FinalAmount = 75000,  PaidAmount = 80000,  ChangeAmount = 5000,  Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 10 },
-            new Order { OrderId = 10, OrderCode = "HD010", SubTotal = 320000, TaxAmount = 0, DiscountAmount = 20000, FinalAmount = 300000, PaidAmount = 300000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 12, CustomerId = 22 },
-        };
+            // ── Tháng 6/2026 ────────────────────────────────────────────────
+            new Order { OrderId = 1,  OrderCode = "HD001", OrderDate = new DateTime(2026, 6, 1, 8, 30, 0),  SubTotal = 66000,  TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 66000,  PaidAmount = 70000,  ChangeAmount = 4000,  Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 1 },
+            new Order { OrderId = 2,  OrderCode = "HD002", OrderDate = new DateTime(2026, 6, 1, 14, 10, 0), SubTotal = 110000, TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 110000, PaidAmount = 110000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 4 },
+            new Order { OrderId = 3,  OrderCode = "HD003", OrderDate = new DateTime(2026, 6, 2, 9, 15, 0),  SubTotal = 55000,  TaxAmount = 0, DiscountAmount = 5000,  FinalAmount = 50000,  PaidAmount = 50000,  ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 3,  CustomerId = 2 },
+            new Order { OrderId = 4,  OrderCode = "HD004", OrderDate = new DateTime(2026, 6, 2, 16, 45, 0), SubTotal = 180000, TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 180000, PaidAmount = 200000, ChangeAmount = 20000, Status = OrderStatus.Completed, EmployeeId = 3,  CustomerId = 8 },
+            new Order { OrderId = 5,  OrderCode = "HD005", OrderDate = new DateTime(2026, 6, 5, 10, 0, 0),  SubTotal = 92000,  TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 92000,  PaidAmount = 100000, ChangeAmount = 8000,  Status = OrderStatus.Completed, EmployeeId = 5,  CustomerId = 3 },
+            new Order { OrderId = 6,  OrderCode = "HD006", OrderDate = new DateTime(2026, 6, 5, 15, 30, 0), SubTotal = 245000, TaxAmount = 0, DiscountAmount = 10000, FinalAmount = 235000, PaidAmount = 235000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 6,  CustomerId = 12 },
+            new Order { OrderId = 7,  OrderCode = "HD007", OrderDate = new DateTime(2026, 6, 10, 11, 20, 0), SubTotal = 38000, TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 38000,  PaidAmount = 40000,  ChangeAmount = 2000,  Status = OrderStatus.Completed, EmployeeId = 5,  CustomerId = null },
+            new Order { OrderId = 8,  OrderCode = "HD008", OrderDate = new DateTime(2026, 6, 15, 9, 0, 0),  SubTotal = 130000, TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 130000, PaidAmount = 130000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 10, CustomerId = 6 },
+            new Order { OrderId = 9,  OrderCode = "HD009", OrderDate = new DateTime(2026, 6, 20, 14, 0, 0), SubTotal = 75000,  TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 75000,  PaidAmount = 80000,  ChangeAmount = 5000,  Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 10 },
+            new Order { OrderId = 10, OrderCode = "HD010", OrderDate = new DateTime(2026, 6, 25, 18, 30, 0), SubTotal = 320000, TaxAmount = 0, DiscountAmount = 20000, FinalAmount = 300000, PaidAmount = 300000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 12, CustomerId = 22 },
+
+            // ── Tháng 7/2026 (tuần đầu, gần ngày test 9/7) ──────────────────
+            new Order { OrderId = 11, OrderCode = "HD011", OrderDate = new DateTime(2026, 7, 1, 8, 0, 0),   SubTotal = 76000,  TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 76000,  PaidAmount = 80000,  ChangeAmount = 4000,  Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 5 },
+            new Order { OrderId = 12, OrderCode = "HD012", OrderDate = new DateTime(2026, 7, 1, 15, 0, 0),  SubTotal = 155000, TaxAmount = 0, DiscountAmount = 5000,  FinalAmount = 150000, PaidAmount = 150000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 3,  CustomerId = 7 },
+            new Order { OrderId = 13, OrderCode = "HD013", OrderDate = new DateTime(2026, 7, 2, 9, 30, 0),  SubTotal = 210000, TaxAmount = 0, DiscountAmount = 10000, FinalAmount = 200000, PaidAmount = 200000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 5,  CustomerId = 14 },
+            new Order { OrderId = 14, OrderCode = "HD014", OrderDate = new DateTime(2026, 7, 2, 16, 0, 0),  SubTotal = 48000,  TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 48000,  PaidAmount = 50000,  ChangeAmount = 2000,  Status = OrderStatus.Completed, EmployeeId = 6,  CustomerId = null },
+            new Order { OrderId = 15, OrderCode = "HD015", OrderDate = new DateTime(2026, 7, 3, 10, 45, 0), SubTotal = 185000, TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 185000, PaidAmount = 200000, ChangeAmount = 15000, Status = OrderStatus.Completed, EmployeeId = 10, CustomerId = 16 },
+            new Order { OrderId = 16, OrderCode = "HD016", OrderDate = new DateTime(2026, 7, 4, 8, 15, 0),  SubTotal = 95000,  TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 95000,  PaidAmount = 100000, ChangeAmount = 5000,  Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 19 },
+            new Order { OrderId = 17, OrderCode = "HD017", OrderDate = new DateTime(2026, 7, 4, 14, 30, 0), SubTotal = 260000, TaxAmount = 0, DiscountAmount = 10000, FinalAmount = 250000, PaidAmount = 250000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 3,  CustomerId = 20 },
+            new Order { OrderId = 18, OrderCode = "HD018", OrderDate = new DateTime(2026, 7, 5, 9, 0, 0),   SubTotal = 72000,  TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 72000,  PaidAmount = 80000,  ChangeAmount = 8000,  Status = OrderStatus.Completed, EmployeeId = 5,  CustomerId = 11 },
+            new Order { OrderId = 19, OrderCode = "HD019", OrderDate = new DateTime(2026, 7, 7, 11, 0, 0),  SubTotal = 340000, TaxAmount = 0, DiscountAmount = 20000, FinalAmount = 320000, PaidAmount = 320000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 12, CustomerId = 15 },
+            new Order { OrderId = 20, OrderCode = "HD020", OrderDate = new DateTime(2026, 7, 8, 10, 0, 0),  SubTotal = 115000, TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 115000, PaidAmount = 120000, ChangeAmount = 5000,  Status = OrderStatus.Completed, EmployeeId = 6,  CustomerId = 21 },
+            new Order { OrderId = 21, OrderCode = "HD021", OrderDate = new DateTime(2026, 7, 9, 8, 30, 0),  SubTotal = 165000, TaxAmount = 0, DiscountAmount = 5000,  FinalAmount = 160000, PaidAmount = 160000, ChangeAmount = 0,     Status = OrderStatus.Completed, EmployeeId = 2,  CustomerId = 9 },
+            new Order { OrderId = 22, OrderCode = "HD022", OrderDate = new DateTime(2026, 7, 9, 14, 0, 0),  SubTotal = 88000,  TaxAmount = 0, DiscountAmount = 0,     FinalAmount = 88000,  PaidAmount = 90000,  ChangeAmount = 2000,  Status = OrderStatus.Completed, EmployeeId = 3,  CustomerId = 13 },
+        }.Select(order =>
+        {
+            order.CreatedAt = order.OrderDate;
+            return order;
+        }).ToList();
 
         // ========================= ORDER DETAILS =========================
         public static List<OrderDetail> GetOrderDetails() => new List<OrderDetail>
@@ -270,6 +304,99 @@ namespace MiniMart.Models
             new OrderDetail { OrderDetailId = 25, OrderId = 10, ProductId = 36, Quantity = 2, UnitPrice = 55000, DiscountAmount = 5000,  TotalPrice = 105000, IsGift = false },
             new OrderDetail { OrderDetailId = 26, OrderId = 10, ProductId = 37, Quantity = 2, UnitPrice = 75000, DiscountAmount = 10000, TotalPrice = 140000, IsGift = false },
             new OrderDetail { OrderDetailId = 27, OrderId = 10, ProductId = 41, Quantity = 2, UnitPrice = 55000, DiscountAmount = 5000,  TotalPrice = 105000, IsGift = false },
+
+            // ── Tháng 7/2026 ────────────────────────────────────────────────
+            // Order 11: Nước suối (sp1) x4 + Mì Hảo Hảo (sp24) x5
+            new OrderDetail { OrderDetailId = 28, OrderId = 11, ProductId = 1,  Quantity = 4, UnitPrice = 7000,  DiscountAmount = 0, TotalPrice = 28000, IsGift = false },
+            new OrderDetail { OrderDetailId = 29, OrderId = 11, ProductId = 24, Quantity = 5, UnitPrice = 5000,  DiscountAmount = 0, TotalPrice = 25000, IsGift = false },
+            new OrderDetail { OrderDetailId = 30, OrderId = 11, ProductId = 3,  Quantity = 2, UnitPrice = 11000, DiscountAmount = 0, TotalPrice = 22000, IsGift = false },
+            // Order 12: Sữa Vinamilk (sp18) x3 + Bánh Oreo (sp11) x2 + Snack Pringles (sp12) x1
+            new OrderDetail { OrderDetailId = 31, OrderId = 12, ProductId = 18, Quantity = 3, UnitPrice = 32000, DiscountAmount = 0,    TotalPrice = 96000, IsGift = false },
+            new OrderDetail { OrderDetailId = 32, OrderId = 12, ProductId = 11, Quantity = 2, UnitPrice = 25000, DiscountAmount = 2500, TotalPrice = 47500, IsGift = false },
+            new OrderDetail { OrderDetailId = 33, OrderId = 12, ProductId = 12, Quantity = 1, UnitPrice = 45000, DiscountAmount = 2500, TotalPrice = 42500, IsGift = false },
+            // Order 13: Bột giặt (sp36) x2 + Nước xả (sp38) x2 + Dầu gội (sp41) x2 + Sữa tắm (sp43) x1
+            new OrderDetail { OrderDetailId = 34, OrderId = 13, ProductId = 36, Quantity = 2, UnitPrice = 55000, DiscountAmount = 5000,  TotalPrice = 105000, IsGift = false },
+            new OrderDetail { OrderDetailId = 35, OrderId = 13, ProductId = 38, Quantity = 2, UnitPrice = 52000, DiscountAmount = 5000,  TotalPrice = 99000,  IsGift = false },
+            new OrderDetail { OrderDetailId = 36, OrderId = 13, ProductId = 41, Quantity = 2, UnitPrice = 55000, DiscountAmount = 0,     TotalPrice = 110000, IsGift = false },
+            // Order 14: Mì Hảo Hảo (sp24) x8 + Phở (sp26) x2
+            new OrderDetail { OrderDetailId = 37, OrderId = 14, ProductId = 24, Quantity = 8, UnitPrice = 5000,  DiscountAmount = 0, TotalPrice = 40000, IsGift = false },
+            new OrderDetail { OrderDetailId = 38, OrderId = 14, ProductId = 26, Quantity = 2, UnitPrice = 6000,  DiscountAmount = 0, TotalPrice = 12000, IsGift = false },
+            // Order 15: Dầu ăn (sp31) x2 + Nước mắm (sp29) x2 + Hạt nêm (sp34) x2 + Gạo (sp?) + Đường (sp33) x2
+            new OrderDetail { OrderDetailId = 39, OrderId = 15, ProductId = 31, Quantity = 2, UnitPrice = 55000, DiscountAmount = 0, TotalPrice = 110000, IsGift = false },
+            new OrderDetail { OrderDetailId = 40, OrderId = 15, ProductId = 29, Quantity = 2, UnitPrice = 28000, DiscountAmount = 0, TotalPrice = 56000,  IsGift = false },
+            new OrderDetail { OrderDetailId = 41, OrderId = 15, ProductId = 33, Quantity = 1, UnitPrice = 28000, DiscountAmount = 0, TotalPrice = 28000,  IsGift = false },
+            // Order 16: Bia Tiger (sp8) x3 + Snack Lay's (sp15) x3 + Nước ngọt Pepsi (sp3) x2
+            new OrderDetail { OrderDetailId = 42, OrderId = 16, ProductId = 8,  Quantity = 3, UnitPrice = 18000, DiscountAmount = 0, TotalPrice = 54000, IsGift = false },
+            new OrderDetail { OrderDetailId = 43, OrderId = 16, ProductId = 15, Quantity = 3, UnitPrice = 15000, DiscountAmount = 0, TotalPrice = 45000, IsGift = false },
+            // Order 17: Bột giặt (sp36) x3 + Nước giặt (sp37) x2 + Kem đánh răng (sp44) x2 + Sữa tắm (sp43) x2
+            new OrderDetail { OrderDetailId = 44, OrderId = 17, ProductId = 36, Quantity = 3, UnitPrice = 55000, DiscountAmount = 5000,  TotalPrice = 160000, IsGift = false },
+            new OrderDetail { OrderDetailId = 45, OrderId = 17, ProductId = 37, Quantity = 2, UnitPrice = 75000, DiscountAmount = 5000,  TotalPrice = 145000, IsGift = false },
+            new OrderDetail { OrderDetailId = 46, OrderId = 17, ProductId = 44, Quantity = 2, UnitPrice = 38000, DiscountAmount = 0,     TotalPrice = 76000,  IsGift = false },
+            // Order 18: Sữa chua (sp20) x3 + Mì Hảo Hảo (sp24) x4
+            new OrderDetail { OrderDetailId = 47, OrderId = 18, ProductId = 20, Quantity = 3, UnitPrice = 28000, DiscountAmount = 0, TotalPrice = 84000, IsGift = false },
+            new OrderDetail { OrderDetailId = 48, OrderId = 18, ProductId = 24, Quantity = 4, UnitPrice = 5000,  DiscountAmount = 0, TotalPrice = 20000, IsGift = false },
+            // Order 19: Bột giặt (sp36) x3 + Dầu gội (sp41) x3 + Nước xả (sp38) x3 + Sữa tắm (sp43) x2 + Kem đánh răng (sp44) x2
+            new OrderDetail { OrderDetailId = 49, OrderId = 19, ProductId = 36, Quantity = 3, UnitPrice = 55000, DiscountAmount = 10000, TotalPrice = 155000, IsGift = false },
+            new OrderDetail { OrderDetailId = 50, OrderId = 19, ProductId = 41, Quantity = 3, UnitPrice = 55000, DiscountAmount = 5000,  TotalPrice = 160000, IsGift = false },
+            new OrderDetail { OrderDetailId = 51, OrderId = 19, ProductId = 38, Quantity = 2, UnitPrice = 52000, DiscountAmount = 5000,  TotalPrice = 99000,  IsGift = false },
+            // Order 20: Sữa Vinamilk (sp18) x2 + Bánh Oreo (sp11) x3 + Bia Heineken (sp9) x2
+            new OrderDetail { OrderDetailId = 52, OrderId = 20, ProductId = 18, Quantity = 2, UnitPrice = 32000, DiscountAmount = 0, TotalPrice = 64000,  IsGift = false },
+            new OrderDetail { OrderDetailId = 53, OrderId = 20, ProductId = 11, Quantity = 3, UnitPrice = 25000, DiscountAmount = 0, TotalPrice = 75000,  IsGift = false },
+            // Order 21: Nước suối (sp1) x6 + Nước ngọt (sp3) x3 + Mì Hảo Hảo (sp24) x10
+            new OrderDetail { OrderDetailId = 54, OrderId = 21, ProductId = 1,  Quantity = 6, UnitPrice = 7000,  DiscountAmount = 0, TotalPrice = 42000,  IsGift = false },
+            new OrderDetail { OrderDetailId = 55, OrderId = 21, ProductId = 3,  Quantity = 3, UnitPrice = 11000, DiscountAmount = 0, TotalPrice = 33000,  IsGift = false },
+            new OrderDetail { OrderDetailId = 56, OrderId = 21, ProductId = 24, Quantity = 10, UnitPrice = 5000, DiscountAmount = 5000, TotalPrice = 95000, IsGift = false },
+            // Order 22: Dầu gội (sp41) x1 + Sữa tắm (sp43) x1 + Kem đánh răng (sp44) x2
+            new OrderDetail { OrderDetailId = 57, OrderId = 22, ProductId = 41, Quantity = 1, UnitPrice = 55000, DiscountAmount = 0, TotalPrice = 55000, IsGift = false },
+            new OrderDetail { OrderDetailId = 58, OrderId = 22, ProductId = 43, Quantity = 1, UnitPrice = 72000, DiscountAmount = 0, TotalPrice = 72000, IsGift = false },
+        };
+
+        // ========================= PROMOTIONS =========================
+        public static List<Promotion> GetPromotions() => new List<Promotion>
+        {
+            new Promotion
+            {
+                PromotionId = 1,
+                Name = "Snack mua 1 tặng 1",
+                Description = "Mua 1 tặng 1 cho nhóm snack chọn lọc.",
+                Type = PromotionType.BuyXGetYFree,
+                BuyQuantity = 1,
+                GiftQuantity = 1,
+                GiftProductId = 24,
+                StartDate = new DateTime(2026, 7, 1),
+                EndDate = new DateTime(2026, 7, 31),
+                IsActive = true,
+            },
+            new Promotion
+            {
+                PromotionId = 2,
+                Name = "Hóa đơn từ 150K",
+                Description = "Đơn hàng từ 150.000đ giảm 10%.",
+                Type = PromotionType.PercentDiscount,
+                DiscountPercent = 10,
+                MinimumOrderAmount = 150000,
+                StartDate = new DateTime(2026, 7, 1),
+                EndDate = new DateTime(2026, 8, 31),
+                IsActive = true,
+            },
+            new Promotion
+            {
+                PromotionId = 3,
+                Name = "Giảm giá bánh Oreo",
+                Description = "Bánh Oreo giảm 15% trong tháng 7.",
+                Type = PromotionType.ProductDiscount,
+                DiscountPercent = 15,
+                StartDate = new DateTime(2026, 7, 1),
+                EndDate = new DateTime(2026, 7, 31),
+                IsActive = true,
+            },
+        };
+
+        public static List<PromotionProduct> GetPromotionProducts() => new List<PromotionProduct>
+        {
+            new PromotionProduct { PromotionId = 1, ProductId = 24 },
+            new PromotionProduct { PromotionId = 1, ProductId = 26 },
+            new PromotionProduct { PromotionId = 3, ProductId = 11 },
         };
 
         // ========================= INVENTORY TRANSACTIONS =========================
@@ -288,6 +415,24 @@ namespace MiniMart.Models
             // Bán hàng từ order 4
             new InventoryTransaction { InventoryTransactionId = 9,  TransactionType = InventoryTransactionType.Sale,   Quantity = 2,   PreviousStock = 100, CurrentStock = 98,  ReferenceType = ReferenceType.Order,   ReferenceId = 4, ProductId = 36, BatchId = 10, EmployeeId = 3, Note = "Bán hàng đơn HD004" },
             new InventoryTransaction { InventoryTransactionId = 10, TransactionType = InventoryTransactionType.Sale,   Quantity = 2,   PreviousStock = 90,  CurrentStock = 88,  ReferenceType = ReferenceType.Order,   ReferenceId = 4, ProductId = 38, BatchId = 12, EmployeeId = 3, Note = "Bán hàng đơn HD004" },
+        };
+
+        private static string GetProductImageUrl(string productCode) => productCode switch
+        {
+            "SP001" => "https://storage.googleapis.com/tm-zopsmart-uploads/1/images/640/20250417/3296881-20250417-161955.webp",
+            "SP002" => "https://upload.wikimedia.org/wikipedia/commons/2/29/La_Vie_bottle.jpg",
+            "SP003" => "https://tiimg.tistatic.com/fp/1/006/506/pepsi-cola-canned-soda-330ml-539.jpg",
+            "SP004" => "https://tiimg.tistatic.com/fp/1/006/506/coca-cola-soft-drink-330ml-can-539.jpg",
+            "SP011" => "https://www.crackerjack.co.nz/cdn/shop/products/oreo-original-sandwich-chocolate-1196g-fs1675.jpg",
+            "SP012" => "https://www.pns.hk/cdn/shop/products/448372_1_1024x1024.jpg",
+            "SP014" => "https://www.worldwideholland.com/cdn/shop/products/haribo-gold-bears-250-gr-1_1024x1024.jpg",
+            "SP015" => "https://cdn.shopify.com/s/files/1/0550/6322/3094/products/LaysOriginal50g_1024x1024.jpg",
+            "SP018" => "https://www.avakids.com/images/products/2024/03/07/large/sua-tuoi-vinamilk-it-duong-1-lit-1-hop_1712572233.jpg",
+            "SP020" => "https://www.sieuthianhduong.com/upload/product/sua-milo-180ml-4-hop_1620202344.jpg",
+            "SP024" => "https://osifood.vn/cdn/shop/products/mi-hao-hao-tom-chua-cay-goi-75g_1024x1024.jpg",
+            "SP029" => "https://www.chin-su.com.vn/uploads/products/nuoc-mam-ca-hoi-500ml.jpg",
+            "SP030" => "https://www.chin-su.com.vn/uploads/products/tuong-ot-chin-su-250g.jpg",
+            _ => $"https://placehold.co/320x320/png?text={productCode}",
         };
     }
 }

@@ -3,12 +3,66 @@ import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
+import 'package:mini_mart_management_mobile_app/models/order_summary.dart';
 
 class OrderService {
   OrderService({http.Client? client})
     : _client = client ?? createConfiguredClient();
 
   final http.Client _client;
+
+  Future<List<OrderSummary>> getOrdersByEmployee(int employeeId) async {
+    final uri = ApiConfig.uri('/api/orders').replace(
+      queryParameters: {
+        r'$filter': 'EmployeeId eq $employeeId',
+        r'$orderby': 'OrderDate desc',
+      },
+    );
+    final response = await _client.get(
+      uri,
+      headers: const {'Accept': 'application/json'},
+    );
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(_readMessage(responseJson));
+    }
+
+    final data = responseJson['data'] ?? responseJson['value'];
+    if (data is! List) {
+      throw const ApiException('Không thể đọc lịch sử đơn hàng.');
+    }
+
+    return data
+        .whereType<Map<String, dynamic>>()
+        .map(OrderSummary.fromJson)
+        .toList();
+  }
+
+  Future<List<OrderSummary>> getAllOrders() async {
+    final uri = ApiConfig.uri('/api/orders').replace(
+      queryParameters: {
+        r'$orderby': 'OrderDate desc',
+      },
+    );
+    final response = await _client.get(
+      uri,
+      headers: const {'Accept': 'application/json'},
+    );
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(_readMessage(responseJson));
+    }
+
+    final data = responseJson['data'] ?? responseJson['value'];
+    if (data is! List) {
+      throw const ApiException('Không thể đọc danh sách đơn hàng.');
+    }
+
+    return data
+        .whereType<Map<String, dynamic>>()
+        .map(OrderSummary.fromJson)
+        .toList();
+  }
 
   Future<Map<String, dynamic>> checkout(Map<String, dynamic> data) async {
     final csrfToken = await _fetchCsrfToken();

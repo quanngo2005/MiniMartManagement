@@ -7,6 +7,8 @@ http.Client createHttpClient() => CookieClient(http.Client());
 
 void clearCookieStore() => CookieClient.clearCookies();
 
+String? getCookieHeader() => CookieClient.getCookieHeader();
+
 class CookieClient extends http.BaseClient {
   CookieClient(this._inner);
 
@@ -17,6 +19,13 @@ class CookieClient extends http.BaseClient {
 
   static void clearCookies() {
     _cookies.clear();
+  }
+
+  static String? getCookieHeader() {
+    if (_cookies.isEmpty) return null;
+    return _cookies.entries
+        .map((entry) => '${entry.key}=${entry.value}')
+        .join('; ');
   }
 
   @override

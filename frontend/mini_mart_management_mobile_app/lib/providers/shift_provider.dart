@@ -55,7 +55,7 @@ class ShiftProvider extends ChangeNotifier {
   Future<bool> openNewShift({
     required int cashierId,
     required double startCash,
-    bool isMorning = true,
+    int shiftType = 0, // 0 = Sáng, 1 = Chiều, 2 = Tối
     String? note,
   }) async {
     _isLoading = true;
@@ -64,22 +64,73 @@ class ShiftProvider extends ChangeNotifier {
 
     try {
       final now = DateTime.now();
+      final shifts = await _shiftRepository.getAllShifts();
+      final assignedShift = shifts.cast<Shift?>().firstWhere(
+        (shift) =>
+            shift != null &&
+            shift.status == 1 &&
+            shift.employeeId == cashierId &&
+            _isSameDay(shift.workDate, now) &&
+            _shiftTypeFromStartTime(shift.startTime) == shiftType,
+        orElse: () => null,
+      );
+
+      if (assignedShift != null) {
+        _currentShift = await _shiftRepository.openShift(
+          shiftId: assignedShift.shiftId,
+          cashierId: cashierId,
+          startCash: startCash,
+          note: note,
+        );
+        return true;
+      }
+
       final dateStr =
           '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
-      final shiftCode = (isMorning ? 'SA-' : 'CH-') + dateStr;
-      final shiftName = isMorning ? 'Ca sáng' : 'Ca chiều';
-      final startTimeStr = DateTime(
+
+      String shiftCodePrefix;
+      String shiftName;
+      int startHour;
+      int startMinute = 0;
+      int endHour;
+      int endMinute = 0;
+
+      if (shiftType == 0) {
+        shiftCodePrefix = 'SA-';
+        shiftName = 'Ca sáng';
+        startHour = 6;
+        endHour = 11;
+      } else if (shiftType == 1) {
+        shiftCodePrefix = 'CH-';
+        shiftName = 'Ca chiều';
+        startHour = 11;
+        endHour = 16;
+      } else {
+        shiftCodePrefix = 'TO-';
+        shiftName = 'Ca tối';
+        startHour = 16;
+        endHour = 22;
+        endMinute = 30;
+      }
+
+      final shiftCode = shiftCodePrefix + dateStr;
+      final startTime = DateTime(
         now.year,
         now.month,
         now.day,
-        isMorning ? 6 : 14,
-      ).toIso8601String();
-      final endTimeStr = DateTime(
+        startHour,
+        startMinute,
+      );
+      final endTime = DateTime(
         now.year,
         now.month,
         now.day,
-        isMorning ? 14 : 22,
-      ).toIso8601String();
+        endHour,
+        endMinute,
+      );
+
+      final startTimeStr = startTime.toIso8601String();
+      final endTimeStr = endTime.toIso8601String();
 
       final newShiftPayload = {
         'shiftCode': shiftCode,
@@ -114,6 +165,18 @@ class ShiftProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  bool _isSameDay(DateTime left, DateTime right) {
+    return left.year == right.year &&
+        left.month == right.month &&
+        left.day == right.day;
+  }
+
+  int _shiftTypeFromStartTime(DateTime startTime) {
+    if (startTime.hour >= 6 && startTime.hour < 11) return 0;
+    if (startTime.hour >= 11 && startTime.hour < 16) return 1;
+    return 2;
   }
 
   Future<bool> openShift({

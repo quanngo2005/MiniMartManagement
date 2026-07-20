@@ -1,6 +1,7 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
@@ -56,6 +57,7 @@ namespace MiniMart.Services.Implementations
             var importDate = GetVietnamNow();
             var receipt = _mapper.Map<Receipt>(createDto);
             receipt.ReceiptCode = GenerateReceiptCode(importDate);
+            receipt.CreatedAt = importDate;
             receipt.ImportDate = importDate;
             receipt.EmployeeId = employeeId;
             receipt.ReceiptStatus = ReceiptStatus.Pending;
@@ -142,35 +144,53 @@ namespace MiniMart.Services.Implementations
             if (existing.ReceiptStatus != ReceiptStatus.Pending)
                 throw new DomainException("Only pending receipts can be completed.", StatusCodes.Status422UnprocessableEntity);
 
-            foreach (var batch in existing.Batches)
+            try
             {
-                var product = await _inventoryTransactionRepository.GetProductByIdAsync(batch.ProductId)
-                    ?? throw new DomainException($"Product with ID {batch.ProductId} not found.", StatusCodes.Status422UnprocessableEntity);
-
-                var previousStock = product.StockQuantity;
-                var currentStock = previousStock + batch.QuantityImported;
-
-                await _inventoryTransactionRepository.AdjustProductStockAsync(batch.ProductId, batch.QuantityImported);
-                await _batchRepository.AdjustBatchRemainingQuantityAsync(batch.BatchId, batch.QuantityImported);
-
-                var transaction = new InventoryTransaction
+                await _receiptRepository.ExecuteInTransactionAsync(async () =>
                 {
-                    TransactionType = InventoryTransactionType.Import,
-                    Quantity = batch.QuantityImported,
-                    PreviousStock = previousStock,
-                    CurrentStock = currentStock,
-                    ReferenceType = Models.Enums.ReferenceType.Receipt,
-                    ReferenceId = existing.ReceiptId,
-                    Note = $"Import from receipt {existing.ReceiptCode}",
-                    ProductId = batch.ProductId,
-                    BatchId = batch.BatchId,
-                    EmployeeId = existing.EmployeeId
-                };
+                    var stockByProductId = existing.Batches
+                        .GroupBy(batch => batch.ProductId)
+                        .ToDictionary(
+                            group => group.Key,
+                            group => group.First().Product.StockQuantity);
 
-                await _inventoryTransactionRepository.CreateInventoryTransactionAsync(transaction);
+                    foreach (var batch in existing.Batches)
+                    {
+                        var previousStock = stockByProductId[batch.ProductId];
+                        var currentStock = previousStock + batch.QuantityImported;
+
+                        // The Batches trigger recalculates Product.StockQuantity from active batches.
+                        // Updating the product here would double-count this import and leave its
+                        // RowVersion stale for a later batch of the same product.
+                        await _batchRepository.AdjustBatchRemainingQuantityAsync(batch.BatchId, batch.QuantityImported);
+
+                        var transaction = new InventoryTransaction
+                        {
+                            TransactionType = InventoryTransactionType.Import,
+                            Quantity = batch.QuantityImported,
+                            PreviousStock = previousStock,
+                            CurrentStock = currentStock,
+                            ReferenceType = Models.Enums.ReferenceType.Receipt,
+                            ReferenceId = existing.ReceiptId,
+                            Note = $"Import from receipt {existing.ReceiptCode}",
+                            ProductId = batch.ProductId,
+                            BatchId = batch.BatchId,
+                            EmployeeId = existing.EmployeeId
+                        };
+
+                        await _inventoryTransactionRepository.CreateInventoryTransactionAsync(transaction);
+                        stockByProductId[batch.ProductId] = currentStock;
+                    }
+
+                    await _receiptRepository.MarkReceiptAsCompletedAsync(id);
+                });
             }
-
-            await _receiptRepository.MarkReceiptAsCompletedAsync(id);
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new DomainException(
+                    "Inventory changed while completing this receipt. Reload and retry.",
+                    StatusCodes.Status409Conflict);
+            }
 
             var completed = await _receiptRepository.GetReceiptByIdAsync(id);
             return _mapper.Map<ReceiptDto>(completed!);

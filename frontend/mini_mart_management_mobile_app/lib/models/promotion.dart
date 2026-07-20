@@ -2,9 +2,10 @@ class Promotion {
   final int promotionId;
   final String name;
   final String description;
-  final int type; // 0 = PercentDiscount, 1 = BuyXGetYFree
+  final int type; // 0 = PercentDiscount, 1 = BuyXGetYFree, 2 = ProductDiscount
   final double? discountPercent;
   final double? discountAmount;
+  final double? minimumOrderAmount;
   final int? buyQuantity;
   final int? giftQuantity;
   final int? giftProductId;
@@ -20,6 +21,7 @@ class Promotion {
     required this.type,
     this.discountPercent,
     this.discountAmount,
+    this.minimumOrderAmount,
     this.buyQuantity,
     this.giftQuantity,
     this.giftProductId,
@@ -43,6 +45,9 @@ class Promotion {
           ?.toDouble(),
       discountAmount: (json['discountAmount'] ?? json['DiscountAmount'])
           ?.toDouble(),
+      minimumOrderAmount:
+          (json['minimumOrderAmount'] ?? json['MinimumOrderAmount'])
+              ?.toDouble(),
       buyQuantity: (json['buyQuantity'] ?? json['BuyQuantity']) as int?,
       giftQuantity: (json['giftQuantity'] ?? json['GiftQuantity']) as int?,
       giftProductId: (json['giftProductId'] ?? json['GiftProductId']) as int?,
@@ -68,7 +73,17 @@ class Promotion {
     return 'Active';
   }
 
-  String get discountType => type == 0 ? 'Percentage' : 'BuyXGetYFree';
+  String get discountType {
+    switch (type) {
+      case 0:
+        return 'Percentage';
+      case 1:
+        return 'BuyXGetYFree';
+      default:
+        return 'ProductDiscount';
+    }
+  }
+
   double get discountValue => discountPercent ?? discountAmount ?? 0;
-  int get minPurchaseAmount => 0;
+  double get minPurchaseAmount => minimumOrderAmount ?? 0;
 }

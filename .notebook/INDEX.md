@@ -2,6 +2,18 @@
 
 ## Entries
 
+- [Batch write boundary](batch-write-boundary.md) - batch API is read-only; all writes require an inventory workflow and audit trail.
+- [Batch status mobile flow](batch-status-mobile-flow.md) - authenticated batch status list and its Manager/Warehouse entry points.
+
+- [Receipt import flow](receipt-import-flow.md) - mobile receipt creation and completion path, plus atomicity risk.
+
+- [Flutter stock count scanning](flutter-stock-count-scanning.md) - live count screen reuses barcode scan flow.
+- [Flutter stock-count API flow](flutter-stock-count-api-flow.md) - create, save, cancel, submit, approve/reject, and transaction refresh.
+
+- [Stock count domain foundation](stock-count-domain-foundation.md) - stock-count tables, row versions, and batch provenance.
+
+- [Expiry and batch stock gotcha](expiry-stock-flow-gotcha.md) - expiry is not enforced in checkout; batch stock drifts.
+
 - [Staff employee contract](staff-employee-contract.md) - staff DTO password mapping and removed audit columns.
 - [Cookie authentication flow](auth-cookie-flow.md) - how employee-based auth, cookies, CSRF, and refresh-token storage are wired.
 - [Invoice and VAT foundation](invoice-vat-foundation.md) - TaxRates, category VAT assignments, order-detail VAT snapshots, and e-invoice relationships.
