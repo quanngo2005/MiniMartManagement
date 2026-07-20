@@ -130,7 +130,11 @@ namespace MiniMart.Repositories.RepoImplement
             // BR-INV-01
             decimal subTotal = 0;
             var orderDetails = new List<OrderDetail>();
-            var taxDescriptionsByProductId = new Dictionary<int, string>();
+            var now = DateTime.UtcNow.AddHours(7);
+            var activePromotions = await _context.Promotions
+                .Include(p => p.PromotionProducts)
+                .Where(p => p.IsActive && p.StartDate <= now && p.EndDate >= now)
+                .ToListAsync();
 
             foreach (var item in request.Items)
             {
@@ -138,42 +142,115 @@ namespace MiniMart.Repositories.RepoImplement
                 if (product == null)
                     throw new KeyNotFoundException($"Sản phẩm ID {item.ProductId} không tồn tại.");
 
-                if (product.StockQuantity < item.Quantity)
-                    throw new InvalidOperationException(
-                        $"Sản phẩm '{product.ProductName}' không đủ tồn kho. " +
-                        $"Hiện có: {product.StockQuantity}, yêu cầu: {item.Quantity}.");
+                var buyXGetYPromotion = activePromotions
+                    .Where(p => p.Type == PromotionType.BuyXGetYFree
+                                && p.BuyQuantity.GetValueOrDefault() > 0
+                                && p.GiftQuantity.GetValueOrDefault() > 0
+                                && p.PromotionProducts.Any(pp => pp.ProductId == item.ProductId))
+                    .OrderByDescending(p => p.GiftQuantity.GetValueOrDefault())
+                    .ThenBy(p => p.PromotionId)
+                    .FirstOrDefault();
 
-                var lineTotal = product.SellingPrice * item.Quantity;
-                var taxRate = product.Category?.TaxRate
-                    ?? throw new InvalidOperationException($"Product '{product.ProductName}' does not have a category tax rate.");
-
-                var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                if (!taxRate.Status || taxRate.EffectiveFrom > today ||
-                    (taxRate.EffectiveTo.HasValue && taxRate.EffectiveTo.Value < today))
+                var giftQuantity = 0;
+                var giftProductId = item.ProductId;
+                Product? giftProduct = null;
+                if (buyXGetYPromotion != null)
                 {
-                    throw new InvalidOperationException($"Tax rate for category '{product.Category.CategoryName}' is not active.");
+                    giftQuantity =
+                        (item.Quantity / buyXGetYPromotion.BuyQuantity!.Value)
+                        * buyXGetYPromotion.GiftQuantity!.Value;
+                    giftProductId = buyXGetYPromotion.GiftProductId ?? item.ProductId;
+                    giftProduct = giftProductId == item.ProductId
+                        ? product
+                        : await GetProductByIdAsync(giftProductId);
+
+                    if (giftProduct == null)
+                        throw new KeyNotFoundException($"Sản phẩm quà tặng ID {giftProductId} không tồn tại.");
                 }
 
-                var vatAmount = Math.Round(lineTotal * taxRate.Rate, 2, MidpointRounding.AwayFromZero);
+                var requiredMainStock = item.Quantity
+                    + (giftProductId == item.ProductId ? giftQuantity : 0);
+                if (product.StockQuantity < requiredMainStock)
+                    throw new InvalidOperationException(
+                        $"Sản phẩm '{product.ProductName}' không đủ tồn kho. " +
+                        $"Hiện có: {product.StockQuantity}, yêu cầu: {requiredMainStock}.");
+
+                if (giftProduct != null
+                    && giftProduct.ProductId != product.ProductId
+                    && giftProduct.StockQuantity < giftQuantity)
+                    throw new InvalidOperationException(
+                        $"Sản phẩm quà tặng '{giftProduct.ProductName}' không đủ tồn kho. " +
+                        $"Hiện có: {giftProduct.StockQuantity}, yêu cầu: {giftQuantity}.");
+
+                var productDiscountPromotion = activePromotions
+                    .Where(p => p.Type == PromotionType.ProductDiscount
+                                && p.PromotionProducts.Any(pp => pp.ProductId == item.ProductId))
+                    .Select(p => new
+                    {
+                        Promotion = p,
+                        Amount = p.DiscountPercent.HasValue
+                            ? product.SellingPrice * item.Quantity * p.DiscountPercent.Value / 100m
+                            : p.DiscountAmount.GetValueOrDefault() * item.Quantity
+                    })
+                    .Where(p => p.Amount > 0)
+                    .OrderByDescending(p => p.Amount)
+                    .ThenBy(p => p.Promotion.PromotionId)
+                    .FirstOrDefault();
+
+                var lineTotal = product.SellingPrice * item.Quantity;
+                var lineDiscount = Math.Min(productDiscountPromotion?.Amount ?? 0m, lineTotal);
                 subTotal += lineTotal;
-                taxDescriptionsByProductId[item.ProductId] = taxRate.Description;
 
                 orderDetails.Add(new OrderDetail
                 {
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
                     UnitPrice = product.SellingPrice,
-                    DiscountAmount = 0,
+                    DiscountAmount = lineDiscount,
                     TotalPrice = lineTotal,
-                    VatRate = taxRate.Rate,
-                    VatAmount = vatAmount,
-                    IsGift = false
+                    VatRate = 0,
+                    VatAmount = 0,
+                    IsGift = false,
+                    AppliedPromotionId = productDiscountPromotion?.Promotion.PromotionId
                 });
+
+                if (giftQuantity > 0 && giftProduct != null && buyXGetYPromotion != null)
+                {
+                    orderDetails.Add(new OrderDetail
+                    {
+                        ProductId = giftProduct.ProductId,
+                        Quantity = giftQuantity,
+                        UnitPrice = 0,
+                        DiscountAmount = 0,
+                        TotalPrice = 0,
+                        VatRate = 0,
+                        VatAmount = 0,
+                        IsGift = true,
+                        AppliedPromotionId = buyXGetYPromotion.PromotionId
+                    });
+                }
             }
 
-            decimal discountAmount = loyaltyDiscount;
-            decimal taxAmount = orderDetails.Sum(detail => detail.VatAmount);
-            decimal finalAmount = subTotal - discountAmount + taxAmount;
+            var productDiscountAmount = orderDetails.Sum(od => od.DiscountAmount);
+            var orderLevelPromotion = activePromotions
+                .Where(p => p.Type == PromotionType.PercentDiscount
+                            && subTotal >= p.MinimumOrderAmount.GetValueOrDefault())
+                .Select(p => new
+                {
+                    Promotion = p,
+                    Amount = p.DiscountPercent.HasValue
+                        ? (subTotal - productDiscountAmount) * p.DiscountPercent.Value / 100m
+                        : p.DiscountAmount.GetValueOrDefault()
+                })
+                .Where(p => p.Amount > 0)
+                .OrderByDescending(p => p.Amount)
+                .ThenBy(p => p.Promotion.PromotionId)
+                .FirstOrDefault();
+
+            var promotionDiscount = orderLevelPromotion?.Amount ?? 0m;
+            decimal discountAmount = loyaltyDiscount + productDiscountAmount + promotionDiscount;
+            const decimal taxAmount = 0;
+            decimal finalAmount = subTotal - discountAmount;
             if (finalAmount < 0) finalAmount = 0;
 
             decimal changeAmount = 0;
@@ -184,7 +261,7 @@ namespace MiniMart.Repositories.RepoImplement
                 changeAmount = request.PaidAmount - finalAmount;
             }
 
-            var createdAt = DateTime.UtcNow.AddHours(7);
+            var createdAt = now;
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -217,23 +294,25 @@ namespace MiniMart.Repositories.RepoImplement
                 int pointsEarned = 0;
                 if (request.PaymentMethod == PaymentMethod.Cash)
                 {
-                    foreach (var item in request.Items)
+                    foreach (var detail in orderDetails)
                     {
-                        var product = await _context.Products.FindAsync(item.ProductId);
+                        var product = await _context.Products.FindAsync(detail.ProductId);
                         int previousStock = product!.StockQuantity;
-                        product.StockQuantity -= item.Quantity;
+                        product.StockQuantity -= detail.Quantity;
 
                         _context.InventoryTransactions.Add(new InventoryTransaction
                         {
                             TransactionType = InventoryTransactionType.Sale,
-                            Quantity = item.Quantity,
+                            Quantity = detail.Quantity,
                             PreviousStock = previousStock,
                             CurrentStock = product.StockQuantity,
                             ReferenceType = ReferenceType.Order,
                             ReferenceId = order.OrderId,
-                            ProductId = item.ProductId,
+                            ProductId = detail.ProductId,
                             EmployeeId = request.EmployeeId,
-                            Note = $"Bán hàng - Đơn {order.OrderCode}"
+                            Note = detail.IsGift
+                                ? $"Quà tặng khuyến mãi - Đơn {order.OrderCode}"
+                                : $"Bán hàng - Đơn {order.OrderCode}"
                         });
                     }
 
@@ -274,7 +353,9 @@ namespace MiniMart.Repositories.RepoImplement
                         TotalPrice = od.TotalPrice,
                         VatRate = od.VatRate,
                         VatAmount = od.VatAmount,
-                        TaxDescription = taxDescriptionsByProductId[od.ProductId]
+                        IsGift = od.IsGift,
+                        AppliedPromotionId = od.AppliedPromotionId,
+                        TaxDescription = string.Empty
                     }).ToList()
                 };
             }
@@ -301,7 +382,6 @@ namespace MiniMart.Repositories.RepoImplement
         {
             return await _context.Products
                 .Include(p => p.Category)
-                    .ThenInclude(c => c.TaxRate)
                 .FirstOrDefaultAsync(p => p.ProductId == productId);
         }
 

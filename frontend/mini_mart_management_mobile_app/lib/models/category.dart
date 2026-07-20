@@ -8,7 +8,6 @@ class Category {
     required this.displayOrder,
     this.parentCategoryId,
     this.parentCategoryName,
-    required this.taxRateId,
   });
 
   final int categoryId;
@@ -19,7 +18,6 @@ class Category {
   final int displayOrder;
   final int? parentCategoryId;
   final String? parentCategoryName;
-  final int taxRateId;
 
   factory Category.fromJson(Map<String, dynamic> json) {
     final parent = json['parentCategory'] ?? json['ParentCategory'];
@@ -47,7 +45,6 @@ class Category {
       parentCategoryName: parent is Map<String, dynamic>
           ? (parent['categoryName'] ?? parent['CategoryName']) as String?
           : null,
-      taxRateId: _asInt(json['taxRateId'] ?? json['TaxRateId']),
     );
   }
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_mart_management_mobile_app/models/e_invoice.dart';
+import 'package:mini_mart_management_mobile_app/models/order_summary.dart';
 import 'package:mini_mart_management_mobile_app/providers/e_invoice_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/order_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/invoice_detail_screen.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
@@ -27,6 +29,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<EInvoiceProvider>().loadInvoices();
+      context.read<OrderProvider>().fetchAllOrders();
     });
   }
 
@@ -39,7 +42,11 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<EInvoiceProvider>();
+    final orderProvider = context.watch<OrderProvider>();
     final invoices = provider.invoices;
+    final availableOrders = orderProvider.orders
+        .where((order) => order.isCompleted && !order.isCancelled)
+        .toList();
 
     return Scaffold(
       appBar: MiniMartAppBar.primary(
@@ -56,7 +63,9 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
               slivers: [
                 SliverPadding(
                   padding: const EdgeInsets.all(16),
-                  sliver: SliverToBoxAdapter(child: _buildCreateCard(context)),
+                  sliver: SliverToBoxAdapter(
+                    child: _buildCreateCard(context, availableOrders),
+                  ),
                 ),
                 if (provider.errorMessage != null && invoices.isEmpty)
                   SliverToBoxAdapter(
@@ -107,7 +116,10 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
     );
   }
 
-  Widget _buildCreateCard(BuildContext context) {
+  Widget _buildCreateCard(
+    BuildContext context,
+    List<OrderSummary> availableOrders,
+  ) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -134,6 +146,17 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: availableOrders.isEmpty
+                    ? null
+                    : () => _openOrderPicker(context, availableOrders),
+                icon: const Icon(Icons.list_alt_rounded),
+                label: const Text('Chọn từ danh sách đơn hàng'),
+              ),
+            ),
             const SizedBox(height: 12),
             SizedBox(
               height: 48,
@@ -147,6 +170,87 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _openOrderPicker(
+    BuildContext context,
+    List<OrderSummary> availableOrders,
+  ) async {
+    final selectedOrder = await showModalBottomSheet<OrderSummary>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: SizedBox(
+            height: MediaQuery.sizeOf(sheetContext).height * 0.7,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'Chọn đơn hàng đã hoàn tất',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: availableOrders.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (_, index) {
+                      final order = availableOrders[index];
+                      return ListTile(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: const BorderSide(color: AppColors.borderGray),
+                        ),
+                        title: Text(
+                          order.orderCode,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'ID: ${order.orderId} • ${DateFormat('dd/MM/yyyy HH:mm').format(order.orderDate)}',
+                        ),
+                        trailing: Text(
+                          NumberFormat.currency(
+                            locale: 'vi_VN',
+                            symbol: 'đ',
+                            decimalDigits: 0,
+                          ).format(order.finalAmount),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                        onTap: () => Navigator.pop(sheetContext, order),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selectedOrder == null || !context.mounted) return;
+    setState(() {
+      _orderIdController.text = selectedOrder.orderId.toString();
+    });
   }
 
   Future<void> _createInvoice(BuildContext context) async {

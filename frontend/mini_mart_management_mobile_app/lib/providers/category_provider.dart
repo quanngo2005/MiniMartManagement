@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/category.dart';
-import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/repositories/category_repository.dart';
 
 class CategoryProvider extends ChangeNotifier {
@@ -9,23 +8,12 @@ class CategoryProvider extends ChangeNotifier {
 
   final CategoryRepository _repository;
   List<Category> _categories = const [];
-  List<TaxRate> _taxRates = const [];
   bool _isLoading = false;
   String? _error;
 
   List<Category> get categories => _categories;
-  List<TaxRate> get taxRates => _taxRates;
   bool get isLoading => _isLoading;
   String? get error => _error;
-
-  Future<void> fetchTaxRates() async {
-    try {
-      _taxRates = await _repository.getTaxRates();
-      notifyListeners();
-    } catch (_) {
-      // The category list remains usable without tax metadata.
-    }
-  }
 
   Future<void> fetchAll() async {
     _isLoading = true;
@@ -33,11 +21,6 @@ class CategoryProvider extends ChangeNotifier {
     notifyListeners();
     try {
       _categories = await _repository.getAll();
-      try {
-        _taxRates = await _repository.getTaxRates();
-      } catch (_) {
-        // The category list remains usable without tax metadata.
-      }
     } on ApiException catch (error) {
       _error = error.message;
     } catch (_) {

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/supplier.dart';
 import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart';
@@ -54,7 +54,7 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
 
     return Scaffold(
       appBar: MiniMartAppBar.primary(
-        title: 'Nhà cung cấp',
+        title: 'NhÃ  cung cáº¥p',
         onBrandTap: null,
         onProfileTap: () => Navigator.of(context).push(
           MaterialPageRoute<void>(builder: (_) => const SupplierDebtScreen()),
@@ -69,10 +69,26 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
                 controller: _searchController,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.search_rounded),
-                  hintText: 'Tìm theo tên, mã, liên hệ...',
+                  hintText: 'TÃ¬m theo tÃªn, mÃ£, liÃªn há»‡...',
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const SupplierDebtScreen(),
+                    ),
+                  ),
+                  icon: const Icon(Icons.payments_outlined),
+                  label: const Text('Quản lý nợ nhà cung cấp'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             Expanded(
               child: provider.isLoading && provider.suppliers.isEmpty
                   ? const LoadingOverlay()
@@ -84,7 +100,7 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
                     )
                   : filtered.isEmpty
                   ? const EmptyState(
-                      message: 'Chưa có nhà cung cấp nào.',
+                      message: 'ChÆ°a cÃ³ nhÃ  cung cáº¥p nÃ o.',
                       icon: Icons.local_shipping_outlined,
                     )
                   : RefreshIndicator(
@@ -131,10 +147,11 @@ class _SupplierTile extends StatelessWidget {
         onTap: onTap,
         title: Text(supplier.supplierName),
         subtitle: Text(
-          '${supplier.supplierCode} • ${supplier.contactPerson ?? 'Chưa có liên hệ'}',
+          '${supplier.supplierCode} â€¢ ${supplier.contactPerson ?? 'ChÆ°a cÃ³ liÃªn há»‡'}',
         ),
         trailing: const Icon(Icons.chevron_right_rounded),
       ),
     );
   }
 }
+

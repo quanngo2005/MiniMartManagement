@@ -1,4 +1,5 @@
-import 'dart:convert';
+﻿import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
@@ -76,7 +77,11 @@ class OrderReturnService {
     throw const ApiException('Invalid response structure from server.');
   }
 
-  Future<String> uploadImage(String filePath) async {
+  Future<String> uploadImage(
+    String filePath, {
+    String? fileName,
+    Uint8List? bytes,
+  }) async {
     final csrfToken = await _fetchCsrfToken();
     final uri = ApiConfig.uri('/api/refunds/upload');
     final request = http.MultipartRequest('POST', uri);
@@ -87,7 +92,21 @@ class OrderReturnService {
     if (csrfToken.cookieHeader != null) {
       request.headers['Cookie'] = csrfToken.cookieHeader!;
     }
-    request.files.add(await http.MultipartFile.fromPath('file', filePath));
+
+    if (bytes != null) {
+      final normalizedFileName = fileName?.trim();
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          bytes,
+          filename: normalizedFileName == null || normalizedFileName.isEmpty
+              ? 'evidence.jpg'
+              : normalizedFileName,
+        ),
+      );
+    } else {
+      request.files.add(await http.MultipartFile.fromPath('file', filePath));
+    }
 
     final streamedResponse = await _client.send(request);
     final response = await http.Response.fromStream(streamedResponse);
@@ -190,7 +209,7 @@ class OrderReturnService {
       throw ApiException(
         responseJson is Map<String, dynamic>
             ? _readMessage(responseJson)
-            : 'Xác nhận hoàn tiền mặt thất bại',
+            : 'Xác nhận hoàn tiền thất bại',
       );
     }
 
@@ -217,6 +236,36 @@ class OrderReturnService {
       return responseJson;
     }
     throw const ApiException('Dữ liệu trả về không đúng cấu trúc.');
+  }
+
+  Future<_CsrfToken> _fetchCsrfToken() async {
+    final response = await _client.get(
+      ApiConfig.uri('/api/auth/csrf-token'),
+      headers: const {'Accept': 'application/json'},
+    );
+
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(_readMessage(responseJson));
+    }
+
+    final data = responseJson is Map<String, dynamic>
+        ? (responseJson['data'] ?? responseJson['Data'])
+        : null;
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException('CSRF response is missing token data.');
+    }
+
+    final token = data['csrfToken'] ?? data['CsrfToken'];
+    if (token is! String || token.isEmpty) {
+      throw const ApiException('CSRF token is missing.');
+    }
+
+    final cookieToken = _readCookieToken(response.headers['set-cookie']);
+    return _CsrfToken(
+      value: token,
+      cookieHeader: cookieToken == null ? null : 'XSRF-TOKEN=$cookieToken',
+    );
   }
 
   Object? _decodeResponse(http.Response response) {
@@ -254,40 +303,6 @@ class OrderReturnService {
       if (message is String && message.isNotEmpty) return message;
     }
     return 'Yêu cầu thất bại. Vui lòng thử lại.';
-  }
-
-  Future<_CsrfToken> _fetchCsrfToken() async {
-    final response = await _client.get(
-      ApiConfig.uri('/api/auth/csrf-token'),
-      headers: const {'Accept': 'application/json'},
-    );
-
-    final responseJson = _decodeResponse(response);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(
-        responseJson is Map<String, dynamic>
-            ? _readMessage(responseJson)
-            : 'Failed to fetch CSRF token',
-      );
-    }
-
-    final data = responseJson is Map<String, dynamic>
-        ? (responseJson['data'] ?? responseJson['Data'])
-        : null;
-    if (data is! Map<String, dynamic>) {
-      throw const ApiException('CSRF response is missing token data.');
-    }
-
-    final token = data['csrfToken'] ?? data['CsrfToken'];
-    if (token is! String || token.isEmpty) {
-      throw const ApiException('CSRF token is missing.');
-    }
-
-    final cookieToken = _readCookieToken(response.headers['set-cookie']);
-    return _CsrfToken(
-      value: token,
-      cookieHeader: cookieToken == null ? null : 'XSRF-TOKEN=$cookieToken',
-    );
   }
 
   String? _readCookieToken(String? setCookieHeader) {

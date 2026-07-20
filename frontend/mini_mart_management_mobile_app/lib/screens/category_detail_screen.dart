@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/category.dart';
-import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
@@ -26,7 +25,6 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   bool _saving = false;
   bool _status = true;
   int? _parentCategoryId;
-  int? _taxRateId;
 
   bool get _isNew => widget.categoryId == null;
 
@@ -64,11 +62,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       _descriptionController.text = category.description ?? '';
       _orderController.text = category.displayOrder.toString();
       _parentCategoryId = category.parentCategoryId;
-      _taxRateId = category.taxRateId;
       _status = category.status;
-    }
-    if (_taxRateId == null && provider.taxRates.isNotEmpty) {
-      _taxRateId = provider.taxRates.first.taxRateId;
     }
     setState(() => _loading = false);
   }
@@ -84,7 +78,8 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
           : _descriptionController.text.trim(),
       'displayOrder': int.tryParse(_orderController.text.trim()) ?? 0,
       'parentCategoryId': _parentCategoryId,
-      'taxRateId': _taxRateId,
+      // Kept only for backward-compatible API/database schema. Tax is disabled.
+      'taxRateId': 1,
       'status': _status,
     };
     final provider = context.read<CategoryProvider>();
@@ -133,8 +128,6 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                       maxLines: 3,
                     ),
                     const SizedBox(height: 12),
-                    _buildTaxField(context),
-                    const SizedBox(height: 12),
                     _buildParentField(context),
                     const SizedBox(height: 12),
                     _textField(
@@ -168,34 +161,6 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
               ),
       ),
     );
-  }
-
-  Widget _buildTaxField(BuildContext context) {
-    final rates = context.watch<CategoryProvider>().taxRates;
-    if (rates.isEmpty) {
-      return TextFormField(
-        initialValue: _taxRateId?.toString() ?? '',
-        keyboardType: TextInputType.number,
-        decoration: const InputDecoration(labelText: 'Mã thuế'),
-        onChanged: (value) => _taxRateId = int.tryParse(value),
-        validator: (value) => int.tryParse(value ?? '') == null
-            ? 'Mã thuế không hợp lệ'
-            : null,
-      );
-    }
-    return DropdownButtonFormField<int>(
-      initialValue: rates.any((rate) => rate.taxRateId == _taxRateId)
-          ? _taxRateId
-          : null,
-      decoration: const InputDecoration(labelText: 'Thuế áp dụng'),
-      items: [for (final rate in rates) _taxMenuItem(rate)],
-      onChanged: (value) => setState(() => _taxRateId = value),
-      validator: (value) => value == null ? 'Vui lòng chọn thuế' : null,
-    );
-  }
-
-  DropdownMenuItem<int> _taxMenuItem(TaxRate rate) {
-    return DropdownMenuItem(value: rate.taxRateId, child: Text(rate.label));
   }
 
   Widget _buildParentField(BuildContext context) {

@@ -86,7 +86,24 @@ namespace MiniMart.Controllers
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+                var originalFileName = Path.GetFileName(file.FileName);
+                if (string.IsNullOrWhiteSpace(originalFileName))
+                {
+                    originalFileName = "evidence.jpg";
+                }
+                else if (string.IsNullOrWhiteSpace(Path.GetExtension(originalFileName)))
+                {
+                    var extension = file.ContentType.ToLowerInvariant() switch
+                    {
+                        "image/png" => ".png",
+                        "image/gif" => ".gif",
+                        "image/webp" => ".webp",
+                        _ => ".jpg"
+                    };
+                    originalFileName += extension;
+                }
+
+                var uniqueFileName = $"{Guid.NewGuid()}_{originalFileName}";
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))

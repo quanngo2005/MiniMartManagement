@@ -4,23 +4,32 @@ import '../../theme/app_colors.dart';
 import 'package:intl/intl.dart';
 
 class TierInfoCard extends StatelessWidget {
-  const TierInfoCard({super.key, required this.tier, required this.onEdit});
+  const TierInfoCard({
+    super.key,
+    required this.tier,
+    required this.onEdit,
+    this.onTap,
+  });
 
   final MembershipTier tier;
   final VoidCallback onEdit;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderGray),
-      ),
-      child: Column(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.borderGray),
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -92,7 +101,8 @@ class TierInfoCard extends StatelessWidget {
               ),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

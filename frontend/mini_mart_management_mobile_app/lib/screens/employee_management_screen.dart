@@ -576,21 +576,25 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
     final seen = <String>{};
     final uniqueRoles = <Role>[];
     for (final r in roles) {
-      if (seen.add(r.roleName.trim().toLowerCase())) {
+      final normalizedName = r.roleName.trim().toLowerCase();
+      if (_selectableRoleNames.contains(normalizedName) &&
+          seen.add(normalizedName)) {
         uniqueRoles.add(r);
       }
     }
     var roleItems = uniqueRoles
         .map(
-          (r) =>
-              DropdownMenuItem<int>(value: r.roleId, child: Text(r.roleName)),
+          (r) => DropdownMenuItem<int>(
+            value: r.roleId,
+            child: Text(_roleDisplayName(r.roleName)),
+          ),
         )
         .toList();
     if (roleItems.isEmpty) {
       roleItems = const [
         DropdownMenuItem(value: 1, child: Text('Manager')),
         DropdownMenuItem(value: 2, child: Text('Cashier')),
-        DropdownMenuItem(value: 3, child: Text('Warehouse')),
+        DropdownMenuItem(value: 3, child: Text('Warehouse Staff')),
         DropdownMenuItem(value: 4, child: Text('Admin')),
       ];
     }
@@ -831,6 +835,19 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
         ),
       ),
     );
+  }
+
+  static const _selectableRoleNames = {
+    'admin',
+    'manager',
+    'cashier',
+    'warehouse',
+  };
+
+  static String _roleDisplayName(String roleName) {
+    return roleName.trim().toLowerCase() == 'warehouse'
+        ? 'Warehouse Staff'
+        : roleName;
   }
 
   void _submit() async {

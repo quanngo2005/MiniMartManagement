@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/tier_provider.dart';
+import '../screens/tier_detail_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/tiers/tier_info_card.dart';
 
@@ -24,7 +26,7 @@ class _TierManagementScreenState extends State<TierManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hạng thành viên'),
+        title: const Text('Cấu hình loyalty'),
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.primary,
       ),
@@ -33,16 +35,32 @@ class _TierManagementScreenState extends State<TierManagementScreen> {
           if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
+
+          if (provider.error != null) {
+            return Center(child: Text(provider.error!));
+          }
+
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: provider.tiers.length,
             separatorBuilder: (_, _) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
-              return TierInfoCard(tier: provider.tiers[index], onEdit: () {});
+              final tier = provider.tiers[index];
+              return TierInfoCard(
+                tier: tier,
+                onTap: () => _openTierDetail(context, tier.id),
+                onEdit: () => _openTierDetail(context, tier.id),
+              );
             },
           );
         },
       ),
+    );
+  }
+
+  void _openTierDetail(BuildContext context, String tierId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => TierDetailScreen(tierId: tierId)),
     );
   }
 }

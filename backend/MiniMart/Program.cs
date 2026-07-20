@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
 using MiniMart.Mapping;
@@ -142,6 +143,19 @@ else
 }
 
 app.UseHttpsRedirection();
+var returnUploadsPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "wwwroot",
+    "uploads",
+    "returns");
+Directory.CreateDirectory(returnUploadsPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(returnUploadsPath),
+    RequestPath = "/uploads/returns",
+    ServeUnknownFileTypes = true,
+    DefaultContentType = "image/jpeg"
+});
 app.UseStaticFiles();
 app.UseRouting();
 if (app.Environment.IsDevelopment())

@@ -125,15 +125,7 @@ class _InvoiceHeaderCard extends StatelessWidget {
             ),
             const Divider(height: 24),
             _row(
-              'Trước VAT',
-              NumberFormat('#,###', 'vi_VN').format(invoice.totalBeforeVAT),
-            ),
-            _row(
-              'VAT',
-              NumberFormat('#,###', 'vi_VN').format(invoice.vatAmount),
-            ),
-            _row(
-              'Sau VAT',
+              'Tổng cộng',
               NumberFormat('#,###', 'vi_VN').format(invoice.totalAfterVAT),
               valueColor: AppColors.secondary,
             ),
@@ -178,13 +170,38 @@ class _InvoiceItemCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              item.productName,
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    item.productName,
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                if (item.isGift)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Quà tặng',
+                      style: TextStyle(
+                        color: AppColors.secondary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 6),
             Text(
@@ -194,11 +211,6 @@ class _InvoiceItemCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               'Đơn giá: ${NumberFormat('#,###', 'vi_VN').format(item.unitPrice)}',
-              style: const TextStyle(color: AppColors.textMuted),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'VAT: ${NumberFormat('#,###', 'vi_VN').format(item.vatAmount)}',
               style: const TextStyle(color: AppColors.textMuted),
             ),
             const SizedBox(height: 8),

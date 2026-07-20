@@ -84,11 +84,11 @@ namespace MiniMart.Repositories.Implementations
                         Quantity = detail.Quantity,
                         UnitPrice = detail.UnitPrice,
                         DiscountAmount = detail.DiscountAmount,
-                    AmountBeforeVAT = detail.TotalPrice - detail.DiscountAmount,
-                    VatRate = detail.VatRate,
-                    VatAmount = detail.VatAmount,
-                    AmountAfterVAT = detail.TotalPrice - detail.DiscountAmount + detail.VatAmount,
-                });
+                        AmountBeforeVAT = detail.TotalPrice - detail.DiscountAmount,
+                        VatRate = detail.VatRate,
+                        VatAmount = detail.VatAmount,
+                        AmountAfterVAT = detail.TotalPrice - detail.DiscountAmount + detail.VatAmount,
+                    });
             }
 
             await _context.EInvoices.AddAsync(invoice);

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
+import 'package:mini_mart_management_mobile_app/models/receipt_editor_result.dart';
 import 'package:mini_mart_management_mobile_app/models/warehouse_dashboard.dart';
+import 'package:mini_mart_management_mobile_app/providers/receipt_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/warehouse_dashboard_provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/create_inventory_receipt_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/stock_count_history_screen.dart';
@@ -290,12 +292,7 @@ class _QuickActions extends StatelessWidget {
             icon: Icons.add_box_outlined,
             label: 'Tạo phiếu nhập',
             color: AppColors.primary,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (_) => const CreateInventoryReceiptScreen(),
-              ),
-            ),
+            onTap: () => _createReceipt(context),
           ),
         ),
         const SizedBox(width: 10),
@@ -314,6 +311,37 @@ class _QuickActions extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _createReceipt(BuildContext context) async {
+    final result = await Navigator.of(context).push<ReceiptEditorResult>(
+      MaterialPageRoute<ReceiptEditorResult>(
+        builder: (_) => const CreateInventoryReceiptScreen(),
+      ),
+    );
+    if (!context.mounted || result?.createReceipt == null) return;
+
+    final receiptProvider = context.read<ReceiptProvider>();
+    final saved = await receiptProvider.createReceipt(result!.createReceipt!);
+    if (!context.mounted) return;
+
+    if (saved) {
+      await context.read<WarehouseDashboardProvider>().fetchDashboard();
+    }
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            saved
+                ? 'Đã tạo phiếu nhập kho thành công.'
+                : receiptProvider.errorMessage ??
+                      'Không thể tạo phiếu nhập kho. Vui lòng thử lại.',
+          ),
+        ),
+      );
   }
 }
 

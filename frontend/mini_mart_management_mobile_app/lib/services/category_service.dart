@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/category.dart';
-import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
 class CategoryService {
@@ -22,20 +21,6 @@ class CategoryService {
     final data = json['data'] ?? json['Data'] ?? json;
     if (data is List) return data.map((e) => Category.fromJson(e)).toList();
     throw const ApiException('Không thể đọc danh sách danh mục.');
-  }
-
-  Future<List<TaxRate>> getTaxRates() async {
-    final response = await _client.get(
-      ApiConfig.uri('/api/taxrates'),
-      headers: const {'Accept': 'application/json'},
-    );
-    final json = _decode(response);
-    _checkStatus(response, json);
-    final data = json['data'] ?? json['Data'] ?? json;
-    if (data is List) {
-      return data.map((e) => TaxRate.fromJson(e)).toList();
-    }
-    throw const ApiException('Không thể đọc danh sách thuế.');
   }
 
   Future<Category> create(Map<String, dynamic> body) async {

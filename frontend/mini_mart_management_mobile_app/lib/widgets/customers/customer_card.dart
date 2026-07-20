@@ -11,7 +11,7 @@ class CustomerCard extends StatelessWidget {
 
   // Tính tier từ điểm — theo thang điểm tiêu chuẩn
   static String _tierFromPoints(int points) {
-    if (points >= 2000) return 'gold';
+    if (points >= 1000) return 'gold';
     if (points >= 500) return 'silver';
     return 'bronze';
   }

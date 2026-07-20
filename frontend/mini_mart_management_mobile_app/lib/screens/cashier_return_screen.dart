@@ -1,4 +1,5 @@
-import 'dart:io';
+﻿import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
@@ -26,6 +27,8 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
   final Map<int, int> _selectedQuantities = {}; // ProductId -> Quantity
   final Map<int, bool> _selectedItems = {}; // ProductId -> IsSelected
   String? _localImagePath;
+  String? _localImageName;
+  Uint8List? _localImageBytes;
   bool _isUploadingImage = false;
 
   @override
@@ -62,6 +65,8 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
       _selectedItems.clear();
       _selectedQuantities.clear();
       _localImagePath = null;
+      _localImageName = null;
+      _localImageBytes = null;
     });
   }
 
@@ -74,8 +79,11 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
         imageQuality: 50,
       );
       if (image != null) {
+        final bytes = await image.readAsBytes();
         setState(() {
           _localImagePath = image.path;
+          _localImageName = image.name;
+          _localImageBytes = bytes;
         });
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -222,8 +230,11 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
 
       if (!mounted) return;
 
+      final bytes = await tempFile.readAsBytes();
       setState(() {
         _localImagePath = tempFile.path;
+        _localImageName = path_helper.basename(tempFile.path);
+        _localImageBytes = bytes;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -289,6 +300,8 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
       reason: reason,
       classify: _classify,
       localImagePath: _localImagePath!,
+      localImageName: _localImageName,
+      localImageBytes: _localImageBytes,
       items: itemsToReturn,
     );
 
@@ -300,6 +313,8 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
         _selectedItems.clear();
         _selectedQuantities.clear();
         _localImagePath = null;
+        _localImageName = null;
+        _localImageBytes = null;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -855,7 +870,7 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
                     children: [
                       Center(
                         child: Text(
-                          'Đã đính kèm ảnh minh chứng:\n${path_helper.basename(_localImagePath!)}',
+                          'Đã đính kèm ảnh minh chứng:\n${_localImageName ?? path_helper.basename(_localImagePath!)}',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: AppColors.secondary,
@@ -875,6 +890,8 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
                           onPressed: () {
                             setState(() {
                               _localImagePath = null;
+                              _localImageName = null;
+                              _localImageBytes = null;
                             });
                           },
                         ),

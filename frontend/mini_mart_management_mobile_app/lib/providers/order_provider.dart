@@ -32,4 +32,21 @@ class OrderProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> fetchAllOrders() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _orders = await _repository.getAllOrders();
+    } on ApiException catch (error) {
+      _error = error.message;
+    } catch (_) {
+      _error = 'Không thể tải danh sách đơn hàng.';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
