@@ -112,6 +112,10 @@ namespace MiniMart.Repositories.RepoImplement
             if (shift == null)
                 throw new InvalidOperationException("Ca làm việc không tồn tại hoặc đã đóng.");
 
+            if (DateTime.Now > shift.EndTime)
+                throw new InvalidOperationException("Ca làm việc đã kết thúc. Vui lòng đóng ca trước khi thao tác tiếp.");
+
+            
             Customer? customer = null;
             int loyaltyPointsUsed = 0;
             decimal loyaltyDiscount = 0;
@@ -341,7 +345,6 @@ namespace MiniMart.Repositories.RepoImplement
                     }
                 }
 
-                // Tính toán điểm ngược lại từ DiscountAmount (1 điểm = 1000 VND)
                 int loyaltyPointsUsed = (int)(order.DiscountAmount / 1000m);
                 int pointsEarned = (int)(order.FinalAmount / 50000);
 

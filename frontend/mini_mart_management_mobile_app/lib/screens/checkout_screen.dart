@@ -1276,26 +1276,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Thuế VAT ${(cart.averageVatRate * 100).toInt()}%',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                    Text(
-                      currencyFormatter.format(cart.vatAmount),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                  ],
-                ),
                 if (cart.pointsToUse > 0) ...[
                   const SizedBox(height: 8),
                   Row(
