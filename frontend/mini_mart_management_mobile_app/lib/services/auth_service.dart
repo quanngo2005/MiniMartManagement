@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/auth_response.dart';
+import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 
 class AuthService {
@@ -66,6 +67,25 @@ class AuthService {
     }
 
     return AuthResponse.fromJson(data);
+  }
+
+  Future<EmployeeUser> getCurrentUser() async {
+    final response = await _client.get(
+      ApiConfig.uri('/api/auth/me'),
+      headers: const {'Accept': 'application/json'},
+    );
+
+    final responseJson = _decodeResponse(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(_readMessage(responseJson));
+    }
+
+    final data = responseJson['data'] ?? responseJson['Data'];
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException('Profile response is missing user data.');
+    }
+
+    return EmployeeUser.fromJson(data);
   }
 
   Future<_CsrfToken> _fetchCsrfToken() async {

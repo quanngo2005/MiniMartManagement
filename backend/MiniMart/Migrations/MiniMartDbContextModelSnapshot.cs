@@ -358,15 +358,17 @@ namespace MiniMart.Migrations
 
                     b.Property<string>("CategoryCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -400,7 +402,7 @@ namespace MiniMart.Migrations
                             Description = "Thực phẩm và đồ uống các loại",
                             DisplayOrder = 1,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 3
                         },
                         new
                         {
@@ -410,7 +412,7 @@ namespace MiniMart.Migrations
                             Description = "Sản phẩm vệ sinh và chăm sóc cá nhân",
                             DisplayOrder = 2,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 2
                         },
                         new
                         {
@@ -420,7 +422,7 @@ namespace MiniMart.Migrations
                             Description = "Đồ dùng gia đình",
                             DisplayOrder = 3,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 1
                         },
                         new
                         {
@@ -431,7 +433,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 1,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 3
                         },
                         new
                         {
@@ -442,7 +444,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 2,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 3
                         },
                         new
                         {
@@ -453,7 +455,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 3,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 3
                         },
                         new
                         {
@@ -464,7 +466,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 4,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 3
                         },
                         new
                         {
@@ -475,7 +477,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 5,
                             ParentCategoryId = 1,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 3
                         },
                         new
                         {
@@ -486,7 +488,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 1,
                             ParentCategoryId = 2,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 2
                         },
                         new
                         {
@@ -497,7 +499,7 @@ namespace MiniMart.Migrations
                             DisplayOrder = 2,
                             ParentCategoryId = 2,
                             Status = true,
-                            TaxRateId = 4
+                            TaxRateId = 2
                         });
                 });
 

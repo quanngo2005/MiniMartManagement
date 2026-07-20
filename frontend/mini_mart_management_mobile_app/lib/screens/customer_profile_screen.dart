@@ -5,6 +5,7 @@ import '../models/customer_order.dart';
 import '../models/customer_summary.dart';
 import '../providers/customer_provider.dart';
 import '../theme/app_colors.dart';
+import '../widgets/layout/mini_mart_app_bar.dart';
 import 'points_history_screen.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
@@ -52,31 +53,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(
-        title: const Text('Hồ sơ khách hàng'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.primary,
-        actions: [
-          if (_customer != null) ...[
-            IconButton(
-              icon: const Icon(Icons.edit_outlined),
-              onPressed: () => _showEditSheet(context),
-            ),
-            IconButton(
-              icon: Icon(
-                _customer!.customerStatus
-                    ? Icons.block
-                    : Icons.check_circle_outline,
-                color: _customer!.customerStatus
-                    ? AppColors.statusError
-                    : AppColors.secondary,
-              ),
-              tooltip: _customer!.customerStatus ? 'Vô hiệu hóa' : 'Kích hoạt',
-              onPressed: () => _confirmToggleStatus(context),
-            ),
-          ],
-        ],
-      ),
+      appBar: MiniMartAppBar.secondary(title: 'Hồ sơ khách hàng'),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
@@ -416,163 +393,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showEditSheet(BuildContext context) {
-    final c = _customer!;
-    final fullNameCtrl = TextEditingController(text: c.name);
-    final phoneCtrl = TextEditingController(text: c.phone);
-    final emailCtrl = TextEditingController(text: c.email ?? '');
-    final addressCtrl = TextEditingController(text: c.address ?? '');
-    final formKey = GlobalKey<FormState>();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 16,
-          bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
-        ),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Cập nhật thông tin',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: fullNameCtrl,
-                decoration: const InputDecoration(labelText: 'Họ tên'),
-                validator: (v) => v == null || v.isEmpty ? 'Bắt buộc' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: phoneCtrl,
-                decoration: const InputDecoration(labelText: 'Số điện thoại'),
-                validator: (v) => v == null || v.isEmpty ? 'Bắt buộc' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: emailCtrl,
-                decoration: const InputDecoration(labelText: 'Email'),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: addressCtrl,
-                decoration: const InputDecoration(labelText: 'Địa chỉ'),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () async {
-                    if (!formKey.currentState!.validate()) return;
-                    final id = int.parse(widget.customerId);
-                    final success = await context
-                        .read<CustomerProvider>()
-                        .updateCustomer(id, {
-                          'customerCode': c.customerCode,
-                          'fullName': fullNameCtrl.text.trim(),
-                          'phoneNumber': phoneCtrl.text.trim(),
-                          'email': emailCtrl.text.trim().isEmpty
-                              ? null
-                              : emailCtrl.text.trim(),
-                          'address': addressCtrl.text.trim().isEmpty
-                              ? null
-                              : addressCtrl.text.trim(),
-                          'point': c.points,
-                          'customerStatus': c.customerStatus,
-                        });
-                    if (ctx.mounted) Navigator.pop(ctx);
-                    if (!context.mounted) return;
-                    if (success) {
-                      // Refresh
-                      final updated = await context
-                          .read<CustomerProvider>()
-                          .getCustomerById(id);
-                      if (!mounted) return;
-                      setState(() => _customer = updated);
-                    }
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                  ),
-                  child: const Text('Lưu'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _confirmToggleStatus(BuildContext context) {
-    final isActive = _customer!.customerStatus;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          isActive ? 'Vô hiệu hóa khách hàng?' : 'Kích hoạt khách hàng?',
-        ),
-        content: Text(
-          isActive
-              ? 'Tài khoản sẽ bị vô hiệu hóa. Khách hàng sẽ không thể tích điểm.'
-              : 'Kích hoạt lại tài khoản khách hàng này.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Hủy'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: isActive
-                  ? AppColors.statusError
-                  : AppColors.secondary,
-            ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              final id = int.parse(widget.customerId);
-              final c = _customer!;
-              final success = await context
-                  .read<CustomerProvider>()
-                  .updateCustomer(id, {
-                    'customerCode': c.customerCode,
-                    'fullName': c.name,
-                    'phoneNumber': c.phone,
-                    'email': c.email,
-                    'address': c.address,
-                    'point': c.points,
-                    'customerStatus': !isActive,
-                  });
-              if (!context.mounted) return;
-              if (success) {
-                final updated = await context
-                    .read<CustomerProvider>()
-                    .getCustomerById(id);
-                if (!mounted) return;
-                setState(() => _customer = updated);
-              }
-            },
-            child: Text(isActive ? 'Vô hiệu hóa' : 'Kích hoạt'),
           ),
         ],
       ),

@@ -8,6 +8,7 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/auth/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/app_bottom_nav_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 
 enum EmployeePerformanceFilter { all, morning, afternoon, night }
 
@@ -57,7 +58,10 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: _buildAppBar(context),
+      appBar: MiniMartAppBar.primary(
+        title: 'Hiệu suất nhân viên',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: SafeArea(
         child: provider.isLoading && items.isEmpty
             ? const LoadingOverlay()
@@ -97,25 +101,6 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surfaceContainerLowest,
-      foregroundColor: AppColors.primary,
-      leading: widget.onMenuTap != null
-          ? IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: widget.onMenuTap,
-            )
-          : const SizedBox.shrink(),
-      title: const Text('Hiệu suất nhân viên'),
-      actions: [IconButton(onPressed: _load, icon: const Icon(Icons.refresh))],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(color: AppColors.borderGray, height: 1),
-      ),
-    );
-  }
-
   Widget _buildHeader(BuildContext context) {
     final subtitle = _rangeLabel(_filter);
     return Column(
@@ -147,42 +132,66 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
         ? 0
         : totalRevenue / totalTransactions;
     final topEmployees = items.isEmpty ? 0 : items.length;
+    final revenuePoints = items.map((item) => item.totalRevenue).toList();
+    final transactionPoints = items
+        .map((item) => item.totalTransactions.toDouble())
+        .toList();
+    final averagePoints = items
+        .map(
+          (item) => item.totalTransactions == 0
+              ? 0.0
+              : item.totalRevenue / item.totalTransactions,
+        )
+        .toList();
 
-    return GridView.count(
-      crossAxisCount: 2,
+    final metrics = [
+      _MetricTile(
+        label: 'Tổng doanh thu',
+        value: NumberFormat.compactCurrency(
+          locale: 'vi_VN',
+          symbol: 'đ',
+        ).format(totalRevenue),
+        icon: Icons.payments_outlined,
+        points: revenuePoints,
+        chartColor: AppColors.secondary,
+      ),
+      _MetricTile(
+        label: 'Tổng giao dịch',
+        value: '$totalTransactions',
+        icon: Icons.receipt_long_outlined,
+        points: transactionPoints,
+        chartColor: AppColors.primaryContainer,
+      ),
+      _MetricTile(
+        label: 'Giao dịch TB',
+        value: NumberFormat.compactCurrency(
+          locale: 'vi_VN',
+          symbol: 'đ',
+        ).format(avgTransaction),
+        icon: Icons.show_chart_outlined,
+        points: averagePoints,
+        chartColor: AppColors.secondary,
+      ),
+      _MetricTile(
+        label: 'Nhân viên có dữ liệu',
+        value: '$topEmployees',
+        icon: Icons.people_alt_outlined,
+        points: transactionPoints,
+        chartColor: AppColors.primaryContainer,
+      ),
+    ];
+
+    return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 1.8,
-      children: [
-        _MetricTile(
-          label: 'Tổng doanh thu',
-          value: NumberFormat.compactCurrency(
-            locale: 'vi_VN',
-            symbol: 'đ',
-          ).format(totalRevenue),
-          icon: Icons.payments_outlined,
-        ),
-        _MetricTile(
-          label: 'Tổng giao dịch',
-          value: '$totalTransactions',
-          icon: Icons.receipt_long_outlined,
-        ),
-        _MetricTile(
-          label: 'Giao dịch TB',
-          value: NumberFormat.compactCurrency(
-            locale: 'vi_VN',
-            symbol: 'đ',
-          ).format(avgTransaction),
-          icon: Icons.show_chart_outlined,
-        ),
-        _MetricTile(
-          label: 'Nhân viên có dữ liệu',
-          value: '$topEmployees',
-          icon: Icons.people_alt_outlined,
-        ),
-      ],
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        mainAxisExtent: 154,
+      ),
+      itemCount: metrics.length,
+      itemBuilder: (_, index) => metrics[index],
     );
   }
 
@@ -323,11 +332,15 @@ class _MetricTile extends StatelessWidget {
     required this.label,
     required this.value,
     required this.icon,
+    required this.points,
+    required this.chartColor,
   });
 
   final String label;
   final String value;
   final IconData icon;
+  final List<double> points;
+  final Color chartColor;
 
   @override
   Widget build(BuildContext context) {
@@ -340,14 +353,26 @@ class _MetricTile extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, color: AppColors.primary, size: 20),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ),
+              Icon(icon, color: AppColors.primary, size: 20),
+            ],
           ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: _PerformanceSparkline(points: points, color: chartColor),
+          ),
+          const SizedBox(height: 8),
           Text(
             value,
             maxLines: 1,
@@ -360,6 +385,91 @@ class _MetricTile extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _PerformanceSparkline extends StatelessWidget {
+  const _PerformanceSparkline({required this.points, required this.color});
+
+  final List<double> points;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    if (points.isEmpty) {
+      return Center(
+        child: Text(
+          'Chưa có dữ liệu',
+          style: Theme.of(
+            context,
+          ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
+        ),
+      );
+    }
+    return CustomPaint(
+      painter: _PerformanceSparklinePainter(points: points, color: color),
+      child: const SizedBox.expand(),
+    );
+  }
+}
+
+class _PerformanceSparklinePainter extends CustomPainter {
+  _PerformanceSparklinePainter({required this.points, required this.color});
+
+  final List<double> points;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty || points.isEmpty) return;
+
+    final maxValue = points.reduce(
+      (left, right) => left > right ? left : right,
+    );
+    final minValue = points.reduce(
+      (left, right) => left < right ? left : right,
+    );
+    final range = maxValue - minValue;
+    final linePath = Path();
+
+    for (var index = 0; index < points.length; index++) {
+      final x = points.length == 1
+          ? size.width / 2
+          : size.width * index / (points.length - 1);
+      final normalized = range == 0 ? 0.5 : (points[index] - minValue) / range;
+      final y = size.height - (normalized * (size.height - 8)) - 4;
+      if (index == 0) {
+        linePath.moveTo(x, y);
+      } else {
+        linePath.lineTo(x, y);
+      }
+    }
+
+    final fillPath = Path.from(linePath)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas
+      ..drawPath(fillPath, Paint()..color = color.withValues(alpha: 0.16))
+      ..drawPath(
+        linePath,
+        Paint()
+          ..color = color
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke,
+      );
+  }
+
+  @override
+  bool shouldRepaint(covariant _PerformanceSparklinePainter oldDelegate) {
+    if (oldDelegate.color != color ||
+        oldDelegate.points.length != points.length) {
+      return true;
+    }
+    for (var index = 0; index < points.length; index++) {
+      if (oldDelegate.points[index] != points[index]) return true;
+    }
+    return false;
   }
 }
 

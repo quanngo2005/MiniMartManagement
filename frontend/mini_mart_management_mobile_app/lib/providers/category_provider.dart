@@ -1,20 +1,31 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
-import 'package:mini_mart_management_mobile_app/models/category.dart'
-    as product_category;
+import 'package:mini_mart_management_mobile_app/models/category.dart';
+import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/repositories/category_repository.dart';
 
-class CategoryProvider with ChangeNotifier {
+class CategoryProvider extends ChangeNotifier {
   CategoryProvider(this._repository);
-  final CategoryRepository _repository;
 
-  List<product_category.Category> _categories = [];
+  final CategoryRepository _repository;
+  List<Category> _categories = const [];
+  List<TaxRate> _taxRates = const [];
   bool _isLoading = false;
   String? _error;
 
-  List<product_category.Category> get categories => _categories;
+  List<Category> get categories => _categories;
+  List<TaxRate> get taxRates => _taxRates;
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  Future<void> fetchTaxRates() async {
+    try {
+      _taxRates = await _repository.getTaxRates();
+      notifyListeners();
+    } catch (_) {
+      // The category list remains usable without tax metadata.
+    }
+  }
 
   Future<void> fetchAll() async {
     _isLoading = true;
@@ -22,53 +33,60 @@ class CategoryProvider with ChangeNotifier {
     notifyListeners();
     try {
       _categories = await _repository.getAll();
-    } on ApiException catch (e) {
-      _error = e.message;
+      try {
+        _taxRates = await _repository.getTaxRates();
+      } catch (_) {
+        // The category list remains usable without tax metadata.
+      }
+    } on ApiException catch (error) {
+      _error = error.message;
+    } catch (_) {
+      _error = 'Đã xảy ra lỗi khi tải dữ liệu.';
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<bool> create(Map<String, dynamic> data) async {
+  Future<String?> create(Map<String, dynamic> data) async {
     try {
-      final created = await _repository.create(data);
-      _categories = [..._categories, created];
+      final category = await _repository.create(data);
+      _categories = [..._categories, category];
       notifyListeners();
-      return true;
-    } on ApiException catch (e) {
-      _error = e.message;
-      notifyListeners();
-      return false;
+      return null;
+    } on ApiException catch (error) {
+      return error.message;
+    } catch (_) {
+      return 'Không thể tạo danh mục.';
     }
   }
 
-  Future<bool> update(int id, Map<String, dynamic> data) async {
+  Future<String?> update(int id, Map<String, dynamic> data) async {
     try {
-      final updated = await _repository.update(id, data);
+      final category = await _repository.update(id, data);
       _categories = [
-        for (final c in _categories)
-          if (c.categoryId == id) updated else c,
+        for (final item in _categories)
+          if (item.categoryId == id) category else item,
       ];
       notifyListeners();
-      return true;
-    } on ApiException catch (e) {
-      _error = e.message;
-      notifyListeners();
-      return false;
+      return null;
+    } on ApiException catch (error) {
+      return error.message;
+    } catch (_) {
+      return 'Không thể cập nhật danh mục.';
     }
   }
 
-  Future<bool> delete(int id) async {
+  Future<String?> delete(int id) async {
     try {
       await _repository.delete(id);
-      _categories = _categories.where((c) => c.categoryId != id).toList();
+      _categories = _categories.where((item) => item.categoryId != id).toList();
       notifyListeners();
-      return true;
-    } on ApiException catch (e) {
-      _error = e.message;
-      notifyListeners();
-      return false;
+      return null;
+    } on ApiException catch (error) {
+      return error.message;
+    } catch (_) {
+      return 'Không thể xóa danh mục.';
     }
   }
 }

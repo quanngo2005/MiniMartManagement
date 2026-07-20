@@ -1,48 +1,45 @@
 import 'package:mini_mart_management_mobile_app/core/api_exception.dart';
 import 'package:mini_mart_management_mobile_app/models/category.dart';
+import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/services/category_service.dart';
 
 class CategoryRepository {
   const CategoryRepository(this._service);
+
   final CategoryService _service;
 
-  Future<List<Category>> getAll() async {
-    try {
-      return await _service.getAll();
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException('Không thể tải danh mục: $e');
-    }
-  }
+  Future<List<Category>> getAll() => _guard(
+    _service.getAll,
+    'Không thể tải danh mục',
+  );
 
-  Future<Category> create(Map<String, dynamic> data) async {
-    try {
-      return await _service.create(data);
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException('Không thể tạo danh mục: $e');
-    }
-  }
+  Future<List<TaxRate>> getTaxRates() => _guard(
+    _service.getTaxRates,
+    'Không thể tải danh sách thuế',
+  );
 
-  Future<Category> update(int id, Map<String, dynamic> data) async {
-    try {
-      return await _service.update(id, data);
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException('Không thể cập nhật danh mục: $e');
-    }
-  }
+  Future<Category> create(Map<String, dynamic> data) => _guard(
+    () => _service.create(data),
+    'Không thể tạo danh mục',
+  );
 
-  Future<void> delete(int id) async {
+  Future<Category> update(int id, Map<String, dynamic> data) => _guard(
+    () => _service.update(id, data),
+    'Không thể cập nhật danh mục',
+  );
+
+  Future<void> delete(int id) => _guard(
+    () => _service.delete(id),
+    'Không thể xóa danh mục',
+  );
+
+  Future<T> _guard<T>(Future<T> Function() action, String message) async {
     try {
-      await _service.delete(id);
+      return await action();
     } on ApiException {
       rethrow;
-    } catch (e) {
-      throw ApiException('Không thể xóa danh mục: $e');
+    } catch (error) {
+      throw ApiException('$message: $error');
     }
   }
 }

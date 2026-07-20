@@ -13,7 +13,8 @@ namespace MiniMart.Mapping
                     src.Category == null ? null : new ProductCategoryDto
                     {
                         Id = src.Category.CategoryId,
-                        Name = src.Category.CategoryName
+                        Name = src.Category.CategoryName,
+                        TaxRate = src.Category.TaxRate != null ? src.Category.TaxRate.Rate : null
                     }))
                 .ForMember(dest => dest.Supplier, opt => opt.MapFrom(src =>
                     src.Supplier == null ? null : new ProductSupplierDto

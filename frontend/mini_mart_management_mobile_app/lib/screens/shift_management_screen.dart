@@ -7,6 +7,12 @@ import 'package:intl/intl.dart';
 import 'package:mini_mart_management_mobile_app/providers/employee_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
+import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_navigation_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_drawer.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class ShiftManagementScreen extends StatefulWidget {
@@ -26,6 +32,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
   final _endCashController = TextEditingController();
   final _openNoteController = TextEditingController();
   final _closeNoteController = TextEditingController();
+  int? _endCashInitializedForShiftId;
   bool _isProcessing = false;
   int _selectedShiftType = 0;
 
@@ -50,6 +57,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
 
       if (isManager) {
         shiftProvider.fetchShifts();
+        context.read<EmployeeProvider>().fetchEmployees();
       } else {
         shiftProvider.fetchCurrentShift();
       }
@@ -145,6 +153,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
 
     if (success) {
       _endCashController.clear();
+      _endCashInitializedForShiftId = null;
       _closeNoteController.clear();
       _showSuccessSnackBar('Đã đóng ca làm việc và chốt doanh thu thành công.');
     } else {
@@ -182,82 +191,69 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
     return PopScope(
       canPop: activeShift != null,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: activeShift != null,
-          leading: widget.onMenuTap != null
-              ? IconButton(
+        backgroundColor: AppColors.backgroundSlate,
+        drawer: widget.onMenuTap == null
+            ? const CashierDrawer(selectedTab: CashierNavTab.shift)
+            : null,
+        appBar: widget.onMenuTap == null
+            ? const MiniMartAppBar.primary(title: 'Quản lý ca', showMenu: true)
+            : AppBar(
+                leading: IconButton(
                   icon: const Icon(
                     Icons.menu_rounded,
                     color: AppColors.primary,
                   ),
                   onPressed: widget.onMenuTap,
-                )
-              : null,
-          title: Row(
-            children: [
-              if (widget.onMenuTap == null) ...[
-                const Icon(Icons.storefront_rounded, color: AppColors.primary),
-                const SizedBox(width: 8),
-              ],
-              Expanded(
-                child: Text(
-                  'Store #402 | Quản lý ca',
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
+                ),
+                title: const Text('Quản lý lịch sử ca'),
+                backgroundColor: Colors.white,
+              ),
+        body: Stack(
+          children: [
+            if (shiftProvider.error != null && activeShift == null)
+              ErrorBanner(
+                message: shiftProvider.error!,
+                onRetry: () =>
+                    context.read<ShiftProvider>().fetchCurrentShift(),
+              )
+            else
+              SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (activeShift != null) ...[
+                        _buildActiveShiftCard(
+                          activeShift,
+                          currentUser?.fullName ?? 'Nhân viên',
+                        ),
+                        const SizedBox(height: 16),
+                        _buildBentoMetrics(activeShift),
+                        const SizedBox(height: 16),
+                        _buildCashReconciliation(activeShift),
+                        const SizedBox(height: 20),
+                        _buildCloseShiftButton(activeShift.shiftId),
+                      ] else ...[
+                        _buildNoActiveShiftCard(),
+                        const SizedBox(height: 16),
+                        _buildOpenShiftForm(currentUser?.employeeId ?? 1),
+                      ],
+                      const SizedBox(height: 80),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1),
-            child: Container(color: AppColors.borderGray, height: 1),
-          ),
-        ),
-        body: Stack(
-          children: [
-            SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (activeShift != null) ...[
-                      _buildActiveShiftCard(
-                        activeShift,
-                        currentUser?.fullName ?? 'Nhân viên',
-                      ),
-                      const SizedBox(height: 16),
-                      _buildBentoMetrics(activeShift),
-                      const SizedBox(height: 16),
-                      _buildCashReconciliation(activeShift),
-                      const SizedBox(height: 16),
-                      _buildSparklineChart(),
-                      const SizedBox(height: 20),
-                      _buildCloseShiftButton(activeShift.shiftId),
-                    ] else ...[
-                      _buildNoActiveShiftCard(),
-                      const SizedBox(height: 16),
-                      _buildOpenShiftForm(currentUser?.employeeId ?? 1),
-                    ],
-                    const SizedBox(height: 80),
-                  ],
-                ),
-              ),
-            ),
             if (shiftProvider.isLoading || _isProcessing)
               Container(
                 color: Colors.black.withValues(alpha: 0.15),
-                child: const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
+                child: const LoadingOverlay(),
               ),
           ],
         ),
+        bottomNavigationBar: widget.onMenuTap == null
+            ? const CashierBottomNavigationBar(selectedTab: CashierNavTab.shift)
+            : null,
       ),
     );
   }
@@ -558,12 +554,8 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
   }
 
   Widget _buildBentoMetrics(Shift shift) {
-    final currentCash = shift.startCash + shift.revenue;
-    final expectedEndCash = currentCash;
-
     return Column(
       children: [
-        // Cash Card
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -574,7 +566,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'TIỀN MẶT HIỆN TẠI',
+                'TIỀN MẶT ĐẦU CA',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
@@ -584,7 +576,7 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
               ),
               const SizedBox(height: 6),
               Text(
-                "${_formatCurrency(currentCash)} VNĐ",
+                "${_formatCurrency(shift.startCash)} VNĐ",
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -598,11 +590,11 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Dự kiến kết ca',
+                    'Doanh thu ghi nhận',
                     style: TextStyle(fontSize: 12, color: Color(0xFF768DAD)),
                   ),
                   Text(
-                    "${_formatCurrency(expectedEndCash)} VNĐ",
+                    "${_formatCurrency(shift.revenue)} VNĐ",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -615,100 +607,17 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
             ],
           ),
         ),
-        const SizedBox(height: 12),
-        // Bento stats row
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.borderGray),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Giao dịch',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.receipt_long_rounded,
-                          color: AppColors.secondary,
-                          size: 20,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          '142',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.borderGray),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Tốc độ phục vụ',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.speed_rounded,
-                          color: AppColors.statusWarning,
-                          size: 20,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          '1.2m',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
 
   Widget _buildCashReconciliation(Shift shift) {
+    if (_endCashInitializedForShiftId != shift.shiftId) {
+      final currentCash = shift.startCash + shift.revenue;
+      _endCashController.text = currentCash.toInt().toString();
+      _endCashInitializedForShiftId = shift.shiftId;
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -769,81 +678,6 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSparklineChart() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderGray),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'DOANH THU THEO GIỜ',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textMuted,
-                ),
-              ),
-              Text(
-                '+12% vs Hôm qua',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.secondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 80,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _buildBar(0.40, AppColors.surface),
-                _buildBar(0.55, AppColors.surface),
-                _buildBar(0.35, AppColors.surface),
-                _buildBar(0.70, AppColors.surface),
-                _buildBar(0.90, AppColors.surface),
-                _buildBar(1.00, AppColors.primary),
-                _buildBar(0.80, AppColors.secondary),
-                _buildBar(0.60, AppColors.surface),
-                _buildBar(0.45, AppColors.surface),
-                _buildBar(0.30, AppColors.surface),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBar(double heightFactor, Color color) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2),
-        child: FractionallySizedBox(
-          heightFactor: heightFactor,
-          child: Container(
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(2),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -955,41 +789,34 @@ class _ShiftManagementScreenState extends State<ShiftManagementScreen>
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            _buildShiftTabList(activeShifts, 'Không có ca nào đang hoạt động.'),
-            _buildShiftTabList(
-              historicalShifts,
-              'Không có lịch sử ca làm việc.',
-            ),
-          ],
-        ),
+        body: shiftProvider.isLoading
+            ? const LoadingOverlay()
+            : shiftProvider.error != null
+            ? ErrorBanner(
+                message: shiftProvider.error!,
+                onRetry: () => context.read<ShiftProvider>().fetchShifts(),
+              )
+            : TabBarView(
+                children: [
+                  _buildShiftTabList(
+                    activeShifts,
+                    'Không có ca nào đang hoạt động.',
+                  ),
+                  _buildShiftTabList(
+                    historicalShifts,
+                    'Không có lịch sử ca làm việc.',
+                  ),
+                ],
+              ),
       ),
     );
   }
 
   Widget _buildShiftTabList(List<Shift> shifts, String emptyMessage) {
     if (shifts.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.calendar_today_outlined,
-              size: 64,
-              color: AppColors.textMuted.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              emptyMessage,
-              style: const TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
+      return EmptyState(
+        message: emptyMessage,
+        icon: Icons.calendar_today_outlined,
       );
     }
 

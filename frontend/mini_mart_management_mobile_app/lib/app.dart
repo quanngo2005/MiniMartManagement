@@ -10,6 +10,7 @@ import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart
 import 'package:mini_mart_management_mobile_app/providers/supplier_debt_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/stock_count_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/order_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/e_invoice_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/report_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/product_provider.dart';
@@ -31,7 +32,7 @@ import 'package:mini_mart_management_mobile_app/screens/category_management_scre
 import 'package:mini_mart_management_mobile_app/screens/login_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
-import 'package:mini_mart_management_mobile_app/screens/settings_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/employee_profile_screen.dart';
 import 'package:mini_mart_management_mobile_app/services/auth_service.dart';
 import 'package:mini_mart_management_mobile_app/services/batch_service.dart';
 import 'package:mini_mart_management_mobile_app/services/category_service.dart';
@@ -78,8 +79,9 @@ class MiniMartManagementApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => BatchProvider(BatchRepository(BatchService())),
         ),
-         ChangeNotifierProvider(
-          create: (_) => CategoryProvider(CategoryRepository(CategoryService())),
+        ChangeNotifierProvider(
+          create: (_) =>
+              CategoryProvider(CategoryRepository(CategoryService())),
         ),
         ChangeNotifierProvider(
           create: (_) =>
@@ -122,6 +124,9 @@ class MiniMartManagementApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         Provider<OrderRepository>(create: (_) => OrderRepository()),
         ChangeNotifierProvider(
+          create: (context) => OrderProvider(context.read<OrderRepository>()),
+        ),
+        ChangeNotifierProvider(
           create: (_) =>
               SupplierProvider(SupplierRepository(SupplierService())),
         ),
@@ -152,7 +157,7 @@ class MiniMartManagementApp extends StatelessWidget {
           '/promotions': (_) => const PromotionManagementScreen(),
           '/categories': (_) => const CategoryManagementScreen(),
           '/returns': (_) => const CashierReturnScreen(),
-          '/settings': (_) => const SettingsScreen(),
+          '/settings': (_) => const EmployeeProfileScreen(),
         },
       ),
     );

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_navigation_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_drawer.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/shift_provider.dart';
 import 'package:provider/provider.dart';
@@ -320,10 +322,11 @@ class _CashierReturnScreenState extends State<CashierReturnScreen> {
     final isShiftActive = activeShift != null;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Hoàn trả hàng'),
-        backgroundColor: AppColors.primaryContainer,
-        foregroundColor: Colors.white,
+      backgroundColor: AppColors.backgroundSlate,
+      drawer: const CashierDrawer(selectedTab: CashierNavTab.returns),
+      appBar: const MiniMartAppBar.primary(
+        title: 'Hoàn trả hàng',
+        showMenu: true,
       ),
       body: !isShiftActive ? _buildNoShiftWidget() : _buildBody(),
       bottomNavigationBar: const CashierBottomNavigationBar(

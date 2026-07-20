@@ -1,6 +1,5 @@
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
@@ -12,65 +11,79 @@ namespace MiniMart.Services.Implementations
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IMapper _mapper;
 
-        public CategoryService(ICategoryRepository categoryRepository, IMapper mapper)
-        {
-            _categoryRepository = categoryRepository;
-            _mapper = mapper;
-        }
+        public CategoryService(ICategoryRepository categoryRepository) => _categoryRepository = categoryRepository;
 
-        public IQueryable<CategoryDto> GetAllQueryable()
+        public async Task<IReadOnlyList<CategoryDto>> GetAllAsync()
         {
-            return _categoryRepository.GetAllQueryable()
-                .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider);
+            var categories = await _categoryRepository.GetAllQueryable().ToListAsync();
+            return categories.Select(MapToDto).ToList();
         }
 
         public async Task<CategoryDto?> GetByIdAsync(int id)
         {
             var category = await _categoryRepository.GetByIdAsync(id);
-            return category == null ? null : _mapper.Map<CategoryDto>(category);
+            return category is null ? null : MapToDto(category);
         }
 
-        public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto)
+        public async Task<CategoryDto> CreateAsync(CreateCategoryRequest request)
         {
-            Validate(dto.CategoryCode, dto.CategoryName, dto.ParentCategoryId, dto.TaxRateId);
-            if (await _categoryRepository.CategoryCodeExistsAsync(dto.CategoryCode))
-                throw new DomainException("Category code already exists.", StatusCodes.Status409Conflict);
-            var category = _mapper.Map<Category>(dto);
-            category.Status = true;
-            var created = await _categoryRepository.CreateAsync(category);
-            return _mapper.Map<CategoryDto>(created);
+            await ValidateRequestAsync(request.CategoryCode, request.TaxRateId);
+            var category = new Category
+            {
+                CategoryCode = request.CategoryCode.Trim(),
+                CategoryName = request.CategoryName.Trim(),
+                Description = request.Description?.Trim(),
+                TaxRateId = request.TaxRateId,
+                Status = true
+            };
+            return MapToDto(await _categoryRepository.CreateAsync(category));
         }
 
-        public async Task<CategoryDto> UpdateAsync(int id, UpdateCategoryDto dto)
+        public async Task<CategoryDto> UpdateAsync(int id, UpdateCategoryRequest request)
         {
-            var existing = await _categoryRepository.GetByIdAsync(id);
-            if (existing == null)
-                throw new DomainException($"Category with ID {id} not found.", StatusCodes.Status404NotFound);
-            Validate(dto.CategoryCode, dto.CategoryName, dto.ParentCategoryId, dto.TaxRateId);
-            if (await _categoryRepository.CategoryCodeExistsAsync(dto.CategoryCode, id))
+            var existing = await _categoryRepository.GetByIdAsync(id)
+                ?? throw new DomainException($"Category with ID {id} not found.", StatusCodes.Status404NotFound);
+
+            if (await _categoryRepository.CategoryCodeExistsAsync(request.CategoryCode.Trim(), id))
                 throw new DomainException("Category code already exists.", StatusCodes.Status409Conflict);
-            _mapper.Map(dto, existing);
-            var updated = await _categoryRepository.UpdateAsync(existing);
-            return _mapper.Map<CategoryDto>(updated ?? existing);
+            if (!await _categoryRepository.TaxRateExistsAsync(request.TaxRateId))
+                throw new DomainException($"Active tax rate with ID {request.TaxRateId} was not found.", StatusCodes.Status400BadRequest);
+
+            existing.CategoryCode = request.CategoryCode.Trim();
+            existing.CategoryName = request.CategoryName.Trim();
+            existing.Description = request.Description?.Trim();
+            existing.TaxRateId = request.TaxRateId;
+            return MapToDto((await _categoryRepository.UpdateAsync(existing))!);
         }
 
         public async Task DeleteAsync(int id)
         {
-            var success = await _categoryRepository.DeleteAsync(id);
-            if (!success)
+            if (await _categoryRepository.GetByIdAsync(id) is null)
                 throw new DomainException($"Category with ID {id} not found.", StatusCodes.Status404NotFound);
+
+            if (await _categoryRepository.HasProductsAsync(id))
+                throw new DomainException("Cannot delete category because it currently contains products.");
+
+            await _categoryRepository.DeleteAsync(id);
         }
 
-        private void Validate(string code, string name, int? parentCategoryId, int taxRateId)
+        private async Task ValidateRequestAsync(string categoryCode, int taxRateId)
         {
-            if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(name))
-                throw new DomainException("Category code and name are required.", StatusCodes.Status422UnprocessableEntity);
-            if (parentCategoryId.HasValue && parentCategoryId.Value <= 0)
-                throw new DomainException("ParentCategoryId is invalid.", StatusCodes.Status422UnprocessableEntity);
-            if (taxRateId <= 0)
-                throw new DomainException("TaxRateId is required.", StatusCodes.Status422UnprocessableEntity);
+            if (await _categoryRepository.CategoryCodeExistsAsync(categoryCode.Trim()))
+                throw new DomainException("Category code already exists.", StatusCodes.Status409Conflict);
+            if (!await _categoryRepository.TaxRateExistsAsync(taxRateId))
+                throw new DomainException($"Active tax rate with ID {taxRateId} was not found.", StatusCodes.Status400BadRequest);
         }
+
+        private static CategoryDto MapToDto(Category category) => new()
+        {
+            Id = category.CategoryId,
+            Name = category.CategoryName,
+            Description = category.Description,
+            TaxRateId = category.TaxRateId,
+            TaxRate = category.TaxRate?.Rate ?? 0,
+            TaxDescription = category.TaxRate?.Description ?? string.Empty
+        };
     }
 }

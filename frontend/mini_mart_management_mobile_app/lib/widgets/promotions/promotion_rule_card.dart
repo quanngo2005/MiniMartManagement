@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_mart_management_mobile_app/models/promotion.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
@@ -116,8 +116,8 @@ class PromotionRuleCard extends StatelessWidget {
                             color: isEnded
                                 ? AppColors.textMuted
                                 : statusKey == 'active'
-                                    ? AppColors.secondary
-                                    : AppColors.primary,
+                                ? AppColors.secondary
+                                : AppColors.primary,
                           ),
                         ),
                         if (showActionButtons) ...[

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/promotion.dart';
@@ -114,10 +114,18 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
       backgroundColor: AppColors.surfaceContainerLowest,
       foregroundColor: AppColors.primary,
       titleSpacing: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.menu),
-        color: AppColors.primary,
-        onPressed: widget.onMenuTap ?? () {},
+      leading: InkWell(
+        onTap: widget.onMenuTap ?? () {},
+        child: Center(
+          child: Text(
+            'MMMS',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
       ),
       title: Text(
         'Chương trình khuyến mãi',
@@ -288,7 +296,8 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
   void _openDetail(BuildContext context, Promotion promotion) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => PromotionDetailScreen(promotionId: promotion.promotionId),
+        builder: (_) =>
+            PromotionDetailScreen(promotionId: promotion.promotionId),
       ),
     );
   }
@@ -597,7 +606,9 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
                 spacing: 8,
                 runSpacing: 8,
                 children: filteredProducts.map((product) {
-                  final selected = selectedProductIds.contains(product.productId);
+                  final selected = selectedProductIds.contains(
+                    product.productId,
+                  );
                   return FilterChip(
                     selected: selected,
                     label: Text(
@@ -701,18 +712,9 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
           initialValue: _promotionRule,
           decoration: const InputDecoration(),
           items: const [
-            DropdownMenuItem(
-              value: 0,
-              child: Text('Giảm giá ngưỡng hóa đơn'),
-            ),
-            DropdownMenuItem(
-              value: 1,
-              child: Text('Mua X tặng Y'),
-            ),
-            DropdownMenuItem(
-              value: 2,
-              child: Text('Giảm giá sản phẩm'),
-            ),
+            DropdownMenuItem(value: 0, child: Text('Giảm giá ngưỡng hóa đơn')),
+            DropdownMenuItem(value: 1, child: Text('Mua X tặng Y')),
+            DropdownMenuItem(value: 2, child: Text('Giảm giá sản phẩm')),
           ],
           onChanged: (v) => setState(() => _promotionRule = v ?? 0),
         ),
@@ -835,7 +837,9 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
         'name': _nameCtrl.text.trim(),
         'description': _buildDescription(),
         'type': promotionType,
-        'discountPercent': (_promotionRule == 0 || _promotionRule == 2) ? discount : null,
+        'discountPercent': (_promotionRule == 0 || _promotionRule == 2)
+            ? discount
+            : null,
         'discountAmount': null,
         'minimumOrderAmount': _promotionRule == 0 ? minimumOrder : null,
         'buyQuantity': _promotionRule == 1 ? buyQuantity : null,
@@ -903,4 +907,3 @@ class _PromotionCreateFormState extends State<_PromotionCreateForm> {
     });
   }
 }
-

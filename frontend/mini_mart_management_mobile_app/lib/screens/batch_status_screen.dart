@@ -5,6 +5,7 @@ import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/empty_state.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/error_banner.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class BatchStatusScreen extends StatefulWidget {
@@ -35,32 +36,13 @@ class _BatchStatusScreenState extends State<BatchStatusScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: _buildAppBar(),
+      appBar: MiniMartAppBar.primary(
+        title: 'Quản lý hạn sử dụng',
+        onBrandTap: widget.onMenuTap,
+      ),
       body: RefreshIndicator(
         onRefresh: () => context.read<BatchProvider>().loadBatches(),
         child: _buildBody(provider, batches),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.surfaceBright,
-      foregroundColor: AppColors.primary,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      titleSpacing: widget.onMenuTap == null ? null : 0,
-      leading: widget.onMenuTap == null
-          ? null
-          : IconButton(
-              onPressed: widget.onMenuTap,
-              tooltip: 'Mở menu',
-              icon: const Icon(Icons.menu_rounded),
-            ),
-      title: const Text('Quản lý hạn sử dụng'),
-      bottom: const PreferredSize(
-        preferredSize: Size.fromHeight(1),
-        child: Divider(height: 1, color: AppColors.outlineVariant),
       ),
     );
   }
@@ -81,9 +63,7 @@ class _BatchStatusScreenState extends State<BatchStatusScreen> {
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-          sliver: SliverToBoxAdapter(
-            child: _ExpiryDashboard(batches: batches),
-          ),
+          sliver: SliverToBoxAdapter(child: _ExpiryDashboard(batches: batches)),
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -168,21 +148,27 @@ class _BatchStatusScreenState extends State<BatchStatusScreen> {
   List<Batch> _filteredBatches(List<Batch> batches) {
     final query = _query.toLowerCase();
     final filtered = batches.where((batch) {
-      final matchesProduct = _productId == null || batch.productId == _productId;
-      final matchesQuery = query.isEmpty ||
+      final matchesProduct =
+          _productId == null || batch.productId == _productId;
+      final matchesQuery =
+          query.isEmpty ||
           batch.batchCode.toLowerCase().contains(query) ||
           batch.productName.toLowerCase().contains(query) ||
           batch.productCode.toLowerCase().contains(query);
       return matchesProduct && matchesQuery;
     }).toList();
-    filtered.sort((first, second) => first.expiryDate.compareTo(second.expiryDate));
+    filtered.sort(
+      (first, second) => first.expiryDate.compareTo(second.expiryDate),
+    );
     return filtered;
   }
 
   Future<void> _showProductFilter(List<Batch> batches) async {
-    final products = <int, String>{
-      for (final batch in batches) batch.productId: batch.productName,
-    }.entries.toList()..sort((first, second) => first.value.compareTo(second.value));
+    final products =
+        <int, String>{
+            for (final batch in batches) batch.productId: batch.productName,
+          }.entries.toList()
+          ..sort((first, second) => first.value.compareTo(second.value));
     final selection = await showModalBottomSheet<_ProductFilterSelection>(
       context: context,
       builder: (context) => SafeArea(
@@ -196,10 +182,8 @@ class _BatchStatusScreenState extends State<BatchStatusScreen> {
             ListTile(
               selected: _productId == null,
               title: const Text('Tất cả sản phẩm'),
-              onTap: () => Navigator.pop(
-                context,
-                const _ProductFilterSelection.clear(),
-              ),
+              onTap: () =>
+                  Navigator.pop(context, const _ProductFilterSelection.clear()),
             ),
             ...products.map(
               (product) => ListTile(
@@ -463,9 +447,9 @@ class _ExpiryBatchCard extends StatelessWidget {
           'SKU: ${batch.productCode} · Lô: ${batch.batchCode}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: AppColors.textMuted,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
         ),
         const SizedBox(height: 12),
         Row(
@@ -541,9 +525,9 @@ class _BatchMetadata extends StatelessWidget {
               ),
               Text(
                 label,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
               ),
             ],
           ),
@@ -562,12 +546,36 @@ class _ExpiryBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, foregroundColor, backgroundColor) = switch (state) {
-      _ExpiryState.expired => ('ĐÃ HẾT HẠN', AppColors.statusError, AppColors.errorContainer),
-      _ExpiryState.critical => ('${_daysUntilExpiry(batch)} NGÀY', AppColors.statusError, AppColors.errorContainer),
-      _ExpiryState.warning => ('${_daysUntilExpiry(batch)} NGÀY', AppColors.primary, AppColors.warningContainer),
-      _ExpiryState.available => ('CÒN HÀNG', AppColors.secondary, AppColors.secondaryContainer),
-      _ExpiryState.outOfStock => ('HẾT HÀNG', AppColors.textMuted, AppColors.surfaceContainerHigh),
-      _ExpiryState.inactive => ('NGƯNG DÙNG', AppColors.textMuted, AppColors.surfaceContainerHigh),
+      _ExpiryState.expired => (
+        'ĐÃ HẾT HẠN',
+        AppColors.statusError,
+        AppColors.errorContainer,
+      ),
+      _ExpiryState.critical => (
+        '${_daysUntilExpiry(batch)} NGÀY',
+        AppColors.statusError,
+        AppColors.errorContainer,
+      ),
+      _ExpiryState.warning => (
+        '${_daysUntilExpiry(batch)} NGÀY',
+        AppColors.primary,
+        AppColors.warningContainer,
+      ),
+      _ExpiryState.available => (
+        'CÒN HÀNG',
+        AppColors.secondary,
+        AppColors.secondaryContainer,
+      ),
+      _ExpiryState.outOfStock => (
+        'HẾT HÀNG',
+        AppColors.textMuted,
+        AppColors.surfaceContainerHigh,
+      ),
+      _ExpiryState.inactive => (
+        'NGƯNG DÙNG',
+        AppColors.textMuted,
+        AppColors.surfaceContainerHigh,
+      ),
     };
 
     return DecoratedBox(
@@ -590,7 +598,14 @@ class _ExpiryBadge extends StatelessWidget {
   }
 }
 
-enum _ExpiryState { expired, critical, warning, available, outOfStock, inactive }
+enum _ExpiryState {
+  expired,
+  critical,
+  warning,
+  available,
+  outOfStock,
+  inactive,
+}
 
 _ExpiryState _stateFor(Batch batch) {
   if (!batch.status) return _ExpiryState.inactive;
@@ -601,9 +616,9 @@ _ExpiryState _stateFor(Batch batch) {
   return _ExpiryState.available;
 }
 
-bool _isExpired(Batch batch) => DateUtils.dateOnly(batch.expiryDate).isBefore(
-  DateUtils.dateOnly(DateTime.now()),
-);
+bool _isExpired(Batch batch) => DateUtils.dateOnly(
+  batch.expiryDate,
+).isBefore(DateUtils.dateOnly(DateTime.now()));
 
 bool _isCritical(Batch batch) =>
     batch.status && batch.quantityRemaining > 0 && _daysUntilExpiry(batch) <= 7;

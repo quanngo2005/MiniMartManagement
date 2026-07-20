@@ -4,6 +4,8 @@ import 'package:mini_mart_management_mobile_app/providers/order_return_provider.
 import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/category_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/customer_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/batch_status_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
@@ -11,10 +13,10 @@ import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart
 import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/manager_dashboard_screen.dart';
-import 'package:mini_mart_management_mobile_app/screens/manager_return_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/member_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/product_performance_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/promotion_management_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/supplier_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_bottom_navigation_bar.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/manager_drawer.dart';
@@ -64,11 +66,13 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.batches: 5,
     ManagerNavDestination.staffPerformance: 6,
     ManagerNavDestination.staff: 7,
-    ManagerNavDestination.customers: 8,
-    ManagerNavDestination.promotions: 9,
-    ManagerNavDestination.invoices: 10,
-    ManagerNavDestination.analyze: 11,
-    ManagerNavDestination.returns: 12,
+    ManagerNavDestination.suppliers: 8,
+    ManagerNavDestination.customers: 9,
+    ManagerNavDestination.promotions: 10,
+    ManagerNavDestination.invoices: 11,
+    ManagerNavDestination.analyze: 12,
+    ManagerNavDestination.categories: 13,
+    ManagerNavDestination.customerInformation: 14,
   };
 
   static const _bottomNavDestinations = [
@@ -79,6 +83,9 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
   ];
 
   int get _bottomNavIndex {
+    if (_destination == ManagerNavDestination.customerInformation) {
+      return _bottomNavDestinations.indexOf(ManagerNavDestination.customers);
+    }
     final idx = _bottomNavDestinations.indexOf(_destination);
     return idx >= 0 ? idx : 0;
   }
@@ -101,7 +108,9 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
       key: _scaffoldKey,
       drawer: ManagerDrawer(
         user: widget.user,
-        selected: _destination,
+        selected: _destination == ManagerNavDestination.customerInformation
+            ? ManagerNavDestination.customers
+            : _destination,
         onDestinationSelected: _selectDestination,
       ),
       body: IndexedStack(
@@ -126,17 +135,21 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
+          const SupplierManagementScreen(showBottomNavBar: false),
           MemberManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
+            onManageCustomers: () =>
+                _selectDestination(ManagerNavDestination.customerInformation),
           ),
           PromotionManagementScreen(
             showBottomNavBar: false,
             onMenuTap: _openDrawer,
           ),
-          const InvoiceListScreen(),
+          InvoiceListScreen(onMenuTap: _openDrawer),
           AnalyzeScreen(onMenuTap: _openDrawer),
-          ManagerReturnListScreen(onMenuTap: _openDrawer),
+          CategoryManagementScreen.withProvider(onMenuTap: _openDrawer),
+          CustomerListScreen(showBottomNavBar: false, onMenuTap: _openDrawer),
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(

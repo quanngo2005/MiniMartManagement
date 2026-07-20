@@ -8,6 +8,7 @@ import 'package:mini_mart_management_mobile_app/providers/auth_provider.dart';
 import 'package:mini_mart_management_mobile_app/repositories/order_repository.dart';
 import 'package:mini_mart_management_mobile_app/theme/app_colors.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_bottom_navigation_bar.dart';
+import 'package:mini_mart_management_mobile_app/widgets/layout/cashier_drawer.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -582,10 +583,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   0;
                               if (!context.mounted) return;
                               context.read<CartProvider>().setCustomer(
-                                  customerId,
-                                  name,
-                                  0,
-                                );
+                                customerId,
+                                name,
+                                0,
+                              );
                               setState(() {
                                 _showCreateCustomerButton = false;
                               });
@@ -710,7 +711,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: const MiniMartAppBar.primary(title: 'Bán hàng'),
+      drawer: const CashierDrawer(selectedTab: CashierNavTab.checkout),
+      appBar: const MiniMartAppBar.primary(title: 'Bán hàng', showMenu: true),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
@@ -1255,28 +1257,68 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                   const SizedBox(height: 16),
                 ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Tạm tính',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                    Text(
+                      currencyFormatter.format(cart.totalAmount),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Thuế VAT ${(cart.averageVatRate * 100).toInt()}%',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                    Text(
+                      currencyFormatter.format(cart.vatAmount),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                  ],
+                ),
                 if (cart.pointsToUse > 0) ...[
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Tạm tính',
+                        'Giảm giá',
                         style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.textMuted,
+                          fontSize: 14,
+                          color: AppColors.statusError,
                         ),
                       ),
                       Text(
-                        currencyFormatter.format(cart.totalAmount),
+                        '- ${currencyFormatter.format(cart.discountAmount)}',
                         style: const TextStyle(
-                          fontSize: 16,
-                          color: AppColors.textDark,
+                          fontSize: 14,
+                          color: AppColors.statusError,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
                 ],
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

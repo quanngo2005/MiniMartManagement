@@ -13,6 +13,7 @@ namespace MiniMart.DTOs
         public decimal TotalPrice { get; set; }
         public decimal VatRate { get; set; }
         public decimal VatAmount { get; set; }
+        public string TaxDescription { get; set; } = string.Empty;
     }
 
     public class CreateOrderDetailDto
