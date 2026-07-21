@@ -1,9 +1,9 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniMart.DTOs;
 using MiniMart.Middleware;
 using MiniMart.Services.Interfaces;
+using System.Security.Claims;
 
 namespace MiniMart.Controllers
 {
@@ -152,6 +152,5 @@ namespace MiniMart.Controllers
             var employeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.TryParse(employeeId, out var id) ? id : 0;
         }
-
     }
 }

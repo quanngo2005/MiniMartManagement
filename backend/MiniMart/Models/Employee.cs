@@ -49,6 +49,7 @@ namespace MiniMart.Models
 
         public ICollection<Shift> CashierShifts { get; set; }
             = new List<Shift>();
+
         public ICollection<InventoryTransaction> InventoryTransactions { get; set; }
     = new List<InventoryTransaction>();
 

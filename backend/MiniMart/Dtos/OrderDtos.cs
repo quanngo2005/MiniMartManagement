@@ -8,7 +8,7 @@ namespace MiniMart.DTOs
         public string OrderCode { get; set; } = string.Empty;
         public decimal SubTotal { get; set; }
         public decimal TaxAmount { get; set; }
-        public decimal DiscountAmount { get; set; }  
+        public decimal DiscountAmount { get; set; }
         public decimal FinalAmount { get; set; }
         public decimal PaidAmount { get; set; }
         public decimal ChangeAmount { get; set; }
@@ -65,7 +65,7 @@ namespace MiniMart.DTOs
         public decimal ChangeAmount { get; set; }
         public int LoyaltyPointsUsed { get; set; }
         public int LoyaltyPointsEarned { get; set; }
-        public int? CustomerPointBalance { get; set; } 
+        public int? CustomerPointBalance { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public OrderStatus Status { get; set; }
 
@@ -93,7 +93,7 @@ namespace MiniMart.DTOs
         public DateTime OrderDate { get; set; }
     }
 
-    public class OrderReceiptItemDto      
+    public class OrderReceiptItemDto
     {
         public string ProductName { get; set; } = string.Empty;
         public int Quantity { get; set; }

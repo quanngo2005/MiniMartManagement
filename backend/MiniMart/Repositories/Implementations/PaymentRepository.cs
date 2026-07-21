@@ -5,7 +5,7 @@ using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.Interfaces;
 using MiniMart.Repositories.RepoInterface;
-using MiniMart.Services.Interfaces; 
+using MiniMart.Services.Interfaces;
 
 namespace MiniMart.Repositories.Implementations
 {
@@ -25,7 +25,7 @@ namespace MiniMart.Repositories.Implementations
         public async Task<PaymentResponseDto> CreatePaymentUrlAsync(PaymentRequestDto request, HttpContext context)
         {
             var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == request.OrderId);
-            if (order == null || order.Status == OrderStatus.Completed) 
+            if (order == null || order.Status == OrderStatus.Completed)
             {
                 return new PaymentResponseDto { IsSuccess = false, Message = "Đơn hàng không hợp lệ hoặc đã thanh toán." };
             }
@@ -69,12 +69,12 @@ namespace MiniMart.Repositories.Implementations
 
             var payment = await _context.Payments.Include(p => p.Order)
                                 .FirstOrDefaultAsync(p => p.TransactionRef == callbackResult.TransactionRef);
-            
-            if(payment == null) return false;
+
+            if (payment == null) return false;
 
             if (payment.Status != PaymentStatus.Pending) return true;
 
-            if(callbackResult.IsSuccess)
+            if (callbackResult.IsSuccess)
             {
                 payment.Status = PaymentStatus.Success;
                 payment.PaidAt = DateTime.Now;
@@ -87,7 +87,7 @@ namespace MiniMart.Repositories.Implementations
             {
                 payment.Status = PaymentStatus.Failed;
             }
-            
+
             await _context.SaveChangesAsync();
             return true;
         }

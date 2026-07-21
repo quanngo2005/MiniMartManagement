@@ -1,5 +1,3 @@
-using MiniMart.Models;
-
 namespace MiniMart.DTOs
 {
     public class RevenueSummaryDto

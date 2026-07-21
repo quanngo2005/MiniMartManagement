@@ -1,7 +1,5 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using MiniMart.Data;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
@@ -169,7 +167,7 @@ namespace MiniMart.Services.Implementations
                     // Fail silently to avoid blocking client
                 }
             });
-            
+
             // Reload database graph details to map to DTO properly
             var result = await _orderReturnRepository.GetByIdAsync(created.OrderReturnId);
             return _mapper.Map<OrderReturnDto>(result!);

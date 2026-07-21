@@ -1,4 +1,3 @@
-
 namespace MiniMart.Models
 {
     public class Category
@@ -15,8 +14,8 @@ namespace MiniMart.Models
 
         public int DisplayOrder { get; set; }
 
-        public int? ParentCategoryId { get; set; } 
-        //có những catogory có parent category và có những category không có parent category  
+        public int? ParentCategoryId { get; set; }
+        //có những catogory có parent category và có những category không có parent category
 
         public Category? ParentCategory { get; set; }
 

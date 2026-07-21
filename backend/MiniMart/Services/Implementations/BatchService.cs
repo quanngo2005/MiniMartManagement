@@ -126,6 +126,5 @@ namespace MiniMart.Services
 
             return _mapper.Map<InventoryTransactionDto>(disposedTransaction!);
         }
-
     }
 }

@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using MiniMart.Shared.Exceptions;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
+using MiniMart.Shared.Exceptions;
 
 namespace MiniMart.Data
 {
@@ -343,7 +342,6 @@ namespace MiniMart.Data
             // =========================
             // ORDER
             // =========================
-
 
             // =========================
             // PAYMENT

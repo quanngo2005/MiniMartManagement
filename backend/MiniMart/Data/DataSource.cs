@@ -1,4 +1,3 @@
-using MiniMart.Models;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
@@ -31,7 +30,6 @@ namespace MiniMart.Models
             new Employee { EmployeeId = 12, FullName = "Phan Thị Quỳnh",   Gender = false, DateOfBirth = new DateTime(1997, 5, 14), PhoneNumber = "0901000012", Email = "quynh.phan@minimart.vn",  Username = "quynh.phan",   PasswordHash = "AQAAAAEAACcQAAAAEHashed12", Salary = 8000000,  HireDate = new DateTime(2023, 4, 15), Status = EmployeeStatus.Active, RoleId = 2 },
             new Employee { EmployeeId = 13, FullName = "Admin Test",        Gender = true,  DateOfBirth = new DateTime(1990, 1, 1),  PhoneNumber = "0901000013", Email = "admin.test@minimart.vn",  Username = "admin.test",   PasswordHash = "PBKDF2-SHA256:100000:vECvXvSIQjcJHLryzwWLiA==:bpMkS8sN5DSw0AfpAUBvxc4IScpN1iWkTzLPrhFSk5g=",  Salary = 15000000, HireDate = new DateTime(2024, 1, 1), Status = EmployeeStatus.Active, RoleId = 4 },
             new Employee { EmployeeId = 14, FullName = "Manager Test",      Gender = true,  DateOfBirth = new DateTime(1990, 1, 2),  PhoneNumber = "0901000014", Email = "manager.test@minimart.vn", Username = "manager.test", PasswordHash = "PBKDF2-SHA256:100000:4i06mXfdgXI4rFm+51SILA==:TSBEaTARkBveb/293mpk1+oJ98Ai3yoTyDllFlZIiO0=", Salary = 13000000, HireDate = new DateTime(2024, 1, 1), Status = EmployeeStatus.Active, RoleId = 1 },
-
         };
 
         // ========================= CUSTOMERS =========================
@@ -71,7 +69,7 @@ namespace MiniMart.Models
             new Supplier { SupplierId = 5, SupplierCode = "NCC005", SupplierName = "Công ty CP P&G Việt Nam",      ContactPerson = "Hoàng Thị Lan",      PhoneNumber = "0281000005", Email = "contact@pg.com.vn",        Address = "72 Lê Thánh Tôn, Q.1, TP.HCM",       TaxCode = "0301777666", BankAccount = "0061004567890", BankName = "Techcombank", Status = true },
         };
 
-// ========================= TAX RATES =========================
+        // ========================= TAX RATES =========================
         public static List<TaxRate> GetTaxRates() => new List<TaxRate>
         {
             new TaxRate { TaxRateId = 1, Rate = 0.00m, Description = "Mien thue GTGT", EffectiveFrom = new DateOnly(2025, 7, 1), EffectiveTo = null, Status = true },

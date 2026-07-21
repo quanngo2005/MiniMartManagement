@@ -7,12 +7,12 @@ abstract final class ApiConfig {
       return envUrl;
     }
     if (kIsWeb) {
-      return 'http://localhost:5005';
+      return 'mmms-cvaka8c9bkfkduf3.southeastasia-01.azurewebsites.net';
     }
     // Dynamic mapping for mobile emulators
     return defaultTargetPlatform == TargetPlatform.android
-        ? 'http://10.0.2.2:5005'
-        : 'http://localhost:5005';
+        ? 'mmms-cvaka8c9bkfkduf3.southeastasia-01.azurewebsites.net'
+        : 'http://10.0.2.2:5005';
   }
 
   static Uri uri(String path) {

@@ -36,9 +36,9 @@ namespace MiniMart.Models
 
         public Customer? Customer { get; set; }
 
-        public int? ShiftId { get; set; }        
+        public int? ShiftId { get; set; }
 
-        public Shift? Shift { get; set; }        
+        public Shift? Shift { get; set; }
 
         public ICollection<OrderDetail> OrderDetails { get; set; }
             = new List<OrderDetail>();
@@ -55,4 +55,4 @@ namespace MiniMart.Models
         public ICollection<OrderReturn> OrderReturns { get; set; }
             = new List<OrderReturn>();
     }
-} 
+}
