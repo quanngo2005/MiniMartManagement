@@ -3,6 +3,10 @@ using CommunityToolkit.Mvvm.Input;
 using MiniMart.Models;
 using MiniMart.Models.DTOs;
 using MiniMart.Services;
+using QRCoder;
+using System.IO;
+using System.Windows.Media.Imaging;
+using System.Threading;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -48,6 +52,18 @@ namespace MiniMart.ViewModels
 
         [ObservableProperty]
         private bool _isCheckoutPopupOpen;
+
+        [ObservableProperty]
+        private bool _isVietQRPopupOpen;
+
+        [ObservableProperty]
+        private BitmapImage? _vietQRCodeImage;
+
+        [ObservableProperty]
+        private int _selectedPaymentMethod = 0;
+
+        private long _currentPayosOrderCode = 0;
+        private int _currentOrderId = 0;
 
         [ObservableProperty]
         private bool _isEditCustomerPopupOpen;
@@ -257,7 +273,19 @@ namespace MiniMart.ViewModels
         }
 
         [RelayCommand]
-        private async Task Checkout()
+        private async Task UnifiedCheckout()
+        {
+            if (SelectedPaymentMethod == 0) // Cash
+            {
+                await CheckoutCash();
+            }
+            else // VietQR
+            {
+                await CheckoutVietQR();
+            }
+        }
+
+        private async Task CheckoutCash()
         {
             if (ActiveTab == null || ActiveTab.CartItems.Count == 0) return;
 
@@ -302,6 +330,151 @@ namespace MiniMart.ViewModels
             else
             {
                 System.Windows.MessageBox.Show($"Thanh toán thất bại: {result.ErrorMessage}", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+        }
+
+        [RelayCommand]
+        private async Task CheckoutVietQR()
+        {
+            if (ActiveTab == null || ActiveTab.CartItems.Count == 0) return;
+
+            if (CurrentShift == null)
+            {
+                CurrentShift = await ApiService.Instance.GetCurrentShiftAsync();
+                if (CurrentShift == null)
+                {
+                    System.Windows.MessageBox.Show("Vui lòng mở ca làm việc trước khi thanh toán (Chưa có ca làm việc nào đang mở)!", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    return;
+                }
+            }
+
+            var request = new CheckoutRequestDto
+            {
+                EmployeeId = ApiService.Instance.CurrentUser?.EmployeeId ?? 1,
+                ShiftId = CurrentShift.ShiftId,
+                CustomerId = ActiveTab.CustomerId,
+                LoyaltyPointsToUse = ActiveTab.LoyaltyPointsToUse,
+                PaymentMethod = 7, // 7 for VietQR (PayOS)
+                PaidAmount = ActiveTab.AmountGiven,
+                Note = "Thanh toán VietQR"
+            };
+
+            foreach (var item in ActiveTab.CartItems)
+            {
+                request.Items.Add(new CheckoutItemDto
+                {
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity
+                });
+            }
+
+            var result = await ApiService.Instance.CheckoutCashAsync(request);
+            if (result.Success && result.Data != null)
+            {
+                if (!string.IsNullOrEmpty(result.Data.QrCode))
+                {
+                    var parts = result.Data.QrCode.Split('_', 2);
+                    if (parts.Length == 2)
+                    {
+                        _currentPayosOrderCode = long.Parse(parts[0]);
+                        VietQRCodeImage = GenerateQrCodeBitmap(parts[1]);
+                    }
+                    else
+                    {
+                        // Fallback (shouldn't happen with updated backend)
+                        VietQRCodeImage = GenerateQrCodeBitmap(result.Data.QrCode);
+                    }
+                    
+                    _currentOrderId = result.Data.OrderId;
+                    IsVietQRPopupOpen = true;
+
+                    _pollingCts = new CancellationTokenSource();
+                    _ = PollPayOSStatus(result.Data.OrderId, _pollingCts.Token);
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("Không lấy được mã QR từ máy chủ.", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                System.Windows.MessageBox.Show($"Tạo mã thanh toán thất bại: {result.ErrorMessage}", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+        }
+
+        private BitmapImage GenerateQrCodeBitmap(string text)
+        {
+            using QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            using QRCodeData qrCodeData = qrGenerator.CreateQrCode(text, QRCodeGenerator.ECCLevel.Q);
+            using PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
+            byte[] qrCodeBytes = qrCode.GetGraphic(20);
+            
+            using MemoryStream ms = new MemoryStream(qrCodeBytes);
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = ms;
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+            bitmapImage.Freeze();
+            return bitmapImage;
+        }
+
+        private CancellationTokenSource? _pollingCts;
+
+        private async Task PollPayOSStatus(int orderId, CancellationToken token)
+        {
+            try
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    var status = await ApiService.Instance.CheckPayOSStatusAsync(orderId, _currentPayosOrderCode);
+                    if (status == "PAID")
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            IsVietQRPopupOpen = false;
+                            ActiveTab!.CartItems.Clear();
+                            ActiveTab.AmountGiven = 0m;
+                            ClearCustomer();
+                            System.Windows.MessageBox.Show("Thanh toán VietQR thành công!", "Thành công", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                        });
+                        break;
+                    }
+                    else if (status == "EXPIRED" || status == "CANCELLED")
+                    {
+                        // Auto regenerate QR if not manually cancelled by user
+                        if (!token.IsCancellationRequested)
+                        {
+                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                // Restart checkout quietly
+                                _ = CheckoutVietQR();
+                            });
+                        }
+                        break;
+                    }
+                    await Task.Delay(3000, token);
+                }
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        [RelayCommand]
+        private void HideQR()
+        {
+            IsVietQRPopupOpen = false;
+            // Does not cancel the token, so polling continues in background
+        }
+
+        [RelayCommand]
+        private async Task CancelQR()
+        {
+            _pollingCts?.Cancel();
+            IsVietQRPopupOpen = false;
+            
+            if (_currentOrderId > 0 && _currentPayosOrderCode > 0)
+            {
+                await ApiService.Instance.CancelPayOSAsync(_currentOrderId, _currentPayosOrderCode);
             }
         }
 

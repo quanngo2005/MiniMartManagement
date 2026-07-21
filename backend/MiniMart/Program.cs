@@ -16,6 +16,7 @@ using MiniMart.Services.Interfaces;
 using MiniMart.Services.Implementations;
 using MiniMart.Hubs;
 using MiniMart.Shared.Settings;
+using PayOS;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<TaxSettings>(builder.Configuration.GetSection("TaxSettings"));
@@ -45,10 +46,17 @@ odataBuilder.EntitySet<InventoryTransaction>("InventoryTransactions");
 odataBuilder.EntitySet<Promotion>("Promotions");
 odataBuilder.EntitySet<StockCount>("StockCounts");
 
-// ── Infrastructure ────────────────────────────────────────────────
+// ── Infrastructure ──────────────────────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+var payOS = new PayOSClient(
+    builder.Configuration["PayOS:ClientId"] ?? throw new Exception("Cannot find environment"),
+    builder.Configuration["PayOS:ApiKey"] ?? throw new Exception("Cannot find environment"),
+    builder.Configuration["PayOS:ChecksumKey"] ?? throw new Exception("Cannot find environment")
+);
+builder.Services.AddSingleton(payOS);
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

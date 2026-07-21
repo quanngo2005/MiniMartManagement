@@ -21,6 +21,8 @@
             <TextBlock Text="Bạn chưa có ca làm việc nào đang mở. Vui lòng nhập số tiền mặt có trong két để bắt đầu ca mới." 
                        FontSize="14" Foreground="#64748B" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,30"/>
 
+            <TextBlock Text="{Binding ExpectedShiftInfo}" FontSize="15" FontWeight="SemiBold" Foreground="#2563EB" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+
             <TextBlock Text="Tiền đầu ca (Start Cash):" FontSize="14" Foreground="#64748B" Margin="0,0,0,5"/>
             <TextBox Text="{Binding StartCashString, UpdateSourceTrigger=PropertyChanged}" 
                      Height="45" Padding="15,0" VerticalContentAlignment="Center" FontSize="16" BorderBrush="#E2E8F0" BorderThickness="1" Margin="0,0,0,10"/>

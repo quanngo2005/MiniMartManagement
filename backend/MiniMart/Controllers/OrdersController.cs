@@ -6,6 +6,8 @@ using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
+using PayOS;
+using PayOS.Models.V2.PaymentRequests;
 
 namespace MiniMart.Controllers
 {
@@ -15,6 +17,7 @@ namespace MiniMart.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly PayOSClient _payOS;
 
         private static readonly Expression<Func<Order, OrderDto>> AsDto = o => new OrderDto
         {
@@ -34,9 +37,10 @@ namespace MiniMart.Controllers
 
         private static readonly Func<Order, OrderDto> MapToDto = AsDto.Compile();
 
-        public OrdersController(IOrderRepository orderRepository)
+        public OrdersController(IOrderRepository orderRepository, PayOSClient payOS)
         {
             _orderRepository = orderRepository;
+            _payOS = payOS;
         }
 
         // GET: /api/orders
@@ -108,6 +112,34 @@ namespace MiniMart.Controllers
             try
             {
                 var result = await _orderRepository.CheckoutAsync(request);
+
+                if (request.PaymentMethod == PaymentMethod.VietQR)
+                {
+                    try
+                    {
+                        long payosOrderCode = long.Parse($"{result.OrderCode.Replace("HD", "")}{DateTime.Now:HHmmss}");
+                        var paymentRequest = new CreatePaymentLinkRequest
+                        {
+                            OrderCode = payosOrderCode,
+                            Amount = (int)result.FinalAmount,
+                            Description = $"Thanh toan {result.OrderCode}",
+                            ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds(),
+                            Items = new List<PaymentLinkItem>(),
+                            CancelUrl = $"http://localhost:5173/cancel",
+                            ReturnUrl = $"http://localhost:5173/success"
+                        };
+
+                        var paymentLink = await _payOS.PaymentRequests.CreateAsync(paymentRequest);
+                        result.CheckoutUrl = paymentLink.CheckoutUrl;
+                        // Attach the exact PayOS OrderCode to the QrCode so frontend can track it
+                        result.QrCode = $"{payosOrderCode}_{paymentLink.QrCode}";
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest(new { message = $"Lỗi tạo mã PayOS: {ex.Message}" });
+                    }
+                }
+
                 return Ok(result);
             }
             catch (InvalidOperationException ex)
@@ -117,6 +149,45 @@ namespace MiniMart.Controllers
             catch (KeyNotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("{id}/payos-status/{payosOrderCode}")]
+        public async Task<IActionResult> CheckPayOSStatus(int id, long payosOrderCode)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(id);
+            if (order == null) return NotFound(new { message = "Order not found" });
+
+            if (order.Status == OrderStatus.Completed)
+                return Ok(new { status = "PAID" });
+
+            try
+            {
+                var paymentLinkInfo = await _payOS.PaymentRequests.GetAsync(payosOrderCode);
+                if (paymentLinkInfo.Status.ToString() == "PAID" || paymentLinkInfo.Status.ToString() == "Paid")
+                {
+                    await _orderRepository.ConfirmOrderCompletionAsync(id);
+                    return Ok(new { status = "PAID" });
+                }
+                return Ok(new { status = paymentLinkInfo.Status.ToString() });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/cancel-payos/{payosOrderCode}")]
+        public async Task<IActionResult> CancelPayOS(int id, long payosOrderCode)
+        {
+            try
+            {
+                var paymentLinkInfo = await _payOS.PaymentRequests.CancelAsync(payosOrderCode, "Khach hang huy thanh toan");
+                return Ok(new { status = "CANCELLED" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
     }

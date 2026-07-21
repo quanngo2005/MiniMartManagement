@@ -37,5 +37,7 @@ namespace MiniMart.Models.DTOs
         public int PaymentMethod { get; set; }
         public int Status { get; set; } // OrderStatus
         public DateTime OrderDate { get; set; }
+        public string? CheckoutUrl { get; set; }
+        public string? QrCode { get; set; }
     }
 }
