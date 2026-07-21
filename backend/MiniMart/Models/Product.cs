@@ -1,4 +1,3 @@
-
 namespace MiniMart.Models
 {
     public class Product
@@ -34,7 +33,6 @@ namespace MiniMart.Models
 
         public Supplier Supplier { get; set; }
         public ICollection<PromotionProduct> PromotionProducts { get; set; }
-
 
         public ICollection<Batch> Batches { get; set; }
             = new List<Batch>();

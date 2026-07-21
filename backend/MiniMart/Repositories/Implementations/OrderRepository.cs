@@ -118,7 +118,6 @@ namespace MiniMart.Repositories.RepoImplement
             if (DateTime.Now > shift.EndTime)
                 throw new InvalidOperationException("Ca làm việc đã kết thúc. Vui lòng đóng ca trước khi thao tác tiếp.");
 
-            
             Customer? customer = null;
             int loyaltyPointsUsed = 0;
             decimal loyaltyDiscount = 0;

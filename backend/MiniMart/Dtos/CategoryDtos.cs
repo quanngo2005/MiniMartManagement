@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace MiniMart.DTOs
 {
     public class CategoryDto

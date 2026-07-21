@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MiniMart.DTOs;
 using MiniMart.Models;
-using MiniMart.DTOs;
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Services.Interfaces

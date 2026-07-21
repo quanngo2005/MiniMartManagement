@@ -222,7 +222,7 @@ namespace MiniMart.Repositories.Implementations
                     CategoryName = p.Category.CategoryName
                 })
                 // Ưu tiên hiển thị các mặt hàng tồn kho ít nhất (sắp hết hàng) lên đầu
-                .OrderBy(p => p.CurrentStock - p.MinimumStock) 
+                .OrderBy(p => p.CurrentStock - p.MinimumStock)
                 .ToListAsync();
 
             return result;
@@ -280,6 +280,7 @@ namespace MiniMart.Repositories.Implementations
                     : 0
             });
         }
+
         public async Task<IEnumerable<HourlyRevenueDto>> GetHourlyRevenueAsync(DateTime date)
         {
             var query = await _context.Orders

@@ -60,7 +60,7 @@ namespace MiniMart.Repositories.RepoImplement
             existing.Email = employee.Email;
             existing.Address = employee.Address;
             existing.Username = employee.Username;
-            
+
             if (!string.IsNullOrEmpty(employee.PasswordHash))
             {
                 existing.PasswordHash = employee.PasswordHash;

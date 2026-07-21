@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -55,23 +53,20 @@ namespace MiniMart.Shared.Utils
                 }
             }
             string queryString = data.ToString();
-            
+
             baseUrl += "?" + queryString;
             String signData = queryString;
             if (signData.Length > 0)
             {
-
-                signData= signData.Remove(data.Length - 1, 1);
+                signData = signData.Remove(data.Length - 1, 1);
             }
-            string vnp_SecureHash = Utils.HmacSHA512(vnp_HashSecret , signData);
+            string vnp_SecureHash = Utils.HmacSHA512(vnp_HashSecret, signData);
             baseUrl += "vnp_SecureHash=" + vnp_SecureHash;
-           
+
             return baseUrl;
         }
 
-        
-
-        #endregion
+        #endregion Request
 
         #region Response process
 
@@ -81,9 +76,9 @@ namespace MiniMart.Shared.Utils
             string myChecksum = Utils.HmacSHA512(secretKey, rspRaw);
             return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
         }
+
         private string GetResponseData()
         {
-
             StringBuilder data = new StringBuilder();
             if (_responseData.ContainsKey("vnp_SecureHashType"))
             {
@@ -97,7 +92,7 @@ namespace MiniMart.Shared.Utils
             {
                 if (!String.IsNullOrEmpty(kv.Value))
                 {
-                    data.Append(WebUtility.UrlEncode( kv.Key) + "=" + WebUtility.UrlEncode(kv.Value )+ "&");
+                    data.Append(WebUtility.UrlEncode(kv.Key) + "=" + WebUtility.UrlEncode(kv.Value) + "&");
                 }
             }
             //remove last '&'
@@ -108,16 +103,14 @@ namespace MiniMart.Shared.Utils
             return data.ToString();
         }
 
-        #endregion
+        #endregion Response process
     }
 
     public class Utils
     {
-         
-
         public static String HmacSHA512(string key, String inputData)
         {
-            var hash = new StringBuilder(); 
+            var hash = new StringBuilder();
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
             byte[] inputBytes = Encoding.UTF8.GetBytes(inputData);
             using (var hmac = new HMACSHA512(keyBytes))
@@ -131,6 +124,7 @@ namespace MiniMart.Shared.Utils
 
             return hash.ToString();
         }
+
         //public static string GetIpAddress()
         //{
         //    string ipAddress;

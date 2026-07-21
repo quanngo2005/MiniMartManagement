@@ -1,12 +1,11 @@
-using System.Security.Cryptography;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Http;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using System.Security.Cryptography;
 
 namespace MiniMart.Services.Implementations
 {

@@ -1,4 +1,3 @@
-
 namespace MiniMart.Models
 {
     public class TaxRate

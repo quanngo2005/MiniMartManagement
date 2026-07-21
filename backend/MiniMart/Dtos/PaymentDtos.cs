@@ -18,6 +18,7 @@ namespace MiniMart.DTOs
     {
         [Required]
         public int OrderId { get; set; }
+
         [Required]
         public PaymentMethod PaymentMethod { get; set; }
     }
@@ -34,7 +35,7 @@ namespace MiniMart.DTOs
     {
         public bool IsSuccess { get; set; }
         public string TransactionRef { get; set; } = string.Empty;
-        public decimal Amount { get; set; } 
+        public decimal Amount { get; set; }
         public string ErrorMessage { get; set; } = string.Empty;
     }
 
@@ -54,4 +55,3 @@ namespace MiniMart.DTOs
     //    public string vnp_SecureHash { get; set; } = string.Empty;
     //}
 }
-

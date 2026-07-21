@@ -47,6 +47,5 @@ namespace MiniMart.Controllers
             var created = await _inventoryService.CreateInventoryTransactionAsync(createDto);
             return CreatedAtAction(nameof(GetInventoryTransactionById), new { id = created.InventoryTransactionId }, created);
         }
-
     }
 }

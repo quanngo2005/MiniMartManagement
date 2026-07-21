@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using MiniMart.Data;
 using MiniMart.DTOs;
 using MiniMart.Models;
-using MiniMart.Shared.Authorization;
 
 namespace MiniMart.Controllers
 {

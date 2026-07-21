@@ -1,7 +1,6 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;

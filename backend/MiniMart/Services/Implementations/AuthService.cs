@@ -1,13 +1,13 @@
-using System.Security.Cryptography;
 using AutoMapper;
 using Microsoft.Extensions.Options;
 using MiniMart.DTOs;
-using MiniMart.Shared.Exceptions;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
-using MiniMart.Shared.Settings;
 using MiniMart.Services.Interfaces;
+using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Settings;
+using System.Security.Cryptography;
 
 namespace MiniMart.Services
 {

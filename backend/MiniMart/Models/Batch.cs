@@ -1,4 +1,3 @@
-
 using MiniMart.Models.Enums;
 
 namespace MiniMart.Models
@@ -39,8 +38,8 @@ namespace MiniMart.Models
         public int? ReceiptId { get; set; }
 
         public Receipt? Receipt { get; set; }
+
         public ICollection<InventoryTransaction> InventoryTransactions { get; set; }
             = new List<InventoryTransaction>();
-
     }
 }
