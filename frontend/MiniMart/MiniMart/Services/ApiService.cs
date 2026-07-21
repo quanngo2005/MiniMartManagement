@@ -411,5 +411,46 @@ namespace MiniMart.Services
                 return (false, null, ex.Message);
             }
         }
+
+        public async Task<string> CheckPayOSStatusAsync(int orderId, long payosOrderCode)
+        {
+            try
+            {
+                var response = await _client.GetAsync($"/api/orders/{orderId}/payos-status/{payosOrderCode}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+                    if (result.TryGetProperty("status", out var statusProp))
+                    {
+                        return statusProp.GetString() ?? "";
+                    }
+                }
+                return "";
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        public async Task<bool> CancelPayOSAsync(int orderId, long payosOrderCode)
+        {
+            try
+            {
+                string csrfToken = await FetchCsrfTokenAsync();
+                var request = new HttpRequestMessage(HttpMethod.Post, $"/api/orders/{orderId}/cancel-payos/{payosOrderCode}");
+                if (!string.IsNullOrEmpty(csrfToken))
+                {
+                    request.Headers.Add("X-XSRF-TOKEN", csrfToken);
+                }
+                
+                var response = await _client.SendAsync(request);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
