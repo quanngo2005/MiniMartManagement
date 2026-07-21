@@ -129,7 +129,7 @@ namespace MiniMart.Repositories.RepoImplement
                 {
                     loyaltyPointsUsed = Math.Min(request.LoyaltyPointsToUse, customer.Point);
                     // BR-LYT-02
-                    loyaltyDiscount = loyaltyPointsUsed;
+                    loyaltyDiscount = loyaltyPointsUsed * 1000m;
                 }
             }
 
@@ -270,115 +270,131 @@ namespace MiniMart.Repositories.RepoImplement
             }
 
             var createdAt = now;
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            var strategy = _context.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync(async () =>
             {
-                var order = new Order
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    OrderCode = await GenerateNextOrderCodeAsync(),
-                    SubTotal = subTotal,
-                    TaxAmount = taxAmount,
-                    DiscountAmount = discountAmount,
-                    FinalAmount = finalAmount,
-                    PaidAmount = request.PaidAmount,
-                    ChangeAmount = changeAmount,
-                    Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
-                    CreatedAt = createdAt,
-                    OrderDate = createdAt,
-                    Note = request.Note,
-                    EmployeeId = request.EmployeeId,
-                    CustomerId = request.CustomerId,
-                    ShiftId = request.ShiftId
-                };
+                    var order = new Order
+                    {
+                        OrderCode = await GenerateNextOrderCodeAsync(),
+                        SubTotal = subTotal,
+                        TaxAmount = taxAmount,
+                        DiscountAmount = discountAmount,
+                        FinalAmount = finalAmount,
+                        PaidAmount = request.PaidAmount,
+                        ChangeAmount = changeAmount,
+                        Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
+                        CreatedAt = createdAt,
+                        OrderDate = createdAt,
+                        Note = request.Note,
+                        EmployeeId = request.EmployeeId,
+                        CustomerId = request.CustomerId,
+                        ShiftId = request.ShiftId
+                    };
 
-                await _context.Orders.AddAsync(order);
-                await _context.SaveChangesAsync();
+                    await _context.Orders.AddAsync(order);
+                    await _context.SaveChangesAsync();
 
-                foreach (var detail in orderDetails)
-                    detail.OrderId = order.OrderId;
-
-                await _context.OrderDetails.AddRangeAsync(orderDetails);
-
-                int pointsEarned = 0;
-                if (request.PaymentMethod == PaymentMethod.Cash)
-                {
                     foreach (var detail in orderDetails)
-                    {
-                        var product = await _context.Products.FindAsync(detail.ProductId);
-                        int previousStock = product!.StockQuantity;
-                        product.StockQuantity -= detail.Quantity;
+                        detail.OrderId = order.OrderId;
 
-                        _context.InventoryTransactions.Add(new InventoryTransaction
+                    await _context.OrderDetails.AddRangeAsync(orderDetails);
+
+                    int pointsEarned = 0;
+                    if (request.PaymentMethod == PaymentMethod.Cash)
+                    {
+                        foreach (var detail in orderDetails)
                         {
-                            TransactionType = InventoryTransactionType.Sale,
-                            Quantity = detail.Quantity,
-                            PreviousStock = previousStock,
-                            CurrentStock = product.StockQuantity,
-                            ReferenceType = ReferenceType.Order,
-                            ReferenceId = order.OrderId,
-                            ProductId = detail.ProductId,
-                            EmployeeId = request.EmployeeId,
-                            Note = detail.IsGift
-                                ? $"Quà tặng khuyến mãi - Đơn {order.OrderCode}"
-                                : $"Bán hàng - Đơn {order.OrderCode}"
-                        });
+                            var product = await _context.Products.FindAsync(detail.ProductId);
+                            int previousStock = product!.StockQuantity;
+                            product.StockQuantity -= detail.Quantity;
+
+                            _context.InventoryTransactions.Add(new InventoryTransaction
+                            {
+                                TransactionType = InventoryTransactionType.Sale,
+                                Quantity = detail.Quantity,
+                                PreviousStock = previousStock,
+                                CurrentStock = product.StockQuantity,
+                                ReferenceType = ReferenceType.Order,
+                                ReferenceId = order.OrderId,
+                                ProductId = detail.ProductId,
+                                EmployeeId = request.EmployeeId,
+                                Note = detail.IsGift
+                                    ? $"Quà tặng khuyến mãi - Đơn {order.OrderCode}"
+                                    : $"Bán hàng - Đơn {order.OrderCode}"
+                            });
+                        }
+
+                        pointsEarned = (int)(finalAmount / 50000);
+                        if (customer != null)
+                        {
+                            customer.Point -= loyaltyPointsUsed;
+                            customer.Point += pointsEarned;
+                        }
+
+                        shift.Revenue += finalAmount;
                     }
 
-                    pointsEarned = (int)(finalAmount / 50000);
-                    if (customer != null)
-                    {
-                        customer.Point -= loyaltyPointsUsed;
-                        customer.Point += pointsEarned;
-                    }
-
-                    shift.Revenue += finalAmount;
-                }
+                // Luôn lưu lịch sử Payment cho Cash. Đối với VietQR, lưu lịch sử Payment trạng thái Pending.
+                var paymentRecord = new Payment
+                {
+                    OrderId = order.OrderId,
+                    PaymentMethod = request.PaymentMethod,
+                    Amount = finalAmount,
+                    TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
+                    PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : DateTime.MinValue,
+                    Status = request.PaymentMethod == PaymentMethod.Cash ? PaymentStatus.Success : PaymentStatus.Pending
+                };
+                await _context.Payments.AddAsync(paymentRecord);
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return new CheckoutResponseDto
-                {
-                    OrderId = order.OrderId,
-                    OrderCode = order.OrderCode,
-                    SubTotal = subTotal,
-                    TaxAmount = taxAmount,
-                    DiscountAmount = discountAmount,
-                    FinalAmount = finalAmount,
-                    PaidAmount = request.PaidAmount,
-                    ChangeAmount = changeAmount,
-                    LoyaltyPointsUsed = loyaltyPointsUsed,
-                    LoyaltyPointsEarned = pointsEarned,
-                    CustomerPointBalance = customer?.Point,
-                    PaymentMethod = request.PaymentMethod,
-                    Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
-                    Items = orderDetails.Select(od => new OrderDetailDto
+                    return new CheckoutResponseDto
                     {
-                        ProductId = od.ProductId,
-                        Quantity = od.Quantity,
-                        UnitPrice = od.UnitPrice,
-                        DiscountAmount = od.DiscountAmount,
-                        TotalPrice = od.TotalPrice,
-                        VatRate = od.VatRate,
-                        VatAmount = od.VatAmount,
-                        IsGift = od.IsGift,
-                        AppliedPromotionId = od.AppliedPromotionId,
-                        TaxDescription = string.Empty
-                    }).ToList()
-                };
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                await transaction.RollbackAsync();
-                throw new DomainException(
-                    "Batch data was updated by another operation. Please refresh and try again.",
-                    StatusCodes.Status409Conflict);
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                        OrderId = order.OrderId,
+                        OrderCode = order.OrderCode,
+                        SubTotal = subTotal,
+                        TaxAmount = taxAmount,
+                        DiscountAmount = discountAmount,
+                        FinalAmount = finalAmount,
+                        PaidAmount = request.PaidAmount,
+                        ChangeAmount = changeAmount,
+                        LoyaltyPointsUsed = loyaltyPointsUsed,
+                        LoyaltyPointsEarned = pointsEarned,
+                        CustomerPointBalance = customer?.Point,
+                        PaymentMethod = request.PaymentMethod,
+                        Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
+                        Items = orderDetails.Select(od => new OrderDetailDto
+                        {
+                            ProductId = od.ProductId,
+                            Quantity = od.Quantity,
+                            UnitPrice = od.UnitPrice,
+                            DiscountAmount = od.DiscountAmount,
+                            TotalPrice = od.TotalPrice,
+                            VatRate = od.VatRate,
+                            VatAmount = od.VatAmount,
+                            IsGift = od.IsGift,
+                            AppliedPromotionId = od.AppliedPromotionId,
+                            TaxDescription = string.Empty
+                        }).ToList()
+                    };
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DomainException(
+                        "Batch data was updated by another operation. Please refresh and try again.",
+                        StatusCodes.Status409Conflict);
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
         }
 
         public async Task<Shift?> GetActiveShiftAsync(int shiftId)
@@ -435,46 +451,71 @@ namespace MiniMart.Repositories.RepoImplement
 
             if (order == null || order.Status != OrderStatus.Pending) return;
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                await ConsumeSaleStockAsync(
-                    order.OrderId,
-                    order.OrderCode,
-                    order.EmployeeId,
-                    order.OrderDetails);
-
-                int loyaltyPointsUsed = (int)order.DiscountAmount;
-                int pointsEarned = (int)(order.FinalAmount / 50000);
-
-                if (order.Customer != null)
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    order.Customer.Point -= loyaltyPointsUsed;
-                    order.Customer.Point += pointsEarned;
+                    await ConsumeSaleStockAsync(
+                        order.OrderId,
+                        order.OrderCode,
+                        order.EmployeeId,
+                        order.OrderDetails);
+
+                    int loyaltyPointsUsed = (int)order.DiscountAmount;
+                    int pointsEarned = (int)(order.FinalAmount / 50000);
+
+                    if (order.Customer != null)
+                    {
+                        order.Customer.Point -= loyaltyPointsUsed;
+                        order.Customer.Point += pointsEarned;
+                    }
+
+                    if (order.Shift != null)
+                    {
+                        order.Shift.Revenue += order.FinalAmount;
+                    }
+
+                    order.Status = OrderStatus.Completed;
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DomainException(
+                        "Batch data was updated by another operation. Please refresh and try again.",
+                        StatusCodes.Status409Conflict);
                 }
 
-                if (order.Shift != null)
-                {
-                    order.Shift.Revenue += order.FinalAmount;
-                }
-
+                order.Shift.Revenue += order.FinalAmount;
                 order.Status = OrderStatus.Completed;
+
+                var payment = await _context.Payments.FirstOrDefaultAsync(p => p.OrderId == order.OrderId);
+                if (payment != null)
+                {
+                    payment.Status = PaymentStatus.Success;
+                    payment.PaidAt = DateTime.UtcNow.AddHours(7);
+                }
+                else
+                {
+                    var newPayment = new Payment
+                    {
+                        OrderId = order.OrderId,
+                        PaymentMethod = PaymentMethod.VietQR, // Hay lấy từ order nếu có
+                        Amount = order.FinalAmount,
+                        TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
+                        PaidAt = DateTime.UtcNow.AddHours(7),
+                        Status = PaymentStatus.Success
+                    };
+                    await _context.Payments.AddAsync(newPayment);
+                }
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                await transaction.RollbackAsync();
-                throw new DomainException(
-                    "Batch data was updated by another operation. Please refresh and try again.",
-                    StatusCodes.Status409Conflict);
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            });
         }
 
         private async Task ConsumeSaleStockAsync(

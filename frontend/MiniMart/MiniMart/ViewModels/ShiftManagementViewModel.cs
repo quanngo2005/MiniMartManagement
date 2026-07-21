@@ -17,6 +17,26 @@ namespace MiniMart.ViewModels
         [ObservableProperty]
         private string _errorMessage = string.Empty;
 
+        [ObservableProperty]
+        private string _expectedShiftInfo = string.Empty;
+
+        public ShiftManagementViewModel()
+        {
+            var hour = System.DateTime.Now.Hour;
+            if (hour >= 6 && hour < 11)
+            {
+                ExpectedShiftInfo = $"Ca hiện tại dự kiến: Ca Sáng (06:00 - 11:00)";
+            }
+            else if (hour >= 11 && hour < 16)
+            {
+                ExpectedShiftInfo = $"Ca hiện tại dự kiến: Ca Chiều (11:00 - 16:00)";
+            }
+            else
+            {
+                ExpectedShiftInfo = $"Ca hiện tại dự kiến: Ca Tối (16:00 - 22:30)";
+            }
+        }
+
         [RelayCommand]
         private async Task StartShiftAsync(Window window)
         {
