@@ -1,4 +1,4 @@
-﻿namespace MiniMart.Models.Enums
+namespace MiniMart.Models.Enums
 {
     public enum PaymentMethod
     {
@@ -8,5 +8,6 @@
         Momo = 4,
         VNPay = 5,
         ZaloPay = 6,
+        VietQR = 7,
     }
 }

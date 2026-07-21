@@ -129,7 +129,7 @@ namespace MiniMart.Repositories.RepoImplement
                 {
                     loyaltyPointsUsed = Math.Min(request.LoyaltyPointsToUse, customer.Point);
                     // BR-LYT-02
-                    loyaltyDiscount = loyaltyPointsUsed;
+                    loyaltyDiscount = loyaltyPointsUsed * 1000m;
                 }
             }
 
@@ -337,8 +337,20 @@ namespace MiniMart.Repositories.RepoImplement
                         shift.Revenue += finalAmount;
                     }
 
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                // Luôn lưu lịch sử Payment cho Cash. Đối với VietQR, lưu lịch sử Payment trạng thái Pending.
+                var paymentRecord = new Payment
+                {
+                    OrderId = order.OrderId,
+                    PaymentMethod = request.PaymentMethod,
+                    Amount = finalAmount,
+                    TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
+                    PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : DateTime.MinValue,
+                    Status = request.PaymentMethod == PaymentMethod.Cash ? PaymentStatus.Success : PaymentStatus.Pending
+                };
+                await _context.Payments.AddAsync(paymentRecord);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
                     return new CheckoutResponseDto
                     {
@@ -477,12 +489,45 @@ namespace MiniMart.Repositories.RepoImplement
                         "Batch data was updated by another operation. Please refresh and try again.",
                         StatusCodes.Status409Conflict);
                 }
-                catch
+
+                order.Shift.Revenue += order.FinalAmount;
+                order.Status = OrderStatus.Completed;
+
+                var payment = await _context.Payments.FirstOrDefaultAsync(p => p.OrderId == order.OrderId);
+                if (payment != null)
                 {
-                    await transaction.RollbackAsync();
-                    throw;
+                    payment.Status = PaymentStatus.Success;
+                    payment.PaidAt = DateTime.UtcNow.AddHours(7);
                 }
-            });
+                else
+                {
+                    var newPayment = new Payment
+                    {
+                        OrderId = order.OrderId,
+                        PaymentMethod = PaymentMethod.VietQR, // Hay lấy từ order nếu có
+                        Amount = order.FinalAmount,
+                        TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
+                        PaidAt = DateTime.UtcNow.AddHours(7),
+                        Status = PaymentStatus.Success
+                    };
+                    await _context.Payments.AddAsync(newPayment);
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                await transaction.RollbackAsync();
+                throw new DomainException(
+                    "Batch data was updated by another operation. Please refresh and try again.",
+                    StatusCodes.Status409Conflict);
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         private async Task ConsumeSaleStockAsync(

@@ -362,13 +362,13 @@
                         <!-- Payment Dropdown -->
                         <!-- Ẩn VNPay theo yêu cầu -->
                         <TextBlock Text="Payment Method" FontSize="13" Foreground="#64748B" Margin="0,0,0,5"/>
-                        <ComboBox Height="45" Margin="0,0,0,15" SelectedIndex="0" VerticalContentAlignment="Center" FontSize="16" Padding="10,0">
+                        <ComboBox Height="45" Margin="0,0,0,15" SelectedIndex="{Binding SelectedPaymentMethod}" VerticalContentAlignment="Center" FontSize="16" Padding="10,0">
                             <ComboBoxItem Content="Cash"/>
+                            <ComboBoxItem Content="VietQR (PayOS)"/>
                         </ComboBox>
 
-                        <!-- Nút Checkout -->
-                        <!-- Nút Checkout -->
-                        <Button Content="Checkout" Command="{Binding CheckoutCommand}" Height="60" Background="#4F46E5" Foreground="White" FontSize="20" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                        <!-- Nút Checkout Chung -->
+                        <Button Content="THANH TOÁN" Command="{Binding UnifiedCheckoutCommand}" Height="60" Background="#10B981" Foreground="White" FontSize="18" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="8"/>
@@ -452,7 +452,7 @@
             </Grid> <!-- End Shift Info Grid -->
         </Grid>
 
-        <!-- ================= LỚP PHỦ POPUP THANH TOÁN QR CODE ================= -->
+        <!-- ================= LỚP PHỦ POPUP THANH TOÁN QR CODE (VNPay - cũ) ================= -->
         <Grid Grid.Row="1" Background="#B2000000" Visibility="{Binding IsCheckoutPopupOpen, Converter={StaticResource BoolToVis}}">
             <Border Background="White" Width="450" Height="550" CornerRadius="16" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <Border.Effect>
@@ -477,6 +477,50 @@
                             </Style>
                         </Button.Resources>
                     </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ================= LỚP PHỦ POPUP THANH TOÁN VietQR (PayOS) ================= -->
+        <Grid Grid.Row="1" Background="#B2000000" Visibility="{Binding IsVietQRPopupOpen, Converter={StaticResource BoolToVis}}">
+            <Border Background="White" Width="450" Height="550" CornerRadius="16" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="25" ShadowDepth="5" Opacity="0.4"/>
+                </Border.Effect>
+                <StackPanel Margin="30">
+                    <TextBlock Text="Thanh toán VietQR" FontSize="28" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    <TextBlock Text="Quét mã QR qua ứng dụng ngân hàng" FontSize="16" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,0,0,25"/>
+
+                    <Border Width="250" Height="250" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="2" CornerRadius="8">
+                        <Image Source="{Binding VietQRCodeImage}" Stretch="Uniform" Margin="10"/>
+                    </Border>
+
+                    <!-- Hiển thị lại số tiền cần thanh toán cho khách xem -->
+                    <TextBlock Text="{Binding ActiveTab.FinalAmount, StringFormat=Số tiền: {0:N0} VND}" FontSize="22" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center" Margin="0,25,0,0"/>
+
+                    <Grid Margin="0,25,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Button Grid.Column="0" Content="Ẩn QR" Command="{Binding HideQRCommand}" Height="50" Background="#F1F5F9" Foreground="#64748B" FontSize="16" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="8"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        
+                        <Button Grid.Column="2" Content="Hủy thanh toán" Command="{Binding CancelQRCommand}" Height="50" Background="#EF4444" Foreground="White" FontSize="16" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="8"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
                 </StackPanel>
             </Border>
         </Grid>
