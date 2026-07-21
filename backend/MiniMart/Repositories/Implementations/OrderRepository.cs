@@ -515,19 +515,7 @@ namespace MiniMart.Repositories.RepoImplement
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                await transaction.RollbackAsync();
-                throw new DomainException(
-                    "Batch data was updated by another operation. Please refresh and try again.",
-                    StatusCodes.Status409Conflict);
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            });
         }
 
         private async Task ConsumeSaleStockAsync(
