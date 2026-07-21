@@ -5,19 +5,19 @@ namespace MiniMart.Repositories.RepoInterface
 {
     public interface IOrderRepository
     {
-        // GET /api/orders 
+        // GET /api/orders
         IQueryable<Order> GetAllOrdersQueryable();
 
-        // GET /api/orders/{id} 
+        // GET /api/orders/{id}
         Task<Order?> GetOrderByIdAsync(int id);
 
-        // GET /api/orders/{id}/receipt 
+        // GET /api/orders/{id}/receipt
         Task<OrderReceiptDto?> GetOrderReceiptAsync(int id);
 
-        // POST /api/orders 
+        // POST /api/orders
         Task<Order> CreateOrderAsync(Order order);
 
-        // POST /api/orders/checkout 
+        // POST /api/orders/checkout
         Task<CheckoutResponseDto> CheckoutAsync(CheckoutRequestDto request);
 
         // Cập nhật tồn kho và điểm khi thanh toán thành công
@@ -25,7 +25,9 @@ namespace MiniMart.Repositories.RepoInterface
 
         // Kiểm tra nghiệp vụ
         Task<Shift?> GetActiveShiftAsync(int shiftId); //BR-POS-01
+
         Task<Customer?> GetCustomerByIdAsync(int customerId); //Thông tin + điểm KH
+
         Task<Product?> GetProductByIdAsync(int productId); //BR-INV-01
     }
 }

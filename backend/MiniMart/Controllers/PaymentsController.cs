@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MiniMart.DTOs;
 using MiniMart.Models.Enums;
@@ -11,6 +10,7 @@ namespace MiniMart.Controllers
     public class PaymentsController : ControllerBase
     {
         private readonly IPaymentRepository _paymentRepository;
+
         public PaymentsController(IPaymentRepository paymentRepository)
         {
             _paymentRepository = paymentRepository;
@@ -20,7 +20,7 @@ namespace MiniMart.Controllers
         public async Task<IActionResult> CreatePaymentUrl([FromBody] PaymentRequestDto req)
         {
             var rs = await _paymentRepository.CreatePaymentUrlAsync(req, HttpContext);
-           
+
             if (!rs.IsSuccess) return BadRequest(rs);
 
             return Ok(rs);
@@ -44,7 +44,7 @@ namespace MiniMart.Controllers
             }
 
             bool rs = await _paymentRepository.ProcessPaymentCallbackAsync(Request.Query, gatewayType);
-            
+
             if (rs)
             {
                 if (gatewayType == PaymentMethod.VNPay)
@@ -61,7 +61,7 @@ namespace MiniMart.Controllers
             {
                 return Ok(new { RspCode = "97", Message = "Invalid Signature" });
             }
-            
+
             return BadRequest(new { Message = "Signature validation failed" });
         }
 
@@ -69,7 +69,7 @@ namespace MiniMart.Controllers
         public async Task<IActionResult> CheckStatus(string transactionRef)
         {
             var payment = await _paymentRepository.GetPaymentStatusAsync(transactionRef);
-            
+
             if (payment == null) return NotFound();
 
             return Ok(payment);

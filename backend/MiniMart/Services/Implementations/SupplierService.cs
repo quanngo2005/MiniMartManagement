@@ -1,6 +1,5 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Http;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;

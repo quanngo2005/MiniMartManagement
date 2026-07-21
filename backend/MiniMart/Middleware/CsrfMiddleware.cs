@@ -1,7 +1,7 @@
+using MiniMart.DTOs;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using MiniMart.DTOs;
 
 namespace MiniMart.Middleware
 {

@@ -3,18 +3,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OData.ModelBuilder;
 using MiniMart.Data;
+using MiniMart.Hubs;
 using MiniMart.Mapping;
 using MiniMart.Middleware;
 using MiniMart.Models;
-using MiniMart.Shared.Extensions;
-using MiniMart.Repositories.RepoInterface;
-using MiniMart.Repositories.RepoImplement;
 using MiniMart.Repositories.Implementations;
 using MiniMart.Repositories.Interfaces;
+using MiniMart.Repositories.RepoImplement;
+using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services;
-using MiniMart.Services.Interfaces;
 using MiniMart.Services.Implementations;
-using MiniMart.Hubs;
+using MiniMart.Services.Interfaces;
+using MiniMart.Shared.Extensions;
 using MiniMart.Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,7 +48,15 @@ odataBuilder.EntitySet<StockCount>("StockCounts");
 // ── Infrastructure ────────────────────────────────────────────────
 builder.Services.AddDbContext<MiniMartDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null
+            );
+        }));
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -132,14 +140,11 @@ var app = builder.Build();
 // ── Pipeline ──────────────────────────────────────────────────────
 app.UseMiddleware<ExceptionMiddleware>();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI();
+
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 

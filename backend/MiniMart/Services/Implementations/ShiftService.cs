@@ -1,6 +1,5 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using MiniMart.DTOs;
 using MiniMart.Models;
@@ -53,7 +52,7 @@ namespace MiniMart.Services.Implementations
             DateTime startTime;
             DateTime endTime;
             string shiftCodePrefix;
-            
+
             if (hour >= 6 && hour < 11)
             {
                 shiftName = "Ca sáng";
@@ -115,7 +114,7 @@ namespace MiniMart.Services.Implementations
             DateTime startTime;
             DateTime endTime;
             string shiftCodePrefix;
-            
+
             if (hour >= 6 && hour < 11)
             {
                 shiftName = "Ca sáng";

@@ -5,8 +5,6 @@ namespace MiniMart.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // Tạm thời mở public để test trên Swagger
-    // [Authorize(Roles = "Manager")] 
     public class ReportsController : ControllerBase
     {
         private readonly IReportService _reportService;

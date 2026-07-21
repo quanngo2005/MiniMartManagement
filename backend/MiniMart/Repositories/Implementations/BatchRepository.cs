@@ -51,7 +51,6 @@ namespace MiniMart.Repositories.RepoImplement
                 .FirstOrDefaultAsync(b => b.BatchId == id && !b.IsDeleted);
         }
 
-
         public async Task<bool> BatchExistsAsync(int batchId)
         {
             return await _context.Batches.AnyAsync(b => b.BatchId == batchId);

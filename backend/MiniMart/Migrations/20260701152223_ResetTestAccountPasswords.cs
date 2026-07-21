@@ -9,8 +9,9 @@ namespace MiniMart.Migrations
     {
         // Passwords reset to: Manager@123
         // Hash: PBKDF2-SHA256, 100000 iterations, SHA256
-        private const string AdminHash    = "PBKDF2-SHA256:100000:AAAAAAAAAAAAAAAAAAAAAA==:r0GIBpkS8e7GxDqGPi9RRGMTbz3e+lNuLZZL8JSwPCY=";
-        private const string ManagerHash  = "PBKDF2-SHA256:100000:4i06mXfdgXI4rFm+51SILA==:TSBEaTARkBveb/293mpk1+oJ98Ai3yoTyDllFlZIiO0=";
+        private const string AdminHash = "PBKDF2-SHA256:100000:AAAAAAAAAAAAAAAAAAAAAA==:r0GIBpkS8e7GxDqGPi9RRGMTbz3e+lNuLZZL8JSwPCY=";
+
+        private const string ManagerHash = "PBKDF2-SHA256:100000:4i06mXfdgXI4rFm+51SILA==:TSBEaTARkBveb/293mpk1+oJ98Ai3yoTyDllFlZIiO0=";
 
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

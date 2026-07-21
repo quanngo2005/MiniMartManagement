@@ -74,21 +74,21 @@ namespace MiniMart.Repositories.Implementations
                 Status = true,
             };
 
-                foreach (var detail in order.OrderDetails)
+            foreach (var detail in order.OrderDetails)
+            {
+                invoice.EInvoiceDetails.Add(new EInvoiceDetail
                 {
-                    invoice.EInvoiceDetails.Add(new EInvoiceDetail
-                    {
-                        OrderDetailId = detail.OrderDetailId,
-                        ProductName = detail.Product?.ProductName ?? string.Empty,
-                        Unit = string.Empty,
-                        Quantity = detail.Quantity,
-                        UnitPrice = detail.UnitPrice,
-                        DiscountAmount = detail.DiscountAmount,
-                        AmountBeforeVAT = detail.TotalPrice - detail.DiscountAmount,
-                        VatRate = detail.VatRate,
-                        VatAmount = detail.VatAmount,
-                        AmountAfterVAT = detail.TotalPrice - detail.DiscountAmount + detail.VatAmount,
-                    });
+                    OrderDetailId = detail.OrderDetailId,
+                    ProductName = detail.Product?.ProductName ?? string.Empty,
+                    Unit = string.Empty,
+                    Quantity = detail.Quantity,
+                    UnitPrice = detail.UnitPrice,
+                    DiscountAmount = detail.DiscountAmount,
+                    AmountBeforeVAT = detail.TotalPrice - detail.DiscountAmount,
+                    VatRate = detail.VatRate,
+                    VatAmount = detail.VatAmount,
+                    AmountAfterVAT = detail.TotalPrice - detail.DiscountAmount + detail.VatAmount,
+                });
             }
 
             await _context.EInvoices.AddAsync(invoice);
