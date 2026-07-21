@@ -202,7 +202,7 @@ namespace MiniMart.Services.Implementations
             shift.CashierId = openRequest.CashierId;
             shift.StartCash = openRequest.StartCash;
             shift.Status = ShiftStatus.Working;
-            shift.StartedAt = DateTime.Now;
+            shift.StartedAt = DateTime.UtcNow.AddHours(7);
             if (!string.IsNullOrEmpty(openRequest.Note))
             {
                 shift.Note = openRequest.Note;
@@ -227,7 +227,7 @@ namespace MiniMart.Services.Implementations
 
             shift.EndCash = closeRequest.EndCash;
             shift.Status = ShiftStatus.Closed;
-            shift.ClosedAt = DateTime.Now;
+            shift.ClosedAt = DateTime.UtcNow.AddHours(7);
             if (!string.IsNullOrEmpty(closeRequest.Note))
             {
                 shift.Note = closeRequest.Note;

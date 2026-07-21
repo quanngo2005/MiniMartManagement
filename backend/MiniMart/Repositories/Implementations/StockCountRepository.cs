@@ -147,17 +147,21 @@ namespace MiniMart.Repositories.Implementations
                 return;
             }
 
-            await using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                await operation();
-                await transaction.CommitAsync();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    await operation();
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
         }
 
         public void ApplyOriginalRowVersion(StockCount stockCount, byte[] rowVersion)

@@ -83,18 +83,22 @@ namespace MiniMart.Repositories.RepoImplement
                 return;
             }
 
-            await using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                await operation();
-                await transaction.CommitAsync();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                _context.ChangeTracker.Clear();
-                throw;
-            }
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    await operation();
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    _context.ChangeTracker.Clear();
+                    throw;
+                }
+            });
         }
     }
 }

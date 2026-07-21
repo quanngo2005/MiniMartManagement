@@ -9,6 +9,7 @@ import 'package:mini_mart_management_mobile_app/screens/customer_list_screen.dar
 import 'package:mini_mart_management_mobile_app/screens/batch_status_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_management_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/employee_performance_screen.dart';
+import 'package:mini_mart_management_mobile_app/screens/stock_count_history_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/invoice_list_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_documents_screen.dart';
 import 'package:mini_mart_management_mobile_app/screens/inventory_transactions_screen.dart';
@@ -75,6 +76,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     ManagerNavDestination.categories: 13,
     ManagerNavDestination.customerInformation: 14,
     ManagerNavDestination.returns: 15,
+    ManagerNavDestination.stockCount: 16,
   };
 
   static const _bottomNavDestinations = [
@@ -153,6 +155,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
           CategoryManagementScreen.withProvider(onMenuTap: _openDrawer),
           CustomerListScreen(showBottomNavBar: false, onMenuTap: _openDrawer),
           ManagerReturnListScreen(onMenuTap: _openDrawer),
+          const StockCountHistoryScreen(),
         ],
       ),
       bottomNavigationBar: ManagerBottomNavigationBar(

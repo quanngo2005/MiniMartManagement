@@ -19,6 +19,8 @@ import 'package:mini_mart_management_mobile_app/services/http_client_factory.dar
 import 'package:mini_mart_management_mobile_app/screens/shift_management_screen.dart';
 import 'dart:async';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:mini_mart_management_mobile_app/screens/barcode_scanner_screen.dart';
+import 'package:mini_mart_management_mobile_app/models/scanned_product.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -323,6 +325,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: AppColors.secondary),
     );
+  }
+
+  Future<void> _openBarcodeScanner() async {
+    final cart = context.read<CartProvider>();
+    final scannedList = await Navigator.of(context).push<List<ScannedProduct>>(
+      MaterialPageRoute(builder: (_) => const BarcodeScannerScreen()),
+    );
+    if (scannedList == null || scannedList.isEmpty) return;
+    int addedCount = 0;
+    for (final entry in scannedList) {
+      for (int i = 0; i < entry.quantity; i++) {
+        cart.addItem(entry.product);
+        addedCount++;
+      }
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Đã thêm $addedCount sản phẩm vào giỏ hàng'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   Future<void> _handleCheckout() async {
@@ -1601,7 +1627,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 16.0),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: _openBarcodeScanner,
           backgroundColor: AppColors.primary,
           child: const Icon(Icons.qr_code_scanner, color: Colors.white),
         ),
