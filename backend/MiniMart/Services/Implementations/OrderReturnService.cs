@@ -1,11 +1,13 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Services.Implementations
 {
@@ -19,6 +21,7 @@ namespace MiniMart.Services.Implementations
         private readonly IProductRepository _productRepository;
         private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
+        private readonly ILogger<OrderReturnService> _logger;
 
         public OrderReturnService(
             IOrderReturnRepository orderReturnRepository,
@@ -28,6 +31,7 @@ namespace MiniMart.Services.Implementations
             IInventoryTransactionRepository inventoryTransactionRepository,
             IProductRepository productRepository,
             INotificationService notificationService,
+            ILogger<OrderReturnService> logger,
             IMapper mapper)
         {
             _orderReturnRepository = orderReturnRepository;
@@ -37,6 +41,7 @@ namespace MiniMart.Services.Implementations
             _inventoryTransactionRepository = inventoryTransactionRepository;
             _productRepository = productRepository;
             _notificationService = notificationService;
+            _logger = logger;
             _mapper = mapper;
         }
 
@@ -72,7 +77,7 @@ namespace MiniMart.Services.Implementations
             }
 
             // 3. Check if return request is within 48h limit
-            var timeDiff = DateTime.Now - order.OrderDate;
+            var timeDiff = HanoiTime.Now - order.OrderDate;
             if (timeDiff.TotalHours > 48)
             {
                 throw new DomainException("Hóa đơn đã quá hạn hoàn trả 48 giờ kể từ lúc mua.", StatusCodes.Status400BadRequest);
@@ -126,7 +131,7 @@ namespace MiniMart.Services.Implementations
 
             // 5. Generate ReturnCode
             var count = await _orderReturnRepository.GetAllQueryable().CountAsync();
-            var createdAt = DateTime.UtcNow.AddHours(7);
+            var createdAt = HanoiTime.Now;
             var returnCode = $"RET-{createdAt:yyyyMMdd}-{count + 1:D4}";
 
             var orderReturn = new OrderReturn
@@ -147,26 +152,23 @@ namespace MiniMart.Services.Implementations
 
             var created = await _orderReturnRepository.CreateAsync(orderReturn);
 
-            // Trigger SignalR notification to Managers in background
-            _ = Task.Run(async () =>
+            // Send SignalR notification to Managers
+            try
             {
-                try
-                {
-                    await _notificationService.SendToRoleAsync(
-                        "Manager",
-                        "Yêu cầu trả hàng mới",
-                        $"Đơn hàng #{order.OrderCode} có yêu cầu hoàn trả sản phẩm.",
-                        new Dictionary<string, string>
-                        {
-                            { "type", "order_return_request" },
-                            { "orderReturnId", created.OrderReturnId.ToString() }
-                        });
-                }
-                catch
-                {
-                    // Fail silently to avoid blocking client
-                }
-            });
+                await _notificationService.SendToRoleAsync(
+                    "Manager",
+                    "Yêu cầu trả hàng mới",
+                    $"Đơn hàng #{order.OrderCode} có yêu cầu hoàn trả sản phẩm.",
+                    new Dictionary<string, string>
+                    {
+                        { "type", "order_return_request" },
+                        { "orderReturnId", created.OrderReturnId.ToString() }
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send order_return_request notification for OrderReturnId {OrderReturnId}", created.OrderReturnId);
+            }
 
             // Reload database graph details to map to DTO properly
             var result = await _orderReturnRepository.GetByIdAsync(created.OrderReturnId);
@@ -201,7 +203,7 @@ namespace MiniMart.Services.Implementations
 
                     // 2. Restock oldest active batch
                     var oldestBatch = await _batchRepository.GetAllBatchesQueryable()
-                        .Where(b => b.ProductId == detail.ProductId && !b.IsDeleted && b.ExpiryDate >= DateTime.Today)
+                        .Where(b => b.ProductId == detail.ProductId && !b.IsDeleted && b.ExpiryDate >= HanoiTime.Now.Date)
                         .OrderBy(b => b.ExpiryDate)
                         .FirstOrDefaultAsync();
 
@@ -249,27 +251,24 @@ namespace MiniMart.Services.Implementations
             orderReturn.Status = OrderReturnStatus.Approved;
             await _orderReturnRepository.UpdateAsync(orderReturn);
 
-            // Trigger SignalR notification to Cashier in background
-            _ = Task.Run(async () =>
+            // Send SignalR notification to Cashier
+            try
             {
-                try
-                {
-                    await _notificationService.SendToUserAsync(
-                        orderReturn.EmployeeId,
-                        "Yêu cầu trả hàng đã được duyệt",
-                        $"Yêu cầu trả hàng {orderReturn.ReturnCode} đã được phê duyệt.",
-                        new Dictionary<string, string>
-                        {
-                            { "type", "order_return_response" },
-                            { "status", "approved" },
-                            { "orderReturnId", orderReturn.OrderReturnId.ToString() }
-                        });
-                }
-                catch
-                {
-                    // Fail silently
-                }
-            });
+                await _notificationService.SendToUserAsync(
+                    orderReturn.EmployeeId,
+                    "Yêu cầu trả hàng đã được duyệt",
+                    $"Yêu cầu trả hàng {orderReturn.ReturnCode} đã được phê duyệt.",
+                    new Dictionary<string, string>
+                    {
+                        { "type", "order_return_response" },
+                        { "status", "approved" },
+                        { "orderReturnId", orderReturn.OrderReturnId.ToString() }
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send order_return_response (approved) notification for OrderReturnId {OrderReturnId}", orderReturn.OrderReturnId);
+            }
 
             return _mapper.Map<OrderReturnDto>(orderReturn);
         }
@@ -291,27 +290,24 @@ namespace MiniMart.Services.Implementations
             orderReturn.Reason = $"{orderReturn.Reason} | Lý do từ chối: {rejectDto.Note}";
             await _orderReturnRepository.UpdateAsync(orderReturn);
 
-            // Trigger SignalR notification to Cashier in background
-            _ = Task.Run(async () =>
+            // Send SignalR notification to Cashier
+            try
             {
-                try
-                {
-                    await _notificationService.SendToUserAsync(
-                        orderReturn.EmployeeId,
-                        "Yêu cầu trả hàng đã bị từ chối",
-                        $"Yêu cầu trả hàng {orderReturn.ReturnCode} đã bị từ chối.",
-                        new Dictionary<string, string>
-                        {
-                            { "type", "order_return_response" },
-                            { "status", "rejected" },
-                            { "orderReturnId", orderReturn.OrderReturnId.ToString() }
-                        });
-                }
-                catch
-                {
-                    // Fail silently
-                }
-            });
+                await _notificationService.SendToUserAsync(
+                    orderReturn.EmployeeId,
+                    "Yêu cầu trả hàng đã bị từ chối",
+                    $"Yêu cầu trả hàng {orderReturn.ReturnCode} đã bị từ chối.",
+                    new Dictionary<string, string>
+                    {
+                        { "type", "order_return_response" },
+                        { "status", "rejected" },
+                        { "orderReturnId", orderReturn.OrderReturnId.ToString() }
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send order_return_response (rejected) notification for OrderReturnId {OrderReturnId}", orderReturn.OrderReturnId);
+            }
 
             return _mapper.Map<OrderReturnDto>(orderReturn);
         }

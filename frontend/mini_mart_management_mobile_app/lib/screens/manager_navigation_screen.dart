@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mini_mart_management_mobile_app/models/employee_user.dart';
 import 'package:mini_mart_management_mobile_app/providers/order_return_provider.dart';
+import 'package:mini_mart_management_mobile_app/providers/stock_count_provider.dart';
+import 'package:mini_mart_management_mobile_app/models/stock_count.dart';
 import 'package:mini_mart_management_mobile_app/services/signalr_service.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/screens/analyze_screen.dart';
@@ -43,6 +45,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<OrderReturnProvider>().loadAllReturns();
+      context.read<StockCountProvider>().loadStockCounts();
     });
     SignalrService.instance.addListener(_onNotificationReceived);
   }
@@ -56,6 +59,7 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
   void _onNotificationReceived() {
     if (mounted) {
       context.read<OrderReturnProvider>().loadAllReturns();
+      context.read<StockCountProvider>().loadStockCounts();
     }
   }
 
@@ -107,6 +111,10 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final stackIndex = _destinationToIndex[_destination]!;
+    final hasPendingReturns = context.watch<OrderReturnProvider>().pendingReturns.isNotEmpty;
+    final hasPendingStockCounts = context.watch<StockCountProvider>().stockCounts
+        .where((s) => s.status == StockCountStatus.pendingApproval)
+        .isNotEmpty;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -115,6 +123,8 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
         selected: _destination == ManagerNavDestination.customerInformation
             ? ManagerNavDestination.customers
             : _destination,
+        hasPendingReturns: hasPendingReturns,
+        hasPendingStockCounts: hasPendingStockCounts,
         onDestinationSelected: _selectDestination,
       ),
       body: IndexedStack(

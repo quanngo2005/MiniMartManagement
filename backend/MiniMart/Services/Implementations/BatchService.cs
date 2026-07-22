@@ -7,6 +7,7 @@ using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Services
 {
@@ -79,7 +80,7 @@ namespace MiniMart.Services
                         "Batch ID does not exist.",
                         StatusCodes.Status404NotFound);
 
-                if (batch.ExpiryDate.Date >= DateTime.Today)
+                if (batch.ExpiryDate.Date >= HanoiTime.Now.Date)
                 {
                     throw new DomainException(
                         "Only expired batches can be disposed.",

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MiniMart.Data;
 using MiniMart.Models;
 using MiniMart.Repositories.Interfaces;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Repositories.Implementations
 {
@@ -60,7 +61,7 @@ namespace MiniMart.Repositories.Implementations
             var invoice = new EInvoice
             {
                 OrderId = order.OrderId,
-                InvoiceSerial = $"K{DateTime.Now:yy}",
+                InvoiceSerial = $"K{HanoiTime.Now:yy}",
                 InvoiceNumber = await GenerateNextInvoiceNumberAsync(),
                 BuyerTaxCode = string.Empty,
                 BuyerName = order.Customer?.FullName,
@@ -70,7 +71,7 @@ namespace MiniMart.Repositories.Implementations
                 TotalAfterVAT = order.FinalAmount,
                 GDTAuthCode = null,
                 XMLContent = null,
-                IssuedAt = DateTime.Now,
+                IssuedAt = HanoiTime.Now,
                 Status = true,
             };
 

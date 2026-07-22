@@ -6,6 +6,7 @@ using MiniMart.Models.Enums;
 using MiniMart.Repositories.Interfaces;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Repositories.Implementations
 {
@@ -36,7 +37,7 @@ namespace MiniMart.Repositories.Implementations
                 return new PaymentResponseDto { IsSuccess = false, Message = "Phương thức thanh toán này chưa được hỗ trợ." };
             }
 
-            string txnRef = request.OrderId.ToString() + "_" + DateTime.Now.ToString("HHmmss");
+            string txnRef = request.OrderId.ToString() + "_" + HanoiTime.Now.ToString("HHmmss");
 
             string paymentUrl = gateway.CreatePaymentUrl(order, txnRef, context);
 
@@ -77,7 +78,7 @@ namespace MiniMart.Repositories.Implementations
             if (callbackResult.IsSuccess)
             {
                 payment.Status = PaymentStatus.Success;
-                payment.PaidAt = DateTime.Now;
+                payment.PaidAt = HanoiTime.Now;
                 payment.Order.PaidAmount = payment.Order.FinalAmount;
 
                 await _context.SaveChangesAsync();
@@ -117,7 +118,7 @@ namespace MiniMart.Repositories.Implementations
             if (payment == null || payment.Status == PaymentStatus.Success) return false;
 
             payment.Status = PaymentStatus.Success;
-            payment.PaidAt = DateTime.Now;
+            payment.PaidAt = HanoiTime.Now;
             payment.Order.PaidAmount = payment.Order.FinalAmount;
 
             await _context.SaveChangesAsync();

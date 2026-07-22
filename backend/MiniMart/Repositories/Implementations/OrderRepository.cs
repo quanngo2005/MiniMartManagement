@@ -5,6 +5,7 @@ using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Repositories.RepoImplement
 {
@@ -100,7 +101,7 @@ namespace MiniMart.Repositories.RepoImplement
         {
             order.Status = OrderStatus.Pending;
             order.OrderCode = await GenerateNextOrderCodeAsync();
-            order.OrderDate = DateTime.Now;
+            order.OrderDate = HanoiTime.Now;
 
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
@@ -115,7 +116,7 @@ namespace MiniMart.Repositories.RepoImplement
             if (shift == null)
                 throw new InvalidOperationException("Ca làm việc không tồn tại hoặc đã đóng.");
 
-            if (DateTime.Now > shift.EndTime)
+            if (HanoiTime.Now > shift.EndTime)
                 throw new InvalidOperationException("Ca làm việc đã kết thúc. Vui lòng đóng ca trước khi thao tác tiếp.");
 
             Customer? customer = null;
@@ -133,12 +134,12 @@ namespace MiniMart.Repositories.RepoImplement
                 }
             }
 
-            var checkoutAt = DateTime.UtcNow.AddHours(7);
+            var checkoutAt = HanoiTime.Now;
 
             // BR-INV-01
             decimal subTotal = 0;
             var orderDetails = new List<OrderDetail>();
-            var now = DateTime.UtcNow.AddHours(7);
+            var now = HanoiTime.Now;
             var activePromotions = await _context.Promotions
                 .Include(p => p.PromotionProducts)
                 .Where(p => p.IsActive && p.StartDate <= now && p.EndDate >= now)
@@ -343,7 +344,7 @@ namespace MiniMart.Repositories.RepoImplement
                     OrderId = order.OrderId,
                     PaymentMethod = request.PaymentMethod,
                     Amount = finalAmount,
-                    TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
+                    TransactionRef = $"{order.OrderId}_{HanoiTime.Now:MMddHHmmss}",
                     PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : DateTime.MinValue,
                     Status = request.PaymentMethod == PaymentMethod.Cash ? PaymentStatus.Success : PaymentStatus.Pending
                 };
@@ -497,7 +498,7 @@ namespace MiniMart.Repositories.RepoImplement
                 if (payment != null)
                 {
                     payment.Status = PaymentStatus.Success;
-                    payment.PaidAt = DateTime.UtcNow.AddHours(7);
+                    payment.PaidAt = HanoiTime.Now;
                 }
                 else
                 {
@@ -506,8 +507,8 @@ namespace MiniMart.Repositories.RepoImplement
                         OrderId = order.OrderId,
                         PaymentMethod = PaymentMethod.VietQR, // Hay lấy từ order nếu có
                         Amount = order.FinalAmount,
-                        TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
-                        PaidAt = DateTime.UtcNow.AddHours(7),
+                        TransactionRef = $"{order.OrderId}_{HanoiTime.Now:MMddHHmmss}",
+                        PaidAt = HanoiTime.Now,
                         Status = PaymentStatus.Success
                     };
                     await _context.Payments.AddAsync(newPayment);
@@ -538,7 +539,7 @@ namespace MiniMart.Repositories.RepoImplement
                 throw new KeyNotFoundException("One or more order products do not exist.");
             }
 
-            var businessDate = DateTime.Today;
+            var businessDate = HanoiTime.Now.Date;
             var sellableBatches = await _batchRepository
                 .GetSellableBatchesForProductsAsync(productIds, businessDate);
 

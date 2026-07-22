@@ -25,7 +25,7 @@ namespace MiniMart.Services.Implementations
             vnpay.AddRequestData("vnp_TmnCode", _configuration["Vnpay:TmnCode"]!);
 
             vnpay.AddRequestData("vnp_Amount", (order.FinalAmount * 100).ToString("0"));
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CreateDate", HanoiTime.Now.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
             vnpay.AddRequestData("vnp_Locale", "vn");

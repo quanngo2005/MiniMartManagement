@@ -172,10 +172,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 app.UseStaticFiles();
 app.UseRouting();
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors(DevelopmentCorsPolicy);
-}
+app.UseCors(DevelopmentCorsPolicy);
 app.UseMiddleware<CsrfMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();

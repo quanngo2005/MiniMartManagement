@@ -7,6 +7,7 @@ using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Services.Implementations
 {
@@ -262,7 +263,7 @@ namespace MiniMart.Services.Implementations
 
         private static DateTime GetVietnamNow()
         {
-            return DateTime.UtcNow.AddHours(7);
+            return HanoiTime.Now;
         }
 
         private static string GenerateReceiptCode(DateTime timestamp)
