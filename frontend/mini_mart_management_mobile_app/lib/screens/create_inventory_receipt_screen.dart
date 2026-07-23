@@ -191,6 +191,8 @@ class _CreateInventoryReceiptScreenState
     BuildContext context,
     List<ProductLookup> suggestions,
   ) {
+    final hasSupplier = _selectedSupplier != null;
+
     return _FormPanel(
       title: 'Danh sách sản phẩm',
       icon: Icons.inventory_2_outlined,
@@ -198,34 +200,63 @@ class _CreateInventoryReceiptScreenState
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            onPressed: () => _productSearchFocusNode.requestFocus(),
+            onPressed: hasSupplier
+                ? () => _productSearchFocusNode.requestFocus()
+                : null,
             tooltip: 'Thêm sản phẩm',
             icon: const Icon(Icons.add_circle_outline_rounded),
           ),
           IconButton(
-            onPressed: _openBarcodeScanner,
+            onPressed: hasSupplier ? _openBarcodeScanner : null,
             tooltip: 'Quét mã vạch',
             icon: const Icon(Icons.qr_code_scanner_rounded),
           ),
         ],
       ),
       children: [
-        TextFormField(
-          controller: _productSearchController,
-          focusNode: _productSearchFocusNode,
-          decoration: const InputDecoration(
-            labelText: 'Tìm sản phẩm theo tên, mã sản phẩm hoặc mã vạch',
-            prefixIcon: Icon(Icons.search_rounded),
+        if (!hasSupplier) ...[
+          const _InlineMessage(
+            message: 'Vui lòng chọn nhà cung cấp trước khi thêm sản phẩm.',
           ),
-          onChanged: (_) => setState(() {}),
-        ),
-        if (suggestions.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          _ProductSuggestList(products: suggestions, onSelected: _addProduct),
         ],
-        if (_lines.isEmpty) ...[
-          const SizedBox(height: 12),
-          const _InlineMessage(message: 'Chưa có sản phẩm nào trong phiếu.'),
+        if (hasSupplier) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.filter_alt_outlined,
+                  size: 14,
+                  color: AppColors.secondary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Sản phẩm từ: ${_selectedSupplier!.supplierName}',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AppColors.secondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextFormField(
+            controller: _productSearchController,
+            focusNode: _productSearchFocusNode,
+            decoration: const InputDecoration(
+              labelText: 'Tìm sản phẩm theo tên, mã sản phẩm hoặc mã vạch',
+              prefixIcon: Icon(Icons.search_rounded),
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+          if (suggestions.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            _ProductSuggestList(products: suggestions, onSelected: _addProduct),
+          ],
+          if (_lines.isEmpty) ...[
+            const SizedBox(height: 12),
+            const _InlineMessage(message: 'Chưa có sản phẩm nào trong phiếu.'),
+          ],
         ],
         for (final (index, line) in _lines.indexed) ...[
           const SizedBox(height: 12),
@@ -359,14 +390,18 @@ class _CreateInventoryReceiptScreenState
   }
 
   List<ProductLookup> _filterProducts(List<ProductLookup> products) {
+    final supplierId = _selectedSupplier?.supplierId;
+    if (supplierId == null) return const [];
+
     final query = _productSearchController.text.trim().toLowerCase();
     if (query.isEmpty) return const [];
 
     return products
         .where((product) {
-          return product.productName.toLowerCase().contains(query) ||
-              product.productCode.toLowerCase().contains(query) ||
-              product.barcode.toLowerCase().contains(query);
+          return product.supplierId == supplierId &&
+              (product.productName.toLowerCase().contains(query) ||
+                  product.productCode.toLowerCase().contains(query) ||
+                  product.barcode.toLowerCase().contains(query));
         })
         .take(5)
         .toList(growable: false);
@@ -380,6 +415,11 @@ class _CreateInventoryReceiptScreenState
   }
 
   void _addProduct(ProductLookup product) {
+    if (_selectedSupplier == null ||
+        product.supplierId != _selectedSupplier!.supplierId) {
+      return;
+    }
+
     if (_lines.any((line) => line.product.productId == product.productId)) {
       _productSearchController.clear();
       setState(() {});
@@ -405,8 +445,15 @@ class _CreateInventoryReceiptScreenState
     );
     if (scannedList == null || scannedList.isEmpty) return;
 
+    final supplierId = _selectedSupplier?.supplierId;
+    int skippedCount = 0;
+
     setState(() {
       for (final entry in scannedList) {
+        if (entry.product.supplierId != supplierId) {
+          skippedCount++;
+          continue;
+        }
         if (_lines.any((l) => l.product.productId == entry.product.productId)) {
           continue;
         }
@@ -415,6 +462,14 @@ class _CreateInventoryReceiptScreenState
         _lines.add(draft);
       }
     });
+
+    if (skippedCount > 0 && mounted) {
+      _showActionSnackBar(
+        context,
+        '$skippedCount sản phẩm không thuộc nhà cung cấp '
+        '"${_selectedSupplier!.supplierName}" đã được bỏ qua.',
+      );
+    }
   }
 
   void _submit(BuildContext context, EmployeeUser? currentUser) {

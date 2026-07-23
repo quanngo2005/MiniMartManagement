@@ -7,11 +7,11 @@ abstract final class ApiConfig {
       return envUrl;
     }
     if (kIsWeb) {
-      return 'https://mmms-cvaka8c9bkfkduf3.southeastasia-01.azurewebsites.net';
+      return 'http://localhost:5005';
     }
     // Dynamic mapping for mobile emulators
     return defaultTargetPlatform == TargetPlatform.android
-        ? 'https://mmms-cvaka8c9bkfkduf3.southeastasia-01.azurewebsites.net' 
+        ? 'https://mmms-cvaka8c9bkfkduf3.southeastasia-01.azurewebsites.net'
         : 'http://10.0.2.2:5005';
   }
 

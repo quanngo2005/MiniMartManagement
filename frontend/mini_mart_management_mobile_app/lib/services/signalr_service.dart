@@ -129,6 +129,20 @@ class SignalrService {
           iconColor = Colors.redAccent;
           backgroundColor = const Color(0xFF6B1D1D);
         }
+      } else if (type == 'stock_count_request') {
+        icon = Icons.inventory_2_outlined;
+        iconColor = Colors.orangeAccent;
+        backgroundColor = const Color(0xFF3E2723);
+      } else if (type == 'stock_count_response') {
+        if (status == 'approved') {
+          icon = Icons.check_circle_outline;
+          iconColor = Colors.greenAccent;
+          backgroundColor = const Color(0xFF1E4620);
+        } else if (status == 'rejected') {
+          icon = Icons.cancel_outlined;
+          iconColor = Colors.redAccent;
+          backgroundColor = const Color(0xFF6B1D1D);
+        }
       }
     }
 

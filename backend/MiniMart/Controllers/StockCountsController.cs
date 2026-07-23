@@ -70,7 +70,6 @@ namespace MiniMart.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Policy = "ManagerUp")]
         public async Task<ActionResult<StockCountDetailDto>> CancelDraft(int id, [FromBody] StockCountTransitionDto transitionDto)
         {
             if (transitionDto == null || !ModelState.IsValid)

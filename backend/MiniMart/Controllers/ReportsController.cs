@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MiniMart.Services.Interfaces;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Controllers
 {
@@ -24,8 +25,8 @@ namespace MiniMart.Controllers
         [HttpGet("revenue/daily")]
         public async Task<IActionResult> GetDailyRevenue([FromQuery] int month, [FromQuery] int year)
         {
-            if (month == 0) month = DateTime.Now.Month;
-            if (year == 0) year = DateTime.Now.Year;
+            if (month == 0) month = HanoiTime.Now.Month;
+            if (year == 0) year = HanoiTime.Now.Year;
 
             if (month < 1 || month > 12 || year < 2000)
                 return BadRequest("Invalid month or year.");
@@ -37,7 +38,7 @@ namespace MiniMart.Controllers
         [HttpGet("revenue/monthly")]
         public async Task<IActionResult> GetMonthlyRevenue([FromQuery] int year)
         {
-            if (year == 0) year = DateTime.Now.Year;
+            if (year == 0) year = HanoiTime.Now.Year;
 
             if (year < 2000)
                 return BadRequest("Invalid year.");
@@ -49,8 +50,8 @@ namespace MiniMart.Controllers
         [HttpGet("financial/monthly")]
         public async Task<IActionResult> GetMonthlyFinancialReport([FromQuery] int month, [FromQuery] int year)
         {
-            if (month == 0) month = DateTime.Now.Month;
-            if (year == 0) year = DateTime.Now.Year;
+            if (month == 0) month = HanoiTime.Now.Month;
+            if (year == 0) year = HanoiTime.Now.Year;
 
             if (month < 1 || month > 12 || year < 2000)
                 return BadRequest("Invalid month or year.");
@@ -62,7 +63,7 @@ namespace MiniMart.Controllers
         [HttpGet("revenue/hourly")]
         public async Task<IActionResult> GetHourlyRevenue([FromQuery] DateTime date)
         {
-            if (date == default) date = DateTime.Today;
+            if (date == default) date = HanoiTime.Now.Date;
 
             var result = await _reportService.GetHourlyRevenueAsync(date);
             return Ok(result);

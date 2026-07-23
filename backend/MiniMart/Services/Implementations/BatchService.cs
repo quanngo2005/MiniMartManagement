@@ -7,6 +7,7 @@ using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Services
 {
@@ -14,15 +15,18 @@ namespace MiniMart.Services
     {
         private readonly IBatchRepository _batchRepository;
         private readonly IInventoryTransactionRepository _inventoryTransactionRepository;
+        private readonly IProductStockAdjuster _productStockAdjuster;
         private readonly IMapper _mapper;
 
         public BatchService(
             IBatchRepository batchRepository,
             IInventoryTransactionRepository inventoryTransactionRepository,
+            IProductStockAdjuster productStockAdjuster,
             IMapper mapper)
         {
             _batchRepository = batchRepository;
             _inventoryTransactionRepository = inventoryTransactionRepository;
+            _productStockAdjuster = productStockAdjuster;
             _mapper = mapper;
         }
 
@@ -79,7 +83,7 @@ namespace MiniMart.Services
                         "Batch ID does not exist.",
                         StatusCodes.Status404NotFound);
 
-                if (batch.ExpiryDate.Date >= DateTime.Today)
+                if (batch.ExpiryDate.Date >= HanoiTime.Now.Date)
                 {
                     throw new DomainException(
                         "Only expired batches can be disposed.",
@@ -109,6 +113,8 @@ namespace MiniMart.Services
                 await _batchRepository.AdjustBatchRemainingQuantityAsync(
                     batch.BatchId,
                     -disposalQuantity);
+
+                await _productStockAdjuster.AdjustAsync(product.ProductId, -disposalQuantity);
 
                 disposedTransaction = await _inventoryTransactionRepository
                     .CreateInventoryTransactionAsync(new InventoryTransaction

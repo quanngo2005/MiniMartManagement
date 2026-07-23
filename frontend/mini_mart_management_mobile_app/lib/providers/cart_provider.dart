@@ -37,7 +37,10 @@ class CartProvider extends ChangeNotifier {
   double get promotionDiscountAmount {
     final activePromotions = _activePromotions;
     final productDiscount = _productDiscountAmount(activePromotions);
-    final orderDiscount = _orderDiscountAmount(activePromotions, productDiscount);
+    final orderDiscount = _orderDiscountAmount(
+      activePromotions,
+      productDiscount,
+    );
     return productDiscount + orderDiscount;
   }
 
@@ -62,24 +65,29 @@ class CartProvider extends ChangeNotifier {
   }
 
   int giftQuantityForProduct(int productId) {
-    final item = _items.where((i) => i.product.productId == productId).firstOrNull;
+    final item = _items
+        .where((i) => i.product.productId == productId)
+        .firstOrNull;
     if (item == null) return 0;
 
-    final promotion = _activePromotions
-        .where(
-          (p) =>
-              p.type == 1 &&
-              (p.buyQuantity ?? 0) > 0 &&
-              (p.giftQuantity ?? 0) > 0 &&
-              p.productIds.contains(productId),
-        )
-        .toList()
-      ..sort((a, b) {
-        final giftCompare = (b.giftQuantity ?? 0).compareTo(a.giftQuantity ?? 0);
-        return giftCompare != 0
-            ? giftCompare
-            : a.promotionId.compareTo(b.promotionId);
-      });
+    final promotion =
+        _activePromotions
+            .where(
+              (p) =>
+                  p.type == 1 &&
+                  (p.buyQuantity ?? 0) > 0 &&
+                  (p.giftQuantity ?? 0) > 0 &&
+                  p.productIds.contains(productId),
+            )
+            .toList()
+          ..sort((a, b) {
+            final giftCompare = (b.giftQuantity ?? 0).compareTo(
+              a.giftQuantity ?? 0,
+            );
+            return giftCompare != 0
+                ? giftCompare
+                : a.promotionId.compareTo(b.promotionId);
+          });
 
     if (promotion.isEmpty) return 0;
     final selected = promotion.first;
@@ -193,16 +201,23 @@ class CartProvider extends ChangeNotifier {
   double _productDiscountAmount(List<Promotion> activePromotions) {
     var totalDiscount = 0.0;
     for (final item in _items) {
-      final discounts = activePromotions
-          .where((p) => p.type == 2 && p.productIds.contains(item.product.productId))
-          .map((p) {
-        final lineTotal = item.totalPrice;
-        if (p.discountPercent != null) {
-          return lineTotal * p.discountPercent! / 100;
-        }
-        return (p.discountAmount ?? 0) * item.quantity;
-      }).where((amount) => amount > 0).toList()
-        ..sort((a, b) => b.compareTo(a));
+      final discounts =
+          activePromotions
+              .where(
+                (p) =>
+                    p.type == 2 &&
+                    p.productIds.contains(item.product.productId),
+              )
+              .map((p) {
+                final lineTotal = item.totalPrice;
+                if (p.discountPercent != null) {
+                  return lineTotal * p.discountPercent! / 100;
+                }
+                return (p.discountAmount ?? 0) * item.quantity;
+              })
+              .where((amount) => amount > 0)
+              .toList()
+            ..sort((a, b) => b.compareTo(a));
 
       if (discounts.isNotEmpty) {
         totalDiscount += discounts.first.clamp(0, item.totalPrice);
@@ -215,19 +230,22 @@ class CartProvider extends ChangeNotifier {
     List<Promotion> activePromotions,
     double productDiscount,
   ) {
-    final eligibleDiscounts = activePromotions
-        .where(
-          (p) =>
-              p.type == 0 &&
-              totalAmount >= (p.minimumOrderAmount ?? 0),
-        )
-        .map((p) {
-      if (p.discountPercent != null) {
-        return (totalAmount - productDiscount) * p.discountPercent! / 100;
-      }
-      return p.discountAmount ?? 0;
-    }).where((amount) => amount > 0).toList()
-      ..sort((a, b) => b.compareTo(a));
+    final eligibleDiscounts =
+        activePromotions
+            .where(
+              (p) => p.type == 0 && totalAmount >= (p.minimumOrderAmount ?? 0),
+            )
+            .map((p) {
+              if (p.discountPercent != null) {
+                return (totalAmount - productDiscount) *
+                    p.discountPercent! /
+                    100;
+              }
+              return p.discountAmount ?? 0;
+            })
+            .where((amount) => amount > 0)
+            .toList()
+          ..sort((a, b) => b.compareTo(a));
 
     return eligibleDiscounts.isEmpty ? 0 : eligibleDiscounts.first;
   }
