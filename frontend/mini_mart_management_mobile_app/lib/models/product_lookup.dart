@@ -8,6 +8,8 @@ class ProductLookup {
     required this.stockQuantity,
     required this.status,
     this.category,
+    this.supplierId = 0,
+    this.supplierName = '',
   });
 
   final int productId;
@@ -18,6 +20,8 @@ class ProductLookup {
   final int stockQuantity;
   final bool status;
   final ProductLookupCategory? category;
+  final int supplierId;
+  final String supplierName;
 
   factory ProductLookup.fromJson(Map<String, dynamic> json) {
     return ProductLookup(
@@ -31,7 +35,28 @@ class ProductLookup {
       category: ProductLookupCategory.fromJsonOrNull(
         json['category'] ?? json['Category'],
       ),
+      supplierId: _readSupplierId(json),
+      supplierName: _readSupplierName(json),
     );
+  }
+
+  static int _readSupplierId(Map<String, dynamic> json) {
+    final supplier = json['supplier'] ?? json['Supplier'];
+    if (supplier is Map<String, dynamic>) {
+      final id = supplier['id'] ?? supplier['Id'];
+      if (id is int) return id;
+      if (id is num) return id.toInt();
+    }
+    return 0;
+  }
+
+  static String _readSupplierName(Map<String, dynamic> json) {
+    final supplier = json['supplier'] ?? json['Supplier'];
+    if (supplier is Map<String, dynamic>) {
+      final name = supplier['name'] ?? supplier['Name'];
+      if (name is String) return name;
+    }
+    return '';
   }
 }
 

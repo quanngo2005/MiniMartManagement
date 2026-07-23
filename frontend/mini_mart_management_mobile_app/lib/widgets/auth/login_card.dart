@@ -121,6 +121,7 @@ class LoginCard extends StatelessWidget {
                 icon: const Icon(Icons.login, size: 20),
                 label: const Text('Đăng nhập'),
                 style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
                   backgroundColor: AppColors.primary,
                   disabledBackgroundColor: AppColors.primary.withValues(
                     alpha: 0.68,

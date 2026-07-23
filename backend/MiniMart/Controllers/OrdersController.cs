@@ -4,6 +4,7 @@ using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
+using MiniMart.Shared.Utils;
 using PayOS;
 using PayOS.Models.V2.PaymentRequests;
 using System.Linq.Expressions;
@@ -116,7 +117,7 @@ namespace MiniMart.Controllers
                 {
                     try
                     {
-                        long payosOrderCode = long.Parse($"{result.OrderCode.Replace("HD", "")}{DateTime.Now:HHmmss}");
+                        long payosOrderCode = long.Parse($"{result.OrderCode.Replace("HD", "")}{HanoiTime.Now:HHmmss}");
                         var paymentRequest = new CreatePaymentLinkRequest
                         {
                             OrderCode = payosOrderCode,

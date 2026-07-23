@@ -7,6 +7,7 @@ using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Services.Implementations
 {
@@ -202,7 +203,7 @@ namespace MiniMart.Services.Implementations
             shift.CashierId = openRequest.CashierId;
             shift.StartCash = openRequest.StartCash;
             shift.Status = ShiftStatus.Working;
-            shift.StartedAt = DateTime.UtcNow.AddHours(7);
+            shift.StartedAt = HanoiTime.Now;
             if (!string.IsNullOrEmpty(openRequest.Note))
             {
                 shift.Note = openRequest.Note;
@@ -227,7 +228,7 @@ namespace MiniMart.Services.Implementations
 
             shift.EndCash = closeRequest.EndCash;
             shift.Status = ShiftStatus.Closed;
-            shift.ClosedAt = DateTime.UtcNow.AddHours(7);
+            shift.ClosedAt = HanoiTime.Now;
             if (!string.IsNullOrEmpty(closeRequest.Note))
             {
                 shift.Note = closeRequest.Note;

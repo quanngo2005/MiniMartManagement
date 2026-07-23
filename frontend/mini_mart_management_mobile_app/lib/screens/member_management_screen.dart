@@ -29,6 +29,7 @@ class MemberManagementScreen extends StatefulWidget {
   @override
   State<MemberManagementScreen> createState() => _MemberManagementScreenState();
 }
+
 class _MemberManagementScreenState extends State<MemberManagementScreen> {
   @override
   void initState() {
@@ -120,9 +121,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const TierManagementScreen(),
-                ),
+                MaterialPageRoute(builder: (_) => const TierManagementScreen()),
               ),
               child: const Text('Chi tiết'),
             ),

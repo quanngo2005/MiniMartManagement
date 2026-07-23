@@ -7,6 +7,7 @@ using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Services.Implementations
 {
@@ -16,6 +17,7 @@ namespace MiniMart.Services.Implementations
         private readonly IProductRepository _productRepository;
         private readonly IBatchRepository _batchRepository;
         private readonly IInventoryTransactionRepository _inventoryTransactionRepository;
+        private readonly IProductStockAdjuster _productStockAdjuster;
         private readonly IMapper _mapper;
 
         public ReceiptService(
@@ -23,12 +25,14 @@ namespace MiniMart.Services.Implementations
             IProductRepository productRepository,
             IBatchRepository batchRepository,
             IInventoryTransactionRepository inventoryTransactionRepository,
+            IProductStockAdjuster productStockAdjuster,
             IMapper mapper)
         {
             _receiptRepository = receiptRepository;
             _productRepository = productRepository;
             _batchRepository = batchRepository;
             _inventoryTransactionRepository = inventoryTransactionRepository;
+            _productStockAdjuster = productStockAdjuster;
             _mapper = mapper;
         }
 
@@ -158,9 +162,6 @@ namespace MiniMart.Services.Implementations
                         var previousStock = stockByProductId[batch.ProductId];
                         var currentStock = previousStock + batch.QuantityImported;
 
-                        // The Batches trigger recalculates Product.StockQuantity from active batches.
-                        // Updating the product here would double-count this import and leave its
-                        // RowVersion stale for a later batch of the same product.
                         await _batchRepository.AdjustBatchRemainingQuantityAsync(batch.BatchId, batch.QuantityImported);
 
                         var transaction = new InventoryTransaction
@@ -179,6 +180,20 @@ namespace MiniMart.Services.Implementations
 
                         await _inventoryTransactionRepository.CreateInventoryTransactionAsync(transaction);
                         stockByProductId[batch.ProductId] = currentStock;
+                    }
+
+                    // Product.StockQuantity is updated once per product after the batch loop
+                    // via IProductStockAdjuster — the single point of truth for stock writes.
+                    // This avoids per-batch lock contention on the Product row and ensures
+                    // the cached stock stays in sync with batch totals for drift detection
+                    // at stock-count approval time (see StockCountService.ApproveAsync).
+                    var importTotalByProductId = existing.Batches
+                        .GroupBy(batch => batch.ProductId)
+                        .ToDictionary(group => group.Key, group => group.Sum(b => b.QuantityImported));
+
+                    foreach (var (productId, totalQty) in importTotalByProductId)
+                    {
+                        await _productStockAdjuster.AdjustAsync(productId, totalQty);
                     }
 
                     await _receiptRepository.MarkReceiptAsCompletedAsync(id);
@@ -262,7 +277,7 @@ namespace MiniMart.Services.Implementations
 
         private static DateTime GetVietnamNow()
         {
-            return DateTime.UtcNow.AddHours(7);
+            return HanoiTime.Now;
         }
 
         private static string GenerateReceiptCode(DateTime timestamp)

@@ -170,9 +170,8 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
         .where((item) => item.categoryId != widget.categoryId)
         .toList();
     return DropdownButtonFormField<int?>(
-      initialValue: categories.any(
-        (item) => item.categoryId == _parentCategoryId,
-      )
+      initialValue:
+          categories.any((item) => item.categoryId == _parentCategoryId)
           ? _parentCategoryId
           : null,
       decoration: const InputDecoration(labelText: 'Danh mục cha'),

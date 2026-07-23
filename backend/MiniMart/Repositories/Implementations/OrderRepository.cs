@@ -4,7 +4,9 @@ using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
+using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Repositories.RepoImplement
 {
@@ -12,11 +14,16 @@ namespace MiniMart.Repositories.RepoImplement
     {
         private readonly MiniMartDbContext _context;
         private readonly IBatchRepository _batchRepository;
+        private readonly IProductStockAdjuster _productStockAdjuster;
 
-        public OrderRepository(MiniMartDbContext context, IBatchRepository batchRepository)
+        public OrderRepository(
+            MiniMartDbContext context,
+            IBatchRepository batchRepository,
+            IProductStockAdjuster productStockAdjuster)
         {
             _context = context;
             _batchRepository = batchRepository;
+            _productStockAdjuster = productStockAdjuster;
         }
 
         // GET ALL (OData)
@@ -100,7 +107,7 @@ namespace MiniMart.Repositories.RepoImplement
         {
             order.Status = OrderStatus.Pending;
             order.OrderCode = await GenerateNextOrderCodeAsync();
-            order.OrderDate = DateTime.Now;
+            order.OrderDate = HanoiTime.Now;
 
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
@@ -115,7 +122,7 @@ namespace MiniMart.Repositories.RepoImplement
             if (shift == null)
                 throw new InvalidOperationException("Ca làm việc không tồn tại hoặc đã đóng.");
 
-            if (DateTime.Now > shift.EndTime)
+            if (HanoiTime.Now > shift.EndTime)
                 throw new InvalidOperationException("Ca làm việc đã kết thúc. Vui lòng đóng ca trước khi thao tác tiếp.");
 
             Customer? customer = null;
@@ -133,12 +140,12 @@ namespace MiniMart.Repositories.RepoImplement
                 }
             }
 
-            var checkoutAt = DateTime.UtcNow.AddHours(7);
+            var checkoutAt = HanoiTime.Now;
 
             // BR-INV-01
             decimal subTotal = 0;
             var orderDetails = new List<OrderDetail>();
-            var now = DateTime.UtcNow.AddHours(7);
+            var now = HanoiTime.Now;
             var activePromotions = await _context.Promotions
                 .Include(p => p.PromotionProducts)
                 .Where(p => p.IsActive && p.StartDate <= now && p.EndDate >= now)
@@ -305,27 +312,8 @@ namespace MiniMart.Repositories.RepoImplement
                     int pointsEarned = 0;
                     if (request.PaymentMethod == PaymentMethod.Cash)
                     {
-                        foreach (var detail in orderDetails)
-                        {
-                            var product = await _context.Products.FindAsync(detail.ProductId);
-                            int previousStock = product!.StockQuantity;
-                            product.StockQuantity -= detail.Quantity;
-
-                            _context.InventoryTransactions.Add(new InventoryTransaction
-                            {
-                                TransactionType = InventoryTransactionType.Sale,
-                                Quantity = detail.Quantity,
-                                PreviousStock = previousStock,
-                                CurrentStock = product.StockQuantity,
-                                ReferenceType = ReferenceType.Order,
-                                ReferenceId = order.OrderId,
-                                ProductId = detail.ProductId,
-                                EmployeeId = request.EmployeeId,
-                                Note = detail.IsGift
-                                    ? $"Quà tặng khuyến mãi - Đơn {order.OrderCode}"
-                                    : $"Bán hàng - Đơn {order.OrderCode}"
-                            });
-                        }
+                        await ConsumeSaleStockAsync(
+                            order.OrderId, order.OrderCode, request.EmployeeId, orderDetails);
 
                         pointsEarned = (int)(finalAmount / 50000);
                         if (customer != null)
@@ -343,8 +331,8 @@ namespace MiniMart.Repositories.RepoImplement
                     OrderId = order.OrderId,
                     PaymentMethod = request.PaymentMethod,
                     Amount = finalAmount,
-                    TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
-                    PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : createdAt,
+                    TransactionRef = $"{order.OrderId}_{HanoiTime.Now:MMddHHmmss}",
+                    PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : DateTime.MinValue,
                     Status = request.PaymentMethod == PaymentMethod.Cash ? PaymentStatus.Success : PaymentStatus.Pending
                 };
                 await _context.Payments.AddAsync(paymentRecord);
@@ -509,10 +497,28 @@ namespace MiniMart.Repositories.RepoImplement
                         "Batch data was updated by another operation. Please refresh and try again.",
                         StatusCodes.Status409Conflict);
                 }
-                catch
+
+                order.Shift.Revenue += order.FinalAmount;
+                order.Status = OrderStatus.Completed;
+
+                var payment = await _context.Payments.FirstOrDefaultAsync(p => p.OrderId == order.OrderId);
+                if (payment != null)
                 {
-                    await transaction.RollbackAsync();
-                    throw;
+                    payment.Status = PaymentStatus.Success;
+                    payment.PaidAt = HanoiTime.Now;
+                }
+                else
+                {
+                    var newPayment = new Payment
+                    {
+                        OrderId = order.OrderId,
+                        PaymentMethod = PaymentMethod.VietQR, // Hay lấy từ order nếu có
+                        Amount = order.FinalAmount,
+                        TransactionRef = $"{order.OrderId}_{HanoiTime.Now:MMddHHmmss}",
+                        PaidAt = HanoiTime.Now,
+                        Status = PaymentStatus.Success
+                    };
+                    await _context.Payments.AddAsync(newPayment);
                 }
 
                 await _context.SaveChangesAsync();
@@ -540,7 +546,7 @@ namespace MiniMart.Repositories.RepoImplement
                 throw new KeyNotFoundException("One or more order products do not exist.");
             }
 
-            var businessDate = DateTime.Today;
+            var businessDate = HanoiTime.Now.Date;
             var sellableBatches = await _batchRepository
                 .GetSellableBatchesForProductsAsync(productIds, businessDate);
 
@@ -567,7 +573,7 @@ namespace MiniMart.Repositories.RepoImplement
             foreach (var (productId, quantity) in requestedQuantities)
             {
                 var product = products[productId];
-                product.StockQuantity -= quantity;
+                await _productStockAdjuster.AdjustAsync(productId, -quantity);
 
                 var quantityToAllocate = quantity;
                 foreach (var batch in sellableBatches.Where(batch => batch.ProductId == productId))

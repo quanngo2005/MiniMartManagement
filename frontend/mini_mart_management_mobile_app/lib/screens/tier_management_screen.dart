@@ -59,8 +59,8 @@ class _TierManagementScreenState extends State<TierManagementScreen> {
   }
 
   void _openTierDetail(BuildContext context, String tierId) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => TierDetailScreen(tierId: tierId)),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => TierDetailScreen(tierId: tierId)));
   }
 }
