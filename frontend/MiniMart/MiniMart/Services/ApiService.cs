@@ -17,7 +17,11 @@ namespace MiniMart.Services
 
         private readonly HttpClient _client;
         private readonly CookieContainer _cookieContainer;
+#if DEBUG
         private readonly string _baseUrl = "http://localhost:5005";
+#else
+        private readonly string _baseUrl = "https://mmms-cvaka8c9bkfkduf3.southeastasia-01.azurewebsites.net";
+#endif
 
         private ApiService()
         {
@@ -91,7 +95,7 @@ namespace MiniMart.Services
                         {
                             var cookie = new Cookie(nameValue[0].Trim(), nameValue[1].Trim())
                             {
-                                Domain = "localhost",
+                                Domain = new Uri(_baseUrl).Host,
                                 Path = "/"
                             };
                             _cookieContainer.Add(new Uri(_baseUrl), cookie);
@@ -326,6 +330,28 @@ namespace MiniMart.Services
                 System.Diagnostics.Debug.WriteLine($"SearchProductsAsync Error: {ex.Message}");
             }
             return new List<ProductDto>();
+        }
+
+        public async Task<bool> UpdateCustomerAsync(int customerId, CustomerDto customerDto)
+        {
+            try
+            {
+                string csrfToken = await FetchCsrfTokenAsync();
+                var req = new HttpRequestMessage(HttpMethod.Put, $"/api/customers/{customerId}")
+                {
+                    Content = JsonContent.Create(customerDto)
+                };
+                if (!string.IsNullOrEmpty(csrfToken))
+                {
+                    req.Headers.Add("X-XSRF-TOKEN", csrfToken);
+                }
+                var response = await _client.SendAsync(req);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<CustomerDto?> GetCustomerByPhoneAsync(string phone)

@@ -1,0 +1,144 @@
+@startuml MiniMart_Checkout_Sequence
+skinparam BackgroundColor white
+skinparam Shadowing false
+skinparam SequenceArrowColor black
+skinparam SequenceLifeLineBorderColor black
+skinparam SequenceLifeLineBackgroundColor white
+skinparam SequenceGroupBorderColor black
+skinparam SequenceGroupHeaderFontColor black
+skinparam SequenceGroupBackgroundColor #E0E0E0
+skinparam ParticipantBorderColor black
+skinparam ParticipantBackgroundColor #F5F5F5
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor #F5F5F5
+skinparam DatabaseBorderColor black
+skinparam DatabaseBackgroundColor #F5F5F5
+skinparam ControlBorderColor black
+skinparam ControlBackgroundColor #F5F5F5
+skinparam BoundaryBorderColor black
+skinparam BoundaryBackgroundColor #F5F5F5
+skinparam NoteBackgroundColor #FFF2CC
+skinparam NoteBorderColor black
+skinparam maxMessageSize 250
+autonumber
+
+title **Checkout & Payment Sequence (WPF POS)**
+
+actor Cashier
+boundary "WPF POS App" as App
+control "ProductController" as PC
+control "CustomerController" as CC
+control "OrdersController" as OC
+control "OrderRepository" as OR
+control "InventoryService" as IS
+control "PayOSClient" as POS
+database "MiniMartDbContext" as DB
+
+== Scan Products (Tạo Hóa Đơn) ==
+
+loop For each product
+    Cashier -> App : Scan Barcode / Enter Product ID
+    activate App
+    
+    App -> PC : GET /api/products/{id}
+    activate PC
+    PC -> DB : Query Product by ID
+    activate DB
+    DB --> PC : Product Data
+    deactivate DB
+    PC --> App : 200 OK (Product Info, Price)
+    deactivate PC
+    
+    App -> App : Add to Cart\nCalculate Subtotal
+    App --> Cashier : Update UI (Show item in cart)
+    deactivate App
+end
+
+== Add Customer & Points (Khách Hàng & Điểm Thưởng) ==
+
+opt Customer provides phone number
+    Cashier -> App : Enter Phone Number
+    activate App
+    App -> CC : GET /api/customers?phone={phone}
+    activate CC
+    CC -> DB : Query Customer by Phone
+    activate DB
+    DB --> CC : Customer Data
+    deactivate DB
+    CC --> App : 200 OK (Customer Info, Reward Points)
+    deactivate CC
+    
+    App -> App : Link Customer to Cart
+    App --> Cashier : Display Customer Name & Points Balance
+    deactivate App
+end
+
+== Checkout & Payment (Thanh Toán) ==
+
+Cashier -> App : Select Payment Method (Cash / VietQR)\n& Input LoyaltyPointsToUse (Optional)
+activate App
+App -> App : Calculate Final Total\n(Subtotal - Points Discount)
+App --> Cashier : Display Final Total
+
+Cashier -> App : Press "Pay" (Confirm Payment)
+
+App -> OC : POST /api/orders/checkout\n{ items, customerId, paymentMethod, loyaltyPointsToUse }
+activate OC
+
+OC -> OR : CheckoutAsync(request)
+activate OR
+
+' Validate and deduct inventory
+OR -> IS : ValidateAndDeductStock(items)
+activate IS
+IS -> DB : Check Stock Quantity
+activate DB
+DB --> IS : Current Stock
+deactivate DB
+
+alt Insufficient Stock
+    IS --> OR : throw InvalidOperationException("Out of stock")
+    OR --> OC : throw Exception
+    OC --> App : 400 Bad Request
+    App --> Cashier : Display Error Message
+else Stock Available
+    IS -> DB : Update Product Stock (Deduct)
+    activate DB
+    DB --> IS : Success
+    deactivate DB
+    IS --> OR : Success
+    deactivate IS
+    
+    opt If Customer is linked
+        OR -> DB : Deduct LoyaltyPointsToUse
+        activate DB
+        OR -> DB : Calculate & Add LoyaltyPointsEarned
+        DB --> OR : Success
+        deactivate DB
+    end
+    
+    ' Save order
+    OR -> DB : Add(Order), AddRange(OrderDetails)
+    activate DB
+    DB --> OR : Success
+    deactivate DB
+    
+    OR --> OC : CheckoutResponseDto
+    deactivate OR
+    
+    opt PaymentMethod == VietQR
+        OC -> POS : CreateAsync(paymentRequest)
+        activate POS
+        POS --> OC : CheckoutUrl & QrCode
+        deactivate POS
+    end
+    
+    OC --> App : 200 OK (CheckoutResponseDto w/ QrCode if VietQR)
+    deactivate OC
+    
+    App -> App : Clear Cart UI
+    App --> Cashier : Show Success / Display QR Code / Print Receipt
+    deactivate App
+end
+
+@enduml

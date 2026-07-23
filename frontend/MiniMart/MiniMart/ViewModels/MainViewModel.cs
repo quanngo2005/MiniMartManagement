@@ -188,12 +188,29 @@ namespace MiniMart.ViewModels
         }
 
         [RelayCommand]
-        private void SaveEditCustomer()
+        private async Task SaveEditCustomer()
         {
-            if (ActiveTab != null)
+            if (ActiveTab != null && ActiveTab.CustomerId.HasValue)
             {
-                ActiveTab.CustomerName = TempCustomerName;
-                ActiveTab.CustomerPhone = TempCustomerPhone;
+                var customer = await ApiService.Instance.GetCustomerByPhoneAsync(ActiveTab.CustomerPhone);
+                if (customer != null)
+                {
+                    customer.FullName = TempCustomerName;
+                    customer.PhoneNumber = TempCustomerPhone;
+                    
+                    var success = await ApiService.Instance.UpdateCustomerAsync(customer.CustomerId, customer);
+                    if (success)
+                    {
+                        ActiveTab.CustomerName = TempCustomerName;
+                        ActiveTab.CustomerPhone = TempCustomerPhone;
+                        System.Windows.MessageBox.Show("Cập nhật thông tin khách hàng thành công!", "Thành công", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("Cập nhật thông tin khách hàng thất bại!", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                        return;
+                    }
+                }
             }
             IsEditCustomerPopupOpen = false;
         }

@@ -1,0 +1,281 @@
+@startuml PhucNguyen_Resort_Hub_Architecture
+
+skinparam BackgroundColor white
+skinparam Shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+skinparam PackageBorderColor black
+skinparam PackageBackgroundColor #F5F5F5
+skinparam ComponentBorderColor black
+skinparam ComponentBackgroundColor #EEEEEE
+skinparam RectangleBorderColor black
+skinparam RectangleBackgroundColor #F5F5F5
+skinparam DatabaseBorderColor black
+skinparam DatabaseBackgroundColor #F5F5F5
+skinparam ArrowColor black
+skinparam NoteBorderColor black
+skinparam NoteBackgroundColor #FFF2CC
+
+title **PhucNguyen Resort Hub — Software Architecture**
+
+' ═══════════════════════════════════════════════════
+' CLIENT LAYER
+' ═══════════════════════════════════════════════════
+package "Client Layer" as ClientLayer #e8f5e9 {
+    component "Web Browser" as Browser
+    component "Thymeleaf HTML Templates (SSR)" as Thymeleaf
+    component "Static Assets\n(CSS / JS / Images)" as StaticAssets
+    component "Role Portals\nCustomer | Admin | Manager\nReceptionist | Tour Guide" as RolePortals
+
+    Browser --> Thymeleaf
+    Thymeleaf --> StaticAssets
+    Thymeleaf --> RolePortals
+}
+
+' ═══════════════════════════════════════════════════
+' SPRING BOOT APPLICATION
+' ═══════════════════════════════════════════════════
+package "Spring Boot Application (Java 17 — Port 8080)" as AppLayer #e3f2fd {
+
+    ' --- Security Layer ---
+    package "Security Layer (Spring Security)" as SecurityLayer #fce4ec {
+        component "SecurityFilterChain" as SecFilter
+        component "DaoAuthenticationProvider\n(BCrypt)" as AuthProvider
+        component "CustomUserDetailsService\n+ CustomUserDetails" as UserDetails
+        component "CustomAuthSuccessHandler\n(Role-based Redirect)" as AuthSuccess
+        component "@EnableMethodSecurity\n@PreAuthorize" as MethodSec
+    }
+
+    ' --- Controller Layer ---
+    package "Controller Layer (MVC + REST API)" as ControllerLayer #e8eaf6 {
+
+        package "Admin Controllers" as AdminCtrl #c5cae9 {
+            component "AdminController" as CAdmin
+            component "RoomCategoryController" as CRoomCat
+            component "StaffManagementController" as CStaff
+            component "MenuManagementController" as CMenuMgmt
+            component "AdminTourController\n+ TourBookingCtrl" as CTourAdmin
+        }
+
+        package "Customer Controllers" as CustCtrl #c5cae9 {
+            component "BookingController" as CBooking
+            component "CustomerController" as CCustomer
+            component "CustomerProfileController" as CCustProfile
+            component "FoodOrderController" as CFoodOrder
+            component "TableReservationController" as CTableRes
+        }
+
+        package "Receptionist & Manager" as RecMgrCtrl #c5cae9 {
+            component "ReceptionistController" as CRecep
+            component "RoomController" as CRoom
+            component "InvoiceController" as CInvoice
+            component "ManagerController" as CManager
+            component "ManagerAiController" as CManagerAi
+        }
+
+        package "Tour + Review + REST API" as TourApiCtrl #c5cae9 {
+            component "TourController" as CTour
+            component "TourManifestController" as CTourManifest
+            component "ReviewController" as CReview
+            component "ReviewModerationCtrl" as CReviewMod
+            component "BookingApiController" as CApiBooking #fff9c4
+            component "PaymentApiController" as CApiPayment #fff9c4
+            component "RoomApiController" as CApiRoom #fff9c4
+            component "AuthController" as CAuth #fff9c4
+        }
+    }
+
+    ' --- Service Layer ---
+    package "Service Layer (Business Logic)" as ServiceLayer #e0f2f1 {
+
+        package "Core Hotel Services" as CoreSvc #b2dfdb {
+            component "BookingService" as SBooking
+            component "RoomService" as SRoom
+            component "ReceptionistService" as SRecep
+            component "FolioService" as SFolio
+            component "InvoiceService" as SInvoice
+            component "NightAuditService" as SNightAudit
+            component "RoomCategoryInventoryService" as SRoomInv
+        }
+
+        package "FnB Services" as FnbSvc #b2dfdb {
+            component "FoodOrderService" as SFood
+            component "MenuService" as SMenu
+            component "TableReservationService" as STable
+        }
+
+        package "Tour Services" as TourSvc #b2dfdb {
+            component "TourService" as STour
+            component "TourBookingService" as STourBooking
+        }
+
+        package "Support Services" as SupportSvc #b2dfdb {
+            component "EmailService" as SEmail
+            component "AuthService" as SAuth
+            component "CustomerService" as SCustomerSvc
+            component "StaffService" as SStaffSvc
+            component "ReviewService\n+ ModerationService" as SReview
+            component "DashboardService" as SDashboard
+        }
+
+        package "AI & External Services" as ExtSvc #b2dfdb {
+            component "GeminiService\n(Google AI)" as SGemini
+            component "CloudinaryService\n(Image Upload)" as SCloudinary
+            component "PaymentService\n(VNPay Integration)" as SVNPay
+            component "WeatherService\n(OpenWeather API)" as SWeather
+            component "ManagerAiChatService" as SMgrAiChat
+            component "SystemConfigService" as SSysConfig
+        }
+    }
+
+    ' --- Repository Layer ---
+    package "Repository Layer (Spring Data JPA Interface)" as RepoLayer #fff3e0 {
+
+        package "User & Auth" as RepoUser #ffe0b2 {
+            component "UserRepository" as RUser
+            component "RoleRepository" as RRole
+            component "VerificationTokenRepo" as RVerif
+            component "CustomerRepository" as RCustomer
+            component "StaffRepository" as RStaff
+        }
+
+        package "Room & Booking" as RepoRoom #ffe0b2 {
+            component "RoomRepository" as RRoom
+            component "RoomCategoryRepository" as RRoomCat
+            component "RoomBookingRepository" as RRoomBooking
+            component "RoomAssignmentRepository" as RRoomAssign
+            component "BookingGuestRepository" as RBookingGuest
+        }
+
+        package "Finance" as RepoFin #ffe0b2 {
+            component "GuestFolioRepository" as RFolio
+            component "FolioTransactionRepo" as RFolioTx
+            component "InvoiceRepository" as RInvoice
+            component "PaymentRepository" as RPayment
+            component "SystemConfigRepository" as RSysConfig
+        }
+
+        package "FnB" as RepoFnb #ffe0b2 {
+            component "MenuCategoryRepository" as RMenuCat
+            component "MenuItemRepository" as RMenuItem
+            component "FoodOrderRepository" as RFoodOrder
+            component "FoodOrderItemRepository" as RFoodItem
+            component "RestaurantTableRepository" as RRestTable
+        }
+
+        package "Tour & Review" as RepoTour #ffe0b2 {
+            component "TourRepository" as RTour
+            component "TourScheduleRepository" as RTourSched
+            component "TourBookingRepository" as RTourBooking
+            component "TourAttendeeRepository" as RTourAttendee
+            component "ReviewRepository" as RReview
+        }
+    }
+}
+
+' ═══════════════════════════════════════════════════
+' DATA STORAGE LAYER
+' ═══════════════════════════════════════════════════
+package "Data Storage Layer" as DataLayer #f3e5f5 {
+    database "Microsoft SQL Server\n(PhucNguyenResortDB_VER2 | Port 1433)" as MSSQL
+    note bottom of MSSQL
+        **Core Tables:** Users | Roles | Customers | Staff
+        RoomCategories | Rooms | RoomBookings | RoomAssignments
+        BookingGuests | GuestFolios | FolioTransactions
+        Invoices | Payments | MenuCategories | MenuItems
+        FoodOrders | FoodOrderItems | RestaurantTables
+        TableReservations | Tours | TourSchedules
+        TourBookings | TourAttendees | TourImages
+        Reviews | SystemConfig | VerificationTokens
+        ManagerAiChats | CartItems
+    end note
+}
+
+' ═══════════════════════════════════════════════════
+' EXTERNAL SERVICES
+' ═══════════════════════════════════════════════════
+package "External Services" as ExtServices {
+    component "VNPay\nPayment Gateway\n(Sandbox HTTPS)" as ExtVNPay #fff9c4
+    component "Cloudinary\nImage & File CDN" as ExtCloudinary #e1f5fe
+    component "Google Gemini AI\n(LLM Chat | google-genai 1.0)" as ExtGemini #e8f5e9
+    component "Gmail SMTP\nEmail Notifications\n(Port 587 | STARTTLS)" as ExtSMTP #fce4ec
+    component "OpenWeather API\nWeather Data (REST)" as ExtWeather #e8eaf6
+}
+
+' ═══════════════════════════════════════════════════
+' CROSS-CUTTING CONCERNS
+' ═══════════════════════════════════════════════════
+package "Cross-Cutting Concerns" as CrossCutting {
+
+    package "Schedulers (@Scheduled)" as Schedulers {
+        component "BookingScheduler\n(Auto-cancel expired)" as SchedBooking
+        component "NightAuditScheduler\n(Daily at midnight)" as SchedNight
+    }
+
+    package "Event-Driven (Spring Events)" as Events {
+        component "ReviewSubmittedEvent" as EvReviewSub
+        component "ReviewVisibilityToggled" as EvReviewVis
+        component "TourBookedEvent" as EvTourBooked
+        component "TourBookingApprovedEvent" as EvTourApproved
+        component "TourCancelledEvent" as EvTourCancel
+        component "TourCancelledNotification" as EvTourCancelNotif
+        component "TourBookingNotificationListener" as Listener #ffe082
+    }
+
+    package "DTOs" as DTOs {
+        component "BookingRequestDTO" as DTO1
+        component "RoomBookingDTO" as DTO2
+        component "CheckInForm" as DTO3
+        component "ReservationDetailDTO" as DTO4
+        component "GuestDTO" as DTO5
+        component "OrderItemDTO" as DTO6
+    }
+}
+
+' ═══════════════════════════════════════════════════
+' CONNECTIONS
+' ═══════════════════════════════════════════════════
+
+' Client → App
+ClientLayer -down-> SecurityLayer : HTTP Request/Response\n(Thymeleaf + JSON)
+
+' Security → Controller
+SecurityLayer -[dashed]down-> ControllerLayer : guards
+
+' Controller → Service
+ControllerLayer -down-> ServiceLayer : delegates to
+
+' Service → Repository
+ServiceLayer -down-> RepoLayer : queries
+
+' Repository → Database
+RepoLayer -down-> MSSQL : JPA/Hibernate\n(MSSQL JDBC)
+
+' Service → External Services
+SVNPay -right-> ExtVNPay : HTTPS
+SCloudinary -right-> ExtCloudinary : REST API
+SGemini -right-> ExtGemini : gRPC/REST
+SEmail -right-> ExtSMTP : SMTP/TLS
+SWeather -right-> ExtWeather : REST
+
+' ═══════════════════════════════════════════════════
+' LEGEND / TECH STACK
+' ═══════════════════════════════════════════════════
+legend bottom left
+    |= Color |= Layer |
+    | <#e8f5e9> | Client / Presentation Layer |
+    | <#fce4ec> | Security Layer |
+    | <#e8eaf6> | Controller Layer (MVC + REST API) |
+    | <#e0f2f1> | Service Layer (Business Logic) |
+    | <#fff3e0> | Repository Layer (Spring Data JPA) |
+    | <#f3e5f5> | Database Layer (MS SQL Server) |
+    | <#eeeeee> | Cross-Cutting (Events, Schedulers, DTOs) |
+
+    **Tech Stack:**
+    Spring Boot 3.5 | Java 17 | Spring Security | Spring Data JPA
+    Thymeleaf (SSR) | Hibernate | MS SQL Server | Lombok | Maven
+    Cloudinary | VNPay Payment | Google Gemini AI | OpenWeather API
+    Gmail SMTP | Spring Events
+end legend
+
+@enduml

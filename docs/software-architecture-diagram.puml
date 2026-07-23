@@ -1,0 +1,241 @@
+@startuml MiniMart_Software_Architecture
+
+skinparam BackgroundColor white
+skinparam Shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+skinparam PackageBorderColor black
+skinparam PackageBackgroundColor #F5F5F5
+skinparam ComponentBorderColor black
+skinparam ComponentBackgroundColor #EEEEEE
+skinparam DatabaseBorderColor black
+skinparam DatabaseBackgroundColor #F5F5F5
+skinparam ArrowColor black
+skinparam NoteBorderColor black
+skinparam NoteBackgroundColor #FFF2CC
+
+title **MiniMart Management System — Software Architecture**
+
+' ═══════════════════════════════════════════════════
+' CLIENT LAYER
+' ═══════════════════════════════════════════════════
+package "Client Layer (Frontend)" as ClientLayer #e8f5e9 {
+    component "WPF Desktop App\n(POS & Management)" as WPFApp
+    component "Flutter Mobile App\n(Employee & Cashier)" as FlutterApp
+}
+
+' ═══════════════════════════════════════════════════
+' ASP.NET CORE APPLICATION
+' ═══════════════════════════════════════════════════
+package "ASP.NET Core Web API Application (.NET 8)" as AppLayer #e3f2fd {
+
+    ' --- Security Layer ---
+    package "Security Layer (ASP.NET Core Middleware)" as SecurityLayer #fce4ec {
+        component "JWT Bearer\nAuthentication" as JwtAuth
+        component "Authorization Middleware\n(Roles/Claims Policies)" as Authz
+        component "CSRF Protection\nMiddleware" as Csrf
+        component "[Authorize] Attributes" as AuthAttributes
+    }
+
+    ' --- Controller Layer ---
+    package "Controller Layer (Web API Endpoints)" as ControllerLayer #e8eaf6 {
+
+        package "Auth & Staff" as CtrlAuth #c5cae9 {
+            component "AuthController" as CAuth
+            component "EmployeesController" as CEmp
+            component "RolesController" as CRoles
+            component "ShiftsController" as CShifts
+        }
+
+        package "Sales & Orders" as CtrlSales #c5cae9 {
+            component "OrdersController" as COrders
+            component "PaymentsController" as CPayments
+            component "RefundsController" as CRefunds
+            component "EInvoicesController" as CEInv
+        }
+
+        package "Products & Inventory" as CtrlInv #c5cae9 {
+            component "ProductsController" as CProd
+            component "CategoriesController" as CCat
+            component "InventoryController" as CInv
+            component "StockCountsController" as CStock
+            component "BatchesController" as CBatches
+        }
+
+        package "Customers & Admin" as CtrlAdmin #c5cae9 {
+            component "CustomersController" as CCust
+            component "PromotionsController" as CPromo
+            component "ReportsController" as CReports
+            component "SuppliersController" as CSup
+            component "ReceiptsController" as CRec
+        }
+    }
+
+    ' --- Service Layer ---
+    package "Service Layer (Business Logic)" as ServiceLayer #e0f2f1 {
+
+        package "Security & Support" as SvcSec #b2dfdb {
+            component "AuthService" as SAuth
+            component "JwtService" as SJwt
+            component "NotificationService" as SNotif
+            component "VnPayService" as SVNPay
+        }
+
+        package "Sales & Operations" as SvcSales #b2dfdb {
+            component "OrderReturnService" as SOrdRet
+            component "EInvoiceService" as SEInv
+            component "PromotionService" as SPromo
+            component "ShiftService" as SShift
+            component "ReportService" as SReport
+        }
+
+        package "Products & Inventory" as SvcInv #b2dfdb {
+            component "ProductService" as SProd
+            component "CategoryService" as SCat
+            component "InventoryService" as SInv
+            component "StockCountService" as SStock
+            component "BatchService" as SBatch
+            component "ReceiptService" as SRec
+        }
+
+        package "Stakeholders" as SvcStake #b2dfdb {
+            component "CustomerService" as SCust
+            component "EmployeeService" as SEmp
+            component "SupplierService" as SSup
+        }
+    }
+
+    ' --- Repository Layer ---
+    package "Repository Layer (Entity Framework Core)" as RepoLayer #fff3e0 {
+
+        package "Sales Repositories" as RepoSales #ffe0b2 {
+            component "OrderRepository\n(Handles Checkout)" as ROrd
+            component "OrderReturnRepository" as ROrdRet
+            component "PaymentRepository" as RPay
+            component "EInvoiceRepository" as REInv
+        }
+
+        package "Inventory Repositories" as RepoInv #ffe0b2 {
+            component "ProductRepository" as RProd
+            component "CategoryRepository" as RCat
+            component "InventoryTxRepository" as RInvTx
+            component "StockCountRepository" as RStock
+            component "BatchRepository" as RBatch
+            component "ReceiptRepository" as RRec
+        }
+
+        package "User & Admin Repositories" as RepoUser #ffe0b2 {
+            component "CustomerRepository" as RCust
+            component "EmployeeRepository" as REmp
+            component "SupplierRepository" as RSup
+            component "PromotionRepository" as RPromo
+            component "ReportRepository" as RReport
+            component "ShiftRepository" as RShift
+            component "RefreshTokenRepository" as RRefresh
+        }
+    }
+}
+
+' ═══════════════════════════════════════════════════
+' EXTERNAL SERVICES
+' ═══════════════════════════════════════════════════
+package "External Services" as ExtServices {
+    component "PayOS API\n(VietQR Payment)" as PayOS #fff9c4
+}
+
+' ═══════════════════════════════════════════════════
+' CROSS-CUTTING & DATA LAYER
+' ═══════════════════════════════════════════════════
+package "Cross-Cutting Concerns" as CrossCutting #eeeeee {
+
+    package "Real-time Notifications (SignalR)" as CCC_SignalR {
+        component "NotificationHub" as Hub
+        component "Group: Managers" as HubMgr
+        component "Group: Employee_{id}" as HubEmp
+    }
+
+    package "Data Transfer Objects (DTOs)" as CCC_DTOs {
+        component "OrderDtos" as DtoOrder
+        component "ProductDtos" as DtoProd
+        component "CustomerDtos" as DtoCust
+        component "EmployeeDtos" as DtoEmp
+        component "StockCountDtos" as DtoStock
+        component "ReceiptDtos" as DtoRec
+    }
+
+    package "Mappers & Utilities" as CCC_Utils {
+        component "AutoMapper Profiles" as Mapper
+        component "Shared/Utils" as Utils
+    }
+}
+
+package "Data Storage Layer" as DataLayer #f3e5f5 {
+    database "Microsoft SQL Server\n(MiniMartDbContext)" as DB
+    note bottom of DB
+        **Core Tables:** Employees | Roles | Shifts | Customers | Suppliers
+        RefreshTokens | Categories | Products | Batches | InventoryTransactions
+        StockCounts | StockCountLines | StockCountCategories | Receipts | Orders
+        OrderDetails | OrderReturns | OrderReturnDetails | Payments | EInvoices
+        EInvoiceDetails | Promotions | PromotionProducts | PointTransactions
+        TaxRates
+    end note
+}
+
+' ═══════════════════════════════════════════════════
+' CONNECTIONS (MAIN DATA FLOW)
+' ═══════════════════════════════════════════════════
+
+' --- 1. Client Sends Request ---
+ClientLayer -down-> SecurityLayer : [1] HTTPS Request\n(With JWT Headers)
+
+' --- 2. Security Check ---
+SecurityLayer -[dashed]down-> ControllerLayer : [2] Validates & Routes\n(To Endpoint)
+
+' --- 3. Controller Processing ---
+ControllerLayer -down-> ServiceLayer : [3a] Calls Service\n(Complex Logic)
+ControllerLayer -down-> RepoLayer : [3b] Calls Repo directly\n(Simple Read/Write)
+
+' --- 4. Service Data Interaction ---
+ServiceLayer -down-> RepoLayer : [4] Executes Queries/Commands
+
+' --- 5. Repository DB Interaction ---
+RepoLayer -down-> DB : [5] SQL Interaction\nvia EF Core (LINQ)
+
+' ---------------------------------------------------
+' REAL-TIME & EXTERNAL CONNECTIONS
+' ---------------------------------------------------
+FlutterApp -right-> Hub : WebSockets Connection (SignalR)
+ServiceLayer -up-> Hub : Triggers Push Notifications
+COrders -right-> PayOS : [External] HTTPS Call to generate VietQR
+
+' ---------------------------------------------------
+' CROSS-CUTTING CONCERNS USAGE
+' ---------------------------------------------------
+ControllerLayer .right.> CCC_DTOs : [Receives/Returns] DTOs
+ServiceLayer .right.> CCC_DTOs : [Processes] DTOs
+ServiceLayer .right.> Mapper : Uses AutoMapper Profile
+
+' ═══════════════════════════════════════════════════
+' LEGEND
+' ═══════════════════════════════════════════════════
+legend bottom left
+    |= Color |= Layer |
+    | <#e8f5e9> | Client / Presentation Layer |
+    | <#e3f2fd> | ASP.NET Core Application Box |
+    | <#fce4ec> | Security Layer (Middleware) |
+    | <#e8eaf6> | Controller Layer (Web API) |
+    | <#e0f2f1> | Service Layer (Business Logic) |
+    | <#fff3e0> | Repository Layer (Data Access) |
+    | <#f3e5f5> | Data Storage (SQL Server) |
+    | <#eeeeee> | Cross-Cutting Concerns |
+    | <#fff9c4> | External Services |
+
+    **Tech Stack Details:**
+    * **Backend Core**: ASP.NET Core 8.0, C# 12
+    * **Database & ORM**: MS SQL Server, Entity Framework Core
+    * **Client Apps**: WPF (.NET 8), Flutter (Dart)
+    * **Security & Comm**: JWT Authentication, SignalR (WebSockets)
+    * **Utils & 3rd Party**: AutoMapper, PayOS (VietQR Payment)
+end legend
+
+@enduml

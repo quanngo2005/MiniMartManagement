@@ -1,0 +1,93 @@
+@startuml MiniMart_Login_Sequence_Refined
+skinparam BackgroundColor white
+skinparam Shadowing false
+skinparam SequenceArrowColor black
+skinparam SequenceLifeLineBorderColor black
+skinparam SequenceLifeLineBackgroundColor white
+skinparam SequenceGroupBorderColor black
+skinparam SequenceGroupHeaderFontColor black
+skinparam SequenceGroupBackgroundColor #E0E0E0
+skinparam ParticipantBorderColor black
+skinparam ParticipantBackgroundColor #F5F5F5
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor #F5F5F5
+skinparam DatabaseBorderColor black
+skinparam DatabaseBackgroundColor #F5F5F5
+skinparam ControlBorderColor black
+skinparam ControlBackgroundColor #F5F5F5
+skinparam BoundaryBorderColor black
+skinparam BoundaryBackgroundColor #F5F5F5
+skinparam NoteBackgroundColor #FFF2CC
+skinparam NoteBorderColor black
+skinparam maxMessageSize 250
+autonumber
+title **Login Sequence**
+
+actor Employee
+boundary "MiniMart Mobile App" as App
+control "AuthController" as AC
+control "AuthService" as MAS
+control "EmployeeRepository" as ER
+control "JwtService" as JS
+control "RefreshTokenRepository" as RR
+database "MiniMartDbContext" as DB
+
+Employee -> App : Submit credentials
+activate App
+
+App -> AC : POST /api/auth/login
+activate AC
+
+alt Invalid Credentials
+    AC --> App : 400/401/403 Error Response
+    App --> Employee : Display error message
+else Valid Credentials
+    AC -> MAS : LoginAsync(LoginRequest)
+    activate MAS
+    
+    MAS -> ER : GetByUsernameAsync(username)
+    activate ER
+    ER -> DB : Query Employee.Include(Role)
+    activate DB
+    DB --> ER : Employee + Role data
+    deactivate DB
+    ER --> MAS : Employee entity
+    deactivate ER
+    
+    MAS -> JS : GenerateAccessToken(employee)
+    activate JS
+    JS --> MAS : accessToken
+    deactivate JS
+    
+    MAS -> JS : GenerateRefreshToken()
+    activate JS
+    JS --> MAS : refreshToken
+    deactivate JS
+    
+    MAS -> RR : CreateAsync(refreshToken)
+    activate RR
+    RR -> DB : Add(RefreshToken)
+    activate DB
+    DB --> RR : Success
+    deactivate DB
+    RR --> MAS : Success
+    deactivate RR
+    MAS -> RR : RevokeOldTokensAsync(employeeId)
+    activate RR
+    RR -> DB : Update(OldTokens)
+    activate DB
+    DB --> RR : Success
+    deactivate DB
+    RR --> MAS : Success
+    deactivate RR
+    
+    MAS --> AC : AuthResponse, TokenPair
+    deactivate MAS
+    
+    AC --> App : 200 OK (AuthResponse)\n+ Set-Cookie: Tokens
+    deactivate AC
+    
+    App --> Employee : Navigate based on Role
+    deactivate App
+end
+@enduml
