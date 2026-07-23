@@ -331,8 +331,8 @@ namespace MiniMart.Repositories.RepoImplement
                     OrderId = order.OrderId,
                     PaymentMethod = request.PaymentMethod,
                     Amount = finalAmount,
-                    TransactionRef = $"{order.OrderId}_{HanoiTime.Now:MMddHHmmss}",
-                    PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : DateTime.MinValue,
+                    TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
+                    PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : createdAt,
                     Status = request.PaymentMethod == PaymentMethod.Cash ? PaymentStatus.Success : PaymentStatus.Pending
                 };
                 await _context.Payments.AddAsync(paymentRecord);
@@ -467,6 +467,26 @@ namespace MiniMart.Repositories.RepoImplement
 
                     order.Status = OrderStatus.Completed;
 
+                    var payment = await _context.Payments.FirstOrDefaultAsync(p => p.OrderId == order.OrderId);
+                    if (payment != null)
+                    {
+                        payment.Status = PaymentStatus.Success;
+                        payment.PaidAt = DateTime.UtcNow.AddHours(7);
+                    }
+                    else
+                    {
+                        var newPayment = new Payment
+                        {
+                            OrderId = order.OrderId,
+                            PaymentMethod = PaymentMethod.VietQR,
+                            Amount = order.FinalAmount,
+                            TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
+                            PaidAt = DateTime.UtcNow.AddHours(7),
+                            Status = PaymentStatus.Success
+                        };
+                        await _context.Payments.AddAsync(newPayment);
+                    }
+
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
@@ -477,28 +497,10 @@ namespace MiniMart.Repositories.RepoImplement
                         "Batch data was updated by another operation. Please refresh and try again.",
                         StatusCodes.Status409Conflict);
                 }
-
-                order.Shift.Revenue += order.FinalAmount;
-                order.Status = OrderStatus.Completed;
-
-                var payment = await _context.Payments.FirstOrDefaultAsync(p => p.OrderId == order.OrderId);
-                if (payment != null)
+                catch
                 {
-                    payment.Status = PaymentStatus.Success;
-                    payment.PaidAt = HanoiTime.Now;
-                }
-                else
-                {
-                    var newPayment = new Payment
-                    {
-                        OrderId = order.OrderId,
-                        PaymentMethod = PaymentMethod.VietQR, // Hay lấy từ order nếu có
-                        Amount = order.FinalAmount,
-                        TransactionRef = $"{order.OrderId}_{HanoiTime.Now:MMddHHmmss}",
-                        PaidAt = HanoiTime.Now,
-                        Status = PaymentStatus.Success
-                    };
-                    await _context.Payments.AddAsync(newPayment);
+                    await transaction.RollbackAsync();
+                    throw;
                 }
 
                 await _context.SaveChangesAsync();

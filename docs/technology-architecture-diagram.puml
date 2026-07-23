@@ -1,0 +1,148 @@
+@startuml MiniMart_Technology_Architecture
+skinparam BackgroundColor white
+skinparam Shadowing false
+skinparam RectangleBorderColor black
+skinparam RectangleBackgroundColor #F5F5F5
+skinparam ComponentBorderColor black
+skinparam ComponentBackgroundColor #F5F5F5
+skinparam DatabaseBorderColor black
+skinparam DatabaseBackgroundColor #F5F5F5
+skinparam CloudBorderColor black
+skinparam CloudBackgroundColor #F5F5F5
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor #F5F5F5
+skinparam ArrowColor black
+skinparam NoteBorderColor black
+skinparam NoteBackgroundColor #FFF2CC
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+
+title **MiniMart Management System — Technology Architecture Diagram**
+
+' ═══════════════════════════════════════════════════
+' ACTORS
+' ═══════════════════════════════════════════════════
+actor "Cashier" as Cashier
+actor "Manager" as Manager
+actor "Warehouse\nStaff" as Warehouse
+
+' ═══════════════════════════════════════════════════
+' CLIENT LAYER
+' ═══════════════════════════════════════════════════
+rectangle "Client Layer" as ClientLayer {
+    rectangle "Flutter Mobile App\n(Dart)" as FlutterApp {
+        component "Provider\n(State Management)" as Provider
+        component "REST API Client\n(HTTP + Cookie)" as FlutterHttp
+        component "SignalR Client\n(WebSocket)" as FlutterSignalR
+    }
+    rectangle "WPF Desktop App\n(.NET 8 / MVVM)" as WPFApp {
+        component "ViewModel\n(MVVM Pattern)" as ViewModel
+        component "REST API Client\n(HttpClient)" as WPFHttp
+    }
+}
+
+' ═══════════════════════════════════════════════════
+' API LAYER (Docker Container)
+' ═══════════════════════════════════════════════════
+rectangle "API Layer — Docker Container (ASP.NET Core 8.0)" as APILayer {
+    rectangle "Middleware Pipeline" as Middleware {
+        component "CSRF\nMiddleware" as CSRF
+        component "JWT Bearer\nAuthentication" as JWT
+    }
+    rectangle "API Endpoints" as Endpoints {
+        component "REST API\nControllers" as REST
+        component "OData\nEndpoints" as OData
+        component "Swagger UI\n(API Docs)" as Swagger
+    }
+    rectangle "Real-Time Communication" as RealTime {
+        component "SignalR\nNotificationHub" as SignalR
+    }
+    rectangle "Business Logic" as BizLogic {
+        component "Services\n(Auth, Order, Inventory...)" as Services
+        component "Repositories\n(Data Access Layer)" as Repos
+        component "AutoMapper\n(Entity <-> DTO)" as Mapper
+    }
+}
+
+' ═══════════════════════════════════════════════════
+' DATA LAYER
+' ═══════════════════════════════════════════════════
+rectangle "Data Layer" as DataLayer {
+    database "SQL Server\n(Entity Framework Core 8)" as SQLServer
+}
+
+' ═══════════════════════════════════════════════════
+' EXTERNAL SERVICES
+' ═══════════════════════════════════════════════════
+rectangle "External Services" as ExternalServices {
+    component "PayOS\n(VietQR Payment)" as PayOS
+}
+
+' ═══════════════════════════════════════════════════
+' INFRASTRUCTURE & DevOps
+' ═══════════════════════════════════════════════════
+rectangle "Infrastructure & DevOps" as Infra {
+    cloud "AWS\n(Cloud Hosting)" as AWS
+    component "Docker\n(Containerization)" as Docker
+    rectangle "CI/CD Pipeline" as CICD {
+        component "GitHub\n(Source Control)" as GitHub
+        component "GitHub Actions\n(.NET CI + Flutter CI)" as GHA
+    }
+}
+
+' ═══════════════════════════════════════════════════
+' CONNECTIONS — Actors to Clients
+' ═══════════════════════════════════════════════════
+Cashier --> FlutterApp : Mobile POS
+Cashier --> WPFApp : Desktop POS
+Manager --> FlutterApp : Management
+Warehouse --> WPFApp : Inventory
+
+' ═══════════════════════════════════════════════════
+' CONNECTIONS — Clients to API
+' ═══════════════════════════════════════════════════
+FlutterHttp --> REST : HTTPS\n(REST + OData)
+FlutterSignalR --> SignalR : WSS\n(Real-Time)
+WPFHttp --> REST : HTTPS\n(REST + OData)
+
+' ═══════════════════════════════════════════════════
+' CONNECTIONS — Internal API
+' ═══════════════════════════════════════════════════
+REST --> Services
+OData --> Services
+Services --> Repos
+Services --> Mapper
+Repos --> SQLServer : TCP/IP\n(EF Core)
+
+' ═══════════════════════════════════════════════════
+' CONNECTIONS — External Services
+' ═══════════════════════════════════════════════════
+Services --> PayOS : HTTPS\n(Payment API)
+
+' ═══════════════════════════════════════════════════
+' CONNECTIONS — DevOps
+' ═══════════════════════════════════════════════════
+GitHub --> GHA : Trigger\n(push / PR)
+GHA --> Docker : Build &\nPublish
+Docker --> AWS : Deploy
+
+' ═══════════════════════════════════════════════════
+' NOTES
+' ═══════════════════════════════════════════════════
+note right of PayOS
+  Payment Methods:
+  - Cash
+  - BankTransfer
+  - CreditCard
+  - VietQR (via PayOS)
+  - VNPay
+  - ZaloPay
+end note
+
+note bottom of SignalR
+  Real-time notifications
+  for Order Return approval
+  (Manager <-> Cashier)
+end note
+
+@enduml
