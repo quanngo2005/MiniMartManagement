@@ -65,7 +65,9 @@ class _TierDetailScreenState extends State<TierDetailScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          ok ? 'Đã lưu cấu hình ${tier.name}.' : provider.error ?? 'Không thể lưu cấu hình loyalty.',
+          ok
+              ? 'Đã lưu cấu hình ${tier.name}.'
+              : provider.error ?? 'Không thể lưu cấu hình loyalty.',
         ),
         backgroundColor: ok ? AppColors.secondary : AppColors.statusError,
       ),
@@ -132,7 +134,8 @@ class _TierDetailScreenState extends State<TierDetailScreen> {
                       children: [
                         Text(
                           tier.name,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primary,
                               ),

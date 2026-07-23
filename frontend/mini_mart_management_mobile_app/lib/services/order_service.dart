@@ -39,11 +39,9 @@ class OrderService {
   }
 
   Future<List<OrderSummary>> getAllOrders() async {
-    final uri = ApiConfig.uri('/api/orders').replace(
-      queryParameters: {
-        r'$orderby': 'OrderDate desc',
-      },
-    );
+    final uri = ApiConfig.uri(
+      '/api/orders',
+    ).replace(queryParameters: {r'$orderby': 'OrderDate desc'});
     final response = await _client.get(
       uri,
       headers: const {'Accept': 'application/json'},

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import '../models/membership_tier.dart';
 
 class TierProvider with ChangeNotifier {
@@ -73,15 +73,18 @@ class TierProvider with ChangeNotifier {
       return false;
     }
 
-    _tiers = _tiers.map((tier) {
-      if (tier.id != tierId) return tier;
-      return tier.copyWith(
-        requiredPoints: requiredPoints,
-        benefits: benefits,
-        colorCode: colorCode,
-      );
-    }).toList(growable: false)
-      ..sort((a, b) => b.requiredPoints.compareTo(a.requiredPoints));
+    _tiers =
+        _tiers
+            .map((tier) {
+              if (tier.id != tierId) return tier;
+              return tier.copyWith(
+                requiredPoints: requiredPoints,
+                benefits: benefits,
+                colorCode: colorCode,
+              );
+            })
+            .toList(growable: false)
+          ..sort((a, b) => b.requiredPoints.compareTo(a.requiredPoints));
     notifyListeners();
     return true;
   }
