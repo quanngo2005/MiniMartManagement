@@ -13,6 +13,7 @@ namespace MiniMart.Shared.Extensions
             services.AddScoped<IBatchService, BatchService>();
             services.AddScoped<IReceiptService, ReceiptService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ISupplierService, SupplierService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IShiftService, ShiftService>();

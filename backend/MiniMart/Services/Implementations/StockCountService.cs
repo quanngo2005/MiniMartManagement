@@ -157,7 +157,7 @@ namespace MiniMart.Services.Implementations
             var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
                 ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
 
-            EnsureStatus(stockCount, StockCountStatus.Draft);
+            ValidateTransition(stockCount, StockCountStatus.Cancelled);
             _stockCountRepository.ApplyOriginalRowVersion(stockCount, rowVersion);
             stockCount.Status = StockCountStatus.Cancelled;
 
@@ -386,26 +386,36 @@ namespace MiniMart.Services.Implementations
                 ValidateTransition(stockCount, StockCountStatus.Closed);
                 _stockCountRepository.ApplyOriginalRowVersion(stockCount, rowVersion);
 
+                var varianceLines = stockCount.Lines
+                    .Where(line => line.ActualQuantity.HasValue && line.ActualQuantity.Value != line.SnapshotQuantity)
+                    .ToList();
+                var allProductIds = stockCount.Lines
+                    .Select(line => line.ProductId)
+                    .Distinct()
+                    .ToList();
+                var batches = (await _stockCountRepository.GetTrackedBatchesForProductsAsync(allProductIds)).ToList();
+
                 var driftedLines = stockCount.Lines
-                    .Where(line => line.Product.StockQuantity != line.SnapshotQuantity)
-                    .Select(line => new StockCountStockDriftDto
+                    .Select(line =>
                     {
-                        StockCountLineId = line.StockCountLineId,
-                        ProductId = line.ProductId,
-                        SnapshotQuantity = line.SnapshotQuantity,
-                        CurrentQuantity = line.Product.StockQuantity
+                        var activeBatchTotal = batches
+                            .Where(b => b.ProductId == line.ProductId && !b.IsDeleted && b.Status)
+                            .Sum(b => b.QuantityRemaining);
+                        return (Line: line, ActiveBatchTotal: activeBatchTotal);
+                    })
+                    .Where(x => x.ActiveBatchTotal != x.Line.SnapshotQuantity)
+                    .Select(x => new StockCountStockDriftDto
+                    {
+                        StockCountLineId = x.Line.StockCountLineId,
+                        ProductId = x.Line.ProductId,
+                        SnapshotQuantity = x.Line.SnapshotQuantity,
+                        CurrentQuantity = x.ActiveBatchTotal
                     })
                     .ToList();
                 if (driftedLines.Count > 0)
                 {
                     throw new StockCountStockDriftException(driftedLines);
                 }
-
-                var varianceLines = stockCount.Lines
-                    .Where(line => line.ActualQuantity.HasValue && line.ActualQuantity.Value != line.SnapshotQuantity)
-                    .ToList();
-                var productIds = varianceLines.Select(line => line.ProductId).Distinct().ToList();
-                var batches = (await _stockCountRepository.GetTrackedBatchesForProductsAsync(productIds)).ToList();
                 var adjustmentBatches = new List<Batch>();
                 var inventoryTransactions = new List<InventoryTransaction>();
                 var approvedAt = HanoiTime.Now;
@@ -415,13 +425,15 @@ namespace MiniMart.Services.Implementations
                     var product = line.Product;
                     var variance = line.ActualQuantity!.Value - line.SnapshotQuantity;
                     var productBatches = batches.Where(batch => batch.ProductId == line.ProductId).ToList();
-                    var runningStock = product.StockQuantity;
+                    var runningStock = productBatches
+                        .Where(b => !b.IsDeleted && b.Status)
+                        .Sum(b => b.QuantityRemaining);
 
                     if (variance < 0)
                     {
                         var quantityToDeduct = -variance;
                         // Reconciliation deliberately includes expired-but-undisposed batches:
-                        // cached ProductStock counts them as on-hand, so shortage allocation must too.
+                        // active batch total counts them as on-hand, so shortage allocation must too.
                         // Disposal of expired stock is a separate explicit workflow (POST /api/batches/{id}/dispose-expired).
                         // Do NOT reuse GetSellableBatchesForProductsAsync here — that pool intentionally
                         // excludes expired stock for order fulfillment and must stay that way.
@@ -553,6 +565,21 @@ namespace MiniMart.Services.Implementations
             stockCount.ReviewedAt = HanoiTime.Now;
             stockCount.RejectionReason = rejectDto.Reason.Trim();
 
+            var rejectProductIds = stockCount.Lines.Select(l => l.ProductId).Distinct().ToList();
+            var rejectBatches = (await _stockCountRepository.GetTrackedBatchesForProductsAsync(rejectProductIds));
+
+            foreach (var line in stockCount.Lines)
+            {
+                var activeBatchTotal = rejectBatches
+                    .Where(b => b.ProductId == line.ProductId && !b.IsDeleted && b.Status)
+                    .Sum(b => b.QuantityRemaining);
+                line.SnapshotQuantity = activeBatchTotal;
+                line.ActualQuantity = null;
+                line.Note = null;
+            }
+
+            stockCount.StartedAt = HanoiTime.Now;
+
             try
             {
                 await _stockCountRepository.SaveChangesAsync();
@@ -631,7 +658,9 @@ namespace MiniMart.Services.Implementations
             var isAllowed = (stockCount.Status, targetStatus) switch
             {
                 (StockCountStatus.Draft, StockCountStatus.Counting) => true,
+                (StockCountStatus.Draft, StockCountStatus.Cancelled) => true,
                 (StockCountStatus.Counting, StockCountStatus.PendingApproval) => true,
+                (StockCountStatus.Counting, StockCountStatus.Cancelled) => true,
                 (StockCountStatus.PendingApproval, StockCountStatus.Closed) => true,
                 (StockCountStatus.PendingApproval, StockCountStatus.Counting) => true,
                 _ => false

@@ -238,10 +238,11 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
   }
 
   Future<void> _cancelDraft() async {
+    final isDraft = _count!.status == StockCountStatus.draft;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Hủy phiếu kiểm kê nháp'),
+        title: Text(isDraft ? 'Hủy phiếu kiểm kê nháp' : 'Hủy phiếu kiểm kê'),
         content: const Text(
           'Phiếu sẽ được lưu trong lịch sử với trạng thái đã hủy.',
         ),
@@ -528,6 +529,16 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
       ),
       StockCountStatus.counting => Row(
         children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: _cancelDraft,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.statusError,
+              ),
+              child: const Text('Hủy phiếu'),
+            ),
+          ),
+          const SizedBox(width: 8),
           Expanded(
             child: OutlinedButton(onPressed: _save, child: const Text('Lưu')),
           ),
