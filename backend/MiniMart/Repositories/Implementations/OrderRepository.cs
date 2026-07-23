@@ -514,6 +514,9 @@ namespace MiniMart.Repositories.RepoImplement
                     await transaction.RollbackAsync();
                     throw;
                 }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
             });
         }
 
