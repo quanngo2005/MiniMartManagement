@@ -7,9 +7,9 @@ class CheckoutItem {
   CheckoutItem({required this.productId, required this.quantity});
 
   Map<String, dynamic> toJson() => {
-        'productId': productId,
-        'quantity': quantity,
-      };
+    'productId': productId,
+    'quantity': quantity,
+  };
 }
 
 class CheckoutRequest {
@@ -34,15 +34,15 @@ class CheckoutRequest {
   });
 
   Map<String, dynamic> toJson() => {
-        'employeeId': employeeId,
-        'shiftId': shiftId,
-        if (customerId != null) 'customerId': customerId,
-        'loyaltyPointsToUse': loyaltyPointsToUse,
-        'paymentMethod': _paymentMethodToApiValue(paymentMethod),
-        'paidAmount': paidAmount,
-        if (note != null) 'note': note,
-        'items': items.map((i) => i.toJson()).toList(),
-      };
+    'employeeId': employeeId,
+    'shiftId': shiftId,
+    if (customerId != null) 'customerId': customerId,
+    'loyaltyPointsToUse': loyaltyPointsToUse,
+    'paymentMethod': _paymentMethodToApiValue(paymentMethod),
+    'paidAmount': paidAmount,
+    if (note != null) 'note': note,
+    'items': items.map((i) => i.toJson()).toList(),
+  };
 
   static int _paymentMethodToApiValue(PaymentMethod method) {
     switch (method) {
@@ -107,7 +107,8 @@ class CheckoutResponse {
       paymentMethod: _parsePaymentMethod(json['paymentMethod']),
       status: json['status']?.toString() ?? '',
       orderDate: DateTime.tryParse(json['orderDate'] ?? '') ?? DateTime.now(),
-      items: (json['items'] as List<dynamic>?)
+      items:
+          (json['items'] as List<dynamic>?)
               ?.map((i) => CheckoutItemResponse.fromJson(i))
               .toList() ??
           [],

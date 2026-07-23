@@ -15,15 +15,18 @@ namespace MiniMart.Services
     {
         private readonly IBatchRepository _batchRepository;
         private readonly IInventoryTransactionRepository _inventoryTransactionRepository;
+        private readonly IProductStockAdjuster _productStockAdjuster;
         private readonly IMapper _mapper;
 
         public BatchService(
             IBatchRepository batchRepository,
             IInventoryTransactionRepository inventoryTransactionRepository,
+            IProductStockAdjuster productStockAdjuster,
             IMapper mapper)
         {
             _batchRepository = batchRepository;
             _inventoryTransactionRepository = inventoryTransactionRepository;
+            _productStockAdjuster = productStockAdjuster;
             _mapper = mapper;
         }
 
@@ -110,6 +113,8 @@ namespace MiniMart.Services
                 await _batchRepository.AdjustBatchRemainingQuantityAsync(
                     batch.BatchId,
                     -disposalQuantity);
+
+                await _productStockAdjuster.AdjustAsync(product.ProductId, -disposalQuantity);
 
                 disposedTransaction = await _inventoryTransactionRepository
                     .CreateInventoryTransactionAsync(new InventoryTransaction

@@ -8,6 +8,7 @@ namespace MiniMart.Shared.Extensions
     {
         public static IServiceCollection AddAppServices(this IServiceCollection services)
         {
+            services.AddScoped<IProductStockAdjuster, ProductStockAdjuster>();
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<IBatchService, BatchService>();
             services.AddScoped<IReceiptService, ReceiptService>();

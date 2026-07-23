@@ -111,8 +111,13 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final stackIndex = _destinationToIndex[_destination]!;
-    final hasPendingReturns = context.watch<OrderReturnProvider>().pendingReturns.isNotEmpty;
-    final hasPendingStockCounts = context.watch<StockCountProvider>().stockCounts
+    final hasPendingReturns = context
+        .watch<OrderReturnProvider>()
+        .pendingReturns
+        .isNotEmpty;
+    final hasPendingStockCounts = context
+        .watch<StockCountProvider>()
+        .stockCounts
         .where((s) => s.status == StockCountStatus.pendingApproval)
         .isNotEmpty;
 

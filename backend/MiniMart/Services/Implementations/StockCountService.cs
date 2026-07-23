@@ -420,8 +420,13 @@ namespace MiniMart.Services.Implementations
                     if (variance < 0)
                     {
                         var quantityToDeduct = -variance;
+                        // Reconciliation deliberately includes expired-but-undisposed batches:
+                        // cached ProductStock counts them as on-hand, so shortage allocation must too.
+                        // Disposal of expired stock is a separate explicit workflow (POST /api/batches/{id}/dispose-expired).
+                        // Do NOT reuse GetSellableBatchesForProductsAsync here — that pool intentionally
+                        // excludes expired stock for order fulfillment and must stay that way.
                         var eligibleBatches = productBatches
-                            .Where(batch => batch.Status && batch.QuantityRemaining > 0 && batch.ExpiryDate >= HanoiTime.Now.Date)
+                            .Where(batch => batch.Status && batch.QuantityRemaining > 0)
                             .OrderBy(batch => batch.ExpiryDate)
                             .ThenBy(batch => batch.Receipt?.ImportDate ?? DateTime.MaxValue)
                             .ThenBy(batch => batch.BatchId)

@@ -15,7 +15,8 @@ class OrderRepository {
 
   Future<List<OrderSummary>> getAllOrders() async {
     final orders = await _service.getAllOrders();
-    return orders..sort((left, right) => right.orderDate.compareTo(left.orderDate));
+    return orders
+      ..sort((left, right) => right.orderDate.compareTo(left.orderDate));
   }
 
   Future<Map<String, dynamic>> checkout({

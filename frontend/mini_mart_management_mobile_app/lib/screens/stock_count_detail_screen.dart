@@ -303,9 +303,14 @@ class _StockCountDetailScreenState extends State<StockCountDetailScreen> {
     }
   }
 
-  void _message(String value) => ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(value)));
+  void _message(String value) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(value)));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

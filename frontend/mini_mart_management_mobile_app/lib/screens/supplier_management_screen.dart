@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mini_mart_management_mobile_app/models/supplier.dart';
 import 'package:mini_mart_management_mobile_app/providers/supplier_provider.dart';
@@ -154,4 +154,3 @@ class _SupplierTile extends StatelessWidget {
     );
   }
 }
-

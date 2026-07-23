@@ -100,19 +100,17 @@ class _CategoryBodyState extends State<_CategoryBody> {
       );
     }
 
-    final categories = provider.categories.where((category) {
-      final query = _query.toLowerCase();
-      return query.isEmpty ||
-          category.categoryName.toLowerCase().contains(query) ||
-          category.categoryCode.toLowerCase().contains(query) ||
-          (category.description?.toLowerCase().contains(query) ?? false);
-    }).toList()
-      ..sort((a, b) {
-        final order = a.displayOrder.compareTo(b.displayOrder);
-        return order == 0
-            ? a.categoryName.compareTo(b.categoryName)
-            : order;
-      });
+    final categories =
+        provider.categories.where((category) {
+          final query = _query.toLowerCase();
+          return query.isEmpty ||
+              category.categoryName.toLowerCase().contains(query) ||
+              category.categoryCode.toLowerCase().contains(query) ||
+              (category.description?.toLowerCase().contains(query) ?? false);
+        }).toList()..sort((a, b) {
+          final order = a.displayOrder.compareTo(b.displayOrder);
+          return order == 0 ? a.categoryName.compareTo(b.categoryName) : order;
+        });
 
     return RefreshIndicator(
       onRefresh: context.read<CategoryProvider>().fetchAll,

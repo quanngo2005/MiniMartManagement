@@ -4,6 +4,7 @@ using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
+using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
 using MiniMart.Shared.Utils;
 
@@ -13,11 +14,16 @@ namespace MiniMart.Repositories.RepoImplement
     {
         private readonly MiniMartDbContext _context;
         private readonly IBatchRepository _batchRepository;
+        private readonly IProductStockAdjuster _productStockAdjuster;
 
-        public OrderRepository(MiniMartDbContext context, IBatchRepository batchRepository)
+        public OrderRepository(
+            MiniMartDbContext context,
+            IBatchRepository batchRepository,
+            IProductStockAdjuster productStockAdjuster)
         {
             _context = context;
             _batchRepository = batchRepository;
+            _productStockAdjuster = productStockAdjuster;
         }
 
         // GET ALL (OData)
@@ -306,27 +312,8 @@ namespace MiniMart.Repositories.RepoImplement
                     int pointsEarned = 0;
                     if (request.PaymentMethod == PaymentMethod.Cash)
                     {
-                        foreach (var detail in orderDetails)
-                        {
-                            var product = await _context.Products.FindAsync(detail.ProductId);
-                            int previousStock = product!.StockQuantity;
-                            product.StockQuantity -= detail.Quantity;
-
-                            _context.InventoryTransactions.Add(new InventoryTransaction
-                            {
-                                TransactionType = InventoryTransactionType.Sale,
-                                Quantity = detail.Quantity,
-                                PreviousStock = previousStock,
-                                CurrentStock = product.StockQuantity,
-                                ReferenceType = ReferenceType.Order,
-                                ReferenceId = order.OrderId,
-                                ProductId = detail.ProductId,
-                                EmployeeId = request.EmployeeId,
-                                Note = detail.IsGift
-                                    ? $"Quà tặng khuyến mãi - Đơn {order.OrderCode}"
-                                    : $"Bán hàng - Đơn {order.OrderCode}"
-                            });
-                        }
+                        await ConsumeSaleStockAsync(
+                            order.OrderId, order.OrderCode, request.EmployeeId, orderDetails);
 
                         pointsEarned = (int)(finalAmount / 50000);
                         if (customer != null)
@@ -566,7 +553,7 @@ namespace MiniMart.Repositories.RepoImplement
             foreach (var (productId, quantity) in requestedQuantities)
             {
                 var product = products[productId];
-                product.StockQuantity -= quantity;
+                await _productStockAdjuster.AdjustAsync(productId, -quantity);
 
                 var quantityToAllocate = quantity;
                 foreach (var batch in sellableBatches.Where(batch => batch.ProductId == productId))
