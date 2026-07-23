@@ -76,7 +76,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       await shiftProvider.fetchCurrentShift();
       await promotionProvider.fetchPromotions();
       if (mounted) {
-        context.read<CartProvider>().setPromotions(promotionProvider.promotions);
+        context.read<CartProvider>().setPromotions(
+          promotionProvider.promotions,
+        );
       }
       if (mounted && shiftProvider.currentShift == null) {
         Navigator.of(context).push(

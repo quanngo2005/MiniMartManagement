@@ -11,7 +11,7 @@ abstract final class ApiConfig {
     }
     // Dynamic mapping for mobile emulators
     return defaultTargetPlatform == TargetPlatform.android
-        ? 'https://mmms-cvaka8c9bkfkduf3.southeastasia-01.azurewebsites.net' 
+        ? 'https://mmms-cvaka8c9bkfkduf3.southeastasia-01.azurewebsites.net'
         : 'http://10.0.2.2:5005';
   }
 

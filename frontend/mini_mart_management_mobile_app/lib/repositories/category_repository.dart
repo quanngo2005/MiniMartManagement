@@ -7,25 +7,17 @@ class CategoryRepository {
 
   final CategoryService _service;
 
-  Future<List<Category>> getAll() => _guard(
-    _service.getAll,
-    'Không thể tải danh mục',
-  );
+  Future<List<Category>> getAll() =>
+      _guard(_service.getAll, 'Không thể tải danh mục');
 
-  Future<Category> create(Map<String, dynamic> data) => _guard(
-    () => _service.create(data),
-    'Không thể tạo danh mục',
-  );
+  Future<Category> create(Map<String, dynamic> data) =>
+      _guard(() => _service.create(data), 'Không thể tạo danh mục');
 
-  Future<Category> update(int id, Map<String, dynamic> data) => _guard(
-    () => _service.update(id, data),
-    'Không thể cập nhật danh mục',
-  );
+  Future<Category> update(int id, Map<String, dynamic> data) =>
+      _guard(() => _service.update(id, data), 'Không thể cập nhật danh mục');
 
-  Future<void> delete(int id) => _guard(
-    () => _service.delete(id),
-    'Không thể xóa danh mục',
-  );
+  Future<void> delete(int id) =>
+      _guard(() => _service.delete(id), 'Không thể xóa danh mục');
 
   Future<T> _guard<T>(Future<T> Function() action, String message) async {
     try {
