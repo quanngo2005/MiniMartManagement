@@ -357,7 +357,7 @@ namespace MiniMart.Data
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<Payment>()
-                .ToTable(t => t.HasCheckConstraint("CK_Payments_PaymentMethod", "[PaymentMethod] IN (1,2,3,4,5,6)"));
+                .ToTable(t => t.HasCheckConstraint("CK_Payments_PaymentMethod", "[PaymentMethod] IN (1,2,3,4,5,6,7)"));
 
             // =========================
             // ORDER RETURN

@@ -344,7 +344,7 @@ namespace MiniMart.Repositories.RepoImplement
                     PaymentMethod = request.PaymentMethod,
                     Amount = finalAmount,
                     TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
-                    PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : DateTime.MinValue,
+                    PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : createdAt,
                     Status = request.PaymentMethod == PaymentMethod.Cash ? PaymentStatus.Success : PaymentStatus.Pending
                 };
                 await _context.Payments.AddAsync(paymentRecord);

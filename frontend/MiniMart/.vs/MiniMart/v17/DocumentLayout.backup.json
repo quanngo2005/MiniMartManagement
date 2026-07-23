@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "T:\\PRN232Project\\MiniMartManagement\\frontend\\MiniMart\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{8B368926-9645-4955-B6D9-9666C50B6B8A}|MiniMart\\MiniMart.csproj|t:\\prn232project\\minimartmanagement\\frontend\\minimart\\minimart\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{8B368926-9645-4955-B6D9-9666C50B6B8A}|MiniMart\\MiniMart.csproj|solutionrelative:minimart\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{8B368926-9645-4955-B6D9-9666C50B6B8A}|MiniMart\\MiniMart.csproj|t:\\prn232project\\minimartmanagement\\frontend\\minimart\\minimart\\viewmodels\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8B368926-9645-4955-B6D9-9666C50B6B8A}|MiniMart\\MiniMart.csproj|solutionrelative:minimart\\viewmodels\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8B368926-9645-4955-B6D9-9666C50B6B8A}|MiniMart\\MiniMart.csproj|t:\\prn232project\\minimartmanagement\\frontend\\minimart\\minimart\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8B368926-9645-4955-B6D9-9666C50B6B8A}|MiniMart\\MiniMart.csproj|solutionrelative:minimart\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8B368926-9645-4955-B6D9-9666C50B6B8A}|MiniMart\\MiniMart.csproj|t:\\prn232project\\minimartmanagement\\frontend\\minimart\\minimart\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{8B368926-9645-4955-B6D9-9666C50B6B8A}|MiniMart\\MiniMart.csproj|solutionrelative:minimart\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8B368926-9645-4955-B6D9-9666C50B6B8A}|MiniMart\\MiniMart.csproj|t:\\prn232project\\minimartmanagement\\frontend\\minimart\\minimart\\models\\cartitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -26,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 253,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -54,7 +54,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "MainViewModel.cs",
               "DocumentMoniker": "T:\\PRN232Project\\MiniMartManagement\\frontend\\MiniMart\\MiniMart\\ViewModels\\MainViewModel.cs",
               "RelativeDocumentMoniker": "MiniMart\\ViewModels\\MainViewModel.cs",
@@ -67,18 +67,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "T:\\PRN232Project\\MiniMartManagement\\frontend\\MiniMart\\MiniMart\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MiniMart\\MainWindow.xaml",
               "ToolTip": "T:\\PRN232Project\\MiniMartManagement\\frontend\\MiniMart\\MiniMart\\MainWindow.xaml",
               "RelativeToolTip": "MiniMart\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-07-09T15:04:27.357Z"
+              "WhenOpened": "2026-07-09T15:04:27.357Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "T:\\PRN232Project\\MiniMartManagement\\frontend\\MiniMart\\MiniMart\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "MiniMart\\MainWindow.xaml.cs",

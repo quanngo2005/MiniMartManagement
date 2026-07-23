@@ -352,7 +352,17 @@
                         <!-- Tiền khách đưa & Tiền thối -->
                         <Grid Margin="0,0,0,10">
                             <TextBlock Text="Amount Given" FontSize="16" Foreground="#64748B" VerticalAlignment="Center"/>
-                            <TextBox Width="120" Height="40" Padding="10,0" FontSize="16" FontWeight="Medium" VerticalContentAlignment="Center" BorderBrush="#E2E8F0" BorderThickness="1" HorizontalAlignment="Right" Text="{Binding ActiveTab.AmountGiven, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}"/>
+                            <TextBox Width="120" Height="40" Padding="10,0" FontSize="16" FontWeight="Medium" VerticalContentAlignment="Center" BorderBrush="#E2E8F0" BorderThickness="1" HorizontalAlignment="Right" Text="{Binding ActiveTab.AmountGiven, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedPaymentMethod}" Value="1">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
                         </Grid>
                         <Grid Margin="0,0,0,20">
                             <TextBlock Text="Change" FontSize="16" Foreground="#64748B" VerticalAlignment="Center"/>
@@ -468,7 +478,7 @@
                     </Border>
 
                     <!-- Hiển thị lại số tiền cần thanh toán cho khách xem -->
-                    <TextBlock Text="{Binding FinalAmount, StringFormat=Số tiền: {0:N0} VND}" FontSize="22" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center" Margin="0,25,0,0"/>
+                    <TextBlock Text="{Binding ActiveTab.FinalAmount, StringFormat=Số tiền: {0:N0} VND}" FontSize="22" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center" Margin="0,25,0,0"/>
 
                     <Button Content="Hủy giao dịch" Command="{Binding ClosePopupCommand}" Margin="0,25,0,0" Height="50" Background="#F1F5F9" Foreground="#EF4444" FontSize="18" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
                         <Button.Resources>
