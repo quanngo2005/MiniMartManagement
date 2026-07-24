@@ -137,9 +137,7 @@ namespace MiniMart.Controllers
             });
         }
 
-        private SameSiteMode CookieSameSite => _environment.IsDevelopment()
-            ? SameSiteMode.None
-            : SameSiteMode.Strict;
+        private SameSiteMode CookieSameSite => SameSiteMode.None;
 
         private void DeleteTokenCookies()
         {

@@ -7,7 +7,7 @@ abstract final class ApiConfig {
       return envUrl;
     }
     if (kIsWeb) {
-      return 'http://localhost:5005';
+      return 'https://mmms-cvaka8c9bkfkduf3.southeastasia-01.azurewebsites.net';
     }
     // Dynamic mapping for mobile emulators
     return defaultTargetPlatform == TargetPlatform.android
