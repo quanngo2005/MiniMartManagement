@@ -1,3 +1,5 @@
+enum PromotionLifecycleStatus { active, upcoming, ended, inactive }
+
 class Promotion {
   final int promotionId;
   final String name;
@@ -65,6 +67,14 @@ class Promotion {
   String get title => name;
   // Backend không có field 'code' — hiển thị id như placeholder
   String get code => 'KM$promotionId';
+  PromotionLifecycleStatus get lifecycleStatus {
+    final now = DateTime.now();
+    if (!isActive) return PromotionLifecycleStatus.inactive;
+    if (now.isBefore(startDate)) return PromotionLifecycleStatus.upcoming;
+    if (now.isAfter(endDate)) return PromotionLifecycleStatus.ended;
+    return PromotionLifecycleStatus.active;
+  }
+
   String get status {
     final now = DateTime.now();
     if (!isActive) return 'Ngưng';

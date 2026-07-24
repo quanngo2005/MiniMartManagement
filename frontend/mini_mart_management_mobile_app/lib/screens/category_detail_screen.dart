@@ -88,7 +88,9 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       );
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-        List list = decoded is List ? decoded : (decoded['data'] ?? decoded['Data'] ?? []);
+        List list = decoded is List
+            ? decoded
+            : (decoded['data'] ?? decoded['Data'] ?? []);
         _taxRates = list
             .whereType<Map<String, dynamic>>()
             .map(TaxRate.fromJson)
@@ -196,13 +198,20 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
 
   Widget _buildTaxRateField() {
     return DropdownButtonFormField<int>(
-      initialValue: _taxRates.any((t) => t.taxRateId == _taxRateId) ? _taxRateId : null,
+      isExpanded: true,
+      initialValue: _taxRates.any((t) => t.taxRateId == _taxRateId)
+          ? _taxRateId
+          : null,
       decoration: const InputDecoration(labelText: 'Thuế suất *'),
       items: [
         for (final tax in _taxRates)
           DropdownMenuItem<int>(
             value: tax.taxRateId,
-            child: Text('${tax.rate.toInt()}% — ${tax.description}'),
+            child: Text(
+              '${tax.rate.toInt()}% — ${tax.description}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
       ],
       onChanged: (value) => setState(() => _taxRateId = value),

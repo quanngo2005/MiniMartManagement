@@ -159,6 +159,7 @@ class InventoryTransactionCard extends StatelessWidget {
       InventoryReferenceType.returnToSupplier => 'Trả nhà cung cấp',
       InventoryReferenceType.adjustment => 'Điều chỉnh',
       InventoryReferenceType.orderReturn => 'Trả hàng',
+      InventoryReferenceType.stockCount => 'Kiểm kê kho',
     };
   }
 }

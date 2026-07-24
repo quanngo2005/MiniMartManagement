@@ -422,6 +422,15 @@ class _PaymentSummary extends StatelessWidget {
                 valueColor: AppColors.statusError,
               ),
             _summaryRow('Thuế VAT', fmt.format(invoice.vatAmount)),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                '(Đã bao gồm thuế GTGT)',
+                style: Theme.of(
+                  context,
+                ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
+              ),
+            ),
             const Divider(height: 20),
             _summaryRow(
               'Tổng cộng',

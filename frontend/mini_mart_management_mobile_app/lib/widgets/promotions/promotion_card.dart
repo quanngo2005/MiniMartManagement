@@ -16,7 +16,9 @@ class PromotionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final isExpired = promotion.status == 'Expired';
+    final isExpired =
+        promotion.lifecycleStatus == PromotionLifecycleStatus.ended ||
+        promotion.lifecycleStatus == PromotionLifecycleStatus.inactive;
 
     return InkWell(
       onTap: onTap,
