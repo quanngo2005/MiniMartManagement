@@ -165,7 +165,7 @@ class ManagerDrawer extends StatelessWidget {
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.customers),
                   ),
-                  const _DrawerSectionLabel('Marketing'),
+                  const _DrawerSectionLabel('Tiếp thị'),
                   _DrawerTile(
                     icon: Icons.local_offer_outlined,
                     activeIcon: Icons.local_offer_rounded,

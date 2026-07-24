@@ -33,7 +33,7 @@ namespace MiniMart.Controllers
             var stockCount = await _stockCountService.GetDetailByIdAsync(id);
             if (stockCount == null)
             {
-                return NotFound(new { message = $"Stock count with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy phiếu kiểm kê với ID {id}." });
             }
 
             return Ok(stockCount);

@@ -210,7 +210,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection('Danh m?c & NCC', [
+                _buildSection('Danh mục & NCC', [
                   _categorySelector(context),
                   _supplierSelector(context),
                 ]),

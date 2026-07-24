@@ -9,7 +9,7 @@ class ApiException implements Exception {
 
 class UnauthorizedException implements Exception {
   const UnauthorizedException([
-    this.message = 'Session expired. Please login again.',
+    this.message = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
   ]);
   final String message;
   @override

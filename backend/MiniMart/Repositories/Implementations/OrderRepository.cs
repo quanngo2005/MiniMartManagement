@@ -525,7 +525,7 @@ namespace MiniMart.Repositories.RepoImplement
 
             if (products.Count != productIds.Count)
             {
-                throw new KeyNotFoundException("One or more order products do not exist.");
+                throw new KeyNotFoundException("Một hoặc nhiều sản phẩm trong đơn hàng không tồn tại.");
             }
 
             var businessDate = HanoiTime.Now.Date;

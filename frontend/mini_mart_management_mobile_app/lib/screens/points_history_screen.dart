@@ -197,13 +197,13 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
           child: Row(
             children: [
-              _buildTab(0, 'All History'),
+              _buildTab(0, 'Tất cả'),
               const SizedBox(width: 8),
-              _buildTab(1, 'Purchases'),
+              _buildTab(1, 'Mua hàng'),
               const SizedBox(width: 8),
-              _buildTab(2, 'Rewards'),
+              _buildTab(2, 'Đổi thưởng'),
               const SizedBox(width: 8),
-              _buildTab(3, 'Adjustments'),
+              _buildTab(3, 'Điều chỉnh'),
             ],
           ),
         ),
@@ -214,7 +214,7 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'LATEST TRANSACTIONS',
+              'GIAO DỊCH GẦN ĐÂY',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.8,
@@ -239,7 +239,7 @@ class _PointsHistoryScreenState extends State<PointsHistoryScreen> {
         Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
-            'END OF RECENT HISTORY',
+            'HẾT LỊCH SỬ',
             style: TextStyle(
               fontSize: 11,
               color: AppColors.textMuted.withValues(alpha: 0.7),

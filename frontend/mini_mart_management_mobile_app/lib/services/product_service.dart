@@ -85,16 +85,16 @@ class ProductService {
     final json = _decodeMap(response.body);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw ApiException(
-        json['message'] ?? json['Message'] ?? 'Không thể lấy CSRF token.',
+        json['message'] ?? json['Message'] ?? 'Không thể lấy token CSRF.',
       );
     }
     final data = json['data'] ?? json['Data'];
     if (data is! Map<String, dynamic>) {
-      throw const ApiException('CSRF response is missing token data.');
+      throw const ApiException('Phản hồi CSRF thiếu dữ liệu token.');
     }
     final token = data['csrfToken'] ?? data['CsrfToken'];
     if (token is! String || token.isEmpty) {
-      throw const ApiException('CSRF token is missing.');
+      throw const ApiException('Thiếu token CSRF.');
     }
     return token;
   }

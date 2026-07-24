@@ -33,7 +33,7 @@ class InventoryService {
     try {
       return jsonDecode(response.body);
     } on FormatException {
-      throw const ApiException('Server returned an invalid response.');
+      throw const ApiException('Máy chủ trả về phản hồi không hợp lệ.');
     }
   }
 
@@ -45,13 +45,13 @@ class InventoryService {
     };
 
     if (source is! List<dynamic>) {
-      throw const ApiException('Inventory response is missing transactions.');
+      throw const ApiException('Phản hồi kho thiếu danh sách giao dịch.');
     }
 
     return source
         .map((item) {
           if (item is Map<String, dynamic>) return item;
-          throw const ApiException('Inventory transaction could not be read.');
+          throw const ApiException('Giao dịch kho không thể đọc được.');
         })
         .toList(growable: false);
   }
@@ -62,6 +62,6 @@ class InventoryService {
       if (message is String && message.isNotEmpty) return message;
     }
 
-    return 'Inventory request failed. Please try again.';
+    return 'Yêu cầu kho thất bại. Vui lòng thử lại.';
   }
 }

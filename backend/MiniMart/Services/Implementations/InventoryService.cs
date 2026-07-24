@@ -43,7 +43,7 @@ namespace MiniMart.Services
             await ValidateReferencesAsync(createDto.ProductId, createDto.BatchId, createDto.EmployeeId);
 
             var product = await _inventoryTransactionRepository.GetProductByIdAsync(createDto.ProductId)
-                ?? throw new DomainException("Product ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                ?? throw new DomainException("ID sản phẩm không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             var stockDelta = GetSignedQuantity(createDto.TransactionType, createDto.Quantity);
             var previousStock = product.StockQuantity;
@@ -70,17 +70,17 @@ namespace MiniMart.Services
         {
             if (!await _inventoryTransactionRepository.ProductExistsAsync(productId))
             {
-                throw new DomainException("Product ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID sản phẩm không tồn tại.", StatusCodes.Status422UnprocessableEntity);
             }
 
             if (!await _inventoryTransactionRepository.EmployeeExistsAsync(employeeId))
             {
-                throw new DomainException("Employee ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID nhân viên không tồn tại.", StatusCodes.Status422UnprocessableEntity);
             }
 
             if (batchId.HasValue && !await _batchRepository.BatchExistsAsync(batchId.Value))
             {
-                throw new DomainException("Batch ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID lô hàng không tồn tại.", StatusCodes.Status422UnprocessableEntity);
             }
         }
 
@@ -92,11 +92,11 @@ namespace MiniMart.Services
             }
 
             var batch = await _batchRepository.GetBatchByIdAsync(batchId.Value)
-                ?? throw new DomainException("Batch ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                ?? throw new DomainException("ID lô hàng không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             if (batch.QuantityRemaining + quantityDelta < 0)
             {
-                throw new DomainException("Batch remaining quantity cannot be negative.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Số lượng tồn của lô hàng không thể âm.", StatusCodes.Status422UnprocessableEntity);
             }
         }
 
@@ -106,7 +106,7 @@ namespace MiniMart.Services
             {
                 if (quantity == 0)
                 {
-                    throw new DomainException("Adjustment quantity must not be zero.");
+                    throw new DomainException("Số lượng điều chỉnh không được bằng 0.");
                 }
 
                 return quantity;
@@ -114,7 +114,7 @@ namespace MiniMart.Services
 
             if (quantity <= 0)
             {
-                throw new DomainException("Quantity must be greater than zero.");
+                throw new DomainException("Số lượng phải lớn hơn 0.");
             }
 
             return transactionType switch
@@ -124,7 +124,7 @@ namespace MiniMart.Services
                 InventoryTransactionType.Sale => -quantity,
                 InventoryTransactionType.ReturnToSupplier => -quantity,
                 InventoryTransactionType.Damage => -quantity,
-                _ => throw new DomainException("Unsupported inventory transaction type.")
+                _ => throw new DomainException("Loại giao dịch kho không được hỗ trợ.")
             };
         }
 
@@ -132,7 +132,7 @@ namespace MiniMart.Services
         {
             if (stock < 0)
             {
-                throw new DomainException("Inventory stock cannot be negative.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Tồn kho không thể âm.", StatusCodes.Status422UnprocessableEntity);
             }
         }
     }

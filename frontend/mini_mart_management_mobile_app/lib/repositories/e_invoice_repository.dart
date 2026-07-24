@@ -3,8 +3,7 @@ import 'package:mini_mart_management_mobile_app/models/e_invoice.dart';
 import 'package:mini_mart_management_mobile_app/services/e_invoice_service.dart';
 
 class EInvoiceRepository {
-  EInvoiceRepository({EInvoiceService? service})
-    : _service = service ?? EInvoiceService();
+  const EInvoiceRepository(this._service);
 
   final EInvoiceService _service;
 
@@ -14,7 +13,9 @@ class EInvoiceRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Invoice list response could not be read.');
+      throw const ApiException(
+        'Phản hồi danh sách hóa đơn không thể đọc được.',
+      );
     }
   }
 
@@ -24,7 +25,7 @@ class EInvoiceRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Invoice detail response could not be read.');
+      throw const ApiException('Phản hồi chi tiết hóa đơn không thể đọc được.');
     }
   }
 
@@ -34,7 +35,7 @@ class EInvoiceRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Invoice create response could not be read.');
+      throw const ApiException('Phản hồi tạo hóa đơn không thể đọc được.');
     }
   }
 }

@@ -103,7 +103,7 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
                                 Icons.person_add_alt_1_rounded,
                                 size: 20,
                               ),
-                              label: const Text('Add User'),
+                              label: const Text('Thêm người dùng'),
                               style: FilledButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor:
@@ -443,7 +443,7 @@ class _EmployeeManagementScreenState extends State<EmployeeManagementScreen> {
                   TextButton.icon(
                     onPressed: () => _showEditEmployeeDialog(context, emp),
                     icon: const Icon(Icons.edit_rounded, size: 16),
-                    label: const Text('Edit'),
+                    label: const Text('Chỉnh sửa'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(
@@ -592,10 +592,10 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
         .toList();
     if (roleItems.isEmpty) {
       roleItems = const [
-        DropdownMenuItem(value: 1, child: Text('Manager')),
-        DropdownMenuItem(value: 2, child: Text('Cashier')),
-        DropdownMenuItem(value: 3, child: Text('Warehouse Staff')),
-        DropdownMenuItem(value: 4, child: Text('Admin')),
+        DropdownMenuItem(value: 1, child: Text('Quản lý')),
+        DropdownMenuItem(value: 2, child: Text('Thu ngân')),
+        DropdownMenuItem(value: 3, child: Text('Nhân viên kho')),
+        DropdownMenuItem(value: 4, child: Text('Quản trị viên')),
       ];
     }
     if (!roleItems.any((item) => item.value == _roleId)) {
@@ -603,7 +603,7 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
         ..add(
           DropdownMenuItem<int>(
             value: _roleId,
-            child: Text('Role ID: $_roleId'),
+            child: Text('ID vai trò: $_roleId'),
           ),
         );
     }
@@ -846,7 +846,7 @@ class _EmployeeFormSheetState extends State<_EmployeeFormSheet> {
 
   static String _roleDisplayName(String roleName) {
     return roleName.trim().toLowerCase() == 'warehouse'
-        ? 'Warehouse Staff'
+        ? 'Nhân viên kho'
         : roleName;
   }
 

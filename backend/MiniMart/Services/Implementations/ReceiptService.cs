@@ -52,10 +52,10 @@ namespace MiniMart.Services.Implementations
         public async Task<ReceiptDto> CreateReceiptAsync(CreateReceiptDto createDto, int employeeId)
         {
             if (!await _receiptRepository.SupplierExistsAsync(createDto.SupplierId))
-                throw new DomainException("Supplier ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID nhà cung cấp không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             if (!await _receiptRepository.EmployeeExistsAsync(employeeId))
-                throw new DomainException("Employee ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID nhân viên không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             var importDate = GetVietnamNow();
             var receipt = _mapper.Map<Receipt>(createDto);
@@ -85,13 +85,13 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _receiptRepository.GetReceiptByIdAsync(id);
             if (existing == null)
-                throw new DomainException($"Receipt with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy phiếu nhập với ID {id}.", StatusCodes.Status404NotFound);
 
             if (existing.ReceiptStatus != ReceiptStatus.Pending)
-                throw new DomainException("Only pending receipts can be updated.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Chỉ có thể cập nhật phiếu nhập ở trạng thái chờ.", StatusCodes.Status422UnprocessableEntity);
 
             if (!await _receiptRepository.SupplierExistsAsync(updateDto.SupplierId))
-                throw new DomainException("Supplier ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID nhà cung cấp không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             var receiptCode = existing.ReceiptCode;
             var importDate = existing.ImportDate;
@@ -120,7 +120,7 @@ namespace MiniMart.Services.Implementations
 
             var updated = await _receiptRepository.UpdateReceiptAsync(existing);
             if (updated == null)
-                throw new DomainException($"Receipt with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy phiếu nhập với ID {id}.", StatusCodes.Status404NotFound);
 
             var updatedWithDetails = await _receiptRepository.GetReceiptByIdAsync(id);
             return _mapper.Map<ReceiptDto>(updatedWithDetails ?? updated);
@@ -130,10 +130,10 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _receiptRepository.GetReceiptByIdAsync(id);
             if (existing == null)
-                throw new DomainException($"Receipt with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy phiếu nhập với ID {id}.", StatusCodes.Status404NotFound);
 
             if (existing.ReceiptStatus != ReceiptStatus.Pending)
-                throw new DomainException("Only pending receipts can be cancelled.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Chỉ có thể hủy phiếu nhập ở trạng thái chờ.", StatusCodes.Status422UnprocessableEntity);
 
             await _receiptRepository.CancelReceiptAsync(id);
         }
@@ -142,10 +142,10 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _receiptRepository.GetReceiptByIdAsync(id);
             if (existing == null)
-                throw new DomainException($"Receipt with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy phiếu nhập với ID {id}.", StatusCodes.Status404NotFound);
 
             if (existing.ReceiptStatus != ReceiptStatus.Pending)
-                throw new DomainException("Only pending receipts can be completed.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Chỉ có thể hoàn thành phiếu nhập ở trạng thái chờ.", StatusCodes.Status422UnprocessableEntity);
 
             try
             {
@@ -202,7 +202,7 @@ namespace MiniMart.Services.Implementations
             catch (DbUpdateConcurrencyException)
             {
                 throw new DomainException(
-                    "Inventory changed while completing this receipt. Reload and retry.",
+                    "Tồn kho đã thay đổi trong khi hoàn thành phiếu nhập. Vui lòng tải lại và thử lại.",
                     StatusCodes.Status409Conflict);
             }
 
@@ -222,25 +222,25 @@ namespace MiniMart.Services.Implementations
             {
                 productId = line.ProductId.Value;
                 if (!await _receiptRepository.ProductExistsAsync(productId))
-                    throw new DomainException($"Product with ID {productId} does not exist.", StatusCodes.Status422UnprocessableEntity);
+                    throw new DomainException($"Sản phẩm với ID {productId} không tồn tại.", StatusCodes.Status422UnprocessableEntity);
             }
             else if (!string.IsNullOrWhiteSpace(line.Barcode))
             {
                 var product = await _receiptRepository.GetActiveProductByBarcodeAsync(line.Barcode);
                 if (product == null)
-                    throw new DomainException($"No active product found with barcode '{line.Barcode}'.", StatusCodes.Status422UnprocessableEntity);
+                    throw new DomainException($"Không tìm thấy sản phẩm đang bán với mã vạch '{line.Barcode}'.", StatusCodes.Status422UnprocessableEntity);
                 productId = product.ProductId;
             }
             else
             {
-                throw new DomainException("Each batch line must specify either ProductId or Barcode.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Mỗi dòng lô hàng phải có ProductId hoặc Barcode.", StatusCodes.Status400BadRequest);
             }
 
             if (line.Quantity <= 0)
-                throw new DomainException("Quantity must be greater than zero.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Số lượng phải lớn hơn 0.", StatusCodes.Status422UnprocessableEntity);
 
             if (line.ExpiryDate <= line.ManufactureDate)
-                throw new DomainException("Expiry date must be after manufacture date.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Ngày hết hạn phải sau ngày sản xuất.", StatusCodes.Status422UnprocessableEntity);
 
             return new Batch
             {
@@ -264,11 +264,11 @@ namespace MiniMart.Services.Implementations
         private static void ApplyServerCalculatedTotals(Receipt receipt, decimal paidAmount)
         {
             if (paidAmount < 0)
-                throw new DomainException("Paid amount cannot be negative.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Số tiền đã thanh toán không thể âm.", StatusCodes.Status422UnprocessableEntity);
 
             var totalAmount = receipt.Batches.Sum(batch => batch.ImportPrice * batch.QuantityImported);
             if (paidAmount > totalAmount)
-                throw new DomainException("Paid amount cannot exceed total amount.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Số tiền thanh toán không thể vượt quá tổng tiền.", StatusCodes.Status422UnprocessableEntity);
 
             receipt.TotalAmount = totalAmount;
             receipt.PaidAmount = paidAmount;

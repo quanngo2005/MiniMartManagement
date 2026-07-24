@@ -164,12 +164,12 @@ class _CategoryTreeRow extends StatelessWidget {
               ),
               CategoryActionButton(
                 icon: Icons.edit_outlined,
-                tooltip: 'Edit ${category.name}',
+                tooltip: 'Sửa ${category.name}',
                 onPressed: () => onEdit(category),
               ),
               CategoryActionButton(
                 icon: Icons.delete_outline,
-                tooltip: 'Delete ${category.name}',
+                tooltip: 'Xóa ${category.name}',
                 foregroundColor: AppColors.statusError,
                 onPressed: () => onDelete(category),
               ),
@@ -181,12 +181,12 @@ class _CategoryTreeRow extends StatelessWidget {
   }
 
   String _buildMetadata(CategorySummary category) {
-    final products = '${category.productCount} Products';
+    final products = '${category.productCount} Sản phẩm';
     if (category.subcategoryCount == 0) return products;
 
     final suffix = category.subcategoryCount == 1
-        ? 'Subcategory'
-        : 'Subcategories';
+        ? 'danh mục con'
+        : 'danh mục con';
     return '$products - ${category.subcategoryCount} $suffix';
   }
 }

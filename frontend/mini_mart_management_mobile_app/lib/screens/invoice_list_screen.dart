@@ -141,7 +141,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
               controller: _orderIdController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                labelText: 'Order ID',
+                labelText: 'Mã đơn hàng',
                 hintText: 'Nhập ID đơn hàng',
                 border: OutlineInputBorder(),
               ),
@@ -257,7 +257,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
     final orderId = int.tryParse(_orderIdController.text.trim());
     if (orderId == null || orderId <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập Order ID hợp lệ.')),
+        const SnackBar(content: Text('Vui lòng nhập mã đơn hàng hợp lệ.')),
       );
       return;
     }

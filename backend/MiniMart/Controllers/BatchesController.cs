@@ -33,7 +33,7 @@ namespace MiniMart.Controllers
         {
             var batch = await _batchService.GetBatchByIdAsync(id);
             if (batch == null)
-                return NotFound(new { message = $"Batch with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy lô hàng với ID {id}." });
 
             return Ok(batch);
         }

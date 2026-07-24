@@ -67,20 +67,20 @@ class Promotion {
   String get code => 'KM$promotionId';
   String get status {
     final now = DateTime.now();
-    if (!isActive) return 'Inactive';
-    if (now.isBefore(startDate)) return 'Upcoming';
-    if (now.isAfter(endDate)) return 'Expired';
-    return 'Active';
+    if (!isActive) return 'Ngưng';
+    if (now.isBefore(startDate)) return 'Sắp diễn ra';
+    if (now.isAfter(endDate)) return 'Đã kết thúc';
+    return 'Đang chạy';
   }
 
   String get discountType {
     switch (type) {
       case 0:
-        return 'Percentage';
+        return 'Phần trăm';
       case 1:
-        return 'BuyXGetYFree';
+        return 'Mua X tặng Y';
       default:
-        return 'ProductDiscount';
+        return 'Giảm sản phẩm';
     }
   }
 

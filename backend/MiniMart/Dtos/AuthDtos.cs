@@ -96,7 +96,7 @@ namespace MiniMart.DTOs
 
         public T? Data { get; set; }
 
-        public static ApiResponse<T> Ok(T? data, string message = "Success")
+        public static ApiResponse<T> Ok(T? data, string message = "Thành công")
         {
             return new ApiResponse<T> { Success = true, Message = message, Data = data };
         }

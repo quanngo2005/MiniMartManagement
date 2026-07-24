@@ -17,7 +17,7 @@ class AuthRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Login response could not be read.');
+      throw const ApiException('Phản hồi đăng nhập không thể đọc được.');
     }
   }
 
@@ -31,7 +31,7 @@ class AuthRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Profile response could not be read.');
+      throw const ApiException('Phản hồi hồ sơ không thể đọc được.');
     }
   }
 }

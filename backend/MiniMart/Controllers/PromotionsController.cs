@@ -33,7 +33,7 @@ namespace MiniMart.Controllers
         {
             var promotion = await _promotionService.GetPromotionByIdAsync(id);
             if (promotion == null)
-                return NotFound(new { message = $"Promotion with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy chương trình khuyến mãi với ID {id}." });
 
             return Ok(promotion);
         }

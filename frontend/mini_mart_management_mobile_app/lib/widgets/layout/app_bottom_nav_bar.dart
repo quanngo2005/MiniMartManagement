@@ -73,22 +73,22 @@ class AppBottomNavBar extends StatelessWidget {
       destinations: const [
         NavigationDestination(
           icon: Icon(Icons.inventory_2_outlined),
-          label: 'Catalog',
+          label: 'Sản phẩm',
         ),
         NavigationDestination(
           selectedIcon: Icon(Icons.category_rounded),
           icon: Icon(Icons.category_outlined),
-          label: 'Categories',
+          label: 'Danh mục',
         ),
         NavigationDestination(
           selectedIcon: Icon(Icons.group_rounded),
           icon: Icon(Icons.group_outlined),
-          label: 'Staff',
+          label: 'Nhân viên',
         ),
         NavigationDestination(
           selectedIcon: Icon(Icons.local_shipping_rounded),
           icon: Icon(Icons.local_shipping_outlined),
-          label: 'Suppliers',
+          label: 'Nhà cung cấp',
         ),
       ],
     );

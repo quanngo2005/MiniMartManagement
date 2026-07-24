@@ -94,11 +94,11 @@ class SupplierService {
     }
     final data = json['data'] ?? json['Data'];
     if (data is! Map<String, dynamic>) {
-      throw const ApiException('CSRF response is missing token data.');
+      throw const ApiException('Phản hồi CSRF thiếu dữ liệu token.');
     }
     final token = data['csrfToken'] ?? data['CsrfToken'];
     if (token is! String || token.isEmpty) {
-      throw const ApiException('CSRF token is missing.');
+      throw const ApiException('Thiếu token CSRF.');
     }
     final cookieVal = _parseCookie(response.headers['set-cookie']);
     return _CsrfToken(

@@ -33,7 +33,7 @@ namespace MiniMart.Controllers
         {
             var product = await _productService.GetByIdAsync(id);
             if (product == null)
-                return NotFound(new { message = $"Product with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy sản phẩm với ID {id}." });
             return Ok(product);
         }
 
@@ -43,7 +43,7 @@ namespace MiniMart.Controllers
         {
             var product = await _productService.GetByBarcodeAsync(barcode);
             if (product == null)
-                return NotFound(new { message = $"Product with barcode '{barcode}' not found." });
+                return NotFound(new { message = $"Không tìm thấy sản phẩm với mã vạch '{barcode}'." });
             return Ok(product);
         }
 

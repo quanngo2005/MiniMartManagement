@@ -43,7 +43,7 @@ class CashierDrawer extends StatelessWidget {
                           ),
                         ),
                         const Text(
-                          'Cashier',
+                          'Thu ngân',
                           style: TextStyle(color: AppColors.textMuted),
                         ),
                       ],

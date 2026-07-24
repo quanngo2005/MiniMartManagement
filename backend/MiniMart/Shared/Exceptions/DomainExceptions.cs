@@ -15,7 +15,7 @@ namespace MiniMart.Shared.Exceptions
 
     public class UnauthorizedDomainException : DomainException
     {
-        public UnauthorizedDomainException(string message = "Unauthorized")
+        public UnauthorizedDomainException(string message = "Không được phép truy cập")
             : base(message, StatusCodes.Status401Unauthorized)
         {
         }
@@ -23,7 +23,7 @@ namespace MiniMart.Shared.Exceptions
 
     public class ForbiddenDomainException : DomainException
     {
-        public ForbiddenDomainException(string message = "Forbidden")
+        public ForbiddenDomainException(string message = "Không có quyền truy cập")
             : base(message, StatusCodes.Status403Forbidden)
         {
         }
@@ -34,7 +34,7 @@ namespace MiniMart.Shared.Exceptions
         public IReadOnlyList<int> LineIds { get; }
 
         public StockCountLineConcurrencyException(IReadOnlyList<int> lineIds)
-            : base("One or more stock-count lines were changed by another user. Reload and retry.", StatusCodes.Status409Conflict)
+            : base("Một hoặc nhiều dòng kiểm kê đã bị thay đổi bởi người dùng khác. Vui lòng tải lại và thử lại.", StatusCodes.Status409Conflict)
         {
             LineIds = lineIds;
         }
@@ -45,7 +45,7 @@ namespace MiniMart.Shared.Exceptions
         public IReadOnlyList<StockCountStockDriftDto> Lines { get; }
 
         public StockCountStockDriftException(IReadOnlyList<StockCountStockDriftDto> lines)
-            : base("Live stock has changed since this count was created. Reload and recount the affected lines.", StatusCodes.Status409Conflict)
+            : base("Tồn kho thực tế đã thay đổi từ khi tạo phiếu kiểm kê này. Vui lòng tải lại và kiểm đếm lại các dòng bị ảnh hưởng.", StatusCodes.Status409Conflict)
         {
             Lines = lines;
         }

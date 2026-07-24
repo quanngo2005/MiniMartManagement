@@ -40,16 +40,16 @@ namespace MiniMart.Services.Implementations
         public async Task<ProductResponseDto> CreateAsync(ProductCreateDto dto)
         {
             if (await _productRepository.BarcodeExistsAsync(dto.Barcode))
-                throw new DomainException("Barcode already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã vạch đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (await _productRepository.ProductCodeExistsAsync(dto.ProductCode))
-                throw new DomainException("Product code already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã sản phẩm đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (!await _productRepository.CategoryExistsAsync(dto.CategoryId))
-                throw new DomainException($"Category with ID {dto.CategoryId} not found.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException($"Không tìm thấy danh mục với ID {dto.CategoryId}.", StatusCodes.Status422UnprocessableEntity);
 
             if (!await _productRepository.SupplierExistsAsync(dto.SupplierId))
-                throw new DomainException($"Supplier with ID {dto.SupplierId} not found.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException($"Không tìm thấy nhà cung cấp với ID {dto.SupplierId}.", StatusCodes.Status422UnprocessableEntity);
 
             var product = _mapper.Map<Product>(dto);
             var created = await _productRepository.CreateAsync(product);
@@ -60,19 +60,19 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _productRepository.GetByIdAsync(id);
             if (existing == null)
-                throw new DomainException($"Product with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy sản phẩm với ID {id}.", StatusCodes.Status404NotFound);
 
             if (await _productRepository.BarcodeExistsAsync(dto.Barcode, id))
-                throw new DomainException("Barcode already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã vạch đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (await _productRepository.ProductCodeExistsAsync(dto.ProductCode, id))
-                throw new DomainException("Product code already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã sản phẩm đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (!await _productRepository.CategoryExistsAsync(dto.CategoryId))
-                throw new DomainException($"Category with ID {dto.CategoryId} not found.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException($"Không tìm thấy danh mục với ID {dto.CategoryId}.", StatusCodes.Status422UnprocessableEntity);
 
             if (!await _productRepository.SupplierExistsAsync(dto.SupplierId))
-                throw new DomainException($"Supplier with ID {dto.SupplierId} not found.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException($"Không tìm thấy nhà cung cấp với ID {dto.SupplierId}.", StatusCodes.Status422UnprocessableEntity);
 
             _mapper.Map(dto, existing);
             var updated = await _productRepository.UpdateAsync(existing);
@@ -83,7 +83,7 @@ namespace MiniMart.Services.Implementations
         {
             var success = await _productRepository.DeleteAsync(id);
             if (!success)
-                throw new DomainException($"Product with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy sản phẩm với ID {id}.", StatusCodes.Status404NotFound);
         }
 
         public async Task<IEnumerable<ProductResponseDto>> GetLowStockAsync()

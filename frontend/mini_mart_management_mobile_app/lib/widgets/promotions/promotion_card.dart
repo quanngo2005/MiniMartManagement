@@ -80,7 +80,7 @@ class PromotionCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '${promotion.discountType == 'Percentage' ? '${promotion.discountValue.toInt()}%' : '${NumberFormat('#,###').format(promotion.discountValue)}đ'} Off',
+              '${promotion.discountType == 'Percentage' ? '${promotion.discountValue.toInt()}%' : '${NumberFormat('#,###').format(promotion.discountValue)}đ'} Giảm',
               style: textTheme.titleMedium?.copyWith(
                 color: isExpired
                     ? AppColors.textMuted

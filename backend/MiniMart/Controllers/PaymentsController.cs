@@ -40,7 +40,7 @@ namespace MiniMart.Controllers
             }
             else
             {
-                return BadRequest(new { Message = "Unsupported gateway" });
+                return BadRequest(new { Message = "Cổng thanh toán không được hỗ trợ" });
             }
 
             bool rs = await _paymentRepository.ProcessPaymentCallbackAsync(Request.Query, gatewayType);
@@ -49,20 +49,20 @@ namespace MiniMart.Controllers
             {
                 if (gatewayType == PaymentMethod.VNPay)
                 {
-                    return Ok(new { RspCode = "00", Message = "Confirm Success" });
+                    return Ok(new { RspCode = "00", Message = "Xác nhận thành công" });
                 }
                 // ===Momo===
                 // ...
                 // ==========
-                return Ok(new { Message = "Success" });
+                return Ok(new { Message = "Thành công" });
             }
 
             if (gatewayType == PaymentMethod.VNPay)
             {
-                return Ok(new { RspCode = "97", Message = "Invalid Signature" });
+                return Ok(new { RspCode = "97", Message = "Chữ ký không hợp lệ" });
             }
 
-            return BadRequest(new { Message = "Signature validation failed" });
+            return BadRequest(new { Message = "Xác thực chữ ký thất bại" });
         }
 
         [HttpGet("{transactionRef}/status")]
@@ -79,8 +79,8 @@ namespace MiniMart.Controllers
         public async Task<IActionResult> MockSuccess(string transactionRef)
         {
             bool rs = await _paymentRepository.MockPaymentSuccessAsync(transactionRef);
-            if (!rs) return BadRequest(new { Message = "Mock failed. Payment not found or already paid." });
-            return Ok(new { Message = "Mock success" });
+            if (!rs) return BadRequest(new { Message = "Giả lập thất bại. Không tìm thấy thanh toán hoặc đã thanh toán." });
+            return Ok(new { Message = "Giả lập thành công" });
         }
     }
 }

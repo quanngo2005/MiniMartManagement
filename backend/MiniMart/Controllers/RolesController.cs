@@ -43,7 +43,7 @@ namespace MiniMart.Controllers
             var role = await _dbContext.Roles.FindAsync(id);
             if (role == null)
             {
-                return NotFound(new { message = $"Role with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy vai trò với ID {id}." });
             }
 
             return Ok(new RoleDto
@@ -58,13 +58,13 @@ namespace MiniMart.Controllers
         [HttpPost]
         public async Task<ActionResult<RoleDto>> Create([FromBody] CreateRoleDto dto)
         {
-            if (dto == null) return BadRequest(new { message = "Invalid role data." });
+            if (dto == null) return BadRequest(new { message = "Dữ liệu vai trò không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var nameExists = await _dbContext.Roles.AnyAsync(r => r.RoleName == dto.RoleName);
             if (nameExists)
             {
-                return Conflict(new { message = "Role name already exists." });
+                return Conflict(new { message = "Tên vai trò đã tồn tại." });
             }
 
             var role = new Role
@@ -89,19 +89,19 @@ namespace MiniMart.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<RoleDto>> Update(int id, [FromBody] UpdateRoleDto dto)
         {
-            if (dto == null) return BadRequest(new { message = "Invalid role data." });
+            if (dto == null) return BadRequest(new { message = "Dữ liệu vai trò không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var role = await _dbContext.Roles.FindAsync(id);
             if (role == null)
             {
-                return NotFound(new { message = $"Role with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy vai trò với ID {id}." });
             }
 
             var nameExists = await _dbContext.Roles.AnyAsync(r => r.RoleName == dto.RoleName && r.RoleId != id);
             if (nameExists)
             {
-                return Conflict(new { message = "Role name already exists." });
+                return Conflict(new { message = "Tên vai trò đã tồn tại." });
             }
 
             role.RoleName = dto.RoleName;
@@ -125,13 +125,13 @@ namespace MiniMart.Controllers
             var role = await _dbContext.Roles.FindAsync(id);
             if (role == null)
             {
-                return NotFound(new { message = $"Role with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy vai trò với ID {id}." });
             }
 
             var hasEmployees = await _dbContext.Employees.AnyAsync(e => e.RoleId == id);
             if (hasEmployees)
             {
-                return UnprocessableEntity(new { message = "Cannot delete role with assigned employees." });
+                return UnprocessableEntity(new { message = "Không thể xóa vai trò đã có nhân viên được gán." });
             }
 
             _dbContext.Roles.Remove(role);

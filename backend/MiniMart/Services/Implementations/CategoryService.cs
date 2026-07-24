@@ -42,12 +42,12 @@ namespace MiniMart.Services.Implementations
         public async Task<CategoryDto> UpdateAsync(int id, UpdateCategoryRequest request)
         {
             var existing = await _categoryRepository.GetByIdAsync(id)
-                ?? throw new DomainException($"Category with ID {id} not found.", StatusCodes.Status404NotFound);
+                ?? throw new DomainException($"Không tìm thấy danh mục với ID {id}.", StatusCodes.Status404NotFound);
 
             if (await _categoryRepository.CategoryCodeExistsAsync(request.CategoryCode.Trim(), id))
-                throw new DomainException("Category code already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã danh mục đã tồn tại.", StatusCodes.Status409Conflict);
             if (!await _categoryRepository.TaxRateExistsAsync(request.TaxRateId))
-                throw new DomainException($"Active tax rate with ID {request.TaxRateId} was not found.", StatusCodes.Status400BadRequest);
+                throw new DomainException($"Không tìm thấy thuế suất với ID {request.TaxRateId}.", StatusCodes.Status400BadRequest);
 
             existing.CategoryCode = request.CategoryCode.Trim();
             existing.CategoryName = request.CategoryName.Trim();
@@ -59,10 +59,10 @@ namespace MiniMart.Services.Implementations
         public async Task DeleteAsync(int id)
         {
             if (await _categoryRepository.GetByIdAsync(id) is null)
-                throw new DomainException($"Category with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy danh mục với ID {id}.", StatusCodes.Status404NotFound);
 
             if (await _categoryRepository.HasProductsAsync(id))
-                throw new DomainException("Cannot delete category because it currently contains products.");
+                throw new DomainException("Không thể xóa danh mục vì đang chứa sản phẩm.");
 
             await _categoryRepository.DeleteAsync(id);
         }
@@ -70,9 +70,9 @@ namespace MiniMart.Services.Implementations
         private async Task ValidateRequestAsync(string categoryCode, int taxRateId)
         {
             if (await _categoryRepository.CategoryCodeExistsAsync(categoryCode.Trim()))
-                throw new DomainException("Category code already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã danh mục đã tồn tại.", StatusCodes.Status409Conflict);
             if (!await _categoryRepository.TaxRateExistsAsync(taxRateId))
-                throw new DomainException($"Active tax rate with ID {taxRateId} was not found.", StatusCodes.Status400BadRequest);
+                throw new DomainException($"Không tìm thấy thuế suất với ID {taxRateId}.", StatusCodes.Status400BadRequest);
         }
 
         private static CategoryDto MapToDto(Category category) => new()

@@ -38,7 +38,7 @@ namespace MiniMart.Controllers
             var shift = await _shiftService.GetShiftByIdAsync(id);
             if (shift == null)
             {
-                return NotFound(new { message = $"Shift with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy ca làm việc với ID {id}." });
             }
             return Ok(shift);
         }
@@ -49,7 +49,7 @@ namespace MiniMart.Controllers
         [HttpPost]
         public async Task<ActionResult<ShiftDto>> CreateShift([FromBody] CreateShiftDto createDto)
         {
-            if (createDto == null) return BadRequest(new { message = "Invalid shift data." });
+            if (createDto == null) return BadRequest(new { message = "Dữ liệu ca làm việc không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var created = await _shiftService.CreateShiftAsync(createDto);
@@ -62,7 +62,7 @@ namespace MiniMart.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ShiftDto>> UpdateShift(int id, [FromBody] UpdateShiftDto updateDto)
         {
-            if (updateDto == null) return BadRequest(new { message = "Invalid update data." });
+            if (updateDto == null) return BadRequest(new { message = "Dữ liệu cập nhật không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var updated = await _shiftService.UpdateShiftAsync(id, updateDto);
@@ -85,7 +85,7 @@ namespace MiniMart.Controllers
         [HttpPost("open")]
         public async Task<ActionResult<ShiftDto>> OpenShift([FromBody] OpenShiftRequest openRequest)
         {
-            if (openRequest == null) return BadRequest(new { message = "Invalid open request." });
+            if (openRequest == null) return BadRequest(new { message = "Yêu cầu mở ca không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var currentUserId = GetCurrentEmployeeId();
@@ -101,7 +101,7 @@ namespace MiniMart.Controllers
         [HttpPost("{id}/close")]
         public async Task<ActionResult<ShiftDto>> CloseShift(int id, [FromBody] CloseShiftRequest closeRequest)
         {
-            if (closeRequest == null) return BadRequest(new { message = "Invalid close request." });
+            if (closeRequest == null) return BadRequest(new { message = "Yêu cầu đóng ca không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var currentUserId = GetCurrentEmployeeId();
@@ -132,7 +132,7 @@ namespace MiniMart.Controllers
 
             if (activeShift == null)
             {
-                return NotFound(new { message = "No active working shift found." });
+                return NotFound(new { message = "Không tìm thấy ca làm việc đang hoạt động." });
             }
 
             return Ok(activeShift);

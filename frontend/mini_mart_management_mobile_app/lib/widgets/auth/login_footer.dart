@@ -7,7 +7,7 @@ class LoginFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Text(
-      'V2.4.0 • RETAIL OS',
+      'V2.4.0',
       style: TextStyle(
         color: AppColors.outlineVariant,
         fontSize: 12,

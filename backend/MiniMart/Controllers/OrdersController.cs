@@ -156,7 +156,7 @@ namespace MiniMart.Controllers
         public async Task<IActionResult> CheckPayOSStatus(int id, long payosOrderCode)
         {
             var order = await _orderRepository.GetOrderByIdAsync(id);
-            if (order == null) return NotFound(new { message = "Order not found" });
+            if (order == null) return NotFound(new { message = "Không tìm thấy đơn hàng" });
 
             if (order.Status == OrderStatus.Completed)
                 return Ok(new { status = "PAID" });

@@ -71,11 +71,11 @@ class CategoryService {
     _checkStatus(response, json);
     final data = json['data'] ?? json['Data'];
     if (data is! Map<String, dynamic>) {
-      throw const ApiException('CSRF response thiếu token.');
+      throw const ApiException('Phản hồi CSRF thiếu dữ liệu token.');
     }
     final token = data['csrfToken'] ?? data['CsrfToken'];
     if (token is! String || token.isEmpty) {
-      throw const ApiException('CSRF token thiếu.');
+      throw const ApiException('Thiếu token CSRF.');
     }
     final cookieToken = RegExp(
       r'XSRF-TOKEN=([^;,\s]+)',

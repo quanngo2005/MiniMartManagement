@@ -32,7 +32,7 @@ namespace MiniMart.Controllers
             var inventoryTransaction = await _inventoryService.GetInventoryTransactionByIdAsync(id);
             if (inventoryTransaction == null)
             {
-                return NotFound(new { message = $"Inventory transaction with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy giao dịch kho với ID {id}." });
             }
 
             return Ok(inventoryTransaction);
@@ -41,7 +41,7 @@ namespace MiniMart.Controllers
         [HttpPost]
         public async Task<ActionResult<InventoryTransactionDto>> CreateInventoryTransaction([FromBody] CreateInventoryTransactionDto createDto)
         {
-            if (createDto == null) return BadRequest(new { message = "Invalid inventory transaction data." });
+            if (createDto == null) return BadRequest(new { message = "Dữ liệu giao dịch kho không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var created = await _inventoryService.CreateInventoryTransactionAsync(createDto);
