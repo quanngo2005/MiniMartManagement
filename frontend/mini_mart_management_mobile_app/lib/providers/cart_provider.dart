@@ -45,7 +45,9 @@ class CartProvider extends ChangeNotifier {
   }
 
   double get discountAmount {
-    return loyaltyDiscountAmount + promotionDiscountAmount;
+    var totalDiscount = loyaltyDiscountAmount + promotionDiscountAmount;
+    if (totalDiscount > totalAmount) totalDiscount = totalAmount;
+    return totalDiscount;
   }
 
   double get finalAmount {

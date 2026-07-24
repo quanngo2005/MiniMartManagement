@@ -1511,7 +1511,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Tạm tính',
+                      'Tạm tính (đã gồm VAT)',
                       style: TextStyle(
                         fontSize: 16,
                         color: AppColors.textMuted,
@@ -1591,6 +1591,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 4),
+                const Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    '(Đã bao gồm thuế GTGT)',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 SizedBox(

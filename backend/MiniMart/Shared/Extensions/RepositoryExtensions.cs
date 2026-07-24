@@ -24,6 +24,7 @@ namespace MiniMart.Shared.Extensions
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IStockCountRepository, StockCountRepository>();
+            services.AddScoped<IEInvoiceRepository, EInvoiceRepository>();
             return services;
         }
 

@@ -66,7 +66,7 @@ namespace MiniMart.Repositories.Implementations
                 BuyerTaxCode = string.Empty,
                 BuyerName = order.Customer?.FullName,
                 BuyerAddress = order.Customer?.Address,
-                TotalBeforeVAT = order.SubTotal,
+                TotalBeforeVAT = order.OrderDetails.Sum(d => d.AmountBeforeVAT),
                 VATAmount = order.TaxAmount,
                 TotalAfterVAT = order.FinalAmount,
                 GDTAuthCode = null,
@@ -85,10 +85,11 @@ namespace MiniMart.Repositories.Implementations
                     Quantity = detail.Quantity,
                     UnitPrice = detail.UnitPrice,
                     DiscountAmount = detail.DiscountAmount,
-                    AmountBeforeVAT = detail.TotalPrice - detail.DiscountAmount,
+                    AmountBeforeVAT = detail.AmountBeforeVAT,
                     VatRate = detail.VatRate,
                     VatAmount = detail.VatAmount,
-                    AmountAfterVAT = detail.TotalPrice - detail.DiscountAmount + detail.VatAmount,
+                    // AmountAfterVAT = AmountBeforeVAT + VatAmount = netLineTotal (hiệu số tránh lệch làm tròn)
+                    AmountAfterVAT = detail.AmountBeforeVAT + detail.VatAmount,
                 });
             }
 

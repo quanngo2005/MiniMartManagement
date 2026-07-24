@@ -3,6 +3,7 @@ using MiniMart.Data;
 using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
+using MiniMart.Repositories.Interfaces;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
@@ -15,15 +16,18 @@ namespace MiniMart.Repositories.RepoImplement
         private readonly MiniMartDbContext _context;
         private readonly IBatchRepository _batchRepository;
         private readonly IProductStockAdjuster _productStockAdjuster;
+        private readonly IEInvoiceRepository _eInvoiceRepository;
 
         public OrderRepository(
             MiniMartDbContext context,
             IBatchRepository batchRepository,
-            IProductStockAdjuster productStockAdjuster)
+            IProductStockAdjuster productStockAdjuster,
+            IEInvoiceRepository eInvoiceRepository)
         {
             _context = context;
             _batchRepository = batchRepository;
             _productStockAdjuster = productStockAdjuster;
+            _eInvoiceRepository = eInvoiceRepository;
         }
 
         // GET ALL (OData)
@@ -69,6 +73,7 @@ namespace MiniMart.Repositories.RepoImplement
                 CustomerName = order.Customer?.FullName,
                 CustomerPhone = order.Customer?.PhoneNumber,
                 SubTotal = order.SubTotal,
+                TaxAmount = order.TaxAmount,
                 DiscountAmount = order.DiscountAmount,
                 FinalAmount = order.FinalAmount,
                 PaidAmount = order.PaidAmount,
@@ -81,7 +86,10 @@ namespace MiniMart.Repositories.RepoImplement
                     UnitPrice = od.UnitPrice,
                     DiscountAmount = od.DiscountAmount,
                     TotalPrice = od.TotalPrice,
-                    IsGift = od.IsGift
+                    IsGift = od.IsGift,
+                    VatRate = od.VatRate,
+                    VatAmount = od.VatAmount,
+                    AmountBeforeVAT = od.AmountBeforeVAT
                 }).ToList()
             };
         }
@@ -114,7 +122,7 @@ namespace MiniMart.Repositories.RepoImplement
             return order;
         }
 
-        // CHECKOUT
+        // CHECKOUT — Mô hình B: SellingPrice đã gồm VAT, tách ngược thuế tại thời điểm thanh toán
         public async Task<CheckoutResponseDto> CheckoutAsync(CheckoutRequestDto request)
         {
             // BR-POS-01
@@ -140,12 +148,10 @@ namespace MiniMart.Repositories.RepoImplement
                 }
             }
 
-            var checkoutAt = HanoiTime.Now;
+            var now = HanoiTime.Now;
 
             // BR-INV-01
-            decimal subTotal = 0;
             var orderDetails = new List<OrderDetail>();
-            var now = HanoiTime.Now;
             var activePromotions = await _context.Promotions
                 .Include(p => p.PromotionProducts)
                 .Where(p => p.IsActive && p.StartDate <= now && p.EndDate >= now)
@@ -156,6 +162,8 @@ namespace MiniMart.Repositories.RepoImplement
                 var product = await GetProductByIdAsync(item.ProductId);
                 if (product == null)
                     throw new KeyNotFoundException($"Sản phẩm ID {item.ProductId} không tồn tại.");
+
+                var taxRate = product.Category?.TaxRate?.Rate ?? 0m;
 
                 var buyXGetYPromotion = activePromotions
                     .Where(p => p.Type == PromotionType.BuyXGetYFree
@@ -171,6 +179,7 @@ namespace MiniMart.Repositories.RepoImplement
                 Product? giftProduct = null;
                 if (buyXGetYPromotion != null)
                 {
+                    // Integer division (floor): (Qty / BuyQty) lấy phần nguyên
                     giftQuantity =
                         (item.Quantity / buyXGetYPromotion.BuyQuantity!.Value)
                         * buyXGetYPromotion.GiftQuantity!.Value;
@@ -212,9 +221,10 @@ namespace MiniMart.Repositories.RepoImplement
                     .ThenBy(p => p.Promotion.PromotionId)
                     .FirstOrDefault();
 
+                // lineTotal = giá bán (đã gồm VAT) * số lượng
                 var lineTotal = product.SellingPrice * item.Quantity;
+                // Discount cấp dòng từ khuyến mãi sản phẩm
                 var lineDiscount = Math.Min(productDiscountPromotion?.Amount ?? 0m, lineTotal);
-                subTotal += lineTotal;
 
                 orderDetails.Add(new OrderDetail
                 {
@@ -223,8 +233,9 @@ namespace MiniMart.Repositories.RepoImplement
                     UnitPrice = product.SellingPrice,
                     DiscountAmount = lineDiscount,
                     TotalPrice = lineTotal,
-                    VatRate = 0,
+                    VatRate = taxRate,
                     VatAmount = 0,
+                    AmountBeforeVAT = 0,
                     IsGift = false,
                     AppliedPromotionId = productDiscountPromotion?.Promotion.PromotionId
                 });
@@ -240,13 +251,20 @@ namespace MiniMart.Repositories.RepoImplement
                         TotalPrice = 0,
                         VatRate = 0,
                         VatAmount = 0,
+                        AmountBeforeVAT = 0,
                         IsGift = true,
                         AppliedPromotionId = buyXGetYPromotion.PromotionId
                     });
                 }
             }
 
+            // Tính SubTotal = tổng TotalPrice các dòng (đã gồm VAT, trước chiết khấu)
+            var subTotal = orderDetails.Sum(od => od.TotalPrice);
+
+            // Tổng discount từ khuyến mãi sản phẩm (đã gán vào từng dòng)
             var productDiscountAmount = orderDetails.Sum(od => od.DiscountAmount);
+
+            // Khuyến mãi cấp đơn hàng (PercentDiscount)
             var orderLevelPromotion = activePromotions
                 .Where(p => p.Type == PromotionType.PercentDiscount
                             && subTotal >= p.MinimumOrderAmount.GetValueOrDefault())
@@ -263,9 +281,58 @@ namespace MiniMart.Repositories.RepoImplement
                 .FirstOrDefault();
 
             var promotionDiscount = orderLevelPromotion?.Amount ?? 0m;
-            decimal discountAmount = loyaltyDiscount + productDiscountAmount + promotionDiscount;
-            const decimal taxAmount = 0;
-            decimal finalAmount = subTotal - discountAmount;
+            var orderLevelDiscount = promotionDiscount + loyaltyDiscount;
+
+            // Cap: order-level discount không được vượt quá tổng còn lại sau khi trừ product discount
+            var remainingForOrderDiscount = Math.Max(0, subTotal - productDiscountAmount);
+            if (orderLevelDiscount > remainingForOrderDiscount)
+                orderLevelDiscount = remainingForOrderDiscount;
+
+            // Phân bổ chiết khấu cấp đơn hàng xuống từng dòng (theo tỷ trọng TotalPrice)
+            if (orderLevelDiscount > 0)
+            {
+                var nonGiftDetails = orderDetails.Where(od => !od.IsGift).ToList();
+                var nonGiftSubTotal = nonGiftDetails.Sum(od => od.TotalPrice);
+                if (nonGiftSubTotal > 0)
+                {
+                    var remaining = orderLevelDiscount;
+                    for (int i = 0; i < nonGiftDetails.Count; i++)
+                    {
+                        bool isLast = i == nonGiftDetails.Count - 1;
+                        var share = isLast
+                            ? remaining
+                            : Math.Round(orderLevelDiscount * nonGiftDetails[i].TotalPrice / nonGiftSubTotal, 0,
+                                MidpointRounding.AwayFromZero);
+                        nonGiftDetails[i].DiscountAmount += share;
+                        remaining -= share;
+                    }
+                }
+            }
+
+            // Tính thuế ngược cho từng dòng (không phải hàng tặng)
+            foreach (var od in orderDetails.Where(od => !od.IsGift))
+            {
+                var netLineTotal = od.TotalPrice - od.DiscountAmount;
+                if (netLineTotal <= 0)
+                {
+                    od.VatAmount = 0;
+                    od.AmountBeforeVAT = 0;
+                }
+                else
+                {
+                    // Khi VatRate = 0: (1 + 0/100) = 1 → AmountBeforeVAT = netLineTotal, VatAmount = 0
+                    od.AmountBeforeVAT = Math.Round(netLineTotal / (1 + od.VatRate / 100m), 0,
+                        MidpointRounding.AwayFromZero);
+                    // Hiệu số để đảm bảo AmountBeforeVAT + VatAmount == netLineTotal
+                    od.VatAmount = netLineTotal - od.AmountBeforeVAT;
+                }
+            }
+
+            // Tổng hợp đơn hàng
+            var totalDiscountAmount = orderDetails.Sum(od => od.DiscountAmount);
+            // Ưu tiên discount từ loyalty (đã phân bổ vào dòng ở trên)
+            var totalTaxAmount = orderDetails.Sum(od => od.VatAmount);
+            var finalAmount = subTotal - totalDiscountAmount;
             if (finalAmount < 0) finalAmount = 0;
 
             decimal changeAmount = 0;
@@ -276,7 +343,6 @@ namespace MiniMart.Repositories.RepoImplement
                 changeAmount = request.PaidAmount - finalAmount;
             }
 
-            var createdAt = now;
             var strategy = _context.Database.CreateExecutionStrategy();
             return await strategy.ExecuteAsync(async () =>
             {
@@ -287,14 +353,14 @@ namespace MiniMart.Repositories.RepoImplement
                     {
                         OrderCode = await GenerateNextOrderCodeAsync(),
                         SubTotal = subTotal,
-                        TaxAmount = taxAmount,
-                        DiscountAmount = discountAmount,
+                        TaxAmount = totalTaxAmount,
+                        DiscountAmount = totalDiscountAmount,
                         FinalAmount = finalAmount,
                         PaidAmount = request.PaidAmount,
                         ChangeAmount = changeAmount,
                         Status = request.PaymentMethod == PaymentMethod.Cash ? OrderStatus.Completed : OrderStatus.Pending,
-                        CreatedAt = createdAt,
-                        OrderDate = createdAt,
+                        CreatedAt = now,
+                        OrderDate = now,
                         Note = request.Note,
                         EmployeeId = request.EmployeeId,
                         CustomerId = request.CustomerId,
@@ -308,6 +374,7 @@ namespace MiniMart.Repositories.RepoImplement
                         detail.OrderId = order.OrderId;
 
                     await _context.OrderDetails.AddRangeAsync(orderDetails);
+                    await _context.SaveChangesAsync();
 
                     int pointsEarned = 0;
                     if (request.PaymentMethod == PaymentMethod.Cash)
@@ -325,28 +392,33 @@ namespace MiniMart.Repositories.RepoImplement
                         shift.Revenue += finalAmount;
                     }
 
-                // Luôn lưu lịch sử Payment cho Cash. Đối với VietQR, lưu lịch sử Payment trạng thái Pending.
-                var paymentRecord = new Payment
-                {
-                    OrderId = order.OrderId,
-                    PaymentMethod = request.PaymentMethod,
-                    Amount = finalAmount,
-                    TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
-                    PaidAt = request.PaymentMethod == PaymentMethod.Cash ? createdAt : createdAt,
-                    Status = request.PaymentMethod == PaymentMethod.Cash ? PaymentStatus.Success : PaymentStatus.Pending
-                };
-                await _context.Payments.AddAsync(paymentRecord);
+                    var paymentRecord = new Payment
+                    {
+                        OrderId = order.OrderId,
+                        PaymentMethod = request.PaymentMethod,
+                        Amount = finalAmount,
+                        TransactionRef = $"{order.OrderId}_{DateTime.Now:MMddHHmmss}",
+                        PaidAt = request.PaymentMethod == PaymentMethod.Cash ? now : now,
+                        Status = request.PaymentMethod == PaymentMethod.Cash ? PaymentStatus.Success : PaymentStatus.Pending
+                    };
+                    await _context.Payments.AddAsync(paymentRecord);
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    // Tự động tạo e-invoice cho đơn hoàn tất ngay (tiền mặt)
+                    if (request.PaymentMethod == PaymentMethod.Cash)
+                    {
+                        await _eInvoiceRepository.CreateInvoiceFromOrderAsync(order.OrderId);
+                    }
 
                     return new CheckoutResponseDto
                     {
                         OrderId = order.OrderId,
                         OrderCode = order.OrderCode,
                         SubTotal = subTotal,
-                        TaxAmount = taxAmount,
-                        DiscountAmount = discountAmount,
+                        TaxAmount = totalTaxAmount,
+                        DiscountAmount = totalDiscountAmount,
                         FinalAmount = finalAmount,
                         PaidAmount = request.PaidAmount,
                         ChangeAmount = changeAmount,
@@ -364,6 +436,7 @@ namespace MiniMart.Repositories.RepoImplement
                             TotalPrice = od.TotalPrice,
                             VatRate = od.VatRate,
                             VatAmount = od.VatAmount,
+                            AmountBeforeVAT = od.AmountBeforeVAT,
                             IsGift = od.IsGift,
                             AppliedPromotionId = od.AppliedPromotionId,
                             TaxDescription = string.Empty
@@ -401,6 +474,7 @@ namespace MiniMart.Repositories.RepoImplement
         {
             return await _context.Products
                 .Include(p => p.Category)
+                    .ThenInclude(c => c.TaxRate)
                 .FirstOrDefaultAsync(p => p.ProductId == productId);
         }
 
@@ -489,6 +563,9 @@ namespace MiniMart.Repositories.RepoImplement
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
+
+                    // Tự động tạo e-invoice sau khi xác nhận đơn (VietQR)
+                    await _eInvoiceRepository.CreateInvoiceFromOrderAsync(order.OrderId);
                 }
                 catch (DbUpdateConcurrencyException)
                 {

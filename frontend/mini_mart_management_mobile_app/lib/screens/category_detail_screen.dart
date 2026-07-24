@@ -1,6 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:mini_mart_management_mobile_app/config/api_config.dart';
 import 'package:mini_mart_management_mobile_app/models/category.dart';
+import 'package:mini_mart_management_mobile_app/models/tax_rate.dart';
 import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
+import 'package:mini_mart_management_mobile_app/services/http_client_factory.dart';
 import 'package:mini_mart_management_mobile_app/widgets/feedback/loading_overlay.dart';
 import 'package:mini_mart_management_mobile_app/widgets/layout/mini_mart_app_bar.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +29,8 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   bool _saving = false;
   bool _status = true;
   int? _parentCategoryId;
+  int? _taxRateId;
+  List<TaxRate> _taxRates = [];
 
   bool get _isNew => widget.categoryId == null;
 
@@ -44,6 +50,8 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   }
 
   Future<void> _load() async {
+    await _fetchTaxRates();
+
     final provider = context.read<CategoryProvider>();
     if (provider.categories.isEmpty) await provider.fetchAll();
     if (!mounted) return;
@@ -62,9 +70,31 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       _descriptionController.text = category.description ?? '';
       _orderController.text = category.displayOrder.toString();
       _parentCategoryId = category.parentCategoryId;
+      _taxRateId = category.taxRateId;
       _status = category.status;
     }
+    if (_taxRateId == null && _taxRates.isNotEmpty) {
+      _taxRateId = _taxRates.first.taxRateId;
+    }
     setState(() => _loading = false);
+  }
+
+  Future<void> _fetchTaxRates() async {
+    try {
+      final client = createConfiguredClient();
+      final response = await client.get(
+        ApiConfig.uri('/api/taxrates'),
+        headers: {'Accept': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        List list = decoded is List ? decoded : (decoded['data'] ?? decoded['Data'] ?? []);
+        _taxRates = list
+            .whereType<Map<String, dynamic>>()
+            .map(TaxRate.fromJson)
+            .toList();
+      }
+    } catch (_) {}
   }
 
   Future<void> _save() async {
@@ -78,8 +108,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
           : _descriptionController.text.trim(),
       'displayOrder': int.tryParse(_orderController.text.trim()) ?? 0,
       'parentCategoryId': _parentCategoryId,
-      // Kept only for backward-compatible API/database schema. Tax is disabled.
-      'taxRateId': 1,
+      'taxRateId': _taxRateId,
       'status': _status,
     };
     final provider = context.read<CategoryProvider>();
@@ -130,6 +159,8 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                     const SizedBox(height: 12),
                     _buildParentField(context),
                     const SizedBox(height: 12),
+                    _buildTaxRateField(),
+                    const SizedBox(height: 12),
                     _textField(
                       controller: _orderController,
                       label: 'Thứ tự hiển thị',
@@ -160,6 +191,22 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                 ),
               ),
       ),
+    );
+  }
+
+  Widget _buildTaxRateField() {
+    return DropdownButtonFormField<int>(
+      initialValue: _taxRates.any((t) => t.taxRateId == _taxRateId) ? _taxRateId : null,
+      decoration: const InputDecoration(labelText: 'Thuế suất *'),
+      items: [
+        for (final tax in _taxRates)
+          DropdownMenuItem<int>(
+            value: tax.taxRateId,
+            child: Text('${tax.rate.toInt()}% — ${tax.description}'),
+          ),
+      ],
+      onChanged: (value) => setState(() => _taxRateId = value),
+      validator: (value) => value == null ? 'Chọn thuế suất' : null,
     );
   }
 

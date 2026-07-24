@@ -134,6 +134,9 @@ class CheckoutItemResponse {
   final double unitPrice;
   final double discountAmount;
   final double totalPrice;
+  final double vatRate;
+  final double vatAmount;
+  final double amountBeforeVAT;
 
   CheckoutItemResponse({
     required this.productId,
@@ -141,6 +144,9 @@ class CheckoutItemResponse {
     required this.unitPrice,
     required this.discountAmount,
     required this.totalPrice,
+    this.vatRate = 0,
+    this.vatAmount = 0,
+    this.amountBeforeVAT = 0,
   });
 
   factory CheckoutItemResponse.fromJson(Map<String, dynamic> json) {
@@ -150,6 +156,9 @@ class CheckoutItemResponse {
       unitPrice: (json['unitPrice'] ?? 0).toDouble(),
       discountAmount: (json['discountAmount'] ?? 0).toDouble(),
       totalPrice: (json['totalPrice'] ?? 0).toDouble(),
+      vatRate: (json['vatRate'] ?? 0).toDouble(),
+      vatAmount: (json['vatAmount'] ?? 0).toDouble(),
+      amountBeforeVAT: (json['amountBeforeVAT'] ?? 0).toDouble(),
     );
   }
 }

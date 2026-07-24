@@ -8,6 +8,8 @@ class Category {
     required this.displayOrder,
     this.parentCategoryId,
     this.parentCategoryName,
+    this.taxRateId,
+    this.taxRate,
   });
 
   final int categoryId;
@@ -18,6 +20,8 @@ class Category {
   final int displayOrder;
   final int? parentCategoryId;
   final String? parentCategoryName;
+  final int? taxRateId;
+  final double? taxRate;
 
   factory Category.fromJson(Map<String, dynamic> json) {
     final parent = json['parentCategory'] ?? json['ParentCategory'];
@@ -45,6 +49,8 @@ class Category {
       parentCategoryName: parent is Map<String, dynamic>
           ? (parent['categoryName'] ?? parent['CategoryName']) as String?
           : null,
+      taxRateId: _asNullableInt(json['taxRateId'] ?? json['TaxRateId']),
+      taxRate: _asNullableDouble(json['taxRate'] ?? json['TaxRate']),
     );
   }
 
@@ -64,6 +70,12 @@ class Category {
     if (value is num) return value != 0;
     if (value is String) return value.toLowerCase() == 'true';
     return fallback;
+  }
+
+  static double? _asNullableDouble(Object? value) {
+    if (value == null) return null;
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString());
   }
 
   static String _asString(Object? value, {String fallback = ''}) {

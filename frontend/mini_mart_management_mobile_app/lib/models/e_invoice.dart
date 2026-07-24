@@ -15,6 +15,7 @@ class EInvoice {
     this.buyerAddress,
     this.gdtAuthCode,
     this.xmlContent,
+    this.paymentMethod,
   });
 
   final int eInvoiceId;
@@ -32,6 +33,7 @@ class EInvoice {
   final String? xmlContent;
   final DateTime? issuedAt;
   final bool status;
+  final int? paymentMethod;
 
   factory EInvoice.fromJson(Map<String, dynamic> json) {
     return EInvoice(
@@ -58,6 +60,9 @@ class EInvoice {
       xmlContent: _asStringOrNull(json['xmlContent'] ?? json['XMLContent']),
       issuedAt: _parseDate(json['issuedAt'] ?? json['IssuedAt']),
       status: (json['status'] ?? json['Status'] ?? false) == true,
+      paymentMethod: _asIntOrNull(
+        json['paymentMethod'] ?? json['PaymentMethod'],
+      ),
     );
   }
 
@@ -147,6 +152,8 @@ int _asInt(dynamic value) =>
 double _asDouble(dynamic value) =>
     value is num ? value.toDouble() : double.tryParse('$value') ?? 0;
 String? _asStringOrNull(dynamic value) => value?.toString();
+int? _asIntOrNull(dynamic value) =>
+    value is num ? value.toInt() : int.tryParse('$value');
 DateTime? _parseDate(dynamic value) {
   if (value == null) return null;
   return DateTime.tryParse('$value');

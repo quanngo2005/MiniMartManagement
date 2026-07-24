@@ -5,6 +5,7 @@ using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Services.Implementations
 {
@@ -52,6 +53,7 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException($"Không tìm thấy nhà cung cấp với ID {dto.SupplierId}.", StatusCodes.Status422UnprocessableEntity);
 
             var product = _mapper.Map<Product>(dto);
+            product.SellingPrice = PriceHelper.RoundToDisplayPrice(product.SellingPrice);
             var created = await _productRepository.CreateAsync(product);
             return _mapper.Map<ProductResponseDto>(created);
         }
@@ -75,6 +77,7 @@ namespace MiniMart.Services.Implementations
                 throw new DomainException($"Không tìm thấy nhà cung cấp với ID {dto.SupplierId}.", StatusCodes.Status422UnprocessableEntity);
 
             _mapper.Map(dto, existing);
+            existing.SellingPrice = PriceHelper.RoundToDisplayPrice(existing.SellingPrice);
             var updated = await _productRepository.UpdateAsync(existing);
             return _mapper.Map<ProductResponseDto>(updated!);
         }
