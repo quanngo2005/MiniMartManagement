@@ -101,12 +101,12 @@ class OrderService {
 
     final data = responseJson['data'] ?? responseJson['Data'];
     if (data is! Map<String, dynamic>) {
-      throw const ApiException('CSRF response is missing token data.');
+      throw const ApiException('Phản hồi CSRF thiếu dữ liệu token.');
     }
 
     final token = data['csrfToken'] ?? data['CsrfToken'];
     if (token is! String || token.isEmpty) {
-      throw const ApiException('CSRF token is missing.');
+      throw const ApiException('Thiếu token CSRF.');
     }
 
     final cookieToken = _readCookieToken(response.headers['set-cookie']);
@@ -123,9 +123,9 @@ class OrderService {
       if (decoded is Map<String, dynamic>) return decoded;
       if (decoded is List) return {'data': decoded};
     } on FormatException {
-      throw const ApiException('Server returned an invalid response.');
+      throw const ApiException('Máy chủ trả về phản hồi không hợp lệ.');
     }
-    throw const ApiException('Server returned an unexpected response.');
+    throw const ApiException('Máy chủ trả về phản hồi không mong đợi.');
   }
 
   String _readMessage(Map<String, dynamic> responseJson) {

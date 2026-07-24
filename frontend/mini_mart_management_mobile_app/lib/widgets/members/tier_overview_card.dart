@@ -15,7 +15,7 @@ class TierOverviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = _accentColor(tier.name);
+    final accent = _accentColor(tier.colorCode);
 
     return Container(
       width: 240,
@@ -45,11 +45,7 @@ class TierOverviewCard extends StatelessWidget {
                   color: accent,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  _tierIcon(tier.name),
-                  color: Colors.white,
-                  size: 22,
-                ),
+                child: Icon(_tierIcon(tier.id), color: Colors.white, size: 22),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -112,22 +108,17 @@ class TierOverviewCard extends StatelessWidget {
     );
   }
 
-  Color _accentColor(String name) {
-    switch (name.toLowerCase()) {
-      case 'gold':
-        return const Color(0xFFFFD700);
-      case 'silver':
-        return const Color(0xFFC0C0C0);
-      default:
-        return const Color(0xFFCD7F32);
-    }
+  Color _accentColor(String colorCode) {
+    final isValid = RegExp(r'^#[0-9a-fA-F]{6}$').hasMatch(colorCode);
+    if (!isValid) return const Color(0xFFCD7F32);
+    return Color(int.parse(colorCode.replaceFirst('#', '0xFF')));
   }
 
-  IconData _tierIcon(String name) {
-    switch (name.toLowerCase()) {
-      case 'gold':
+  IconData _tierIcon(String tierId) {
+    switch (tierId) {
+      case '3':
         return Icons.workspace_premium;
-      case 'silver':
+      case '2':
         return Icons.stars;
       default:
         return Icons.military_tech;

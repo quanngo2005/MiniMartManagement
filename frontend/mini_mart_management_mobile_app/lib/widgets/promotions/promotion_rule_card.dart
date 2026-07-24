@@ -21,7 +21,7 @@ class PromotionRuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusKey = _statusKey(promotion.status);
+    final statusKey = _statusKey(promotion.lifecycleStatus);
     final isEnded = statusKey == 'ended';
 
     return InkWell(
@@ -152,13 +152,14 @@ class PromotionRuleCard extends StatelessWidget {
     );
   }
 
-  String _statusKey(String status) {
+  String _statusKey(PromotionLifecycleStatus status) {
     switch (status) {
-      case 'Active':
+      case PromotionLifecycleStatus.active:
         return 'active';
-      case 'Upcoming':
+      case PromotionLifecycleStatus.upcoming:
         return 'scheduled';
-      default:
+      case PromotionLifecycleStatus.ended:
+      case PromotionLifecycleStatus.inactive:
         return 'ended';
     }
   }

@@ -16,6 +16,7 @@ namespace MiniMart.Shared.Extensions
             services.AddScoped<IBatchRepository, BatchRepository>();
             services.AddScoped<IReceiptRepository, ReceiptRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IPromotionRepository, PromotionRepository>();
@@ -23,6 +24,7 @@ namespace MiniMart.Shared.Extensions
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IStockCountRepository, StockCountRepository>();
+            services.AddScoped<IEInvoiceRepository, EInvoiceRepository>();
             return services;
         }
 

@@ -72,9 +72,9 @@ class InventoryLookupService {
       if (decoded is Map<String, dynamic>) return decoded;
       if (decoded is List) return {'data': decoded};
     } on FormatException {
-      throw const ApiException('Server returned an invalid response.');
+      throw const ApiException('Máy chủ trả về phản hồi không hợp lệ.');
     }
-    throw const ApiException('Server returned an unexpected response.');
+    throw const ApiException('Máy chủ trả về phản hồi không mong đợi.');
   }
 
   List<Map<String, dynamic>> _readItems(Map<String, dynamic> responseJson) {

@@ -34,7 +34,7 @@ namespace MiniMart.Services.Implementations
         public async Task<SupplierResponseDto> CreateAsync(SupplierCreateDto dto)
         {
             if (await _supplierRepository.SupplierCodeExistsAsync(dto.SupplierCode))
-                throw new DomainException("Supplier code already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã nhà cung cấp đã tồn tại.", StatusCodes.Status409Conflict);
 
             var supplier = _mapper.Map<Supplier>(dto);
             supplier.Status = true;
@@ -46,10 +46,10 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _supplierRepository.GetByIdAsync(id);
             if (existing == null)
-                throw new DomainException($"Supplier with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy nhà cung cấp với ID {id}.", StatusCodes.Status404NotFound);
 
             if (await _supplierRepository.SupplierCodeExistsAsync(dto.SupplierCode, id))
-                throw new DomainException("Supplier code already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã nhà cung cấp đã tồn tại.", StatusCodes.Status409Conflict);
 
             _mapper.Map(dto, existing);
             var updated = await _supplierRepository.UpdateAsync(existing);
@@ -60,7 +60,7 @@ namespace MiniMart.Services.Implementations
         {
             var success = await _supplierRepository.DeleteAsync(id);
             if (!success)
-                throw new DomainException($"Supplier with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy nhà cung cấp với ID {id}.", StatusCodes.Status404NotFound);
         }
 
         public Task<IReadOnlyList<SupplierDebtSummaryDto>> GetDebtSummariesAsync()

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MiniMart.Data;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
+using System.Data;
 
 namespace MiniMart.Repositories.Implementations
 {
@@ -127,7 +128,7 @@ namespace MiniMart.Repositories.Implementations
             var strategy = _context.Database.CreateExecutionStrategy();
             await strategy.ExecuteAsync(async () =>
             {
-                await using var transaction = await _context.Database.BeginTransactionAsync();
+                await using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead);
                 try
                 {
                     await operation();

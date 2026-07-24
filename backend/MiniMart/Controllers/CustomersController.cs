@@ -32,7 +32,7 @@ namespace MiniMart.Controllers
         {
             var customer = await _customerService.GetCustomerByIdAsync(id);
             if (customer == null)
-                return NotFound(new { message = $"Customer with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy khách hàng với ID {id}." });
 
             return Ok(customer);
         }

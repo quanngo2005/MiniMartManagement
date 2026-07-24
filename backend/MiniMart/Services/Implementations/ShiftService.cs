@@ -7,6 +7,7 @@ using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Services.Implementations
 {
@@ -39,10 +40,10 @@ namespace MiniMart.Services.Implementations
         public async Task<ShiftDto> CreateShiftAsync(CreateShiftDto createDto)
         {
             if (!await _shiftRepository.EmployeeExistsAsync(createDto.EmployeeId))
-                throw new DomainException("Employee ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID nhân viên không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             if (createDto.CashierId.HasValue && !await _shiftRepository.EmployeeExistsAsync(createDto.CashierId.Value))
-                throw new DomainException("Cashier ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID thu ngân không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             var shift = _mapper.Map<Shift>(createDto);
 
@@ -97,13 +98,13 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _shiftRepository.GetShiftByIdAsync(id);
             if (existing == null || existing.Status == ShiftStatus.Cancelled)
-                throw new DomainException($"Shift with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy ca làm việc với ID {id}.", StatusCodes.Status404NotFound);
 
             if (!await _shiftRepository.EmployeeExistsAsync(updateDto.EmployeeId))
-                throw new DomainException("Employee ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID nhân viên không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             if (updateDto.CashierId.HasValue && !await _shiftRepository.EmployeeExistsAsync(updateDto.CashierId.Value))
-                throw new DomainException("Cashier ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID thu ngân không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             _mapper.Map(updateDto, existing);
             existing.ShiftId = id;
@@ -153,7 +154,7 @@ namespace MiniMart.Services.Implementations
 
             var updated = await _shiftRepository.UpdateShiftAsync(existing);
             if (updated == null)
-                throw new DomainException($"Shift with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy ca làm việc với ID {id}.", StatusCodes.Status404NotFound);
 
             var updatedWithDetails = await _shiftRepository.GetShiftByIdAsync(id);
             return _mapper.Map<ShiftDto>(updatedWithDetails ?? updated);
@@ -163,10 +164,10 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _shiftRepository.GetShiftByIdAsync(id);
             if (existing == null || existing.Status == ShiftStatus.Cancelled)
-                throw new DomainException($"Shift with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy ca làm việc với ID {id}.", StatusCodes.Status404NotFound);
 
             if (existing.Status != ShiftStatus.Pending)
-                throw new DomainException("Only Pending shifts can be deleted.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Chỉ có thể xóa ca làm việc ở trạng thái chờ.", StatusCodes.Status422UnprocessableEntity);
 
             await _shiftRepository.DeleteShiftAsync(id);
         }
@@ -175,20 +176,20 @@ namespace MiniMart.Services.Implementations
         {
             var activeShift = await _shiftRepository.GetActiveShiftByCashierIdAsync(openRequest.CashierId);
             if (activeShift != null)
-                throw new DomainException("There is already an active working shift for this cashier.", StatusCodes.Status409Conflict);
+                throw new DomainException("Đã có ca làm việc đang hoạt động cho thu ngân này.", StatusCodes.Status409Conflict);
 
             var shift = await _shiftRepository.GetShiftByIdAsync(openRequest.ShiftId);
             if (shift == null || shift.Status == ShiftStatus.Cancelled)
-                throw new DomainException($"Shift with ID {openRequest.ShiftId} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy ca làm việc với ID {openRequest.ShiftId}.", StatusCodes.Status404NotFound);
 
             if (shift.Status != ShiftStatus.Pending)
-                throw new DomainException($"Cannot open shift with status: {shift.Status}.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException($"Không thể mở ca với trạng thái: {shift.Status}.", StatusCodes.Status422UnprocessableEntity);
 
             if (!await _shiftRepository.EmployeeExistsAsync(openRequest.CashierId))
-                throw new DomainException("Cashier ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID thu ngân không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             if (!isManagerOrAdmin && openRequest.CashierId != currentUserId)
-                throw new DomainException("Forbidden: You cannot open a shift for another cashier.", StatusCodes.Status403Forbidden);
+                throw new DomainException("Bạn không thể mở ca cho thu ngân khác.", StatusCodes.Status403Forbidden);
 
             // Check if cashier already has an active or closed shift with the same ShiftCode
             var alreadyExists = await _shiftRepository.GetAllShiftsQueryable()
@@ -202,7 +203,7 @@ namespace MiniMart.Services.Implementations
             shift.CashierId = openRequest.CashierId;
             shift.StartCash = openRequest.StartCash;
             shift.Status = ShiftStatus.Working;
-            shift.StartedAt = DateTime.UtcNow.AddHours(7);
+            shift.StartedAt = HanoiTime.Now;
             if (!string.IsNullOrEmpty(openRequest.Note))
             {
                 shift.Note = openRequest.Note;
@@ -217,17 +218,17 @@ namespace MiniMart.Services.Implementations
         {
             var shift = await _shiftRepository.GetShiftByIdAsync(id);
             if (shift == null || shift.Status == ShiftStatus.Cancelled)
-                throw new DomainException($"Shift with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy ca làm việc với ID {id}.", StatusCodes.Status404NotFound);
 
             if (shift.Status != ShiftStatus.Working)
-                throw new DomainException("Only working shifts can be closed.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Chỉ có thể đóng ca làm việc đang hoạt động.", StatusCodes.Status422UnprocessableEntity);
 
             if (!isManagerOrAdmin && shift.CashierId != currentUserId)
-                throw new DomainException("Forbidden: You cannot close a shift for another cashier.", StatusCodes.Status403Forbidden);
+                throw new DomainException("Bạn không thể đóng ca cho thu ngân khác.", StatusCodes.Status403Forbidden);
 
             shift.EndCash = closeRequest.EndCash;
             shift.Status = ShiftStatus.Closed;
-            shift.ClosedAt = DateTime.UtcNow.AddHours(7);
+            shift.ClosedAt = HanoiTime.Now;
             if (!string.IsNullOrEmpty(closeRequest.Note))
             {
                 shift.Note = closeRequest.Note;

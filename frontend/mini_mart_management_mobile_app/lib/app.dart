@@ -141,7 +141,7 @@ class MiniMartManagementApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) =>
-              EInvoiceProvider(EInvoiceRepository(service: EInvoiceService())),
+              EInvoiceProvider(EInvoiceRepository(EInvoiceService())),
         ),
       ],
       child: MaterialApp(

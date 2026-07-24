@@ -339,6 +339,10 @@ namespace MiniMart.Data
                 .Property(od => od.VatAmount)
                 .HasColumnType("decimal(18,2)");
 
+            modelBuilder.Entity<OrderDetail>()
+                .Property(od => od.AmountBeforeVAT)
+                .HasColumnType("decimal(18,2)");
+
             // =========================
             // ORDER
             // =========================

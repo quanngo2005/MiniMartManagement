@@ -13,7 +13,7 @@ class ReceiptRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Receipt response could not be read.');
+      throw const ApiException('Phản hồi phiếu nhập không thể đọc được.');
     }
   }
 
@@ -23,7 +23,7 @@ class ReceiptRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Receipt response could not be read.');
+      throw const ApiException('Phản hồi phiếu nhập không thể đọc được.');
     }
   }
 
@@ -33,7 +33,7 @@ class ReceiptRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Receipt response could not be read.');
+      throw const ApiException('Phản hồi phiếu nhập không thể đọc được.');
     }
   }
 
@@ -43,7 +43,7 @@ class ReceiptRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Receipt response could not be read.');
+      throw const ApiException('Phản hồi phiếu nhập không thể đọc được.');
     }
   }
 
@@ -53,7 +53,7 @@ class ReceiptRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Receipt response could not be read.');
+      throw const ApiException('Phản hồi phiếu nhập không thể đọc được.');
     }
   }
 }

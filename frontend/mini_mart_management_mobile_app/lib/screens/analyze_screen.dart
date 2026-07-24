@@ -848,14 +848,21 @@ class _TrendLinesPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (income.isEmpty) return;
 
-    final maxValue = math.max(
-      income.fold<double>(0, math.max),
-      profit.fold<double>(0, math.max),
-    );
+    final allValues = [...income, ...profit];
+    final minValue = math.min(0.0, allValues.reduce(math.min));
+    final maxValue = math.max(0.0, allValues.reduce(math.max));
+    final valueRange = maxValue - minValue;
     final chartHeight = size.height - 28;
     final chartWidth = size.width - 16;
     final leftPadding = 8.0;
     final topPadding = 10.0;
+    final chartBottom = topPadding + chartHeight;
+    final zeroY = valueRange == 0
+        ? chartBottom
+        : topPadding + chartHeight * (maxValue / valueRange);
+
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
 
     void drawSeries(List<double> values, Color color, {bool dashed = false}) {
       final paint = Paint()
@@ -874,19 +881,23 @@ class _TrendLinesPainter extends CustomPainter {
         final x =
             leftPadding +
             chartWidth * (values.length == 1 ? 0 : i / (values.length - 1));
-        final normalized = maxValue == 0 ? 0.0 : values[i] / maxValue;
-        final y = topPadding + (chartHeight * (1 - normalized));
+        final normalized = valueRange == 0
+            ? 0.0
+            : (maxValue - values[i]) / valueRange;
+        final y = (topPadding + chartHeight * normalized)
+            .clamp(topPadding, chartBottom)
+            .toDouble();
         points.add(Offset(x, y));
       }
 
       if (points.isEmpty) return;
 
-      final fillPath = Path()..moveTo(points.first.dx, size.height - 18);
+      final fillPath = Path()..moveTo(points.first.dx, zeroY);
       for (final point in points) {
         fillPath.lineTo(point.dx, point.dy);
       }
       fillPath
-        ..lineTo(points.last.dx, size.height - 18)
+        ..lineTo(points.last.dx, zeroY)
         ..close();
       canvas.drawPath(fillPath, areaPaint);
 
@@ -907,6 +918,7 @@ class _TrendLinesPainter extends CustomPainter {
 
     drawSeries(income, AppColors.primary);
     drawSeries(profit, AppColors.secondary, dashed: true);
+    canvas.restore();
   }
 
   void _drawDashedLine(Canvas canvas, Offset start, Offset end, Paint paint) {

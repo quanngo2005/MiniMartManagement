@@ -154,11 +154,12 @@ class InventoryTransactionCard extends StatelessWidget {
 
   String _referenceLabel(InventoryReferenceType type) {
     return switch (type) {
-      InventoryReferenceType.order => 'Order',
-      InventoryReferenceType.receipt => 'Receipt',
-      InventoryReferenceType.returnToSupplier => 'Supplier return',
-      InventoryReferenceType.adjustment => 'Adjustment',
-      InventoryReferenceType.orderReturn => 'Order return',
+      InventoryReferenceType.order => 'Đơn hàng',
+      InventoryReferenceType.receipt => 'Phiếu nhập',
+      InventoryReferenceType.returnToSupplier => 'Trả nhà cung cấp',
+      InventoryReferenceType.adjustment => 'Điều chỉnh',
+      InventoryReferenceType.orderReturn => 'Trả hàng',
+      InventoryReferenceType.stockCount => 'Kiểm kê kho',
     };
   }
 }

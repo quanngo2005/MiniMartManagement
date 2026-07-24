@@ -45,7 +45,8 @@ enum InventoryReferenceType {
   receipt(2),
   returnToSupplier(3),
   adjustment(4),
-  orderReturn(5);
+  orderReturn(5),
+  stockCount(6);
 
   const InventoryReferenceType(this.value);
 
@@ -65,6 +66,7 @@ enum InventoryReferenceType {
         'returnToSupplier' => InventoryReferenceType.returnToSupplier,
         'Adjustment' || 'adjustment' => InventoryReferenceType.adjustment,
         'OrderReturn' || 'orderReturn' => InventoryReferenceType.orderReturn,
+        'StockCount' || 'stockCount' => InventoryReferenceType.stockCount,
         _ => throw const FormatException('Invalid referenceType.'),
       };
     }

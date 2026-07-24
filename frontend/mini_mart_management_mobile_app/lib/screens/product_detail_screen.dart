@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:mini_mart_management_mobile_app/core/input_formatters.dart';
 import 'package:mini_mart_management_mobile_app/models/product.dart';
 import 'package:mini_mart_management_mobile_app/providers/category_provider.dart';
 import 'package:mini_mart_management_mobile_app/providers/product_provider.dart';
@@ -33,6 +35,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ? widget.product!.sellingPrice.toInt().toString()
         : '',
   );
+  late final _preTaxPriceCtrl = TextEditingController(
+    text: widget.product != null
+        ? _calcPreTaxPrice(widget.product!.sellingPrice)
+        : '',
+  );
+  bool _isUpdatingPrice = false;
+  bool _isUpdatingPreTax = false;
   late final _stockCtrl = TextEditingController(
     text: widget.product?.stockQuantity.toString() ?? '0',
   );
@@ -58,6 +67,56 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   bool get _isNew => widget.product == null;
 
+  double get _currentTaxRate {
+    final catId = int.tryParse(_categoryCtrl.text.trim());
+    if (catId == null) return 0;
+    try {
+      final categories = context.read<CategoryProvider>().categories;
+      final cat = categories.where((c) => c.categoryId == catId).firstOrNull;
+      return cat?.taxRate ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  String _calcPreTaxPrice(double sellingPrice) {
+    final rate = _currentTaxRate;
+    if (rate <= 0) return sellingPrice.toInt().toString();
+    final preTax = sellingPrice / (1 + rate / 100);
+    return preTax.round().toString();
+  }
+
+  String _calcSellingPrice(double preTaxPrice) {
+    final rate = _currentTaxRate;
+    if (rate <= 0) return preTaxPrice.toInt().toString();
+    final selling = preTaxPrice * (1 + rate / 100);
+    return ((selling / 1000).round() * 1000).toInt().toString();
+  }
+
+  void _syncPreTaxFromPrice() {
+    final priceText = _priceCtrl.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final price = double.tryParse(priceText);
+    if (price == null || price <= 0) return;
+    _isUpdatingPreTax = true;
+    _preTaxPriceCtrl.text = _calcPreTaxPrice(price);
+    _isUpdatingPreTax = false;
+  }
+
+  void _onPriceChanged() {
+    if (_isUpdatingPrice) return;
+    _syncPreTaxFromPrice();
+  }
+
+  void _onPreTaxPriceChanged() {
+    if (_isUpdatingPreTax) return;
+    final text = _preTaxPriceCtrl.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final preTax = double.tryParse(text);
+    if (preTax == null || preTax <= 0) return;
+    _isUpdatingPrice = true;
+    _priceCtrl.text = _calcSellingPrice(preTax);
+    _isUpdatingPrice = false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -67,11 +126,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if (mounted) setState(() {});
     });
     _categoryCtrl.addListener(() {
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {});
+        _syncPreTaxFromPrice();
+      }
     });
     _supplierCtrl.addListener(() {
       if (mounted) setState(() {});
     });
+    _priceCtrl.addListener(_onPriceChanged);
+    _preTaxPriceCtrl.addListener(_onPreTaxPriceChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       final categoryProvider = context.read<CategoryProvider>();
@@ -91,6 +155,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     _barcodeCtrl.dispose();
     _nameCtrl.dispose();
     _priceCtrl.dispose();
+    _preTaxPriceCtrl.dispose();
     _stockCtrl.dispose();
     _minStockCtrl.dispose();
     _descCtrl.dispose();
@@ -175,20 +240,57 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   _field(_barcodeCtrl, 'Barcode *', validator: _req),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection('Giá & Kho', [
-                  _field(
-                    _priceCtrl,
-                    'Giá bán (VND) *',
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: _req,
-                  ),
+                _buildSection('Danh mục & Thuế suất', [
+                  _categorySelector(context),
+                  if (_currentTaxRate > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.receipt_long_outlined,
+                              size: 16,
+                              color: AppColors.secondary,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Thuế suất: ${_currentTaxRate.toInt()}%',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.secondary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              'VAT ${_currentTaxRate.toInt()}%',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ]),
+                const SizedBox(height: 16),
+                _buildSection(_isNew ? 'Giá bán' : 'Giá & Kho', [
                   Row(
                     children: [
                       Expanded(
                         child: _field(
-                          _stockCtrl,
-                          'Tồn kho',
+                          _preTaxPriceCtrl,
+                          'Giá trước thuế',
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
@@ -198,22 +300,46 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _field(
-                          _minStockCtrl,
-                          'Tồn kho tối thiểu',
+                          _priceCtrl,
+                          'Giá bán (gồm VAT) *',
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
+                          validator: _req,
                         ),
                       ),
                     ],
                   ),
+                  if (!_isNew)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _field(
+                            _stockCtrl,
+                            'Tồn kho',
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _field(
+                            _minStockCtrl,
+                            'Tồn kho tối thiểu',
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection('Danh m?c & NCC', [
-                  _categorySelector(context),
-                  _supplierSelector(context),
-                ]),
+                _buildSection('Nhà cung cấp', [_supplierSelector(context)]),
                 const SizedBox(height: 16),
                 _buildSection('Mô tả', [
                   _field(_descCtrl, 'Mô tả sản phẩm', maxLines: 3),

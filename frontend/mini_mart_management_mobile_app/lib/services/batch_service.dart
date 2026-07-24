@@ -41,7 +41,7 @@ class BatchService {
     try {
       return jsonDecode(response.body);
     } on FormatException {
-      throw const ApiException('Server returned an invalid batch response.');
+      throw const ApiException('Máy chủ trả về phản hồi lô hàng không hợp lệ.');
     }
   }
 
@@ -52,13 +52,13 @@ class BatchService {
       _ => null,
     };
     if (source is! List<dynamic>) {
-      throw const ApiException('Batch response is missing items.');
+      throw const ApiException('Phản hồi danh sách lô hàng thiếu dữ liệu.');
     }
 
     return source
         .map((item) {
           if (item is Map<String, dynamic>) return item;
-          throw const ApiException('Batch item could not be read.');
+          throw const ApiException('Không thể đọc dữ liệu lô hàng.');
         })
         .toList(growable: false);
   }
@@ -82,15 +82,15 @@ class BatchService {
     }
 
     if (responseJson is! Map<String, dynamic>) {
-      throw const ApiException('CSRF response is invalid.');
+      throw const ApiException('Phản hồi CSRF không hợp lệ.');
     }
     final data = responseJson['data'] ?? responseJson['Data'];
     if (data is! Map<String, dynamic>) {
-      throw const ApiException('CSRF response is missing token data.');
+      throw const ApiException('Phản hồi CSRF thiếu dữ liệu token.');
     }
     final token = data['csrfToken'] ?? data['CsrfToken'];
     if (token is! String || token.isEmpty) {
-      throw const ApiException('CSRF token is missing.');
+      throw const ApiException('Thiếu token CSRF.');
     }
 
     final cookieToken = _readCookieToken(response.headers['set-cookie']);

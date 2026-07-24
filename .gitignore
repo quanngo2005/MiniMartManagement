@@ -54,6 +54,7 @@ TestResult.xml
 nunit-*.xml
 /.gemini
 /.vs
+**/.vs/
 *.db-shm
 /backend/.vs
 /frontend/stitch_assets
@@ -71,3 +72,4 @@ backend/MiniMart/appsettings.Development.json
 /backend/MiniMart/appsettings.Development.json
 /backend/MiniMart/.env
 /.claude
+/.claude/skills/gitnexus

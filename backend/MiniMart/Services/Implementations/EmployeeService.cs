@@ -36,13 +36,13 @@ namespace MiniMart.Services.Implementations
         public async Task<EmployeeDto> CreateEmployeeAsync(CreateEmployeeDto createDto)
         {
             if (await _employeeRepository.UsernameExistsAsync(createDto.Username))
-                throw new DomainException("Username already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Tên đăng nhập đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (await _employeeRepository.PhoneNumberExistsAsync(createDto.PhoneNumber))
-                throw new DomainException("Phone number already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Số điện thoại đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (!await _employeeRepository.RoleExistsAsync(createDto.RoleId))
-                throw new DomainException("Role ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID vai trò không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             var employee = _mapper.Map<Employee>(createDto);
             employee.PasswordHash = HashPassword(createDto.Password);
@@ -56,16 +56,16 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _employeeRepository.GetEmployeeByIdAsync(id);
             if (existing == null)
-                throw new DomainException($"Employee with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy nhân viên với ID {id}.", StatusCodes.Status404NotFound);
 
             if (await _employeeRepository.UsernameExistsAsync(updateDto.Username, id))
-                throw new DomainException("Username already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Tên đăng nhập đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (await _employeeRepository.PhoneNumberExistsAsync(updateDto.PhoneNumber, id))
-                throw new DomainException("Phone number already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Số điện thoại đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (!await _employeeRepository.RoleExistsAsync(updateDto.RoleId))
-                throw new DomainException("Role ID does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("ID vai trò không tồn tại.", StatusCodes.Status422UnprocessableEntity);
 
             var passwordHash = string.IsNullOrEmpty(updateDto.Password) ? existing.PasswordHash : HashPassword(updateDto.Password);
 

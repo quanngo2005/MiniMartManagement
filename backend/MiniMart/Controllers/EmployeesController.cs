@@ -36,7 +36,7 @@ namespace MiniMart.Controllers
             var employee = await _employeeService.GetEmployeeByIdAsync(id);
             if (employee == null)
             {
-                return NotFound(new { message = $"Employee with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy nhân viên với ID {id}." });
             }
             return Ok(employee);
         }
@@ -46,7 +46,7 @@ namespace MiniMart.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeDto>> CreateEmployee([FromBody] CreateEmployeeDto createDto)
         {
-            if (createDto == null) return BadRequest(new { message = "Invalid employee data." });
+            if (createDto == null) return BadRequest(new { message = "Dữ liệu nhân viên không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var created = await _employeeService.CreateEmployeeAsync(createDto);
@@ -58,7 +58,7 @@ namespace MiniMart.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<EmployeeDto>> UpdateEmployee(int id, [FromBody] UpdateEmployeeDto updateDto)
         {
-            if (updateDto == null) return BadRequest(new { message = "Invalid update data." });
+            if (updateDto == null) return BadRequest(new { message = "Dữ liệu cập nhật không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var updated = await _employeeService.UpdateEmployeeAsync(id, updateDto);

@@ -13,7 +13,7 @@ class InventoryRepository {
     } on ApiException {
       rethrow;
     } on FormatException {
-      throw const ApiException('Inventory response could not be read.');
+      throw const ApiException('Phản hồi kho không thể đọc được.');
     }
   }
 }

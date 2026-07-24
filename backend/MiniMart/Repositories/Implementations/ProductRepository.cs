@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MiniMart.Data;
 using MiniMart.Models;
 using MiniMart.Repositories.RepoInterface;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Repositories.RepoImplement
 {
@@ -126,7 +127,7 @@ namespace MiniMart.Repositories.RepoImplement
 
         public async Task<IEnumerable<Product>> GetNearExpirationAsync(int daysThreshold)
         {
-            var threshold = DateTime.UtcNow.AddDays(daysThreshold);
+            var threshold = HanoiTime.Now.AddDays(daysThreshold);
             return await _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.Supplier)

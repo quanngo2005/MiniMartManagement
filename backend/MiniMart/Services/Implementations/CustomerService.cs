@@ -35,10 +35,10 @@ namespace MiniMart.Services.Implementations
         public async Task<CustomerDto> CreateCustomerAsync(CreateCustomerDto createDto)
         {
             if (await _customerRepository.CustomerCodeExistsAsync(createDto.CustomerCode))
-                throw new DomainException("Customer code already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã khách hàng đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (await _customerRepository.PhoneNumberExistsAsync(createDto.PhoneNumber))
-                throw new DomainException("Phone number already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Số điện thoại đã tồn tại.", StatusCodes.Status409Conflict);
 
             var customer = _mapper.Map<Customer>(createDto);
             var created = await _customerRepository.CreateCustomerAsync(customer);
@@ -49,18 +49,18 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _customerRepository.GetCustomerByIdAsync(id);
             if (existing == null)
-                throw new DomainException($"Customer with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy khách hàng với ID {id}.", StatusCodes.Status404NotFound);
 
             if (await _customerRepository.CustomerCodeExistsAsync(updateDto.CustomerCode, id))
-                throw new DomainException("Customer code already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Mã khách hàng đã tồn tại.", StatusCodes.Status409Conflict);
 
             if (await _customerRepository.PhoneNumberExistsAsync(updateDto.PhoneNumber, id))
-                throw new DomainException("Phone number already exists.", StatusCodes.Status409Conflict);
+                throw new DomainException("Số điện thoại đã tồn tại.", StatusCodes.Status409Conflict);
 
             _mapper.Map(updateDto, existing);
             var updated = await _customerRepository.UpdateCustomerAsync(existing);
             if (updated == null)
-                throw new DomainException($"Customer with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy khách hàng với ID {id}.", StatusCodes.Status404NotFound);
 
             return _mapper.Map<CustomerDto>(updated);
         }
@@ -69,14 +69,14 @@ namespace MiniMart.Services.Implementations
         {
             var success = await _customerRepository.DeleteCustomerAsync(id);
             if (!success)
-                throw new DomainException($"Customer with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy khách hàng với ID {id}.", StatusCodes.Status404NotFound);
         }
 
         public async Task<object> GetCustomerPointsAsync(int id)
         {
             var customer = await _customerRepository.GetCustomerByIdAsync(id);
             if (customer == null)
-                throw new DomainException($"Customer with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy khách hàng với ID {id}.", StatusCodes.Status404NotFound);
 
             return new { customerId = customer.CustomerId, fullName = customer.FullName, point = customer.Point };
         }
@@ -85,7 +85,7 @@ namespace MiniMart.Services.Implementations
         {
             var success = await _customerRepository.UpdatePointsAsync(id, updateDto.Delta);
             if (!success)
-                throw new DomainException("Customer not found or points would go below zero.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Không tìm thấy khách hàng hoặc điểm không thể xuống dưới 0.", StatusCodes.Status422UnprocessableEntity);
 
             var customer = await _customerRepository.GetCustomerByIdAsync(id);
             return new { customerId = customer!.CustomerId, fullName = customer.FullName, point = customer.Point };
@@ -95,7 +95,7 @@ namespace MiniMart.Services.Implementations
         {
             var customer = await _customerRepository.GetCustomerByIdAsync(id);
             if (customer == null)
-                throw new DomainException($"Customer with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy khách hàng với ID {id}.", StatusCodes.Status404NotFound);
 
             var orders = await _customerRepository.GetCustomerOrdersAsync(id);
             return orders.Select(o => (object)new
@@ -113,7 +113,7 @@ namespace MiniMart.Services.Implementations
         {
             var customer = await _customerRepository.GetCustomerByIdAsync(id);
             if (customer == null)
-                throw new DomainException($"Customer with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy khách hàng với ID {id}.", StatusCodes.Status404NotFound);
 
             var txns = await _customerRepository.GetCustomerPointTransactionsAsync(id);
             return txns.Select(t => (object)new

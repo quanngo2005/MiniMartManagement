@@ -223,10 +223,10 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
     var gold = 0;
 
     for (final customer in customers) {
-      switch (MembershipTierUtils.tierNameForPoints(customer.points)) {
-        case 'Gold':
+      switch (MembershipTierUtils.tierLevelForPoints(customer.points)) {
+        case 3:
           gold++;
-        case 'Silver':
+        case 2:
           silver++;
         default:
           bronze++;

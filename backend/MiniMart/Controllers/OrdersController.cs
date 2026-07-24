@@ -4,6 +4,7 @@ using MiniMart.DTOs;
 using MiniMart.Models;
 using MiniMart.Models.Enums;
 using MiniMart.Repositories.RepoInterface;
+using MiniMart.Shared.Utils;
 using PayOS;
 using PayOS.Models.V2.PaymentRequests;
 using System.Linq.Expressions;
@@ -23,6 +24,7 @@ namespace MiniMart.Controllers
             OrderId = o.OrderId,
             OrderCode = o.OrderCode,
             SubTotal = o.SubTotal,
+            TaxAmount = o.TaxAmount,
             DiscountAmount = o.DiscountAmount,
             FinalAmount = o.FinalAmount,
             PaidAmount = o.PaidAmount,
@@ -116,7 +118,7 @@ namespace MiniMart.Controllers
                 {
                     try
                     {
-                        long payosOrderCode = long.Parse($"{result.OrderCode.Replace("HD", "")}{DateTime.Now:HHmmss}");
+                        long payosOrderCode = long.Parse($"{result.OrderCode.Replace("HD", "")}{HanoiTime.Now:HHmmss}");
                         var paymentRequest = new CreatePaymentLinkRequest
                         {
                             OrderCode = payosOrderCode,
@@ -155,7 +157,7 @@ namespace MiniMart.Controllers
         public async Task<IActionResult> CheckPayOSStatus(int id, long payosOrderCode)
         {
             var order = await _orderRepository.GetOrderByIdAsync(id);
-            if (order == null) return NotFound(new { message = "Order not found" });
+            if (order == null) return NotFound(new { message = "Không tìm thấy đơn hàng" });
 
             if (order.Status == OrderStatus.Completed)
                 return Ok(new { status = "PAID" });

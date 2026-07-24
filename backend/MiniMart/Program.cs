@@ -66,25 +66,8 @@ var payOS = new PayOSClient(
 );
 builder.Services.AddSingleton(payOS);
 
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
-builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
-builder.Services.AddScoped<IBatchRepository, BatchRepository>();
-builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IInventoryService, InventoryService>();
-builder.Services.AddScoped<IBatchService, BatchService>();
-builder.Services.AddScoped<IReceiptService, ReceiptService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<IShiftService, ShiftService>();
+builder.Services.AddAppServices();
+builder.Services.AddRepositories();
 builder.Services.AddAutoMapper(typeof(InventoryMappingProfile));
 builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 builder.Services.AddAutoMapper(typeof(SupplierMappingProfile));
@@ -98,22 +81,7 @@ builder.Services.AddScoped<IOrderReturnRepository, OrderReturnRepository>();
 builder.Services.AddScoped<IOrderReturnService, OrderReturnService>();
 builder.Services.AddScoped<IEInvoiceRepository, EInvoiceRepository>();
 builder.Services.AddScoped<IEInvoiceService, EInvoiceService>();
-builder.Services.AddScoped<ICustomerService, CustomerService>();
-builder.Services.AddScoped<IPromotionService, PromotionService>();
-builder.Services.AddStockCountRepository();
 builder.Services.AddStockCountServices();
-
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IReportRepository, ReportRepository>();
-builder.Services.AddScoped<IReportService, ReportService>();
-builder.Services.AddScoped<MiniMart.Services.Interfaces.IPaymentGatewayService, VnPayService>();
 
 builder.Services.AddControllers()
     .AddOData(options => options
@@ -172,10 +140,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 app.UseStaticFiles();
 app.UseRouting();
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors(DevelopmentCorsPolicy);
-}
+app.UseCors(DevelopmentCorsPolicy);
 app.UseMiddleware<CsrfMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();

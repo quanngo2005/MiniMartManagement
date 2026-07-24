@@ -13,6 +13,7 @@ namespace MiniMart.DTOs
         public decimal TotalPrice { get; set; }
         public decimal VatRate { get; set; }
         public decimal VatAmount { get; set; }
+        public decimal AmountBeforeVAT { get; set; }
         public string TaxDescription { get; set; } = string.Empty;
     }
 
@@ -28,6 +29,7 @@ namespace MiniMart.DTOs
         public decimal TotalPrice { get; set; }
         public decimal VatRate { get; set; }
         public decimal VatAmount { get; set; }
+        public decimal AmountBeforeVAT { get; set; }
     }
 
     public class UpdateOrderDetailDto
@@ -42,5 +44,6 @@ namespace MiniMart.DTOs
         public decimal TotalPrice { get; set; }
         public decimal VatRate { get; set; }
         public decimal VatAmount { get; set; }
+        public decimal AmountBeforeVAT { get; set; }
     }
 }

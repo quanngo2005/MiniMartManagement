@@ -1,3 +1,5 @@
+enum PromotionLifecycleStatus { active, upcoming, ended, inactive }
+
 class Promotion {
   final int promotionId;
   final String name;
@@ -65,22 +67,30 @@ class Promotion {
   String get title => name;
   // Backend không có field 'code' — hiển thị id như placeholder
   String get code => 'KM$promotionId';
+  PromotionLifecycleStatus get lifecycleStatus {
+    final now = DateTime.now();
+    if (!isActive) return PromotionLifecycleStatus.inactive;
+    if (now.isBefore(startDate)) return PromotionLifecycleStatus.upcoming;
+    if (now.isAfter(endDate)) return PromotionLifecycleStatus.ended;
+    return PromotionLifecycleStatus.active;
+  }
+
   String get status {
     final now = DateTime.now();
-    if (!isActive) return 'Inactive';
-    if (now.isBefore(startDate)) return 'Upcoming';
-    if (now.isAfter(endDate)) return 'Expired';
-    return 'Active';
+    if (!isActive) return 'Ngưng';
+    if (now.isBefore(startDate)) return 'Sắp diễn ra';
+    if (now.isAfter(endDate)) return 'Đã kết thúc';
+    return 'Đang chạy';
   }
 
   String get discountType {
     switch (type) {
       case 0:
-        return 'Percentage';
+        return 'Phần trăm';
       case 1:
-        return 'BuyXGetYFree';
+        return 'Mua X tặng Y';
       default:
-        return 'ProductDiscount';
+        return 'Giảm sản phẩm';
     }
   }
 

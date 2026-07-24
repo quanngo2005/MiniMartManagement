@@ -35,7 +35,7 @@ namespace MiniMart.Services.Implementations
         public async Task<PromotionDto> CreatePromotionAsync(CreatePromotionDto createDto)
         {
             if (createDto.EndDate <= createDto.StartDate)
-                throw new DomainException("EndDate must be after StartDate.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Ngày kết thúc phải sau ngày bắt đầu.", StatusCodes.Status422UnprocessableEntity);
 
             ValidatePromotionRule(
                 createDto.Type,
@@ -49,7 +49,7 @@ namespace MiniMart.Services.Implementations
             if (createDto.Type == MiniMart.Models.Enums.PromotionType.BuyXGetYFree && createDto.GiftProductId.GetValueOrDefault() <= 0)
             {
                 throw new DomainException(
-                    "Buy X Get Y Free requires a gift product.",
+                    "Khuyến mãi Mua X Tặng Y yêu cầu sản phẩm quà tặng.",
                     StatusCodes.Status422UnprocessableEntity);
             }
 
@@ -58,14 +58,14 @@ namespace MiniMart.Services.Implementations
                 && !createDto.ProductIds.Any())
             {
                 throw new DomainException(
-                    "Promotion requires at least one product.",
+                    "Khuyến mãi yêu cầu ít nhất một sản phẩm.",
                     StatusCodes.Status422UnprocessableEntity);
             }
 
             foreach (var productId in createDto.ProductIds)
             {
                 if (!await _promotionRepository.ProductExistsAsync(productId))
-                    throw new DomainException($"Product with ID {productId} does not exist.", StatusCodes.Status422UnprocessableEntity);
+                    throw new DomainException($"Sản phẩm với ID {productId} không tồn tại.", StatusCodes.Status422UnprocessableEntity);
             }
 
             var promotion = _mapper.Map<Promotion>(createDto);
@@ -78,10 +78,10 @@ namespace MiniMart.Services.Implementations
         {
             var existing = await _promotionRepository.GetPromotionByIdAsync(id);
             if (existing == null)
-                throw new DomainException($"Promotion with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy khuyến mãi với ID {id}.", StatusCodes.Status404NotFound);
 
             if (updateDto.EndDate <= updateDto.StartDate)
-                throw new DomainException("EndDate must be after StartDate.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Ngày kết thúc phải sau ngày bắt đầu.", StatusCodes.Status422UnprocessableEntity);
 
             ValidatePromotionRule(
                 updateDto.Type,
@@ -95,7 +95,7 @@ namespace MiniMart.Services.Implementations
             if (updateDto.Type == MiniMart.Models.Enums.PromotionType.BuyXGetYFree && updateDto.GiftProductId.GetValueOrDefault() <= 0)
             {
                 throw new DomainException(
-                    "Buy X Get Y Free requires a gift product.",
+                    "Khuyến mãi Mua X Tặng Y yêu cầu sản phẩm quà tặng.",
                     StatusCodes.Status422UnprocessableEntity);
             }
 
@@ -104,20 +104,20 @@ namespace MiniMart.Services.Implementations
                 && !updateDto.ProductIds.Any())
             {
                 throw new DomainException(
-                    "Promotion requires at least one product.",
+                    "Khuyến mãi yêu cầu ít nhất một sản phẩm.",
                     StatusCodes.Status422UnprocessableEntity);
             }
 
             foreach (var productId in updateDto.ProductIds)
             {
                 if (!await _promotionRepository.ProductExistsAsync(productId))
-                    throw new DomainException($"Product with ID {productId} does not exist.", StatusCodes.Status422UnprocessableEntity);
+                    throw new DomainException($"Sản phẩm với ID {productId} không tồn tại.", StatusCodes.Status422UnprocessableEntity);
             }
 
             _mapper.Map(updateDto, existing);
             var updated = await _promotionRepository.UpdatePromotionAsync(existing, updateDto.ProductIds);
             if (updated == null)
-                throw new DomainException($"Promotion with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy khuyến mãi với ID {id}.", StatusCodes.Status404NotFound);
 
             return _mapper.Map<PromotionDto>(updated);
         }
@@ -126,7 +126,7 @@ namespace MiniMart.Services.Implementations
         {
             var success = await _promotionRepository.DeletePromotionAsync(id);
             if (!success)
-                throw new DomainException($"Promotion with ID {id} not found.", StatusCodes.Status404NotFound);
+                throw new DomainException($"Không tìm thấy khuyến mãi với ID {id}.", StatusCodes.Status404NotFound);
         }
 
         private static void ValidatePromotionRule(
@@ -143,7 +143,7 @@ namespace MiniMart.Services.Implementations
                 if (buyQuantity.GetValueOrDefault() <= 0 || giftQuantity.GetValueOrDefault() <= 0)
                 {
                     throw new DomainException(
-                        "Buy X Get Y Free requires BuyQuantity and GiftQuantity to be greater than 0.",
+                        "Khuyến mãi Mua X Tặng Y yêu cầu số lượng mua và số lượng tặng lớn hơn 0.",
                         StatusCodes.Status422UnprocessableEntity);
                 }
 
@@ -162,7 +162,7 @@ namespace MiniMart.Services.Implementations
                 if ((discountPercent ?? 0) <= 0 && (discountAmount ?? 0) <= 0)
                 {
                     throw new DomainException(
-                        "Product promotions require either DiscountPercent or DiscountAmount.",
+                        "Khuyến mãi sản phẩm yêu cầu phần trăm giảm hoặc số tiền giảm.",
                         StatusCodes.Status422UnprocessableEntity);
                 }
 
@@ -174,14 +174,14 @@ namespace MiniMart.Services.Implementations
                 if (minimumOrderAmount.GetValueOrDefault() <= 0)
                 {
                     throw new DomainException(
-                        "Threshold promotions require MinimumOrderAmount to be greater than 0.",
+                        "Khuyến mãi theo ngưỡng yêu cầu số tiền đơn hàng tối thiểu lớn hơn 0.",
                         StatusCodes.Status422UnprocessableEntity);
                 }
 
                 if ((discountPercent ?? 0) <= 0)
                 {
                     throw new DomainException(
-                        "Threshold promotions require DiscountPercent to be greater than 0.",
+                        "Khuyến mãi theo ngưỡng yêu cầu phần trăm giảm lớn hơn 0.",
                         StatusCodes.Status422UnprocessableEntity);
                 }
 
@@ -189,7 +189,7 @@ namespace MiniMart.Services.Implementations
             }
 
             throw new DomainException(
-                "Unsupported promotion type.",
+                "Loại khuyến mãi không được hỗ trợ.",
                 StatusCodes.Status422UnprocessableEntity);
         }
     }

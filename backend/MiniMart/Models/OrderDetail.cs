@@ -26,6 +26,8 @@
 
         public decimal VatAmount { get; set; }
 
+        public decimal AmountBeforeVAT { get; set; }
+
         public ICollection<EInvoiceDetail> EInvoiceDetails { get; set; }
             = new List<EInvoiceDetail>();
     }

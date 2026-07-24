@@ -43,7 +43,7 @@ namespace MiniMart.Controllers
         {
             var (response, tokens) = await _authService.LoginAsync(request);
             SetTokenCookies(tokens);
-            return Ok(ApiResponse<AuthResponse>.Ok(response, "Login successful."));
+            return Ok(ApiResponse<AuthResponse>.Ok(response, "Đăng nhập thành công."));
         }
 
         [HttpPost("refresh-token")]
@@ -52,12 +52,12 @@ namespace MiniMart.Controllers
             var refreshToken = Request.Cookies[RefreshTokenCookieName];
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
-                return Unauthorized(ApiResponse<object>.Fail("Refresh token is missing."));
+                return Unauthorized(ApiResponse<object>.Fail("Thiếu token làm mới."));
             }
 
             var (response, tokens) = await _authService.RefreshTokenAsync(refreshToken);
             SetTokenCookies(tokens);
-            return Ok(ApiResponse<AuthResponse>.Ok(response, "Token refreshed."));
+            return Ok(ApiResponse<AuthResponse>.Ok(response, "Đã làm mới token."));
         }
 
         [Authorize(Policy = "AnyEmployee")]
@@ -71,7 +71,7 @@ namespace MiniMart.Controllers
             }
 
             DeleteTokenCookies();
-            return Ok(ApiResponse<object>.Ok(null, "Logout successful."));
+            return Ok(ApiResponse<object>.Ok(null, "Đã đăng xuất."));
         }
 
         [Authorize(Policy = "AnyEmployee")]
@@ -80,7 +80,7 @@ namespace MiniMart.Controllers
         {
             await _authService.LogoutAllAsync(GetCurrentEmployeeId());
             DeleteTokenCookies();
-            return Ok(ApiResponse<object>.Ok(null, "Logged out from all devices."));
+            return Ok(ApiResponse<object>.Ok(null, "Đã đăng xuất khỏi tất cả thiết bị."));
         }
 
         [Authorize(Policy = "ManagerUp")]
@@ -88,7 +88,7 @@ namespace MiniMart.Controllers
         public async Task<ActionResult<ApiResponse<AuthResponse>>> Register(RegisterRequest request)
         {
             var response = await _authService.RegisterAsync(request);
-            return Ok(ApiResponse<AuthResponse>.Ok(response, "Employee registered."));
+            return Ok(ApiResponse<AuthResponse>.Ok(response, "Đã đăng ký nhân viên."));
         }
 
         [Authorize(Policy = "AnyEmployee")]
@@ -97,7 +97,7 @@ namespace MiniMart.Controllers
         {
             await _authService.ChangePasswordAsync(GetCurrentEmployeeId(), request);
             DeleteTokenCookies();
-            return Ok(ApiResponse<object>.Ok(null, "Password changed. Please login again."));
+            return Ok(ApiResponse<object>.Ok(null, "Đã đổi mật khẩu. Vui lòng đăng nhập lại."));
         }
 
         [Authorize(Policy = "AnyEmployee")]
@@ -113,7 +113,7 @@ namespace MiniMart.Controllers
         public async Task<ActionResult<ApiResponse<EmployeeUserDto>>> ToggleActive(int employeeId, [FromQuery] bool isActive)
         {
             var user = await _authService.ToggleActiveAsync(employeeId, isActive);
-            return Ok(ApiResponse<EmployeeUserDto>.Ok(user, "Employee status updated."));
+            return Ok(ApiResponse<EmployeeUserDto>.Ok(user, "Đã cập nhật trạng thái nhân viên."));
         }
 
         private void SetTokenCookies(TokenPair tokens)
@@ -137,9 +137,7 @@ namespace MiniMart.Controllers
             });
         }
 
-        private SameSiteMode CookieSameSite => _environment.IsDevelopment()
-            ? SameSiteMode.None
-            : SameSiteMode.Strict;
+        private SameSiteMode CookieSameSite => SameSiteMode.None;
 
         private void DeleteTokenCookies()
         {

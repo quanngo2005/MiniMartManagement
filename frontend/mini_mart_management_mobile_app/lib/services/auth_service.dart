@@ -63,7 +63,7 @@ class AuthService {
 
     final data = responseJson['data'] ?? responseJson['Data'];
     if (data is! Map<String, dynamic>) {
-      throw const ApiException('Login response is missing user data.');
+      throw const ApiException('Phản hồi đăng nhập thiếu dữ liệu người dùng.');
     }
 
     return AuthResponse.fromJson(data);
@@ -82,7 +82,7 @@ class AuthService {
 
     final data = responseJson['data'] ?? responseJson['Data'];
     if (data is! Map<String, dynamic>) {
-      throw const ApiException('Profile response is missing user data.');
+      throw const ApiException('Phản hồi hồ sơ thiếu dữ liệu người dùng.');
     }
 
     return EmployeeUser.fromJson(data);
@@ -101,12 +101,12 @@ class AuthService {
 
     final data = responseJson['data'] ?? responseJson['Data'];
     if (data is! Map<String, dynamic>) {
-      throw const ApiException('CSRF response is missing token data.');
+      throw const ApiException('Phản hồi CSRF thiếu dữ liệu token.');
     }
 
     final token = data['csrfToken'] ?? data['CsrfToken'];
     if (token is! String || token.isEmpty) {
-      throw const ApiException('CSRF token is missing.');
+      throw const ApiException('Thiếu token CSRF.');
     }
 
     final cookieToken = _readCookieToken(response.headers['set-cookie']);
@@ -121,17 +121,17 @@ class AuthService {
       final decoded = jsonDecode(response.body);
       if (decoded is Map<String, dynamic>) return decoded;
     } on FormatException {
-      throw const ApiException('Server returned an invalid response.');
+      throw const ApiException('Máy chủ trả về phản hồi không hợp lệ.');
     }
 
-    throw const ApiException('Server returned an unexpected response.');
+    throw const ApiException('Máy chủ trả về phản hồi không mong đợi.');
   }
 
   String _readMessage(Map<String, dynamic> responseJson) {
     final message = responseJson['message'] ?? responseJson['Message'];
     return message is String && message.isNotEmpty
         ? message
-        : 'Request failed. Please try again.';
+        : 'Yêu cầu thất bại. Vui lòng thử lại.';
   }
 
   String? _readCookieToken(String? setCookieHeader) {

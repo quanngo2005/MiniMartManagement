@@ -28,12 +28,16 @@ class ManagerDrawer extends StatelessWidget {
     required this.user,
     required this.selected,
     required this.onDestinationSelected,
+    this.hasPendingReturns = false,
+    this.hasPendingStockCounts = false,
     super.key,
   });
 
   final EmployeeUser user;
   final ManagerNavDestination selected;
   final ValueChanged<ManagerNavDestination> onDestinationSelected;
+  final bool hasPendingReturns;
+  final bool hasPendingStockCounts;
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +126,7 @@ class ManagerDrawer extends StatelessWidget {
                     label: 'Kiểm kê',
                     destination: ManagerNavDestination.stockCount,
                     selected: selected,
+                    hasBadge: hasPendingStockCounts,
                     onTap: _select(context, ManagerNavDestination.stockCount),
                   ),
                   const _DrawerSectionLabel('Nhân sự & Khách hàng'),
@@ -160,7 +165,7 @@ class ManagerDrawer extends StatelessWidget {
                     selected: selected,
                     onTap: _select(context, ManagerNavDestination.customers),
                   ),
-                  const _DrawerSectionLabel('Marketing'),
+                  const _DrawerSectionLabel('Tiếp thị'),
                   _DrawerTile(
                     icon: Icons.local_offer_outlined,
                     activeIcon: Icons.local_offer_rounded,
@@ -183,6 +188,7 @@ class ManagerDrawer extends StatelessWidget {
                     label: 'Xử lý trả hàng',
                     destination: ManagerNavDestination.returns,
                     selected: selected,
+                    hasBadge: hasPendingReturns,
                     onTap: _select(context, ManagerNavDestination.returns),
                   ),
                   const _DrawerSectionLabel('Cài đặt'),
@@ -298,6 +304,7 @@ class _DrawerTile extends StatelessWidget {
     required this.destination,
     required this.selected,
     required this.onTap,
+    this.hasBadge = false,
   });
 
   final IconData icon;
@@ -306,6 +313,7 @@ class _DrawerTile extends StatelessWidget {
   final ManagerNavDestination destination;
   final ManagerNavDestination selected;
   final VoidCallback onTap;
+  final bool hasBadge;
 
   @override
   Widget build(BuildContext context) {
@@ -328,6 +336,26 @@ class _DrawerTile extends StatelessWidget {
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
+        trailing: hasBadge
+            ? Container(
+                width: 20,
+                height: 20,
+                decoration: const BoxDecoration(
+                  color: Colors.redAccent,
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: Text(
+                    '!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )
+            : null,
         onTap: onTap,
       ),
     );

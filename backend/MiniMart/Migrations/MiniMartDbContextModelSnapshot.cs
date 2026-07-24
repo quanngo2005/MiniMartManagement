@@ -1826,6 +1826,10 @@ namespace MiniMart.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderDetailId"));
 
+                    b.Property<decimal>("AmountBeforeVAT")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int?>("AppliedPromotionId")
                         .HasColumnType("int");
 
@@ -1873,6 +1877,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 1,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 1,
@@ -1886,6 +1891,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 2,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 1,
@@ -1899,6 +1905,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 3,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 1,
@@ -1912,6 +1919,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 4,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 2,
@@ -1925,6 +1933,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 5,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 2,
@@ -1938,6 +1947,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 6,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 2,
@@ -1951,6 +1961,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 7,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 3,
@@ -1964,6 +1975,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 8,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 4,
@@ -1977,6 +1989,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 9,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 4,
@@ -1990,6 +2003,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 10,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 4,
@@ -2003,6 +2017,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 11,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 5,
@@ -2016,6 +2031,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 12,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 5,
@@ -2029,6 +2045,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 13,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 5,
@@ -2042,6 +2059,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 14,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 6,
@@ -2055,6 +2073,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 15,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 6,
@@ -2068,6 +2087,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 16,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 6,
@@ -2081,6 +2101,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 17,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 6,
@@ -2094,6 +2115,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 18,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 7,
@@ -2107,6 +2129,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 19,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 7,
@@ -2120,6 +2143,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 20,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 8,
@@ -2133,6 +2157,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 21,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 8,
@@ -2146,6 +2171,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 22,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 8,
@@ -2159,6 +2185,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 23,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 9,
@@ -2172,6 +2199,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 24,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 9,
@@ -2185,6 +2213,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 25,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 10,
@@ -2198,6 +2227,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 26,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 10000m,
                             IsGift = false,
                             OrderId = 10,
@@ -2211,6 +2241,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 27,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 10,
@@ -2224,6 +2255,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 28,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 11,
@@ -2237,6 +2269,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 29,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 11,
@@ -2250,6 +2283,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 30,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 11,
@@ -2263,6 +2297,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 31,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 12,
@@ -2276,6 +2311,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 32,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 2500m,
                             IsGift = false,
                             OrderId = 12,
@@ -2289,6 +2325,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 33,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 2500m,
                             IsGift = false,
                             OrderId = 12,
@@ -2302,6 +2339,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 34,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 13,
@@ -2315,6 +2353,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 35,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 13,
@@ -2328,6 +2367,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 36,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 13,
@@ -2341,6 +2381,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 37,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 14,
@@ -2354,6 +2395,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 38,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 14,
@@ -2367,6 +2409,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 39,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 15,
@@ -2380,6 +2423,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 40,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 15,
@@ -2393,6 +2437,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 41,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 15,
@@ -2406,6 +2451,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 42,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 16,
@@ -2419,6 +2465,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 43,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 16,
@@ -2432,6 +2479,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 44,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 17,
@@ -2445,6 +2493,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 45,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 17,
@@ -2458,6 +2507,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 46,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 17,
@@ -2471,6 +2521,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 47,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 18,
@@ -2484,6 +2535,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 48,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 18,
@@ -2497,6 +2549,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 49,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 10000m,
                             IsGift = false,
                             OrderId = 19,
@@ -2510,6 +2563,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 50,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 19,
@@ -2523,6 +2577,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 51,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 19,
@@ -2536,6 +2591,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 52,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 20,
@@ -2549,6 +2605,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 53,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 20,
@@ -2562,6 +2619,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 54,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 21,
@@ -2575,6 +2633,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 55,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 21,
@@ -2588,6 +2647,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 56,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 5000m,
                             IsGift = false,
                             OrderId = 21,
@@ -2601,6 +2661,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 57,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 22,
@@ -2614,6 +2675,7 @@ namespace MiniMart.Migrations
                         new
                         {
                             OrderDetailId = 58,
+                            AmountBeforeVAT = 0m,
                             DiscountAmount = 0m,
                             IsGift = false,
                             OrderId = 22,

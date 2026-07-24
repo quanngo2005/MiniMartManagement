@@ -33,7 +33,7 @@ namespace MiniMart.Controllers
         {
             var receipt = await _receiptService.GetReceiptByIdAsync(id);
             if (receipt == null)
-                return NotFound(new { message = $"Receipt with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy phiếu nhập với ID {id}." });
 
             return Ok(receipt);
         }
@@ -42,7 +42,7 @@ namespace MiniMart.Controllers
         [HttpPost]
         public async Task<ActionResult<ReceiptDto>> Create([FromBody] CreateReceiptDto createDto)
         {
-            if (createDto == null) return BadRequest(new { message = "Invalid receipt data." });
+            if (createDto == null) return BadRequest(new { message = "Dữ liệu phiếu nhập không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var created = await _receiptService.CreateReceiptAsync(createDto, GetCurrentEmployeeId());
@@ -53,7 +53,7 @@ namespace MiniMart.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ReceiptDto>> Update(int id, [FromBody] UpdateReceiptDto updateDto)
         {
-            if (updateDto == null) return BadRequest(new { message = "Invalid update data." });
+            if (updateDto == null) return BadRequest(new { message = "Dữ liệu cập nhật không hợp lệ." });
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var updated = await _receiptService.UpdateReceiptAsync(id, updateDto);

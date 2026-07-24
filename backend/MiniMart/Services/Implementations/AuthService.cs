@@ -43,7 +43,7 @@ namespace MiniMart.Services
 
             if (employee == null)
             {
-                throw new UnauthorizedDomainException("Invalid username or password.");
+                throw new UnauthorizedDomainException("Tên đăng nhập hoặc mật khẩu không đúng.");
             }
 
             EnsureCanAuthenticate(employee);
@@ -58,7 +58,7 @@ namespace MiniMart.Services
                 }
 
                 await _employeeRepository.SaveChangesAsync();
-                throw new UnauthorizedDomainException("Invalid username or password.");
+                throw new UnauthorizedDomainException("Tên đăng nhập hoặc mật khẩu không đúng.");
             }
 
             employee.FailedLoginAttempts = 0;
@@ -77,18 +77,18 @@ namespace MiniMart.Services
 
             if (storedToken == null)
             {
-                throw new UnauthorizedDomainException("Invalid refresh token.");
+                throw new UnauthorizedDomainException("Token làm mới không hợp lệ.");
             }
 
             if (storedToken.RevokedAt != null)
             {
                 await LogoutAllAsync(storedToken.EmployeeId);
-                throw new UnauthorizedDomainException("Refresh token reuse detected.");
+                throw new UnauthorizedDomainException("Phát hiện sử dụng lại token làm mới.");
             }
 
             if (storedToken.ExpiresAt <= DateTime.UtcNow)
             {
-                throw new UnauthorizedDomainException("Refresh token expired.");
+                throw new UnauthorizedDomainException("Token làm mới đã hết hạn.");
             }
 
             EnsureCanAuthenticate(storedToken.Employee);
@@ -123,19 +123,19 @@ namespace MiniMart.Services
             var usernameExists = await _employeeRepository.UsernameExistsAsync(request.Username);
             if (usernameExists)
             {
-                throw new DomainException("Username already exists.");
+                throw new DomainException("Tên đăng nhập đã tồn tại.");
             }
 
             var phoneExists = await _employeeRepository.PhoneNumberExistsAsync(request.PhoneNumber);
             if (phoneExists)
             {
-                throw new DomainException("Phone number already exists.");
+                throw new DomainException("Số điện thoại đã tồn tại.");
             }
 
             var roleExists = await _employeeRepository.ActiveRoleExistsAsync(request.RoleId);
             if (!roleExists)
             {
-                throw new DomainException("Role is invalid or inactive.");
+                throw new DomainException("Vai trò không hợp lệ hoặc đã bị vô hiệu hóa.");
             }
 
             var employee = _mapper.Map<Employee>(request);
@@ -183,7 +183,7 @@ namespace MiniMart.Services
 
             if (employee == null)
             {
-                throw new DomainException("Employee not found.", StatusCodes.Status404NotFound);
+                throw new DomainException("Không tìm thấy nhân viên.", StatusCodes.Status404NotFound);
             }
 
             employee.Status = isActive ? EmployeeStatus.Active : EmployeeStatus.Inactive;
@@ -241,12 +241,12 @@ namespace MiniMart.Services
         {
             if (employee.LockoutEnd != null && employee.LockoutEnd > DateTime.UtcNow)
             {
-                throw new UnauthorizedDomainException("Account is temporarily locked.");
+                throw new UnauthorizedDomainException("Tài khoản đang bị tạm khóa.");
             }
 
             if (employee.Status != EmployeeStatus.Active || employee.Role == null || !employee.Role.Status)
             {
-                throw new ForbiddenDomainException("Account is inactive.");
+                throw new ForbiddenDomainException("Tài khoản không hoạt động.");
             }
         }
 

@@ -41,7 +41,7 @@ namespace MiniMart.Controllers
         {
             var supplier = await _supplierService.GetByIdAsync(id);
             if (supplier == null)
-                return NotFound(new { message = $"Supplier with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy nhà cung cấp với ID {id}." });
             return Ok(supplier);
         }
 
@@ -51,7 +51,7 @@ namespace MiniMart.Controllers
         {
             var debtDetail = await _supplierService.GetDebtDetailAsync(id);
             if (debtDetail == null)
-                return NotFound(new { message = $"Supplier with ID {id} not found." });
+                return NotFound(new { message = $"Không tìm thấy nhà cung cấp với ID {id}." });
 
             return Ok(debtDetail);
         }

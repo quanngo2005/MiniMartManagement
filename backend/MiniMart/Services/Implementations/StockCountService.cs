@@ -7,17 +7,27 @@ using MiniMart.Models.Enums;
 using MiniMart.Repositories.Interfaces;
 using MiniMart.Services.Interfaces;
 using MiniMart.Shared.Exceptions;
+using MiniMart.Shared.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace MiniMart.Services.Implementations
 {
     public class StockCountService : IStockCountService
     {
         private readonly IStockCountRepository _stockCountRepository;
+        private readonly INotificationService _notificationService;
+        private readonly ILogger<StockCountService> _logger;
         private readonly IMapper _mapper;
 
-        public StockCountService(IStockCountRepository stockCountRepository, IMapper mapper)
+        public StockCountService(
+            IStockCountRepository stockCountRepository,
+            INotificationService notificationService,
+            ILogger<StockCountService> logger,
+            IMapper mapper)
         {
             _stockCountRepository = stockCountRepository;
+            _notificationService = notificationService;
+            _logger = logger;
             _mapper = mapper;
         }
 
@@ -37,13 +47,13 @@ namespace MiniMart.Services.Implementations
         {
             if (!await _stockCountRepository.EmployeeExistsAsync(employeeId))
             {
-                throw new DomainException("Current employee does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Nhân viên hiện tại không tồn tại.", StatusCodes.Status422UnprocessableEntity);
             }
 
             if (await _stockCountRepository.HasCountingStockCountAsync())
             {
                 throw new DomainException(
-                    "A stock count is already in progress. Complete or submit it before creating another.",
+                    "Đã có phiếu kiểm kê đang tiến hành. Vui lòng hoàn thành hoặc gửi duyệt trước khi tạo phiếu mới.",
                     StatusCodes.Status409Conflict);
             }
 
@@ -59,7 +69,7 @@ namespace MiniMart.Services.Implementations
                     if (categoryProducts.Count == 0)
                     {
                         throw new DomainException(
-                            $"Category with ID {categoryId} has no active products.",
+                            $"Danh mục với ID {categoryId} không có sản phẩm đang bán.",
                             StatusCodes.Status400BadRequest);
                     }
                 }
@@ -68,10 +78,10 @@ namespace MiniMart.Services.Implementations
             var products = await _stockCountRepository.GetActiveProductsForScopeAsync(createDto.Scope, categoryIds);
             if (createDto.Scope != StockCountScope.Selected && products.Count == 0)
             {
-                throw new DomainException("The selected scope has no active products.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Phạm vi đã chọn không có sản phẩm đang bán.", StatusCodes.Status400BadRequest);
             }
 
-            var createdAt = DateTime.UtcNow.AddHours(7);
+            var createdAt = HanoiTime.Now;
             for (var attempt = 0; attempt < 2; attempt++)
             {
                 var stockCount = _mapper.Map<StockCount>(createDto);
@@ -102,7 +112,7 @@ namespace MiniMart.Services.Implementations
                 catch (DbUpdateException)
                 {
                     throw new DomainException(
-                        "Could not allocate a unique stock-count code. Reload and retry.",
+                        "Không thể tạo mã phiếu kiểm kê duy nhất. Vui lòng tải lại và thử lại.",
                         StatusCodes.Status409Conflict);
                 }
             }
@@ -114,16 +124,16 @@ namespace MiniMart.Services.Implementations
         {
             if (rowVersion.Length == 0)
             {
-                throw new DomainException("A stock-count row version is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu phiên bản dòng của phiếu kiểm kê.", StatusCodes.Status400BadRequest);
             }
 
             var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
-                ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
+                ?? throw new DomainException($"Không tìm thấy phiếu kiểm kê với ID {id}.", StatusCodes.Status404NotFound);
 
             ValidateTransition(stockCount, StockCountStatus.Counting);
             _stockCountRepository.ApplyOriginalRowVersion(stockCount, rowVersion);
             stockCount.Status = StockCountStatus.Counting;
-            stockCount.StartedAt = DateTime.Now;
+            stockCount.StartedAt = HanoiTime.Now;
 
             try
             {
@@ -131,7 +141,7 @@ namespace MiniMart.Services.Implementations
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
+                throw new DomainException("Phiếu kiểm kê đã bị thay đổi bởi người dùng khác. Vui lòng tải lại và thử lại.", StatusCodes.Status409Conflict);
             }
 
             return (await GetDetailByIdAsync(id))!;
@@ -141,13 +151,13 @@ namespace MiniMart.Services.Implementations
         {
             if (rowVersion.Length == 0)
             {
-                throw new DomainException("A stock-count row version is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu phiên bản dòng của phiếu kiểm kê.", StatusCodes.Status400BadRequest);
             }
 
             var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
-                ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
+                ?? throw new DomainException($"Không tìm thấy phiếu kiểm kê với ID {id}.", StatusCodes.Status404NotFound);
 
-            EnsureStatus(stockCount, StockCountStatus.Draft);
+            ValidateTransition(stockCount, StockCountStatus.Cancelled);
             _stockCountRepository.ApplyOriginalRowVersion(stockCount, rowVersion);
             stockCount.Status = StockCountStatus.Cancelled;
 
@@ -157,7 +167,7 @@ namespace MiniMart.Services.Implementations
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
+                throw new DomainException("Phiếu kiểm kê đã bị thay đổi bởi người dùng khác. Vui lòng tải lại và thử lại.", StatusCodes.Status409Conflict);
             }
 
             return (await GetDetailByIdAsync(id))!;
@@ -167,23 +177,23 @@ namespace MiniMart.Services.Implementations
         {
             if (addDto.StockCountRowVersion.Length == 0)
             {
-                throw new DomainException("A stock-count row version is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu phiên bản dòng của phiếu kiểm kê.", StatusCodes.Status400BadRequest);
             }
 
             var productIds = addDto.ProductIds.Distinct().ToList();
             if (productIds.Count == 0)
             {
-                throw new DomainException("At least one product is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu ít nhất một sản phẩm.", StatusCodes.Status400BadRequest);
             }
 
             var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
-                ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
+                ?? throw new DomainException($"Không tìm thấy phiếu kiểm kê với ID {id}.", StatusCodes.Status404NotFound);
 
             EnsureStatus(stockCount, StockCountStatus.Counting);
             if (stockCount.Scope != StockCountScope.Selected)
             {
                 throw new DomainException(
-                    "Products can be added only to selected-product stock counts.",
+                    "Chỉ có thể thêm sản phẩm vào phiếu kiểm kê chọn sản phẩm.",
                     StatusCodes.Status409Conflict);
             }
             var existingProductIds = stockCount.Lines
@@ -201,7 +211,7 @@ namespace MiniMart.Services.Implementations
             var products = await _stockCountRepository.GetActiveProductsByIdsAsync(missingProductIds);
             if (products.Count != missingProductIds.Count)
             {
-                throw new DomainException("One or more products do not exist or are inactive.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Một hoặc nhiều sản phẩm không tồn tại hoặc đã ngừng bán.", StatusCodes.Status422UnprocessableEntity);
             }
 
             _stockCountRepository.ApplyOriginalRowVersion(stockCount, addDto.StockCountRowVersion);
@@ -221,11 +231,11 @@ namespace MiniMart.Services.Implementations
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
+                throw new DomainException("Phiếu kiểm kê đã bị thay đổi bởi người dùng khác. Vui lòng tải lại và thử lại.", StatusCodes.Status409Conflict);
             }
             catch (DbUpdateException)
             {
-                throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
+                throw new DomainException("Phiếu kiểm kê đã bị thay đổi bởi người dùng khác. Vui lòng tải lại và thử lại.", StatusCodes.Status409Conflict);
             }
 
             return (await GetDetailByIdAsync(id))!;
@@ -235,27 +245,27 @@ namespace MiniMart.Services.Implementations
         {
             if (updateDto.StockCountRowVersion.Length == 0)
             {
-                throw new DomainException("A stock-count row version is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu phiên bản dòng của phiếu kiểm kê.", StatusCodes.Status400BadRequest);
             }
 
             if (updateDto.Lines.Count == 0)
             {
-                throw new DomainException("At least one stock-count line is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu ít nhất một dòng kiểm kê.", StatusCodes.Status400BadRequest);
             }
 
             var submittedLineIds = updateDto.Lines.Select(line => line.StockCountLineId).ToList();
             if (submittedLineIds.Distinct().Count() != submittedLineIds.Count)
             {
-                throw new DomainException("Each stock-count line can be submitted only once per batch.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Mỗi dòng kiểm kê chỉ có thể gửi một lần mỗi đợt.", StatusCodes.Status400BadRequest);
             }
 
             if (updateDto.Lines.Any(line => line.RowVersion.Length == 0))
             {
-                throw new DomainException("A row version is required for every stock-count line.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu phiên bản dòng cho mỗi dòng kiểm kê.", StatusCodes.Status400BadRequest);
             }
 
             var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
-                ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
+                ?? throw new DomainException($"Không tìm thấy phiếu kiểm kê với ID {id}.", StatusCodes.Status404NotFound);
 
             EnsureStatus(stockCount, StockCountStatus.Counting);
             var linesById = stockCount.Lines.ToDictionary(line => line.StockCountLineId);
@@ -263,7 +273,7 @@ namespace MiniMart.Services.Implementations
             if (invalidLineIds.Count > 0)
             {
                 throw new DomainException(
-                    $"The following lines do not belong to stock count {id}: {string.Join(", ", invalidLineIds)}.",
+                    $"Các dòng sau không thuộc phiếu kiểm kê {id}: {string.Join(", ", invalidLineIds)}.",
                     StatusCodes.Status400BadRequest);
             }
 
@@ -293,16 +303,16 @@ namespace MiniMart.Services.Implementations
         {
             if (rowVersion.Length == 0)
             {
-                throw new DomainException("A stock-count row version is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu phiên bản dòng của phiếu kiểm kê.", StatusCodes.Status400BadRequest);
             }
 
             var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
-                ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
+                ?? throw new DomainException($"Không tìm thấy phiếu kiểm kê với ID {id}.", StatusCodes.Status404NotFound);
 
             ValidateTransition(stockCount, StockCountStatus.PendingApproval);
             if (stockCount.Lines.Count == 0)
             {
-                throw new DomainException("At least one product must be added before submission.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu ít nhất một sản phẩm trước khi gửi duyệt.", StatusCodes.Status400BadRequest);
             }
             var uncountedLineIds = stockCount.Lines
                 .Where(line => line.ActualQuantity is null)
@@ -311,13 +321,13 @@ namespace MiniMart.Services.Implementations
             if (uncountedLineIds.Count > 0)
             {
                 throw new DomainException(
-                    $"All lines must be counted before submission. Uncounted line IDs: {string.Join(", ", uncountedLineIds)}.",
+                    $"Tất cả dòng phải được kiểm đếm trước khi gửi duyệt. ID dòng chưa kiểm: {string.Join(", ", uncountedLineIds)}.",
                     StatusCodes.Status400BadRequest);
             }
 
             _stockCountRepository.ApplyOriginalRowVersion(stockCount, rowVersion);
             stockCount.Status = StockCountStatus.PendingApproval;
-            stockCount.SubmittedAt = DateTime.Now;
+            stockCount.SubmittedAt = HanoiTime.Now;
 
             try
             {
@@ -325,7 +335,24 @@ namespace MiniMart.Services.Implementations
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
+                throw new DomainException("Phiếu kiểm kê đã bị thay đổi bởi người dùng khác. Vui lòng tải lại và thử lại.", StatusCodes.Status409Conflict);
+            }
+
+            try
+            {
+                await _notificationService.SendToRoleAsync(
+                    "Manager",
+                    "Phiếu kiểm kê mới cần duyệt",
+                    $"Phiếu kiểm kê {stockCount.StockCountCode} đã được gửi để duyệt.",
+                    new Dictionary<string, string>
+                    {
+                        { "type", "stock_count_request" },
+                        { "stockCountId", stockCount.StockCountId.ToString() }
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send stock_count_request notification for StockCountId {StockCountId}", stockCount.StockCountId);
             }
 
             return (await GetDetailByIdAsync(id))!;
@@ -335,58 +362,83 @@ namespace MiniMart.Services.Implementations
         {
             if (rowVersion.Length == 0)
             {
-                throw new DomainException("A stock-count row version is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu phiên bản dòng của phiếu kiểm kê.", StatusCodes.Status400BadRequest);
             }
 
             if (!await _stockCountRepository.EmployeeExistsAsync(reviewerEmployeeId))
             {
-                throw new DomainException("Current employee does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Nhân viên hiện tại không tồn tại.", StatusCodes.Status422UnprocessableEntity);
             }
+
+            int createdByEmployeeId = 0;
+            string stockCountCode = string.Empty;
+            int stockCountId = 0;
 
             await _stockCountRepository.ExecuteInTransactionAsync(async () =>
             {
                 var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
-                    ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
+                    ?? throw new DomainException($"Không tìm thấy phiếu kiểm kê với ID {id}.", StatusCodes.Status404NotFound);
+
+                createdByEmployeeId = stockCount.CreatedByEmployeeId;
+                stockCountCode = stockCount.StockCountCode;
+                stockCountId = stockCount.StockCountId;
 
                 ValidateTransition(stockCount, StockCountStatus.Closed);
                 _stockCountRepository.ApplyOriginalRowVersion(stockCount, rowVersion);
 
+                var varianceLines = stockCount.Lines
+                    .Where(line => line.ActualQuantity.HasValue && line.ActualQuantity.Value != line.SnapshotQuantity)
+                    .ToList();
+                var allProductIds = stockCount.Lines
+                    .Select(line => line.ProductId)
+                    .Distinct()
+                    .ToList();
+                var batches = (await _stockCountRepository.GetTrackedBatchesForProductsAsync(allProductIds)).ToList();
+
                 var driftedLines = stockCount.Lines
-                    .Where(line => line.Product.StockQuantity != line.SnapshotQuantity)
-                    .Select(line => new StockCountStockDriftDto
+                    .Select(line =>
                     {
-                        StockCountLineId = line.StockCountLineId,
-                        ProductId = line.ProductId,
-                        SnapshotQuantity = line.SnapshotQuantity,
-                        CurrentQuantity = line.Product.StockQuantity
+                        var activeBatchTotal = batches
+                            .Where(b => b.ProductId == line.ProductId && !b.IsDeleted && b.Status)
+                            .Sum(b => b.QuantityRemaining);
+                        return (Line: line, ActiveBatchTotal: activeBatchTotal);
+                    })
+                    .Where(x => x.ActiveBatchTotal != x.Line.SnapshotQuantity)
+                    .Select(x => new StockCountStockDriftDto
+                    {
+                        StockCountLineId = x.Line.StockCountLineId,
+                        ProductId = x.Line.ProductId,
+                        SnapshotQuantity = x.Line.SnapshotQuantity,
+                        CurrentQuantity = x.ActiveBatchTotal
                     })
                     .ToList();
                 if (driftedLines.Count > 0)
                 {
                     throw new StockCountStockDriftException(driftedLines);
                 }
-
-                var varianceLines = stockCount.Lines
-                    .Where(line => line.ActualQuantity.HasValue && line.ActualQuantity.Value != line.SnapshotQuantity)
-                    .ToList();
-                var productIds = varianceLines.Select(line => line.ProductId).Distinct().ToList();
-                var batches = (await _stockCountRepository.GetTrackedBatchesForProductsAsync(productIds)).ToList();
                 var adjustmentBatches = new List<Batch>();
                 var inventoryTransactions = new List<InventoryTransaction>();
-                var approvedAt = DateTime.Now;
+                var approvedAt = HanoiTime.Now;
 
                 foreach (var line in varianceLines)
                 {
                     var product = line.Product;
                     var variance = line.ActualQuantity!.Value - line.SnapshotQuantity;
                     var productBatches = batches.Where(batch => batch.ProductId == line.ProductId).ToList();
-                    var runningStock = product.StockQuantity;
+                    var runningStock = productBatches
+                        .Where(b => !b.IsDeleted && b.Status)
+                        .Sum(b => b.QuantityRemaining);
 
                     if (variance < 0)
                     {
                         var quantityToDeduct = -variance;
+                        // Reconciliation deliberately includes expired-but-undisposed batches:
+                        // active batch total counts them as on-hand, so shortage allocation must too.
+                        // Disposal of expired stock is a separate explicit workflow (POST /api/batches/{id}/dispose-expired).
+                        // Do NOT reuse GetSellableBatchesForProductsAsync here — that pool intentionally
+                        // excludes expired stock for order fulfillment and must stay that way.
                         var eligibleBatches = productBatches
-                            .Where(batch => batch.Status && batch.QuantityRemaining > 0 && batch.ExpiryDate >= DateTime.Today)
+                            .Where(batch => batch.Status && batch.QuantityRemaining > 0)
                             .OrderBy(batch => batch.ExpiryDate)
                             .ThenBy(batch => batch.Receipt?.ImportDate ?? DateTime.MaxValue)
                             .ThenBy(batch => batch.BatchId)
@@ -395,7 +447,7 @@ namespace MiniMart.Services.Implementations
                         if (eligibleBatches.Sum(batch => batch.QuantityRemaining) < quantityToDeduct)
                         {
                             throw new DomainException(
-                                $"Eligible batch stock cannot cover the negative variance for stock-count line {line.StockCountLineId}.",
+                                $"Tồn kho lô hàng không đủ để bù đắp chênh lệch âm cho dòng kiểm kê {line.StockCountLineId}.",
                                 StatusCodes.Status409Conflict);
                         }
 
@@ -422,33 +474,57 @@ namespace MiniMart.Services.Implementations
                     }
                     else
                     {
-                        var cost = GetAdjustmentCost(productBatches);
-                        var adjustmentBatch = new Batch
-                        {
-                            BatchCode = $"{stockCount.StockCountCode}-ADJ-{line.StockCountLineId}",
-                            ManufactureDate = approvedAt.Date,
-                            ExpiryDate = approvedAt.Date.AddYears(1),
-                            ImportPrice = cost,
-                            QuantityImported = variance,
-                            QuantityRemaining = variance,
-                            Quantity = variance,
-                            TotalPrice = cost * variance,
-                            Status = true,
-                            Provenance = BatchProvenance.StockCountAdjustment,
-                            ProductId = line.ProductId
-                        };
+                        var eligibleBatches = productBatches
+                            .Where(b => !b.IsDeleted && b.Status)
+                            .OrderByDescending(b => b.ExpiryDate)
+                            .ThenByDescending(b => b.Receipt?.ImportDate ?? DateTime.MaxValue)
+                            .ThenByDescending(b => b.BatchId)
+                            .ToList();
 
-                        adjustmentBatches.Add(adjustmentBatch);
-                        productBatches.Add(adjustmentBatch);
-                        batches.Add(adjustmentBatch);
-                        runningStock += variance;
-                        inventoryTransactions.Add(CreateAdjustmentTransaction(
-                            line,
-                            adjustmentBatch,
-                            variance,
-                            runningStock - variance,
-                            runningStock,
-                            reviewerEmployeeId));
+                        if (eligibleBatches.Count > 0)
+                        {
+                            var targetBatch = eligibleBatches.First();
+                            targetBatch.QuantityRemaining += variance;
+                            targetBatch.Status = true;
+                            runningStock += variance;
+                            inventoryTransactions.Add(CreateAdjustmentTransaction(
+                                line,
+                                targetBatch,
+                                variance,
+                                runningStock - variance,
+                                runningStock,
+                                reviewerEmployeeId));
+                        }
+                        else
+                        {
+                            var cost = GetAdjustmentCost(productBatches);
+                            var adjustmentBatch = new Batch
+                            {
+                                BatchCode = $"{stockCount.StockCountCode}-ADJ-{line.StockCountLineId}",
+                                ManufactureDate = approvedAt.Date,
+                                ExpiryDate = approvedAt.Date.AddYears(1),
+                                ImportPrice = cost,
+                                QuantityImported = variance,
+                                QuantityRemaining = variance,
+                                Quantity = variance,
+                                TotalPrice = cost * variance,
+                                Status = true,
+                                Provenance = BatchProvenance.StockCountAdjustment,
+                                ProductId = line.ProductId
+                            };
+
+                            adjustmentBatches.Add(adjustmentBatch);
+                            productBatches.Add(adjustmentBatch);
+                            batches.Add(adjustmentBatch);
+                            runningStock += variance;
+                            inventoryTransactions.Add(CreateAdjustmentTransaction(
+                                line,
+                                adjustmentBatch,
+                                variance,
+                                runningStock - variance,
+                                runningStock,
+                                reviewerEmployeeId));
+                        }
                     }
 
                     product.StockQuantity = productBatches
@@ -465,6 +541,24 @@ namespace MiniMart.Services.Implementations
                 await _stockCountRepository.SaveChangesAsync();
             });
 
+            try
+            {
+                await _notificationService.SendToUserAsync(
+                    createdByEmployeeId,
+                    "Phiếu kiểm kê đã được duyệt",
+                    $"Phiếu kiểm kê {stockCountCode} đã được phê duyệt và điều chỉnh tồn kho.",
+                    new Dictionary<string, string>
+                    {
+                        { "type", "stock_count_response" },
+                        { "status", "approved" },
+                        { "stockCountId", stockCountId.ToString() }
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send stock_count_response (approved) notification for StockCountId {StockCountId}", stockCountId);
+            }
+
             return (await GetDetailByIdAsync(id))!;
         }
 
@@ -472,28 +566,43 @@ namespace MiniMart.Services.Implementations
         {
             if (string.IsNullOrWhiteSpace(rejectDto.Reason))
             {
-                throw new DomainException("A rejection reason is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu lý do từ chối.", StatusCodes.Status400BadRequest);
             }
 
             if (rejectDto.RowVersion.Length == 0)
             {
-                throw new DomainException("A stock-count row version is required.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Yêu cầu phiên bản dòng của phiếu kiểm kê.", StatusCodes.Status400BadRequest);
             }
 
             if (!await _stockCountRepository.EmployeeExistsAsync(reviewerEmployeeId))
             {
-                throw new DomainException("Current employee does not exist.", StatusCodes.Status422UnprocessableEntity);
+                throw new DomainException("Nhân viên hiện tại không tồn tại.", StatusCodes.Status422UnprocessableEntity);
             }
 
             var stockCount = await _stockCountRepository.GetTrackedByIdAsync(id)
-                ?? throw new DomainException($"Stock count with ID {id} not found.", StatusCodes.Status404NotFound);
+                ?? throw new DomainException($"Không tìm thấy phiếu kiểm kê với ID {id}.", StatusCodes.Status404NotFound);
 
             ValidateTransition(stockCount, StockCountStatus.Counting);
             _stockCountRepository.ApplyOriginalRowVersion(stockCount, rejectDto.RowVersion);
             stockCount.Status = StockCountStatus.Counting;
             stockCount.ReviewedByEmployeeId = reviewerEmployeeId;
-            stockCount.ReviewedAt = DateTime.Now;
+            stockCount.ReviewedAt = HanoiTime.Now;
             stockCount.RejectionReason = rejectDto.Reason.Trim();
+
+            var rejectProductIds = stockCount.Lines.Select(l => l.ProductId).Distinct().ToList();
+            var rejectBatches = (await _stockCountRepository.GetTrackedBatchesForProductsAsync(rejectProductIds));
+
+            foreach (var line in stockCount.Lines)
+            {
+                var activeBatchTotal = rejectBatches
+                    .Where(b => b.ProductId == line.ProductId && !b.IsDeleted && b.Status)
+                    .Sum(b => b.QuantityRemaining);
+                line.SnapshotQuantity = activeBatchTotal;
+                line.ActualQuantity = null;
+                line.Note = null;
+            }
+
+            stockCount.StartedAt = HanoiTime.Now;
 
             try
             {
@@ -501,7 +610,26 @@ namespace MiniMart.Services.Implementations
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw new DomainException("The stock count was changed by another user. Reload and retry.", StatusCodes.Status409Conflict);
+                throw new DomainException("Phiếu kiểm kê đã bị thay đổi bởi người dùng khác. Vui lòng tải lại và thử lại.", StatusCodes.Status409Conflict);
+            }
+
+            try
+            {
+                await _notificationService.SendToUserAsync(
+                    stockCount.CreatedByEmployeeId,
+                    "Phiếu kiểm kê đã bị từ chối",
+                    $"Phiếu kiểm kê {stockCount.StockCountCode} đã bị từ chối. Lý do: {stockCount.RejectionReason}",
+                    new Dictionary<string, string>
+                    {
+                        { "type", "stock_count_response" },
+                        { "status", "rejected" },
+                        { "stockCountId", stockCount.StockCountId.ToString() },
+                        { "reason", stockCount.RejectionReason }
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send stock_count_response (rejected) notification for StockCountId {StockCountId}", stockCount.StockCountId);
             }
 
             return (await GetDetailByIdAsync(id))!;
@@ -517,7 +645,7 @@ namespace MiniMart.Services.Implementations
             {
                 if (distinctCategoryIds.Count != 0)
                 {
-                    throw new DomainException("Global stock counts must not include category IDs.", StatusCodes.Status400BadRequest);
+                    throw new DomainException("Phiếu kiểm kê tổng thể không được bao gồm ID danh mục.", StatusCodes.Status400BadRequest);
                 }
 
                 return distinctCategoryIds;
@@ -527,7 +655,7 @@ namespace MiniMart.Services.Implementations
             {
                 if (distinctCategoryIds.Count != 0)
                 {
-                    throw new DomainException("Selected-product stock counts must not include category IDs.", StatusCodes.Status400BadRequest);
+                    throw new DomainException("Phiếu kiểm kê chọn sản phẩm không được bao gồm ID danh mục.", StatusCodes.Status400BadRequest);
                 }
 
                 return distinctCategoryIds;
@@ -535,14 +663,14 @@ namespace MiniMart.Services.Implementations
 
             if (scope != StockCountScope.Category || distinctCategoryIds.Count == 0)
             {
-                throw new DomainException("Category stock counts require at least one category ID.", StatusCodes.Status400BadRequest);
+                throw new DomainException("Phiếu kiểm kê theo danh mục yêu cầu ít nhất một ID danh mục.", StatusCodes.Status400BadRequest);
             }
 
             foreach (var categoryId in distinctCategoryIds)
             {
                 if (!await _stockCountRepository.CategoryExistsAsync(categoryId))
                 {
-                    throw new DomainException($"Category with ID {categoryId} not found.", StatusCodes.Status400BadRequest);
+                    throw new DomainException($"Danh mục với ID {categoryId} không tồn tại.", StatusCodes.Status400BadRequest);
                 }
             }
 
@@ -554,7 +682,9 @@ namespace MiniMart.Services.Implementations
             var isAllowed = (stockCount.Status, targetStatus) switch
             {
                 (StockCountStatus.Draft, StockCountStatus.Counting) => true,
+                (StockCountStatus.Draft, StockCountStatus.Cancelled) => true,
                 (StockCountStatus.Counting, StockCountStatus.PendingApproval) => true,
+                (StockCountStatus.Counting, StockCountStatus.Cancelled) => true,
                 (StockCountStatus.PendingApproval, StockCountStatus.Closed) => true,
                 (StockCountStatus.PendingApproval, StockCountStatus.Counting) => true,
                 _ => false
@@ -563,7 +693,7 @@ namespace MiniMart.Services.Implementations
             if (!isAllowed)
             {
                 throw new DomainException(
-                    $"Cannot transition stock count from {stockCount.Status} to {targetStatus}.",
+                    $"Không thể chuyển trạng thái phiếu kiểm kê từ {stockCount.Status} sang {targetStatus}.",
                     StatusCodes.Status409Conflict);
             }
         }
@@ -573,7 +703,7 @@ namespace MiniMart.Services.Implementations
             if (stockCount.Status != requiredStatus)
             {
                 throw new DomainException(
-                    $"Stock count must be {requiredStatus} but is {stockCount.Status}.",
+                    $"Phiếu kiểm kê phải ở trạng thái {requiredStatus} nhưng hiện tại là {stockCount.Status}.",
                     StatusCodes.Status409Conflict);
             }
         }
@@ -614,7 +744,7 @@ namespace MiniMart.Services.Implementations
                 ReferenceType = ReferenceType.StockCount,
                 ReferenceId = line.StockCountId,
                 SubReferenceId = line.StockCountLineId,
-                Note = "Stock-count adjustment.",
+                Note = "Điều chỉnh kiểm kê.",
                 ProductId = line.ProductId,
                 Batch = batch,
                 EmployeeId = reviewerEmployeeId

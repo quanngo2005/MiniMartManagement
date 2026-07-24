@@ -85,6 +85,7 @@ namespace MiniMart.DTOs
         public string? CustomerName { get; set; }
         public string? CustomerPhone { get; set; }
         public decimal SubTotal { get; set; }
+        public decimal TaxAmount { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal FinalAmount { get; set; }
         public decimal PaidAmount { get; set; }
@@ -104,5 +105,8 @@ namespace MiniMart.DTOs
         public decimal DiscountAmount { get; set; }
         public decimal TotalPrice { get; set; }
         public bool IsGift { get; set; }
+        public decimal VatRate { get; set; }
+        public decimal VatAmount { get; set; }
+        public decimal AmountBeforeVAT { get; set; }
     }
 }

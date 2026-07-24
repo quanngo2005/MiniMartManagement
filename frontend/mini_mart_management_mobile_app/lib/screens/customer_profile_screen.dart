@@ -162,7 +162,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Point Balance',
+                        'Số dư điểm',
                         style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textMuted,
@@ -226,7 +226,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                 Expanded(
                   child: _buildStatCard(
                     context,
-                    'Total Spent',
+                    'Tổng chi tiêu',
                     'đ${fmt.format(totalSpent.round())}k',
                   ),
                 ),
@@ -258,7 +258,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                   ),
                 ),
                 Text(
-                  '${_orders.length} Orders Total',
+                  '${_orders.length} đơn hàng',
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textMuted,

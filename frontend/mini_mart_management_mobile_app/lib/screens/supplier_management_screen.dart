@@ -54,7 +54,7 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
 
     return Scaffold(
       appBar: MiniMartAppBar.primary(
-        title: 'NhÃ  cung cáº¥p',
+        title: 'Nhà cung cấp',
         onBrandTap: null,
         onProfileTap: () => Navigator.of(context).push(
           MaterialPageRoute<void>(builder: (_) => const SupplierDebtScreen()),
@@ -69,7 +69,7 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
                 controller: _searchController,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.search_rounded),
-                  hintText: 'TÃ¬m theo tÃªn, mÃ£, liÃªn há»‡...',
+                  hintText: 'Tìm theo tên, mã, liên hệ...',
                 ),
               ),
             ),
@@ -100,7 +100,7 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
                     )
                   : filtered.isEmpty
                   ? const EmptyState(
-                      message: 'ChÆ°a cÃ³ nhÃ  cung cáº¥p nÃ o.',
+                      message: 'Chưa có nhà cung cấp nào.',
                       icon: Icons.local_shipping_outlined,
                     )
                   : RefreshIndicator(
@@ -147,7 +147,7 @@ class _SupplierTile extends StatelessWidget {
         onTap: onTap,
         title: Text(supplier.supplierName),
         subtitle: Text(
-          '${supplier.supplierCode} â€¢ ${supplier.contactPerson ?? 'ChÆ°a cÃ³ liÃªn há»‡'}',
+          '${supplier.supplierCode} • ${supplier.contactPerson ?? 'Chưa có liên hệ'}',
         ),
         trailing: const Icon(Icons.chevron_right_rounded),
       ),

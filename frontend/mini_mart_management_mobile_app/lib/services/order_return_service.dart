@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:mini_mart_management_mobile_app/config/api_config.dart';
@@ -74,7 +74,7 @@ class OrderReturnService {
     if (responseJson is Map<String, dynamic>) {
       return OrderReturn.fromJson(responseJson);
     }
-    throw const ApiException('Invalid response structure from server.');
+    throw const ApiException('Cấu trúc phản hồi từ máy chủ không hợp lệ.');
   }
 
   Future<String> uploadImage(
@@ -154,7 +154,7 @@ class OrderReturnService {
     if (responseJson is Map<String, dynamic>) {
       return OrderReturn.fromJson(responseJson);
     }
-    throw const ApiException('Invalid response structure from server.');
+    throw const ApiException('Cấu trúc phản hồi từ máy chủ không hợp lệ.');
   }
 
   Future<OrderReturn> rejectOrderReturn(int id, String note) async {
@@ -186,7 +186,7 @@ class OrderReturnService {
     if (responseJson is Map<String, dynamic>) {
       return OrderReturn.fromJson(responseJson);
     }
-    throw const ApiException('Invalid response structure from server.');
+    throw const ApiException('Cấu trúc phản hồi từ máy chủ không hợp lệ.');
   }
 
   Future<OrderReturn> confirmCashRefund(int id) async {
@@ -216,7 +216,7 @@ class OrderReturnService {
     if (responseJson is Map<String, dynamic>) {
       return OrderReturn.fromJson(responseJson);
     }
-    throw const ApiException('Invalid response structure from server.');
+    throw const ApiException('Cấu trúc phản hồi từ máy chủ không hợp lệ.');
   }
 
   Future<Map<String, dynamic>> fetchOrderDetailsForReturn(
@@ -253,12 +253,12 @@ class OrderReturnService {
         ? (responseJson['data'] ?? responseJson['Data'])
         : null;
     if (data is! Map<String, dynamic>) {
-      throw const ApiException('CSRF response is missing token data.');
+      throw const ApiException('Phản hồi CSRF thiếu dữ liệu token.');
     }
 
     final token = data['csrfToken'] ?? data['CsrfToken'];
     if (token is! String || token.isEmpty) {
-      throw const ApiException('CSRF token is missing.');
+      throw const ApiException('Thiếu token CSRF.');
     }
 
     final cookieToken = _readCookieToken(response.headers['set-cookie']);
@@ -274,7 +274,7 @@ class OrderReturnService {
       if (body.isEmpty) return null;
       return jsonDecode(body);
     } on FormatException {
-      throw const ApiException('Server returned an invalid response.');
+      throw const ApiException('Máy chủ trả về phản hồi không hợp lệ.');
     }
   }
 
@@ -286,13 +286,13 @@ class OrderReturnService {
     };
 
     if (source is! List<dynamic>) {
-      throw const ApiException('Response is missing refunds list.');
+      throw const ApiException('Phản hồi thiếu danh sách hoàn trả.');
     }
 
     return source
         .map((item) {
           if (item is Map<String, dynamic>) return item;
-          throw const ApiException('Refund request could not be read.');
+          throw const ApiException('Yêu cầu hoàn tiền không thể đọc được.');
         })
         .toList(growable: false);
   }

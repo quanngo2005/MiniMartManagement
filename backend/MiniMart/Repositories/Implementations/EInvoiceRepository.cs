@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MiniMart.Data;
 using MiniMart.Models;
 using MiniMart.Repositories.Interfaces;
+using MiniMart.Shared.Utils;
 
 namespace MiniMart.Repositories.Implementations
 {
@@ -60,17 +61,17 @@ namespace MiniMart.Repositories.Implementations
             var invoice = new EInvoice
             {
                 OrderId = order.OrderId,
-                InvoiceSerial = $"K{DateTime.Now:yy}",
+                InvoiceSerial = $"K{HanoiTime.Now:yy}",
                 InvoiceNumber = await GenerateNextInvoiceNumberAsync(),
                 BuyerTaxCode = string.Empty,
                 BuyerName = order.Customer?.FullName,
                 BuyerAddress = order.Customer?.Address,
-                TotalBeforeVAT = order.SubTotal,
+                TotalBeforeVAT = order.OrderDetails.Sum(d => d.AmountBeforeVAT),
                 VATAmount = order.TaxAmount,
                 TotalAfterVAT = order.FinalAmount,
                 GDTAuthCode = null,
                 XMLContent = null,
-                IssuedAt = DateTime.Now,
+                IssuedAt = HanoiTime.Now,
                 Status = true,
             };
 
@@ -84,10 +85,11 @@ namespace MiniMart.Repositories.Implementations
                     Quantity = detail.Quantity,
                     UnitPrice = detail.UnitPrice,
                     DiscountAmount = detail.DiscountAmount,
-                    AmountBeforeVAT = detail.TotalPrice - detail.DiscountAmount,
+                    AmountBeforeVAT = detail.AmountBeforeVAT,
                     VatRate = detail.VatRate,
                     VatAmount = detail.VatAmount,
-                    AmountAfterVAT = detail.TotalPrice - detail.DiscountAmount + detail.VatAmount,
+                    // AmountAfterVAT = AmountBeforeVAT + VatAmount = netLineTotal (hiệu số tránh lệch làm tròn)
+                    AmountAfterVAT = detail.AmountBeforeVAT + detail.VatAmount,
                 });
             }
 

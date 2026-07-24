@@ -24,22 +24,22 @@ class ManagerBottomNavigationBar extends StatelessWidget {
         NavigationDestination(
           selectedIcon: Icon(Icons.home_rounded),
           icon: Icon(Icons.home_outlined),
-          label: 'Home',
+          label: 'Trang chủ',
         ),
         NavigationDestination(
           selectedIcon: Icon(Icons.inventory_rounded),
           icon: Icon(Icons.inventory_2_outlined),
-          label: 'Inventory',
+          label: 'Kho',
         ),
         NavigationDestination(
           selectedIcon: Icon(Icons.group_rounded),
           icon: Icon(Icons.group_outlined),
-          label: 'Staff',
+          label: 'Nhân viên',
         ),
         NavigationDestination(
           selectedIcon: Icon(Icons.people_alt_rounded),
           icon: Icon(Icons.people_alt_outlined),
-          label: 'Customers',
+          label: 'Khách hàng',
         ),
       ],
     );
